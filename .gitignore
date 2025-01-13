@@ -11,4 +11,9 @@ target/
 project/project
 project/metals.sbt
 
+node_modules/
+.vscode/
+dist/
+static/
+
 # TODO: rust things :)
