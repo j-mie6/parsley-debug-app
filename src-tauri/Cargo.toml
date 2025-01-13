@@ -1,10 +1,10 @@
 [package]
-name = "app"
+name = "parsley-debug-app"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+description = "A cross-platform debugging UI for `parsley-debug`"
+authors = ["Jamie Willis (@j-mie6)", "Josh Walker (@josh-ja-walker)", "Aniket Gupta (@aniket1101)", "Priyansh Chugh (@PriyanshC)", "Alejandro Perez Fadon (@Aito0)", "Riley Horrix (@Riley-horrix)", "Adam Watson (@AdamW1087)"]
+license = "BSD 3-Clause"
+repository = "https://github.com/j-mie6/parsley-debug-app"
 edition = "2021"
 rust-version = "1.77.2"
 
