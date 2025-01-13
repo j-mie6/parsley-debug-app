@@ -1,12 +1,12 @@
-name: Dill-CI
+name: Dill-CI-Apple
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -16,27 +16,45 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: macos-latest 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Display Script Running
+        run: echo Build beginning on apple architecture
 
-      - name: Run a multi-line script
+      - name: Run Build Script
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo Running build script
+          sh build.sh
 
-  test:
+  test-laminar:
+    needs: build
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
-  deploy:
+
+      - name: Display Script Running 
+        run: echo Testing for laminar beginning on apple architecture
+
+      - name: Run Laminar Test Script
+        run: sh test-laminar.sh
+
+  test-tauri:
+    needs: build
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Display Script Running 
+        run: echo Testing for tauri beginning on apple architecture
+
+      - name: Run Laminar Test Script
+        run: sh test-tauri.sh
