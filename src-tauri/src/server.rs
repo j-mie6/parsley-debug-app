@@ -10,6 +10,15 @@ pub struct ParserInfo {
 	tree: DebugTree,
 }
 
+impl ParserInfo {
+    pub fn new(input: String, tree: DebugTree) -> Self {
+        ParserInfo { 
+            input,
+            tree
+        }
+    }
+}
+
 pub struct DebugTree {}
 
 impl ParserInfo {
@@ -32,10 +41,10 @@ pub fn mount() {
 /* Launch the Rocket server */
 async fn rocket() -> Rocket<Ignite> {
     /* Placeholder parser info struct */
-    let parser_info: ParserInfo = ParserInfo {
-        input: String::from("This is a parser input"),
-        tree: DebugTree { }
-    };
+    let parser_info: ParserInfo = ParserInfo::new(
+        String::from("This is a parser input"),
+        DebugTree { }
+    );
 
     rocket::build()
         .mount("/", rocket::routes![hello, post::post]) /* Mount routes to the base path '/' */
