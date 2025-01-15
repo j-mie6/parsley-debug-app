@@ -1,4 +1,5 @@
 use std::sync::Mutex;
+use rocket::{Ignite, Rocket};
 
 mod post;
 
@@ -24,21 +25,24 @@ impl ParserInfo {
 
 /* Mount the Rocket server to the running instance of Tauri */
 pub fn mount() {
+    /* Spawn the Rocket server as a Tauri process */
+    tauri::async_runtime::spawn(rocket());
+}
+
+/* Launch the Rocket server */
+async fn rocket() -> Rocket<Ignite> {
     /* Placeholder parser info struct */
     let parser_info: ParserInfo = ParserInfo {
         input: String::from("This is a parser input"),
         tree: DebugTree { }
     };
 
-    /* Spawn the Rocket server */
-    tauri::async_runtime::spawn(async move {
-        rocket::build()
-            .mount("/", rocket::routes![hello, post::post]) /* Mount routes to the base path '/' */
-            .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
-            .launch() /* Launch the Rocket server */
-            .await
-            .expect("Rocket failed to initialise");
-    });
+    rocket::build()
+        .mount("/", rocket::routes![hello, post::post]) /* Mount routes to the base path '/' */
+        .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
+        .launch()
+        .await
+        .expect("Rocket failed to initialise")
 }
 
 /* Placeholder GET request handler to print 'Hello world!' */
