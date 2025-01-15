@@ -4,11 +4,11 @@ use rocket::{post, serde::json::Json, http};
 use super::{DebugTree, ParserInfo};
 
 #[derive(serde::Deserialize)] /* Support Json deserialisation */
-struct ParsleyDebugTree { } 
+struct ParsleyDebugTree { } //TODO: populate struct correctly
 
 impl Into<DebugTree> for ParsleyDebugTree {
     fn into(self) -> DebugTree {
-        todo!()
+        DebugTree { } // TODO: convert DebugTree correctly
     }
 }
 
