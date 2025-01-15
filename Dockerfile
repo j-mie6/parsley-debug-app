@@ -45,8 +45,6 @@ RUN npm install
 # Build Frontend
 RUN /sbt buildFrontend
 
-# TODO CHANGE TO UBUNTU AND MANAGE DEPENDANCIES
-
 # Rust and tauri
 RUN cargo install tauri-cli
 RUN rustup target add x86_64-unknown-linux-gnu # add the target for the specific architecture
@@ -62,19 +60,27 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir /var/run/sshd
 RUN echo 'root:password' | chpasswd
 
-# Add a new user
-RUN useradd -m myuser && echo 'myuser:mypassword' | chpasswd && usermod -aG sudo myuser
+# Add a new user, give sudo and set bash as default
+RUN useradd -m myuser && echo 'myuser:a' | chpasswd && usermod -aG sudo myuser && chsh -s /bin/bash myuser
 
-RUN chmod -R a+rxw /home
+# Elevate permissions (can be redone to be more "secure")
+RUN chmod -R 777 /home
+RUN chmod a+rxw /var
+RUN chmod a+rxw /etc
+RUN chmod a+rwx /root
 
-# Expose the necessary SSH port
+# Expose the SSH port
 EXPOSE 22
 
-COPY run.sh /run.sh
-RUN chmod a+x /run.sh
+# Add helpful commands for terminal
+RUN apt-get update && apt-get install -y \
+    vim \
+    nano \
+    sudo
 
-RUN chmod a+rwx /root
-RUN echo rustc --version
+# cargo is in /usr/local/cargo/bin but only way to get it to work is redownload
+RUN echo '\nexport PATH=/usr/local/cargo/bin:$PATH\nalias sbt="sudo /sbt"' >> /home/myuser/.bashrc
+
 
 # Start the SSH server
 CMD sh -c "cd /home && /usr/sbin/sshd -D"
