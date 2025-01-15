@@ -42,7 +42,7 @@ RUN apt-get install -y nodejs
 RUN apt-get install -y npm
 RUN npm install
 
-# Build Frontend
+# Build Frontend (Optional to do here)
 RUN /sbt buildFrontend
 
 # Rust and tauri
@@ -50,26 +50,14 @@ RUN cargo install tauri-cli
 RUN rustup target add x86_64-unknown-linux-gnu # add the target for the specific architecture
 
 
-# Install X11 libraries, OpenSSH server, and necessary packages
+# Install X11 libraries and OpenSSH server
 RUN apt-get update && apt-get install -y \
     xauth \
     x11-apps \
     openssh-server
 
-# Set up SSH
+# Set up SSH and expose SSH port
 RUN mkdir /var/run/sshd
-RUN echo 'root:password' | chpasswd
-
-# Add a new user, give sudo and set bash as default
-RUN useradd -m myuser && echo 'myuser:a' | chpasswd && usermod -aG sudo myuser && chsh -s /bin/bash myuser
-
-# Elevate permissions (can be redone to be more "secure")
-RUN chmod -R 777 /home
-RUN chmod a+rxw /var
-RUN chmod a+rxw /etc
-RUN chmod a+rwx /root
-
-# Expose the SSH port
 EXPOSE 22
 
 # Add helpful commands for terminal
@@ -79,8 +67,16 @@ RUN apt-get update && apt-get install -y \
     sudo
 
 # cargo is in /usr/local/cargo/bin but only way to get it to work is redownload
-RUN echo '\nexport PATH=/usr/local/cargo/bin:$PATH\nalias sbt="sudo /sbt"' >> /home/myuser/.bashrc
+RUN echo '\nexport PATH=/usr/local/cargo/bin:$PATH\nalias sbt="sudo /sbt"' >> /root/.bashrc
 
+#Remove root password
+RUN passwd -d root
+
+# Allow accessing root and using empty passwords with X11 localhost
+RUN \    
+  sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config && \
+  sed -i "s/#PermitEmptyPasswords no/PermitEmptyPasswords yes/" /etc/ssh/sshd_config && \
+  sed -i "s/#X11UseLocalhost/X11UseLocalhost/" /etc/ssh/sshd_config 
 
 # Start the SSH server
-CMD sh -c "cd /home && /usr/sbin/sshd -D"
+CMD sh -c "/usr/sbin/sshd -D"
