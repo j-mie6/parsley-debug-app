@@ -22,7 +22,7 @@ struct Data {
 
 #[allow(private_interfaces)] /* Satisfy clippy */
 /* Handle a post request containing parser data */
-#[post("/", format = "application/json", data = "<data>")] //TODO: check post route
+#[post("/remote", format = "application/json", data = "<data>")] 
 pub async fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
     /* Deserialise and unwrap json data */
     let Data { input, tree } = data.into_inner(); 
