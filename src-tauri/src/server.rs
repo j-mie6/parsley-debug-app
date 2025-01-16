@@ -1,10 +1,9 @@
 use std::sync::Mutex;
-use rocket::{Ignite, Rocket};
+use rocket::Rocket;
 
 mod post;
 
 /* Placeholder ParserInfo structures for state management */
-#[allow(dead_code)] // Satisfy clippy - TODO: remove
 pub struct ParserInfo {
 	input: String,
 	tree: DebugTree,
@@ -31,28 +30,26 @@ impl ParserInfo {
 	}
 }
 
-
-/* Mount the Rocket server to the running instance of Tauri */
-pub fn mount() {
-    /* Spawn the Rocket server as a Tauri process */
-    tauri::async_runtime::spawn(rocket());
-}
-
-/* Launch the Rocket server */
-async fn rocket() -> Rocket<Ignite> {
+/* Build the Rocket server */
+fn build() -> Rocket<rocket::Build> {
     /* Placeholder parser info struct */
     let parser_info: ParserInfo = ParserInfo::new(
         String::from("This is a parser input"),
         DebugTree { }
     );
-
+    
     rocket::build()
         .mount("/", rocket::routes![hello, post::post]) /* Mount routes to the base path '/' */
         .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
-        .launch()
-        .await
+}
+
+/* Launch the Rocket server */
+pub async fn launch() -> Rocket<rocket::Ignite> {
+    build().launch().await
         .expect("Rocket failed to initialise")
 }
+
+
 
 /* Placeholder GET request handler to print 'Hello world!' */
 #[rocket::get("/")]

@@ -10,8 +10,9 @@ pub fn run() {
 				.build(),
 			)?;
 		}
-		
-		server::mount(); /* Start the rocket server */
+
+		/* Mount the Rocket server to the running instance of Tauri */
+		tauri::async_runtime::spawn(server::launch()); 
 		
 		Ok(())
 	})
