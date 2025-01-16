@@ -40,3 +40,66 @@ pub async fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) ->
         Err(_) => http::Status::Conflict
     }
 }
+
+
+#[cfg(test)]
+mod test {
+
+    /* Post unit testing */
+    use rocket::http;
+    use crate::server::test::tracked_client;
+
+    #[test]
+    fn post_succeeds() {
+        let client = tracked_client();
+
+        /* Perform POST request to '/remote' */
+        let response = client.post(rocket::uri!(super::post))
+            .header(http::ContentType::JSON)
+            .body(r#"{"input": "this is the parser input", "tree": {}}"#)
+            .dispatch();
+
+        /* Assert that POST succeeded */
+        assert_eq!(response.status(), http::Status::Ok);
+    }
+
+    #[test]
+    fn empty_post_fails() {
+        let client = tracked_client();
+
+        /* Perform POST request to '/remote' */
+        let response = client.post(rocket::uri!(super::post))
+            .header(http::ContentType::JSON)
+            .body("{}")
+            .dispatch();
+    
+        /* Assert that POST failed */
+        assert_eq!(response.status(), http::Status::UnprocessableEntity);
+    }
+
+    #[test]
+    fn bad_format_post_fails() {
+        let client = tracked_client();
+
+        /* Perform POST request to '/remote' */
+        let response = client.post(rocket::uri!(super::post))
+            .header(http::ContentType::Text) /* Incompatible header type */
+            .body("Hello world")
+            .dispatch();
+    
+        /* Assert that POST failed */
+        assert_eq!(response.status(), http::Status::NotFound);
+    }
+
+    #[test]
+    fn get_on_remote_fails() {
+        let client = tracked_client();
+
+        /* Perform GET request to '/remote' */
+        let response = client.get(rocket::uri!(super::post)).dispatch();
+    
+        /* Assert that GET failed due to no found GET handlers */
+        assert_eq!(response.status(), http::Status::NotFound);
+    }
+
+}
