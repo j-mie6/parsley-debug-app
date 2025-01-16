@@ -1,12 +1,10 @@
 use crate::DebugTree;
 
-#[derive(serde::Deserialize)] /* Support Json deserialisation */
-pub struct ParsleyDebugTree { } //TODO: populate struct correctly
-
+pub type ParsleyDebugTree = String; //TODO: represent tree correctly
 
 impl Into<DebugTree> for ParsleyDebugTree {
     fn into(self) -> DebugTree {
-        DebugTree { } // TODO: convert DebugTree correctly
+        DebugTree { } // TODO: convert to DebugTree correctly
     }
 }
 
