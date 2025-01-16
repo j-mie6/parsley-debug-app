@@ -61,7 +61,42 @@ fn hello() -> String {
 
 #[cfg(test)]
 mod test {
-
-    // Server integration testing
     
+    /* Server integration testing */
+
+    use rocket::{http, local::blocking};
+    use super::build;
+
+    /* Start a blocking, tracked client for rocket */
+    pub fn tracked_client() -> blocking::Client {
+        blocking::Client::tracked(build())
+            .expect("Rocket failed to initialise")
+    }
+
+
+    #[test]
+    fn get_responds_hello_world() {
+        /* Launch rocket client via a blocking, tracked Client for debugging */
+        let client = tracked_client();
+
+        /* Perform GET request to index route '/' */
+        let response = client.get(rocket::uri!(super::hello)).dispatch();
+        
+        /* Assert GET request was successful and payload was correct */
+        assert_eq!(response.status(), http::Status::Ok);
+        assert_eq!(response.into_string().expect("'hello' response payload was not string"), "Hello world!");
+    }
+
+    #[test]
+    fn unrouted_get_fails() {
+        /* Launch rocket client via a blocking, tracked Client for debugging */
+        let client = tracked_client();
+
+        /* Perform GET request to non-existent route '/hello' */
+        let response = client.get("/hello").dispatch();
+        
+        /* Assert GET request was unsuccessful with status 404 */
+        assert_eq!(response.status(), http::Status::NotFound);
+    }
+
 }
