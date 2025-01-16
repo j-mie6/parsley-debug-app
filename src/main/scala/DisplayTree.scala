@@ -10,10 +10,26 @@ import com.raquo.laminar.api.L.*
   */
 class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) {
     def element: Element = {
-        div(
-            p(placeholderText),
-            ul(children.map(_.element))
-        )
+        val currentNode: Element = p(placeholderText)
+        if (children.isEmpty) {
+            currentNode
+        } else {
+            div(
+                paddingLeft := "0",
+                listStyleType := "none",
+                border := "2px solid tomato",
+                padding := "2px",
+                currentNode,
+                ul(
+                    listStyleType := "none",
+                    children.map((t) => li(
+                        verticalAlign := "top",
+                        padding := "2px",
+                        t.element
+                    ))
+                )
+            )
+        }
     }
 }
 
