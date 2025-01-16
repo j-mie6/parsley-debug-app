@@ -1,29 +1,26 @@
 use std::sync::Mutex;
 use rocket::{post, serde::json::Json, http};
 
-use super::{DebugTree, ParserInfo};
+use crate::ParserInfo;
+use super::data::Data;
 
-#[derive(serde::Deserialize)] /* Support Json deserialisation */
-struct ParsleyDebugTree { } //TODO: populate struct correctly
 
-impl Into<DebugTree> for ParsleyDebugTree {
-    fn into(self) -> DebugTree {
-        DebugTree { } // TODO: convert DebugTree correctly
-    }
+/* Expose routes for mounting during launch */
+pub fn routes() -> Vec<rocket::Route> {
+    rocket::routes![hello, post]
 }
 
 
-#[derive(serde::Deserialize)]
-struct Data {
-    input: String,
-    tree: ParsleyDebugTree,
+/* Placeholder GET request handler to print 'Hello world!' */
+#[rocket::get("/")]
+fn hello() -> String {
+    String::from("Hello world!")
 }
 
 
-#[allow(private_interfaces)] /* Satisfy clippy */
-/* Handle a post request containing parser data */
+/* Post request handler to accept parser info */
 #[post("/remote", format = "application/json", data = "<data>")] 
-pub async fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
+async fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
     /* Deserialise and unwrap json data */
     let Data { input, tree } = data.into_inner(); 
 
@@ -42,13 +39,40 @@ pub async fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) ->
 }
 
 
+
 #[cfg(test)]
 mod test {
 
-    /* Post unit testing */
+    /* Request unit testing */
     use rocket::http;
     use crate::server::test::tracked_client;
+    
+    #[test]
+    fn get_responds_hello_world() {
+        /* Launch rocket client via a blocking, tracked Client for debugging */
+        let client = tracked_client();
 
+        /* Perform GET request to index route '/' */
+        let response = client.get(rocket::uri!(super::hello)).dispatch();
+        
+        /* Assert GET request was successful and payload was correct */
+        assert_eq!(response.status(), http::Status::Ok);
+        assert_eq!(response.into_string().expect("'hello' response payload was not string"), "Hello world!");
+    }
+
+    #[test]
+    fn unrouted_get_fails() {
+        /* Launch rocket client via a blocking, tracked Client for debugging */
+        let client = tracked_client();
+
+        /* Perform GET request to non-existent route '/hello' */
+        let response = client.get("/hello").dispatch();
+        
+        /* Assert GET request was unsuccessful with status 404 */
+        assert_eq!(response.status(), http::Status::NotFound);
+    }
+
+    
     #[test]
     fn post_succeeds() {
         let client = tracked_client();

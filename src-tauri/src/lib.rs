@@ -1,4 +1,7 @@
 mod server;
+mod parser_info;
+
+pub use parser_info::{ParserInfo, DebugTree};
 
 pub fn run() {
 	tauri::Builder::default()
