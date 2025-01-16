@@ -80,7 +80,7 @@ mod test {
         /* Perform POST request to '/remote' */
         let response = client.post(rocket::uri!(super::post))
             .header(http::ContentType::JSON)
-            .body(r#"{"input": "this is the parser input", "tree": {}}"#)
+            .body(r#"{"input": "this is the parser input", "tree": "tree"}"#)
             .dispatch();
 
         /* Assert that POST succeeded */
