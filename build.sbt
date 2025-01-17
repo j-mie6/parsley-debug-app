@@ -8,9 +8,9 @@ lazy val tauri = project
   .settings(
     organization := "com.indoorvivants.tauri",
     moduleName := "api",
-    scalaVersion := "3.1.2",
+    scalaVersion := "3.3.4",
     libraryDependencies ++= Seq(
-      "com.raquo" %%% "laminar" % "0.14.2",
+      "com.raquo" %%% "laminar" % "17.2.0",
       "org.scalatest" %% "scalatest" % "3.2.17" % Test
     ),
     externalNpm := baseDirectory.value,
