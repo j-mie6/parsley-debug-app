@@ -36,6 +36,5 @@ pub async fn launch() -> Rocket<Ignite> {
 #[cfg(test)]
 mod test {
     
-    /* Launch unit testing */
 
 }
