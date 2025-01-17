@@ -1,2 +1,5 @@
 #!/bin/sh
-echo TESTING LAMINAR
+echo Testing Laminar...
+
+sbt test
+
