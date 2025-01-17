@@ -1,11 +1,12 @@
 import org.scalajs.dom
 
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.*
 
+import Display.DisplayTree
 
-  @main def hello = renderOnDomContentLoaded(
+  @main def hello(): Unit = renderOnDomContentLoaded(
     dom.document.getElementById("app"),
     appElement()
   )
 
-  def appElement(): Element = h1("Helelo")
+  def appElement(): Element = DisplayTree.SAMPLE_TREE.element
