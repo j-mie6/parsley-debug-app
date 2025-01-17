@@ -33,7 +33,7 @@ class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) 
       */
     def element: Element = {
         val currentNode: Element = p(placeholderText)
-        if child.isEmpty then currentNode else debugTreeElement
+        if children.isEmpty then currentNode else debugTreeElement
     }
 }
 
