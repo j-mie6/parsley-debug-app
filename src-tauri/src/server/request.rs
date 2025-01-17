@@ -44,16 +44,17 @@ async fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> htt
 mod test {
 
     /* Request unit testing */
-    use rocket::http;
+    use rocket::{http, local::blocking::LocalResponse};
     use crate::server::test::tracked_client;
+    use rocket::local::blocking;
     
     #[test]
     fn get_responds_hello_world() {
         /* Launch rocket client via a blocking, tracked Client for debugging */
-        let client = tracked_client();
+        let client: blocking::Client = tracked_client();
 
         /* Perform GET request to index route '/' */
-        let response = client.get(rocket::uri!(super::hello)).dispatch();
+        let response: LocalResponse = client.get(rocket::uri!(super::hello)).dispatch();
         
         /* Assert GET request was successful and payload was correct */
         assert_eq!(response.status(), http::Status::Ok);
@@ -63,10 +64,10 @@ mod test {
     #[test]
     fn unrouted_get_fails() {
         /* Launch rocket client via a blocking, tracked Client for debugging */
-        let client = tracked_client();
+        let client: blocking::Client = tracked_client();
 
         /* Perform GET request to non-existent route '/hello' */
-        let response = client.get("/hello").dispatch();
+        let response: LocalResponse = client.get("/hello").dispatch();
         
         /* Assert GET request was unsuccessful with status 404 */
         assert_eq!(response.status(), http::Status::NotFound);
@@ -75,10 +76,10 @@ mod test {
     
     #[test]
     fn post_succeeds() {
-        let client = tracked_client();
+        let client: blocking::Client = tracked_client();
 
         /* Perform POST request to '/remote' */
-        let response = client.post(rocket::uri!(super::post))
+        let response: LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::JSON)
             .body(r#"{"input": "this is the parser input", "tree": "tree"}"#)
             .dispatch();
@@ -89,10 +90,10 @@ mod test {
 
     #[test]
     fn empty_post_fails() {
-        let client = tracked_client();
+        let client: blocking::Client = tracked_client();
 
         /* Perform POST request to '/remote' */
-        let response = client.post(rocket::uri!(super::post))
+        let response: LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::JSON)
             .body("{}")
             .dispatch();
@@ -103,10 +104,10 @@ mod test {
 
     #[test]
     fn bad_format_post_fails() {
-        let client = tracked_client();
+        let client: blocking::Client = tracked_client();
 
         /* Perform POST request to '/remote' */
-        let response = client.post(rocket::uri!(super::post))
+        let response: LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::Text) /* Incompatible header type */
             .body("Hello world")
             .dispatch();
@@ -117,10 +118,10 @@ mod test {
 
     #[test]
     fn get_on_remote_fails() {
-        let client = tracked_client();
+        let client: blocking::Client = tracked_client();
 
         /* Perform GET request to '/remote' */
-        let response = client.get(rocket::uri!(super::post)).dispatch();
+        let response: LocalResponse = client.get(rocket::uri!(super::post)).dispatch();
     
         /* Assert that GET failed due to no found GET handlers */
         assert_eq!(response.status(), http::Status::NotFound);
