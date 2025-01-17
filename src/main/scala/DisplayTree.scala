@@ -10,13 +10,15 @@ import com.raquo.laminar.api.L.*
   */
 class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) {
     
+    val placeholderElement: Element = p(placeholderText)
+
     private val debugTreeElement: Element = {
         div(
             paddingLeft := "0",
             listStyleType := "none",
             border := "2px solid tomato",
             padding := "2px",
-            currentNode,
+            placeholderElement,
             ul(
                 listStyleType := "none",
                 children.map((t) => li(
@@ -32,8 +34,7 @@ class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) 
       * HTLM element to display DisplayTree
       */
     def element: Element = {
-        val currentNode: Element = p(placeholderText)
-        if children.isEmpty then currentNode else debugTreeElement
+        if children.isEmpty then placeholderElement else debugTreeElement
     }
 }
 
