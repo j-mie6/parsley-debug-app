@@ -1,7 +1,7 @@
 
 #[tauri::command]
-fn greet(name: String) -> String {
-  format!("Hello {}", name)
+fn greet() {
+  println!("Hello Poopy!")
 }
 
 
