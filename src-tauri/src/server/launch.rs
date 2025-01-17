@@ -27,14 +27,14 @@ pub fn build() -> Rocket<Build> {
 }
 
 /* Launch the Rocket server */
-pub async fn launch() -> Rocket<Ignite> {
+pub async fn launch() -> Result<Rocket<Ignite>, rocket::Error> {
     build().launch().await
-        .expect("Rocket failed to initialise")
 }
 
 
 #[cfg(test)]
 mod test {
     
+    /* Launch unit testing */
 
 }

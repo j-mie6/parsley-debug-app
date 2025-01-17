@@ -15,7 +15,9 @@ pub fn run() {
 		}
 
 		/* Mount the Rocket server to the running instance of Tauri */
-		tauri::async_runtime::spawn(server::launch()); 
+		tauri::async_runtime::spawn(async {
+			server::launch().await.expect("Rocket failed to initialise")
+		});
 		
 		Ok(())
 	})
