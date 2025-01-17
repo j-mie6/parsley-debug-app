@@ -10,10 +10,6 @@ organization := "com.example"
 
 moduleName := "tauri-app"
 
-lazy val npmDependencies = Compile / npmDependencies := Seq(
-  "@tauri-apps/api" -> "2.2.0"
-)
-
 lazy val settingsForScalablyTyped = Seq(
   stOutputPackage := "com.example.tauri",
   stMinimize := Selection.AllExcept("@tauri-apps/api"),
@@ -29,7 +25,10 @@ lazy val linkerSettings = Seq(
 lazy val tauri = project
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin, ScalablyTypedConverterExternalNpmPlugin)
   .settings(
-    npmDependencies,
+    externalNpm := baseDirectory.value,
+    Compile / npmDependencies ++= Seq(
+      "@tauri-apps/api" -> "2.2.0"
+    ),
     settingsForScalablyTyped,
     linkerSettings,
     libraryDependencies += "com.raquo" %%% "laminar" % "17.2.0"
