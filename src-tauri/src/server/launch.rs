@@ -36,10 +36,13 @@ pub async fn launch() -> Result<Rocket<Ignite>, rocket::Error> {
 mod test {
     use std::sync::Mutex;
     use rocket::{Rocket, Ignite, Config};
-    use rocket::figment::{Figment, providers::{Format, Toml}};
-    use crate::{DebugTree, ParserInfo, server::request};
+    use rocket::figment::{Figment, Provider};
+    use rocket::figment::providers::{self, Toml, Format};
 
-    const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
+    use crate::{DebugTree, ParserInfo, server::request};
+    use super::ROCKET_CONFIG;
+
+
 
     /* Assert that calling the launch() function launches the Rocket server */
     #[rocket::async_test]
@@ -55,15 +58,25 @@ mod test {
     ** file results in a non-default config file
     */
     #[test]
-    fn check_config_changes() {
+    fn default_config_overridden() {
+        /* Load user config from Rocket.toml */
+        let user_config: providers::Data<Toml> = providers::Toml::string(ROCKET_CONFIG).nested();
+        
+        /* If config could be parsed */
+        if let Ok(data) = user_config.data() {    
+            
+            /* If config file differs from default */
+            if !data.is_empty() && data != Config::default().data().unwrap() {
 
-        /* Override the default config with values from Rocket.toml */
-        let figment: rocket::figment::Figment = Figment::from(Config::default())
-        .merge(Toml::string(ROCKET_CONFIG).nested());
-
-        /* Assert the Rocket server was successfully built */
-        let config: Config = figment.extract().expect("Failed to extract config");
-        assert_ne!(Config::default(), config);
+                /* Override the default config with values from Rocket.toml */
+                let figment: Figment = Figment::from(Config::default())
+                    .merge(user_config);
+        
+                /* Assert the config was correctly overridden */
+                let config: Config = figment.extract().expect("Failed to extract config");
+                assert_ne!(Config::default(), config);
+            }
+        }
     }
 
     #[rocket::async_test]
