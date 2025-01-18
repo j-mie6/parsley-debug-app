@@ -4,7 +4,7 @@ name: Dill-CI-Linux
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "dev", "config-ci-cd" ]
   pull_request:
     branches: [ "main", "dev" ]
 
@@ -22,6 +22,16 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+      
+      - name: Setup JDK
+      - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 11
+        cache: sbt
+
+      - name: Setup sbt launcher
+      - uses: sbt/setup-sbt@v1
 
       - name: Display Script Running
         run: echo Build beginning on linux architecture
@@ -38,6 +48,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup JDK
+      - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 11
+        cache: sbt
+
+      - name: Setup sbt launcher
+      - uses: sbt/setup-sbt@v1
 
       - name: Display Script Running 
         run: echo Testing for laminar beginning on linux architecture
