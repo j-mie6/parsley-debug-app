@@ -4,7 +4,7 @@ name: Dill-CI-Apple
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "dev", "config-ci-cd" ]
   pull_request:
     branches: [ "main", "dev" ]
 
