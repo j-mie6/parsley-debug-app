@@ -2,9 +2,14 @@ name: Dill-CI
 
 on:
   push:
-    branches: [ "main", "dev", "config-ci-cd"]
+    branches: 
+      - main
+      - dev
+      - config-ci-cd
   pull_request:
-    branches: [ "main", "dev" ]
+    branches:
+      - main 
+      - dev
   workflow_dispatch:
 
 jobs:
