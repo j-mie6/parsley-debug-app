@@ -32,26 +32,25 @@ pub async fn launch() -> Result<Rocket<Ignite>, rocket::Error> {
 }
 
 
+
 #[cfg(test)]
 mod test {
-    use std::sync::Mutex;
-    use rocket::{Rocket, Ignite, Config};
+    use rocket::local::blocking;
+    use rocket::{Rocket, Build, Config};
     use rocket::figment::{Figment, Provider};
     use rocket::figment::providers::{self, Toml, Format};
 
-    use crate::{DebugTree, ParserInfo, server::request};
+    use crate::server;
     use super::ROCKET_CONFIG;
 
+    /* Launch unit testing */
 
+    #[test]
+    fn rocket_client_launches_successfully() {
+        let rocket: Rocket<Build> = super::build();
 
-    /* Assert that calling the launch() function launches the Rocket server */
-    #[rocket::async_test]
-    async fn launch_launches_rocket() {
-        /* Launch the Rocket server */
-        let rocket: Result<Rocket<Ignite>, rocket::Error> = super::launch().await;
-
-        /* Assert the Rocket server was successfully launched */
-        assert!(rocket.is_ok());
+        /* Fails if launching rocket would fail */
+        assert!(blocking::Client::tracked(rocket).is_ok())
     }
 
     /* Assert that merging the Rocket.toml config file to the default config
@@ -79,24 +78,12 @@ mod test {
         }
     }
 
-    #[rocket::async_test]
-    async fn check_mounted_routes() {
-        /* Placeholder parser info struct */
-        let parser_info: ParserInfo = ParserInfo::new(
-            String::from("This is a parser input"),
-            DebugTree { }
-        );
+    #[test]
+    fn check_mounted_routes() {
+        let client: blocking::Client = server::test::tracked_client();
 
-        /* Override the default config with values from Rocket.toml */
-        let figment: Figment = Figment::from(Config::default())
-            .merge(Toml::string(ROCKET_CONFIG).nested());
-
-        let rocket: Rocket<Ignite> = rocket::custom(figment) /* Build the Rocket server with a custom config */
-            .mount("/", request::routes()) /* Mount routes to the base path '/' */
-            .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
-            .ignite().await.expect("Rocket failed to ignite");
-
-        /* Assert the Rocket server was successfully built */
-        assert_eq!(rocket.routes().count(), 2);
+        /* Assert the Rocket server was successfully built with 2 routes */
+        assert_eq!(client.rocket().routes().count(), 2);
     }
+
 }
