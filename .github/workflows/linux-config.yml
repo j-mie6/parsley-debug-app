@@ -2,7 +2,7 @@ name: Dill-CI-Linux
 
 on:
   push:
-    branches: [ "main", "dev", "config-ci-cd", "debug-ci-cd" ]
+    branches: [ "main", "dev", "config-ci-cd"]
   pull_request:
     branches: [ "main", "dev" ]
   workflow_dispatch:
@@ -23,17 +23,6 @@ jobs:
 
       - name: Setup sbt launcher
         uses: sbt/setup-sbt@v1
-
-      - name: Test sbt version
-        run: sbt --version
-
-      # Check Node.js version
-      - name: Check Node.js version
-        run: node --version
-
-      # Check TypeScript version
-      - name: Check TypeScript version
-        run: npx tsc --version
 
       - name: Display Script Running
         run: echo Build beginning on Linux architecture
@@ -59,9 +48,6 @@ jobs:
 
       - name: Setup sbt launcher
         uses: sbt/setup-sbt@v1
-
-      - name: Test sbt version
-        run: sbt --version
 
       - name: Display Script Running
         run: echo Testing for laminar beginning on Linux architecture

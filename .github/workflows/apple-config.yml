@@ -20,15 +20,25 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: sbt
+
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
 
       - name: Display Script Running
-        run: echo Build beginning on apple architecture
+        run: echo Build beginning on Linux architecture
 
       - name: Run Build Script
         run: |
-          echo Running build script
+          echo Running build.sh
           sh build.sh
 
   test-laminar:
@@ -37,10 +47,24 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Display Script Running 
-        run: echo Testing for laminar beginning on apple architecture
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: sbt
+
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
+
+      - name: Display Script Running
+        run: echo Testing for laminar beginning on Linux architecture
+
+      - name: Npm Installing
+        run: npm install
 
       - name: Run Laminar Test Script
         run: sh test-laminar.sh
