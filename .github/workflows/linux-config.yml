@@ -2,7 +2,7 @@ name: Dill-CI-Linux
 
 on:
   push:
-    branches: [ "main", "dev", "config-ci-cd"]
+    branches: [ "main", "dev", "config-ci-cd", "config-test-tauri"]
   pull_request:
     branches: [ "main", "dev" ]
   workflow_dispatch:
