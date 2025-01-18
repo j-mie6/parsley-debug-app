@@ -53,9 +53,12 @@ mod test {
         assert!(blocking::Client::tracked(rocket).is_ok())
     }
 
-    /* Assert that merging the Rocket.toml config file to the default config
-    ** file results in a non-default config file
-    */
+    #[test]
+    fn user_config_is_valid() {
+        /* Assert that Rocket.toml can be parsed */
+        assert!(providers::Toml::string(ROCKET_CONFIG).nested().data().is_ok());
+    }
+
     #[test]
     fn default_config_overridden() {
         /* Load user config from Rocket.toml */
