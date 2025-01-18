@@ -43,10 +43,10 @@ async fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> htt
 #[cfg(test)]
 mod test {
 
-    /* Request unit testing */
-    use rocket::{http, local::blocking::LocalResponse};
     use crate::server::test::tracked_client;
-    use rocket::local::blocking;
+    use rocket::{http, local::blocking};
+    
+    /* Request unit testing */
     
     #[test]
     fn get_responds_hello_world() {
@@ -54,11 +54,11 @@ mod test {
         let client: blocking::Client = tracked_client();
 
         /* Perform GET request to index route '/' */
-        let response: LocalResponse = client.get(rocket::uri!(super::hello)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::hello)).dispatch();
         
         /* Assert GET request was successful and payload was correct */
         assert_eq!(response.status(), http::Status::Ok);
-        assert_eq!(response.into_string().expect("'hello' response payload was not string"), "Hello world!");
+        assert_eq!(response.into_string().expect("Payload was not string"), "Hello world!");
     }
 
     #[test]
@@ -67,7 +67,7 @@ mod test {
         let client: blocking::Client = tracked_client();
 
         /* Perform GET request to non-existent route '/hello' */
-        let response: LocalResponse = client.get("/hello").dispatch();
+        let response: blocking::LocalResponse = client.get("/hello").dispatch();
         
         /* Assert GET request was unsuccessful with status 404 */
         assert_eq!(response.status(), http::Status::NotFound);
@@ -79,7 +79,7 @@ mod test {
         let client: blocking::Client = tracked_client();
 
         /* Perform POST request to '/remote' */
-        let response: LocalResponse = client.post(rocket::uri!(super::post))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::JSON)
             .body(r#"{"input": "this is the parser input", "tree": "tree"}"#)
             .dispatch();
@@ -93,7 +93,7 @@ mod test {
         let client: blocking::Client = tracked_client();
 
         /* Perform POST request to '/remote' */
-        let response: LocalResponse = client.post(rocket::uri!(super::post))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::JSON)
             .body("{}")
             .dispatch();
@@ -107,7 +107,7 @@ mod test {
         let client: blocking::Client = tracked_client();
 
         /* Perform POST request to '/remote' */
-        let response: LocalResponse = client.post(rocket::uri!(super::post))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::Text) /* Incompatible header type */
             .body("Hello world")
             .dispatch();
@@ -121,7 +121,7 @@ mod test {
         let client: blocking::Client = tracked_client();
 
         /* Perform GET request to '/remote' */
-        let response: LocalResponse = client.get(rocket::uri!(super::post)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::post)).dispatch();
     
         /* Assert that GET failed due to no found GET handlers */
         assert_eq!(response.status(), http::Status::NotFound);
