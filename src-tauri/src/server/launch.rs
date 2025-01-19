@@ -22,8 +22,8 @@ pub fn build() -> Rocket<Build> {
     .merge(Toml::string(ROCKET_CONFIG).nested());
     
     rocket::custom(figment) /* Build the Rocket server with a custom config */
-    .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
-    .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
+        .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
+        .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
 }
 
 /* Launch the Rocket server */
@@ -81,7 +81,7 @@ mod test {
             }
         }
     }
-    
+
     
     #[test]
     fn check_mounted_routes() {
