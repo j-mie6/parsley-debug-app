@@ -84,11 +84,24 @@ mod test {
 
     
     #[test]
-    fn check_mounted_routes() {
+    fn num_routes_mounted_is_correct() {
         let client: blocking::Client = server::test::tracked_client();
         
         /* Assert the Rocket server was successfully built with 2 routes */
         assert_eq!(client.rocket().routes().count(), 2);
+    }
+
+    #[test]
+    fn mounted_routes_correctly_named() {
+        let client: blocking::Client = server::test::tracked_client();
+        let routes: Vec<&str> = client.rocket()
+            .routes()
+            .map(|r| r.uri.as_str())
+            .collect();
+
+        /* Assert the Rocket server was built with the correct routes */
+        assert!(routes.contains(&"/"));
+        assert!(routes.contains(&"/api/remote"));
     }
     
 }
