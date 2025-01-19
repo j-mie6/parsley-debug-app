@@ -19,7 +19,7 @@ fn hello() -> String {
 
 
 /* Post request handler to accept parser info */
-#[post("/remote", format = "application/json", data = "<data>")] 
+#[post("/api/remote", format = "application/json", data = "<data>")] 
 async fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
     /* Deserialise and unwrap json data */
     let Data { input, tree } = data.into_inner(); 
@@ -77,7 +77,7 @@ mod test {
     fn get_on_post_fails() {
         let client: blocking::Client = tracked_client();
         
-        /* Perform GET request to '/remote' */
+        /* Perform GET request to '/api/remote' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::post)).dispatch();
         
         /* Assert that GET failed due to no found GET handlers */
@@ -89,7 +89,7 @@ mod test {
     fn post_succeeds() {
         let client: blocking::Client = tracked_client();
         
-        /* Perform POST request to '/remote' */
+        /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::JSON)
             .body(r#"{"input": "this is the parser input", "tree": "tree"}"#)
@@ -103,7 +103,7 @@ mod test {
     fn empty_post_fails() {
         let client: blocking::Client = tracked_client();
         
-        /* Perform POST request to '/remote' */
+        /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::JSON)
             .body("{}")
@@ -117,7 +117,7 @@ mod test {
     fn bad_format_post_fails() {
         let client: blocking::Client = tracked_client();
         
-        /* Perform POST request to '/remote' */
+        /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
             .header(http::ContentType::Text) /* Incompatible header type */
             .body("Hello world")

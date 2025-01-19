@@ -26,8 +26,8 @@ mod test {
         /* Format GET request to index route '/' */
         let get_request = client.get("/");
         
-        /* Format POST requests to route '/remote' */
-        let post_request = client.post("/remote")
+        /* Format POST requests to route '/api/remote' */
+        let post_request = client.post("/api/remote")
             .header(http::ContentType::JSON)
             .body(r#"{"input": "this is the parser input", "tree": "tree"}"#);
         
