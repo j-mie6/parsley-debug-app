@@ -1,34 +1,58 @@
-name := "ScalaJS-Tauri-App"
+val Scala213 = "2.13.14"
+val Scala212 = "2.12.18"
+val Scala3 = "3.3.3"
 
-version := "0.1.0-SNAPSHOT"
+val scalatestVersion = "3.2.19"
 
-scalaVersion := "3.3.4"
+val Version = "0.1"
 
-organization := "com.example"
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
-moduleName := "tauri-app"
+inThisBuild(List(
+  // tlBaseVersion := Version,
+  version := Version,
+  organization := "com.github.j-mie6",
+  organizationName := "Parsley Debug App Contributors <https://github.com/j-mie6/parsley-debug-app/graphs/contributors>",
+  startYear := Some(2024),
+  licenses := List("BSD-3-Clause" -> url("https://opensource.org/licenses/BSD-3-Clause")),
+  developers := List(
+    tlGitHubDev("j-mie6", "Jamie Willis"),
+    tlGitHubDev("Riley-horrix", "Riley Horrix"),
+    tlGitHubDev("aniket1101", "Aniket Gupta"),
+    tlGitHubDev("PriyanshC", "Priyansh Chung"),
+    tlGitHubDev("Aito0", "Alejandro Perez Fadon"),
+    tlGitHubDev("AdamW1087", "Adam Watson"),
+    tlGitHubDev("josh-ja-walker", "Josh Walker")
+  ),
+  versionScheme := Some("early-semver"),
+  scalaVersion := Scala3,
+))
 
-lazy val settingsForScalablyTyped = Seq(
-  stOutputPackage := "com.example.tauri",
-  stMinimize := Selection.AllExcept("@types","@tauri-apps/api"),
-  stUseScalaJsDom := true,
-  stIgnore += "type-fest"
+lazy val commonSettings = Seq(
+  resolvers ++= Opts.resolver.sonatypeOssReleases, // Will speed up MiMA during fast back-to-back releases
+  resolvers ++= Opts.resolver.sonatypeOssSnapshots, // needed during flux periods
+
+  libraryDependencies ++= Seq(
+    "org.scalatest"     %%% "scalatest"     % scalatestVersion % Test
+  ),
+
+  Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oI"),
+  Test / parallelExecution := false,
 )
 
-lazy val linkerSettings = Seq(
-  scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)),
-  scalaJSUseMainModuleInitializer := true
-)
 
-lazy val tauri = project
+lazy val dillFrontend = project
   .in(file("."))
   .enablePlugins(ScalaJSPlugin, ScalablyTypedConverterExternalNpmPlugin)
   .settings(
-    // Compile / npmDependencies ++= Seq(
-    //   "@tauri-apps/api" -> "2.2.0"
-    // ),
-    settingsForScalablyTyped,
-    linkerSettings,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)),
+    scalaJSUseMainModuleInitializer := true,
+    stUseScalaJsDom := true,
+    stIgnore += "type-fest",
+    // "@types", "@tauri-apps/api"
+    Compile / stMinimize := Selection.AllExcept("types", "tauri-apps"),
+    name := "dill-frontend",
+    commonSettings,
     libraryDependencies += "com.raquo" %%% "laminar" % "17.2.0",
     externalNpm := baseDirectory.value,
     Compile / packageSrc / mappings ++= {
@@ -47,11 +71,11 @@ lazy val frontendReport = taskKey[(Report, File)]("")
 
 ThisBuild / frontendReport := {
   if (isRelease)
-    (tauri / Compile / fullLinkJS).value.data ->
-      (tauri / Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
+    (dillFrontend / Compile / fullLinkJS).value.data ->
+      (dillFrontend / Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
   else
-    (tauri / Compile / fastLinkJS).value.data ->
-      (tauri / Compile / fastLinkJS / scalaJSLinkerOutputDirectory).value
+    (dillFrontend / Compile / fastLinkJS).value.data ->
+      (dillFrontend / Compile / fastLinkJS / scalaJSLinkerOutputDirectory).value
 }
 
 buildFrontend := {
@@ -69,6 +93,3 @@ buildFrontend := {
     }
     .toMap
 }
-
-Global / onChangedBuildSource := ReloadOnSourceChanges
-

@@ -1,20 +1,24 @@
 import org.scalajs.dom
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.raquo.laminar.api.L._
-
-@js.native
-@JSImport("@tauri-apps/api/core", "invoke")
-def invoke_me_pls[T](cmd: String): js.Promise[T] = js.native
+import lib.Tauri
 
 @main def hello = renderOnDomContentLoaded(
   dom.document.getElementById("app"),
   appElement()
 )
 
+val textSignal: Var[String] = Var("Nothing")
+val myDiv: Div = div(text <-- textSignal)
+
 def appElement(): Div = div(
-  h1("Helelo2"),
-  button(onClick --> {_ => invoke_me_pls("greet") }, "Click Me")
+  h1("Hey!"),
+  button(onClick --> {_ => {
+    for {
+      text <- Tauri.invoke[String]("text")
+    } do textSignal.set(text)
+  } }, "Click Me"),
+  myDiv
 )
