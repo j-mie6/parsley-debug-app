@@ -7,20 +7,20 @@ use super::data::Data;
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![hello, post]
+    rocket::routes![get_hello, post_tree]
 }
 
 
 /* Placeholder GET request handler to print 'Hello world!' */
 #[rocket::get("/")]
-fn hello() -> String {
+fn get_hello() -> String {
     String::from("Hello world!")
 }
 
 
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
-fn post(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
+fn post_tree(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
     /* Deserialise and unwrap json data */
     let Data { input, tree } = data.into_inner(); 
     
@@ -54,7 +54,7 @@ mod test {
         let client: blocking::Client = tracked_client();
         
         /* Perform GET request to index route '/' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::hello)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_hello)).dispatch();
         
         /* Assert GET request was successful and payload was correct */
         assert_eq!(response.status(), http::Status::Ok);
@@ -78,7 +78,7 @@ mod test {
         let client: blocking::Client = tracked_client();
         
         /* Perform GET request to '/api/remote' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::post)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::post_tree)).dispatch();
         
         /* Assert that GET failed due to no found GET handlers */
         assert_eq!(response.status(), http::Status::NotFound);
@@ -86,11 +86,11 @@ mod test {
     
     
     #[test]
-    fn post_succeeds() {
+    fn post_tree_succeeds() {
         let client: blocking::Client = tracked_client();
         
         /* Perform POST request to '/api/remote' */
-        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
             .body(r#"{"input": "this is the parser input", "tree": "tree"}"#)
             .dispatch();
@@ -104,7 +104,7 @@ mod test {
         let client: blocking::Client = tracked_client();
         
         /* Perform POST request to '/api/remote' */
-        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
             .body("{}")
             .dispatch();
@@ -118,7 +118,7 @@ mod test {
         let client: blocking::Client = tracked_client();
         
         /* Perform POST request to '/api/remote' */
-        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::Text) /* Incompatible header type */
             .body("Hello world")
             .dispatch();
