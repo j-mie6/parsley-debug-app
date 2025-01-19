@@ -1,0 +1,12 @@
+# defaults for all profiles
+[default]
+address = "127.0.0.1"
+ident = "Dill Server"
+port = 17484
+
+# set only when compiled in debug mode, i.e, `cargo build`
+[debug]
+
+# set only when compiled in release mode, i.e, `cargo build --release`
+[release]
+ip_header = false
