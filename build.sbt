@@ -7,22 +7,22 @@ val scalatestVersion = "3.2.19"
 val Version = "0.1"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
+Global / excludeLintKeys += dillFrontend / Compile / stMinimize
 
 inThisBuild(List(
-  // tlBaseVersion := Version,
   version := Version,
   organization := "com.github.j-mie6",
   organizationName := "Parsley Debug App Contributors <https://github.com/j-mie6/parsley-debug-app/graphs/contributors>",
   startYear := Some(2024),
   licenses := List("BSD-3-Clause" -> url("https://opensource.org/licenses/BSD-3-Clause")),
   developers := List(
-    tlGitHubDev("j-mie6", "Jamie Willis"),
-    tlGitHubDev("Riley-horrix", "Riley Horrix"),
-    tlGitHubDev("aniket1101", "Aniket Gupta"),
-    tlGitHubDev("PriyanshC", "Priyansh Chung"),
-    tlGitHubDev("Aito0", "Alejandro Perez Fadon"),
-    tlGitHubDev("AdamW1087", "Adam Watson"),
-    tlGitHubDev("josh-ja-walker", "Josh Walker")
+    Developer("j-mie6", "Jamie Willis", "", url("https://github.com/j-mie6/parsley-debug-app")),
+    Developer("Riley-horrix", "Riley Horrix", "", url("https://github.com/j-mie6/parsley-debug-app")),
+    Developer("aniket1101", "Aniket Gupta", "", url("https://github.com/j-mie6/parsley-debug-app")),
+    Developer("PriyanshC", "Priyansh Chung", "", url("https://github.com/j-mie6/parsley-debug-app")),
+    Developer("Aito0", "Alejandro Perez Fadon", "", url("https://github.com/j-mie6/parsley-debug-app")),
+    Developer("AdamW1087", "Adam Watson", "", url("https://github.com/j-mie6/parsley-debug-app")),
+    Developer("josh-ja-walker", "Josh Walker", "", url("https://github.com/j-mie6/parsley-debug-app"))
   ),
   versionScheme := Some("early-semver"),
   scalaVersion := Scala3,
@@ -31,9 +31,8 @@ inThisBuild(List(
 lazy val commonSettings = Seq(
   resolvers ++= Opts.resolver.sonatypeOssReleases, // Will speed up MiMA during fast back-to-back releases
   resolvers ++= Opts.resolver.sonatypeOssSnapshots, // needed during flux periods
-
   libraryDependencies ++= Seq(
-    "org.scalatest"     %%% "scalatest"     % scalatestVersion % Test
+    "org.scalatest" %%% "scalatest" % scalatestVersion % Test
   ),
 
   Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oI"),
@@ -49,7 +48,6 @@ lazy val dillFrontend = project
     scalaJSUseMainModuleInitializer := true,
     stUseScalaJsDom := true,
     stIgnore += "type-fest",
-    // "@types", "@tauri-apps/api"
     Compile / stMinimize := Selection.AllExcept("types", "tauri-apps"),
     name := "dill-frontend",
     commonSettings,
