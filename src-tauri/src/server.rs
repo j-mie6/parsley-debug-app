@@ -10,9 +10,9 @@ mod test {
     
     use rocket::{http, local::blocking};
     use super::launch;
-
+    
     /* Server integration testing */
-
+    
     /* Start a blocking, tracked client for rocket */
     pub fn tracked_client() -> blocking::Client {
         blocking::Client::tracked(launch::build())
@@ -30,13 +30,13 @@ mod test {
         let post_request = client.post("/remote")
             .header(http::ContentType::JSON)
             .body(r#"{"input": "this is the parser input", "tree": "tree"}"#);
-
-
+        
+        
         /* Repeatedly perform requests */
         for _ in 0..100 {
             assert_eq!(get_request.clone().dispatch().status(), http::Status::Ok);
             assert_eq!(post_request.clone().dispatch().status(), http::Status::Ok);
         }
     }   
-
+    
 }

@@ -16,14 +16,14 @@ pub fn build() -> Rocket<Build> {
         String::from("This is a parser input"),
         DebugTree { }
     );
-
+    
     /* Override the default config with values from Rocket.toml */
     let figment: Figment = Figment::from(Config::default())
-        .merge(Toml::string(ROCKET_CONFIG).nested());
-
+    .merge(Toml::string(ROCKET_CONFIG).nested());
+    
     rocket::custom(figment) /* Build the Rocket server with a custom config */
-        .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
-        .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
+    .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
+    .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
 }
 
 /* Launch the Rocket server */
@@ -39,26 +39,27 @@ mod test {
     use rocket::{Rocket, Build, Config};
     use rocket::figment::{Figment, Provider};
     use rocket::figment::providers::{self, Toml, Format};
-
+    
     use crate::server;
     use super::ROCKET_CONFIG;
-
+    
     /* Launch unit testing */
-
+    
     #[test]
     fn rocket_client_launches_successfully() {
         let rocket: Rocket<Build> = super::build();
-
+        
         /* Fails if launching rocket would fail */
         assert!(blocking::Client::tracked(rocket).is_ok())
     }
 
+    
     #[test]
     fn user_config_is_valid() {
         /* Assert that Rocket.toml can be parsed */
         assert!(providers::Toml::string(ROCKET_CONFIG).nested().data().is_ok());
     }
-
+    
     #[test]
     fn default_config_overridden() {
         /* Load user config from Rocket.toml */
@@ -69,24 +70,25 @@ mod test {
             
             /* If config file differs from default */
             if !data.is_empty() && data != Config::default().data().unwrap() {
-
+                
                 /* Override the default config with values from Rocket.toml */
                 let figment: Figment = Figment::from(Config::default())
-                    .merge(user_config);
-        
+                .merge(user_config);
+                
                 /* Assert the config was correctly overridden */
                 let config: Config = figment.extract().expect("Failed to extract config");
                 assert_ne!(Config::default(), config);
             }
         }
     }
-
+    
+    
     #[test]
     fn check_mounted_routes() {
         let client: blocking::Client = server::test::tracked_client();
-
+        
         /* Assert the Rocket server was successfully built with 2 routes */
         assert_eq!(client.rocket().routes().count(), 2);
     }
-
+    
 }

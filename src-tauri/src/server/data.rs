@@ -19,5 +19,5 @@ pub struct Data {
 #[cfg(test)]
 mod test {
     /* Data unit testing */
-
+    
 }
