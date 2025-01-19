@@ -24,18 +24,12 @@ fn post_tree(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http
     /* Deserialise and unwrap json data */
     let Data { input, tree } = data.into_inner(); 
     
-    /* Acquire the mutex to modify state */
-    match state.lock() {
-        /* If successful, update state and return ok http status */
-        Ok(mut state) => {
-            state.set_input(input);
-            state.set_tree(tree.into());
-            http::Status::Ok
-        },
-        
-        /* If unsucessful, return error http status */
-        Err(_) => http::Status::Conflict
-    }
+    /* Acquire the mutex */
+    let mut state = state.lock().expect("ParserInfo mutex could not be acquired");
+    state.set_input(input);
+    state.set_tree(tree.into());
+
+    http::Status::Ok
 }
 
 
