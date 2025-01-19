@@ -8,8 +8,8 @@ lazy val tauri = project
   .settings(
     organization := "com.indoorvivants.tauri",
     moduleName := "api",
-    scalaVersion := "3.1.2",
-    libraryDependencies += "com.raquo" %%% "laminar" % "0.14.2",
+    scalaVersion := "3.3.4",
+    libraryDependencies += "com.raquo" %%% "laminar" % "17.2.0",
     externalNpm := baseDirectory.value,
     stOutputPackage := "com.indoorvivants.tauri",
     stMinimize := Selection.AllExcept("@tauri-apps/api"),
