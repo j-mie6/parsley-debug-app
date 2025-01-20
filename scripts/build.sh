@@ -21,6 +21,8 @@ then
     libssl-dev \
     libayatana-appindicator3-dev \
     librsvg2-dev
+
+    export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
 fi
 
 if [ $? -ne 0 ]
