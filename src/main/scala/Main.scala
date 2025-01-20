@@ -18,11 +18,13 @@ val myDiv: Div = div(text <-- textSignal)
 
 def appElement(): Div = div(
   h1("Hey!"),
-  button(onClick --> {_ => {
-    for {
-      text <- Tauri.invoke[String]("text")
-    } do textSignal.set(text)
-  } }, "Click Me"),
+  button(onClick --> { _ => 
+    {
+      for {
+        text <- Tauri.invoke[String]("text")
+      } do textSignal.set(text)
+    } 
+  }, "Click Me"),
   myDiv,
   DisplayTree.SAMPLE_TREE.element
 )
