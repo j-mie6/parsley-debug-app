@@ -4,10 +4,6 @@ echo
 echo Starting DILL Build
 echo
 
-npm install && \
-sbt buildFrontend && \
-npm run tauri build
-
 # Linux Tauri v2 prerequisites
 if [ $RUNNER_OS == "ubuntu-latest"]
 then
@@ -24,6 +20,12 @@ then
 
     export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
 fi
+
+npm install && \
+sbt buildFrontend && \
+npm run tauri build
+
+
 
 if [ $? -ne 0 ]
 then
