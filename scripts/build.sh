@@ -6,7 +6,7 @@ echo
 
 npm install && \
 sbt buildFrontend && \
-npm run tauri dev
+npm run tauri build
 
 if [ $? -ne 0 ]
 then
