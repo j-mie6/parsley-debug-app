@@ -14,3 +14,6 @@ target/
 .bloop
 project/project
 project/metals.sbt
+
+# This is the file in root dir (copied)
+./package.json
