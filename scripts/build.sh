@@ -4,7 +4,8 @@ echo
 echo Starting DILL Build
 echo
 
-npm i && \
+npm install && \
+ls node_modules && \
 rm -f src-laminar/package.json && \
 cp -f package.json src-laminar/ && \
 sbt buildFrontend && \
