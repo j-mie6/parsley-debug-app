@@ -4,10 +4,9 @@ echo
 echo Starting DILL Build
 echo
 
+export NODE_PATH=${PWD}
+
 npm install && \
-cd src-laminar && \
-npm install && \
-cd .. && \
 sbt buildFrontend && \
 npm run tauri dev
 
