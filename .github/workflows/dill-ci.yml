@@ -36,15 +36,18 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Display Script Running
-        run: echo Build beginning on Linux architecture
+        run: echo Build beginning on $RUNNER_OS architecture
 
       - name: Run Build Script
+        shell: bash
         run: |
           echo Running build.sh
           sh build.sh
 
   test-laminar:
+    # Requires that build job is completed first
     needs: build
+    # Creates a job for each OS
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -65,16 +68,19 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Display Script Running
-        run: echo Testing for laminar beginning on Linux architecture
+        run: echo Testing for laminar beginning on $RUNNER_OS architecture
 
       - name: Npm Installing
         run: npm install
 
       - name: Run Laminar Test Script
+        shell: bash
         run: sh test-laminar.sh
 
   test-tauri:
+    # Requires that build job is completed first
     needs: build
+    # Creates a job for each OS
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -85,7 +91,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Display Script Running
-        run: echo Testing for tauri beginning on Linux architecture
+        run: echo Testing for tauri beginning on $RUNNER_OS architecture
 
       - name: Run Tauri Test Script
+        shell: bash
         run: sh test-tauri.sh
