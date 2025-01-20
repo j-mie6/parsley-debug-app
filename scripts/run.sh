@@ -5,9 +5,9 @@ echo Starting DILL Development Server
 echo
 
 npm install && \
-ls node_modules && \
-rm -f src-laminar/package.json &&\
-cp -f package.json src-laminar/ && \
+cd src-laminar && \
+npm install && \
+cd .. \
 sbt buildFrontend && \
 npm run tauri dev
 

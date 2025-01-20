@@ -5,11 +5,11 @@ echo Starting DILL Build
 echo
 
 npm install && \
-ls node_modules && \
-rm -f src-laminar/package.json && \
-cp -f package.json src-laminar/ && \
+cd src-laminar && \
+npm install && \
+cd .. \
 sbt buildFrontend && \
-npm run tauri build
+npm run tauri dev
 
 if [ $? -ne 0 ]
 then
