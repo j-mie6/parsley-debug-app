@@ -5,7 +5,7 @@ echo Starting DILL Build
 echo
 
 # Linux Tauri v2 prerequisites
-if [ $RUNNER_OS == "ubuntu-latest"]
+if [ $RUNNER_OS == "Linux"]
 then
     apt update
     apt install libwebkit2gtk-4.1-dev \
