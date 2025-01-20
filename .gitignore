@@ -3,3 +3,8 @@
 node_modules/
 dist/
 static/
+target/
+
+.bloop
+.bsp
+.metals

@@ -41,7 +41,7 @@ lazy val commonSettings = Seq(
 
 
 lazy val dillFrontend = project
-  .in(file("."))
+  .in(file("src-laminar"))
   .enablePlugins(ScalaJSPlugin, ScalablyTypedConverterExternalNpmPlugin)
   .settings(
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)),
