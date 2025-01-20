@@ -2,7 +2,10 @@ import org.scalajs.dom
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import Display.DisplayTree
+
 import com.raquo.laminar.api.L._
+
 import lib.Tauri
 
 @main def hello = renderOnDomContentLoaded(
@@ -20,5 +23,6 @@ def appElement(): Div = div(
       text <- Tauri.invoke[String]("text")
     } do textSignal.set(text)
   } }, "Click Me"),
-  myDiv
+  myDiv,
+  DisplayTree.SAMPLE_TREE.element
 )
