@@ -7,7 +7,7 @@ echo
 npm install && \
 cd src-laminar && \
 npm install && \
-cd .. \
+cd .. && \
 sbt buildFrontend && \
 npm run tauri dev
 
