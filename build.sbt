@@ -29,17 +29,16 @@ inThisBuild(List(
 ))
 
 lazy val commonSettings = Seq(
-  resolvers ++= Opts.resolver.sonatypeOssReleases, // Will speed up MiMA during fast back-to-back releases
-  resolvers ++= Opts.resolver.sonatypeOssSnapshots, // needed during flux periods
-  libraryDependencies ++= Seq(
-    "org.scalatest" %%% "scalatest" % scalatestVersion % Test
-  ),
-
-  Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oI"),
-  Test / parallelExecution := false,
-)
-
-
+    resolvers ++= Opts.resolver.sonatypeOssReleases, // Will speed up MiMA during fast back-to-back releases
+    resolvers ++= Opts.resolver.sonatypeOssSnapshots, // needed during flux periods
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatestVersion % Test
+    ),
+    Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oI"),
+    Test / parallelExecution := false,
+  )
+  
+  
 lazy val dillFrontend = project
   .in(file("src-laminar"))
   .enablePlugins(ScalaJSPlugin, ScalablyTypedConverterExternalNpmPlugin)
@@ -52,7 +51,7 @@ lazy val dillFrontend = project
     name := "dill-frontend",
     commonSettings,
     libraryDependencies += "com.raquo" %%% "laminar" % "17.2.0",
-    externalNpm := baseDirectory.value,
+    externalNpm := baseDirectory.value.getParentFile(),
     Compile / packageSrc / mappings ++= {
       val base = (Compile / sourceManaged).value
       val files = (Compile / managedSources).value

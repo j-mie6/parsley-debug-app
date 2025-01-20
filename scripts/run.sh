@@ -4,8 +4,6 @@ echo
 echo Starting DILL Development Server
 echo
 
-export NODE_PATH=${PWD}
-
 npm install && \
 sbt buildFrontend && \
 npm run tauri dev
