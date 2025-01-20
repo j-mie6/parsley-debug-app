@@ -4,6 +4,7 @@ echo
 echo Starting DILL Development Server
 echo
 
+npm i && \
 rm -f src-laminar/package.json &&\
 cp -f package.json src-laminar/ && \
 sbt buildFrontend && \
