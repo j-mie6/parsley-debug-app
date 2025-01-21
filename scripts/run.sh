@@ -4,7 +4,6 @@ echo
 echo Starting DILL Development Server
 echo
 
-npm install && \
 sbt buildFrontend && \
 npm run tauri dev
 
