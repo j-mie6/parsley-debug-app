@@ -1,14 +1,13 @@
-*.class
-*.log
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
+# root level ignore
+.vscode/
+node_modules/
+dist/
+static/
 target/
+
+.bloop
 .bsp
 .metals
-.bloop
+
 project/project
 project/metals.sbt
-
-# TODO: rust things :)
