@@ -32,12 +32,6 @@ jobs:
       - name: Setup 
         uses: ./.github/actions/setup
 
-      - name: Check backend compiles
-        shell: bash
-        run: |
-          cd src-tauri
-          cargo check
-
       - name: Test backend
         shell: bash
         run: sh scripts/test-tauri.sh
