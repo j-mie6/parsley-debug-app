@@ -4,9 +4,8 @@ mod parser_info;
 pub use parser_info::{ParserInfo, DebugTree};
 
 #[tauri::command]
-fn text() -> String {
-  println!("Called");
-  "It Worked!".to_string()
+fn tree_text() -> String {
+  String::from("Tree is empty")
 }
 
 pub fn run() {
@@ -27,7 +26,7 @@ pub fn run() {
 
       Ok(())
     })
-    .invoke_handler(tauri::generate_handler![text])
+    .invoke_handler(tauri::generate_handler![tree_text])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
