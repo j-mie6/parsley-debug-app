@@ -49,5 +49,4 @@ jobs:
       - name: Build artefact
         shell: bash
         run: |
-          echo Running build.sh
           sh scripts/build.sh

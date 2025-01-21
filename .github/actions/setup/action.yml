@@ -16,6 +16,5 @@ runs:
         
       - name: Run Setup Script
         shell: bash
-        run: |
-            echo Running setup.sh
-            sh scripts/setup.sh
+        run: sh scripts/setup.sh
+        
