@@ -48,5 +48,16 @@ jobs:
 
       - name: Build artefact
         shell: bash
-        run: |
-          sh scripts/build.sh
+        run: sh scripts/build.sh
+
+      - name: Upload artefact
+        uses: actions/upload-artifact@v4
+        with:
+          # Name of artefact to upload
+          name: ${{ matrix.os }}-app-bundles
+
+          # Path of artefact to upload
+          path: ./src-tauri/target/release/bundle/
+
+          # Fail upload if no files are found at the path
+          if-no-files-found: error
