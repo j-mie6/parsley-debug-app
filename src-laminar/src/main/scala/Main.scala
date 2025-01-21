@@ -21,7 +21,7 @@ def appElement(): Div = div(
   tree_text,
   button(onClick --> { _ => {
     for {
-      text <- Tauri.invoke[String]("tree_text")
+      text <- Tauri.invoke[String]("render_debug_tree")
     } do textSignal.set(text)
   }}, "Reload tree"),
 )

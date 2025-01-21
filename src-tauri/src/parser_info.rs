@@ -1,10 +1,12 @@
 
 /* Placeholder ParserInfo structures for state management */
+#[derive(serde::Serialize)]
 pub struct ParserInfo {
     input: String,
     tree: DebugTree,
 }
 
+#[derive(serde::Serialize)]
 pub struct DebugTree {}
 
 
