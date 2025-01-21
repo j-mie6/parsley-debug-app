@@ -47,10 +47,10 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          # Name of artefact to upload
+          # Name of artifact to upload
           name: ${{ matrix.os }}-app-bundles
 
-          # Path of artefact to upload
+          # Path of artifact to upload
           path: ./src-tauri/target/release/bundle/
 
           # Fail upload if no files are found at the path
