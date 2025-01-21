@@ -5,8 +5,13 @@ pub struct ParserInfo {
     tree: DebugTree,
 }
 
-pub struct DebugTree {}
-
+/* Defines tree structure used in backend that will be passed to frontend */
+pub struct DebugTree {
+    pub name: String, /*The internal (default) or user-defined name of the parser */
+    pub success: bool, /* Whether the parser was successful */
+    pub input: String, /* The input string passed to the parser */
+    pub children: Vec<DebugTree>, /* The children of this node */
+}
 
 impl ParserInfo {
     pub fn new(input: String, tree: DebugTree) -> Self {
