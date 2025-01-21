@@ -1,15 +1,15 @@
 #!bin/bash
 
-echo
-echo Starting DILL Development Server
-echo
+printf "\nStarting DILL App\n\n"
 
-npm install && \
-sbt buildFrontend && \
+printf "Building frontend...\n\n"
+sbt buildFrontend 
+
+printf "\nStarting app...\n\n"
 npm run tauri dev
 
 if [ $? -ne 0 ]
 then
-    printf "\n\e[31mError In Starting Development Server\e[0m\n\n"
+    printf "\n\e[31mError while starting DILL App\e[0m\n\n"
     exit 1
 fi
