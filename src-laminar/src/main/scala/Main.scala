@@ -9,7 +9,7 @@ import com.raquo.laminar.api.L._
 import lib.Tauri
 import pages.DebugViewPage
 
-@main def hello = renderOnDomContentLoaded(
+@main def app = renderOnDomContentLoaded(
   dom.document.getElementById("app"),
   // DebugViewPage()
   DebugViewPage.page
