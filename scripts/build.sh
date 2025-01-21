@@ -21,14 +21,41 @@ then
     export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
 fi
 
+# macOS and Windows Tauri v2 prerequisites using npm
+if [ "$RUNNER_OS" = "macOS" ] || [ "$RUNNER_OS" = "Windows" ]; then
+    echo "Setting up prerequisites for macOS and Windows using npm..."
+
+    # Use npm to install cross-platform tools
+    npm install -g webkitgtk \
+        curl \
+        wget \
+        pkg-config \
+        librsvg
+
+    # Platform-specific setup
+    if [ "$RUNNER_OS" = "macOS" ]; then
+        echo "Additional macOS-specific setup..."
+
+        # This may be an issue for users on Apple Silion with a default /opt/homebrew install!!
+        # Not sure how but would be good to figure out a workaround for this...
+        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig
+    fi
+
+    if [ "$RUNNER_OS" = "Windows" ]; then
+        echo "Additional Windows-specific setup..."
+
+        export PKG_CONFIG_PATH="/c/Users/runneradmin/AppData/Roaming/npm/node_modules/webkitgtk/lib/pkgconfig"
+    fi
+fi
+
+# Common steps for all platforms
+echo "Installing dependencies and building the project..."
 npm install && \
 sbt buildFrontend && \
 npm run tauri build
 
-
-
-if [ $? -ne 0 ]
-then
+# Check for errors
+if [ $? -ne 0 ]; then
     printf "\n\e[31mError In Starting Development Server\e[0m\n\n"
     exit 1
 fi
