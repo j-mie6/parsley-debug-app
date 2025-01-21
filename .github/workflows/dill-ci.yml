@@ -46,11 +46,11 @@ jobs:
         shell: bash
         run: sh scripts/test-laminar.sh
 
-      - name: Build artefact
+      - name: Build artifact
         shell: bash
         run: sh scripts/build.sh
 
-      - name: Upload artefact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           # Name of artefact to upload
