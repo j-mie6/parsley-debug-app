@@ -15,7 +15,7 @@ mod test {
     
     /* Start a blocking, tracked client for rocket */
     pub fn tracked_client() -> blocking::Client {
-        blocking::Client::tracked(launch::build())
+        blocking::Client::tracked(launch::build(todo!("Pass Tauri AppHandle to Rocket build")))
             .expect("Rocket failed to initialise")
     }
     

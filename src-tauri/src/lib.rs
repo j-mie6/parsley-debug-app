@@ -33,9 +33,12 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     /* Manage the app state using Tauri */
     app.manage(Mutex::new(AppState::new()));
     
+    /* Clone the app handle for use by Rocket state */
+    let handle: tauri::AppHandle = app.handle().clone();
+    
     /* Mount the Rocket server to the running instance of Tauri */
     tauri::async_runtime::spawn(async move {
-        server::launch().await
+        server::launch(handle).await
             .expect("Rocket failed to initialise")
     });
     

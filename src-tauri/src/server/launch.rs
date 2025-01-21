@@ -1,34 +1,25 @@
-use std::sync::Mutex;
-
 use rocket::{Rocket, Build, Ignite, Config};
 use rocket::figment::{Figment, providers::{Format, Toml}};
-
-use crate::state::{DebugTree, ParserInfo};
 
 /* Embed Rocket.toml as a string to allow post-compilation access */
 const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
 
 
 /* Build the Rocket server */
-pub fn build() -> Rocket<Build> {
-    /* Placeholder parser info struct */
-    let parser_info: ParserInfo = ParserInfo::new(
-        String::from("This is a parser input"),
-        DebugTree(String::from("No debug tree")),
-    );
-    
+pub fn build(app_handle: tauri::AppHandle) -> Rocket<Build> {
     /* Override the default config with values from Rocket.toml */
     let figment: Figment = Figment::from(Config::default())
-    .merge(Toml::string(ROCKET_CONFIG).nested());
-    
-    rocket::custom(figment) /* Build the Rocket server with a custom config */
+        .merge(Toml::string(ROCKET_CONFIG).nested());
+
+    /* Build the rocket server */
+    rocket::custom(figment) /* Install our custom config */
         .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
-        .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
+        .manage(app_handle) /* Manage the app handle using Rocket state management */
 }
 
 /* Launch the Rocket server */
-pub async fn launch() -> Result<Rocket<Ignite>, rocket::Error> {
-    build().launch().await
+pub async fn launch(app_handle: tauri::AppHandle) -> Result<Rocket<Ignite>, rocket::Error> {
+    build(app_handle).launch().await
 }
 
 
@@ -47,7 +38,7 @@ mod test {
     
     #[test]
     fn rocket_client_launches_successfully() {
-        let rocket: Rocket<Build> = super::build();
+        let rocket: Rocket<Build> = super::build(todo!("Pass Tauri AppHandle to Rocket build"));
         
         /* Fails if launching rocket would fail */
         assert!(blocking::Client::tracked(rocket).is_ok())

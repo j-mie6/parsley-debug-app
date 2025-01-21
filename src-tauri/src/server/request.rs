@@ -1,7 +1,8 @@
+use tauri::Manager;
 use std::sync::{Mutex, MutexGuard};
-use rocket::{post, serde::json::Json, http};
+use rocket::{http, post, serde::json::Json};
 
-use crate::state::ParserInfo;
+use crate::{AppState, state::ParserInfo};
 use super::data::Data;
 
 
@@ -20,16 +21,18 @@ fn get_hello() -> String {
 
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
-fn post_tree(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
-    /* Deserialise and unwrap json data */
-    let data: Data = data.into_inner(); 
+fn post_tree(data: Json<Data>, state: &rocket::State<tauri::AppHandle>) -> http::Status {
+    /* Deserialise json data and convert to ParserInfo */
+    let parser_info: ParserInfo = data.into_inner().into();
     
-    /* Acquire the mutex */
-    let mut state: MutexGuard<ParserInfo> = state.lock().expect("ParserInfo mutex could not be acquired");
+    /* Acquire the app_state via the state and mutex */
+    let tauri_state: tauri::State<Mutex<AppState>> = state.state::<Mutex<AppState>>();
+    let mut app_state: MutexGuard<AppState> = tauri_state.lock().expect("AppState mutex could not be acquired");
 
-    /* Update state with posted data */
-    *state = data.into();
+    /* Update the parser info */
+    app_state.parser = Some(parser_info);
 
+    /* Return OK status */
     http::Status::Ok
 }
 
