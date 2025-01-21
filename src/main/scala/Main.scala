@@ -12,5 +12,5 @@ import pages.DebugViewPage
 @main def hello = renderOnDomContentLoaded(
   dom.document.getElementById("app"),
   // DebugViewPage()
-  div()
+  DebugViewPage.page
 )

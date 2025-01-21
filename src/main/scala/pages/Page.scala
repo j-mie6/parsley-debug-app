@@ -5,5 +5,5 @@ import scala.util.Failure
 import scala.util.Success
 
 trait Page {
-  def render(): Element
+  lazy val page: Element
 }
