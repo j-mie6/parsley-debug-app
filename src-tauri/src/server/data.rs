@@ -1,20 +1,27 @@
-use crate::DebugTree;
+use crate::state::{DebugTree, ParserInfo};
 
 pub type ParsleyDebugTree = String; //TODO: represent tree correctly
 
 impl Into<DebugTree> for ParsleyDebugTree {
     fn into(self) -> DebugTree {
-        DebugTree { } // TODO: convert to DebugTree correctly
+        DebugTree(self) //TODO: convert to DebugTree correctly
     }
 }
 
 
+/* Data posted to server */
 #[derive(serde::Deserialize)]
 pub struct Data {
-    pub input: String,
-    pub tree: ParsleyDebugTree,
+    input: String,
+    tree: ParsleyDebugTree,
 }
 
+/* Convert from posted data to ParserInfo */
+impl Into<ParserInfo> for Data {
+    fn into(self) -> ParserInfo {
+        ParserInfo::new(self.input, self.tree.into())
+    }
+}
 
 #[cfg(test)]
 mod test {

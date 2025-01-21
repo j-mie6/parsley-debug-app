@@ -1,7 +1,7 @@
-use std::sync::Mutex;
+use std::sync::{Mutex, MutexGuard};
 use rocket::{post, serde::json::Json, http};
 
-use crate::ParserInfo;
+use crate::state::ParserInfo;
 use super::data::Data;
 
 
@@ -22,12 +22,13 @@ fn get_hello() -> String {
 #[post("/api/remote", format = "application/json", data = "<data>")] 
 fn post_tree(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
     /* Deserialise and unwrap json data */
-    let Data { input, tree } = data.into_inner(); 
+    let data: Data = data.into_inner(); 
     
     /* Acquire the mutex */
-    let mut state = state.lock().expect("ParserInfo mutex could not be acquired");
-    state.set_input(input);
-    state.set_tree(tree.into());
+    let mut state: MutexGuard<ParserInfo> = state.lock().expect("ParserInfo mutex could not be acquired");
+
+    /* Update state with posted data */
+    *state = data.into();
 
     http::Status::Ok
 }
