@@ -4,9 +4,9 @@ use crate::DebugTree;
 #[derive(serde::Deserialize)]
 pub struct ParsleyDebugTree {
     pub name: String, /* The user-defined name of the tree */
-    pub internal: String, /*The internal name of the parser */
+    #[allow(dead_code)] pub internal: String, /*The internal name of the parser */
     pub success: bool, /* Whether the parser was successful */
-    pub number: usize, /* The unique child number of this node */
+    #[allow(dead_code)] pub number: usize, /* The unique child number of this node */
     pub input: String, /* The input string passed to the parser */
     pub children: Vec<ParsleyDebugTree>, /* The children of this node */
 }
