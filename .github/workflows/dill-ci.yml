@@ -16,8 +16,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  check:
-    name: Check project compiles using cargo
+  build:
+    name: Check, test and build DILL
 
     # Creates a job for each OS
     runs-on: ${{matrix.os}}
@@ -32,101 +32,21 @@ jobs:
       - name: Setup 
         uses: ./.github/actions/setup
 
-      - name: Run Laminar Test Script
-        shell: bash
-        run: | 
-          cd src-tauri
-          cargo check
-
-          
-  style: 
-    name: Checks code style using cargo
-
-    # Creates a job for each OS
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      # Use composite action for setup 
-      - name: Setup 
-        uses: ./.github/actions/setup
-
-      - name: Cargo clippy
+      - name: Check backend compiles
         shell: bash
         run: |
           cd src-tauri
-          cargo clippy 
+          cargo check
 
-  test-laminar:
-    # Requires that check job is completed first
-    needs: check
-
-    # Creates a job for each OS
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - uses: actions/checkout@v4
-      
-      # Use composite action for setup 
-      - name: Setup 
-        uses: ./.github/actions/setup
-
-      - name: Run Laminar Test Script
-        shell: bash
-        run: sh scripts/test-laminar.sh
-
-
-  test-tauri:
-    # Requires that check job is completed first
-    needs: check
-
-    # Creates a job for each OS
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      # Use composite action for setup 
-      - name: Setup 
-        uses: ./.github/actions/setup
-
-      - name: Run Tauri Test Script
+      - name: Test backend
         shell: bash
         run: sh scripts/test-tauri.sh
 
+      - name: Test frontend
+        shell: bash
+        run: sh scripts/test-laminar.sh
 
-  build:
-    name: Build project into an app
-    
-    # Pass tests before building
-    needs: [test-tauri, test-laminar] 
-    
-    # Creates a job for each OS
-    runs-on: ${{matrix.os}} 
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - uses: actions/checkout@v4
-      
-      # Use composite action for setup 
-      - name: Setup 
-        uses: ./.github/actions/setup
-
-      - name: Run Build Script
+      - name: Build artefact
         shell: bash
         run: |
           echo Running build.sh
