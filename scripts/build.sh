@@ -36,9 +36,17 @@ if [ "$RUNNER_OS" = "macOS" ] || [ "$RUNNER_OS" = "Windows" ]; then
     if [ "$RUNNER_OS" = "macOS" ]; then
         echo "Additional macOS-specific setup..."
 
-        # This may be an issue for users on Apple Silion with a default /opt/homebrew install!!
-        # Not sure how but would be good to figure out a workaround for this...
-        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig
+        ## Users on Apple Silion (M1, M1 Pro, M1 Max, M2, or later chips) 
+        ## may have a default `/opt/homebrew` install!!
+        
+        # Detect Intel vs. Apple Silicon
+        if [ "$(uname -m)" = "arm64" ]; then
+            # Apple Silicon
+            export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/share/pkgconfig"
+        else
+            # Intel
+            export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig"
+        fi
     fi
 
     if [ "$RUNNER_OS" = "Windows" ]; then
