@@ -6,10 +6,12 @@ on:
     branches: 
       - main
       - dev
+      
   pull_request:
     branches:
       - main 
       - dev
+
   # Allows us to run the workflow whenever we want from GitHub Actions
   workflow_dispatch:
 
@@ -42,7 +44,7 @@ jobs:
         shell: bash
         run: |
           echo Running build.sh
-          sh build.sh
+          sh scripts/build.sh
 
   test-laminar:
     # Requires that build job is completed first
@@ -75,7 +77,7 @@ jobs:
 
       - name: Run Laminar Test Script
         shell: bash
-        run: sh test-laminar.sh
+        run: sh scripts/test-laminar.sh
 
   test-tauri:
     # Requires that build job is completed first
@@ -95,4 +97,4 @@ jobs:
 
       - name: Run Tauri Test Script
         shell: bash
-        run: sh test-tauri.sh
+        run: sh scripts/test-tauri.sh
