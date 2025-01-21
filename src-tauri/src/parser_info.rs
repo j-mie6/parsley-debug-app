@@ -13,6 +13,26 @@ pub struct DebugTree {
     pub children: Vec<DebugTree>, /* The children of this node */
 }
 
+impl DebugTree {
+    pub fn new(name: String, success: bool, input: String, children: Vec<DebugTree>) -> Self {
+        DebugTree {
+            name,
+            success,
+            input,
+            children
+        }
+    }
+
+    pub fn default() -> Self {
+        DebugTree {
+            name: String::from(""),
+            success: false,
+            input: String::from(""),
+            children: Vec::new()
+        }
+    }
+}
+
 impl ParserInfo {
     pub fn new(input: String, tree: DebugTree) -> Self {
         ParserInfo { 

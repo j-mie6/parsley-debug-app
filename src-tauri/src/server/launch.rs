@@ -14,7 +14,7 @@ pub fn build() -> Rocket<Build> {
     /* Placeholder parser info struct */
     let parser_info: ParserInfo = ParserInfo::new(
         String::from("This is a parser input"),
-        DebugTree { }
+        DebugTree::default()
     );
     
     /* Override the default config with values from Rocket.toml */

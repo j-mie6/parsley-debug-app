@@ -1,6 +1,6 @@
 use crate::DebugTree;
 
-/* Represents tree received from parsley-debug-views's RemoteView */
+/* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(serde::Deserialize)]
 pub struct ParsleyDebugTree {
     pub name: String, /* The user-defined name of the tree */
