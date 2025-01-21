@@ -1,16 +1,17 @@
 #!bin/bash
 
-echo Removing Scala files...
+printf "Removing Scala files... "
 rm -rf .metals/
 rm -rf .bloop/
 rm -rf .bsp/
+printf "done\n"
 
-echo Removing compiled App files...
+printf "Removing compiled App files... "
 rm -rf static/
 rm -rf target/
+printf "done\n"
 
-echo Removing Tauri and Laminar targets...
+printf "Removing Tauri and Laminar targets... "
 rm -rf src-tauri/target/
 rm -rf src-laminar/target/
-
-echo Done
+printf "done\n"

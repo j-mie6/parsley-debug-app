@@ -1,17 +1,17 @@
 #!bin/bash
 
-echo
-echo Starting DILL Build
-echo
+printf "\nBuilding DILL App\n\n"
 
-sbt buildFrontend && \
-npm run tauri build
+printf "Building frontend...\n\n"
+sbt buildFrontend 
 
-# Check for errors
-if [ $? -ne 0 ]; then
-    printf "\n\e[31mError In Starting Development Server\e[0m\n\n"
+printf "\nStarting app...\n\n"
+npm run tauri dev
+
+if [ $? -ne 0 ]
+then
+    printf "\n\e[31mError while building DILL App\e[0m\n\n"
     exit 1
 fi
 
-echo 
-echo Done! Built DILL into app
+printf "\nDone. Built DILL into app\n"

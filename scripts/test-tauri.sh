@@ -1,11 +1,8 @@
 #!/bin/bash
 
-echo
-echo Testing Tauri...
-echo
+printf "Testing backend...\n"
 
 cd src-tauri || return
-cargo test --verbose
+cargo test
 
-echo
-echo Done! Tested Tauri
+printf "\nDone\n"

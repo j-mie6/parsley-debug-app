@@ -1,7 +1,6 @@
 #!bin/bash
 
-echo "Installing dependencies..."
-echo
+printf "Installing dependencies... \n"
 
 # Linux Tauri v2 prerequisites
 if [ "$RUNNER_OS" = "Linux" ]
@@ -58,5 +57,4 @@ fi
 # Common steps for all platforms
 npm install
 
-echo
-echo Done! Installed dependencies
+printf "\nDone\n"

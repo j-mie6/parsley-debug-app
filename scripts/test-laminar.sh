@@ -1,9 +1,7 @@
 #!/bin/bash
 
-echo Testing Laminar...
-echo
+printf "Testing frontend...\n"
 
 sbt test
 
-echo
-echo Done! Tested Laminar
+printf "\nDone\n"
