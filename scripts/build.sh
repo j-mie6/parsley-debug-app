@@ -6,7 +6,7 @@ printf "Building frontend...\n\n"
 sbt buildFrontend 
 
 printf "\nStarting app...\n\n"
-npm run tauri dev
+npm run tauri build
 
 if [ $? -ne 0 ]
 then
