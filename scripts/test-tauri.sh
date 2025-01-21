@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo Testing Tauri...
 
 cd src-tauri || return
