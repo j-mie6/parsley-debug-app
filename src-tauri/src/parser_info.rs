@@ -27,17 +27,6 @@ impl DebugTree {
             children
         }
     }
-
-    pub fn default() -> Self {
-        DebugTree {
-            name: String::from(""),
-            internal: String::from(""),
-            success: false,
-            input: String::from(""),
-            number: 0,
-            children: Vec::new()
-        }
-    }
 }
 
 impl ParserInfo {

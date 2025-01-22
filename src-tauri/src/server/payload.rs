@@ -1,8 +1,6 @@
 use crate::DebugTree;
 
 /* Represents tree received from parsley-debug-views' Remote View*/
-#[allow(dead_code)] /* For fields that have been retained for compatibility
-                    but are never read */
 #[derive(serde::Deserialize)]
 pub struct ParsleyDebugTree {
     pub name: String, /* The user-defined name of the tree */
