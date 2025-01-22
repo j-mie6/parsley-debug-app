@@ -42,6 +42,33 @@ mod test {
     use crate::DebugTree;
     use super::ParsleyDebugTree;
 
+
+    #[test]
+    fn payload_deserialises() {
+        let payload: &str = r#"{
+            "input": "Test",
+            "tree": {
+                "name": "Test",
+                "internal": "Test",
+                "success": true,
+                "number": 0,
+                "input": "Test",
+                "children": []
+            }
+        }"#;
+        
+        let payload: super::Payload = serde_json::from_str(&payload).expect("Could not deserialise payload");
+        
+        assert_eq!(payload.input, "Test");
+        assert_eq!(payload.tree.name, "Test");
+        assert_eq!(payload.tree.internal, "Test");
+        assert_eq!(payload.tree.success, true);
+        assert_eq!(payload.tree.number, 0);
+        assert_eq!(payload.tree.input, "Test");
+        assert_eq!(payload.tree.children.len(), 0);
+    }
+
+    
     #[test]
     fn parsley_debug_tree_converts_into_debug_tree() {
         let parsley_debug_tree: ParsleyDebugTree = ParsleyDebugTree {
@@ -64,59 +91,7 @@ mod test {
     }
 
     #[test]
-    fn payload_deserialises() {
-        let payload: &str = r#"{"input": "Test", "tree": {"name": "Test", "internal": "Test", "success": true, "number": 0, "input": "Test", "children": []}}"#;
-        
-        let payload: super::Payload = serde_json::from_str(&payload).expect("Could not deserialise payload");
-        
-        assert_eq!(payload.input, "Test");
-        assert_eq!(payload.tree.name, "Test");
-        assert_eq!(payload.tree.internal, "Test");
-        assert_eq!(payload.tree.success, true);
-        assert_eq!(payload.tree.number, 0);
-        assert_eq!(payload.tree.input, "Test");
-        assert_eq!(payload.tree.children.len(), 0);
-    }
-
-    #[test]
-    fn nested_parsley_debug_tree_converts_successfully_into_debug_tree() {
-
-        /* 2nd layer nested children */
-        let child_pdt_1_1: ParsleyDebugTree = ParsleyDebugTree {
-            name: String::from("Test1.1"),
-            internal: String::from("Test1.1"),
-            success: true,
-            number: 0,
-            input: String::from("Test1.1"),
-            children: Vec::new()
-        };
-        let child_pdt_2_1: ParsleyDebugTree = ParsleyDebugTree {
-            name: String::from("Test2.1"),
-            internal: String::from("Test2.1"),
-            success: true,
-            number: 0,
-            input: String::from("Test2.1"),
-            children: Vec::new()
-        };
-
-        /* 1st layer nested children */
-        let child_pdt_1: ParsleyDebugTree = ParsleyDebugTree {
-            name: String::from("Test1"),
-            internal: String::from("Test1"),
-            success: true,
-            number: 0,
-            input: String::from("Test1"),
-            children: vec![child_pdt_1_1]
-        };
-        let child_pdt_2: ParsleyDebugTree = ParsleyDebugTree {
-            name: String::from("Test2"),
-            internal: String::from("Test2"),
-            success: true,
-            number: 0,
-            input: String::from("Test2"),
-            children: vec![child_pdt_2_1]
-        };
-
+    fn nested_parsley_debug_tree_converts_into_debug_tree() {
         /* Root tree to test */
         let parsley_debug_tree: ParsleyDebugTree = ParsleyDebugTree {
             name: String::from("Test"),
@@ -124,7 +99,42 @@ mod test {
             success: true,
             number: 0,
             input: String::from("Test"),
-            children: vec![child_pdt_1, child_pdt_2]
+            children: vec![
+                ParsleyDebugTree {
+                    name: String::from("Test1"),
+                    internal: String::from("Test1"),
+                    success: true,
+                    number: 0,
+                    input: String::from("Test1"),
+                    children: vec![
+                        ParsleyDebugTree {
+                            name: String::from("Test1.1"),
+                            internal: String::from("Test1.1"),
+                            success: true,
+                            number: 0,
+                            input: String::from("Test1.1"),
+                            children: Vec::new()
+                        }
+                    ]
+                },
+                ParsleyDebugTree {
+                    name: String::from("Test2"),
+                    internal: String::from("Test2"),
+                    success: true,
+                    number: 0,
+                    input: String::from("Test2"),
+                    children: vec![
+                        ParsleyDebugTree {
+                            name: String::from("Test2.1"),
+                            internal: String::from("Test2.1"),
+                            success: true,
+                            number: 0,
+                            input: String::from("Test2.1"),
+                            children: Vec::new()
+                        }
+                    ]
+                }
+            ]
         };
         
         let debug_tree: DebugTree = parsley_debug_tree.clone().into(); 

@@ -57,7 +57,7 @@ mod test {
         /* Assert GET request was successful and payload was correct */
         assert_eq!(response.status(), http::Status::Ok);
         assert_eq!(response.into_string().expect("Payload was not string"),
-         "DILL: Debugging Interactively for the ParsLey Language");
+            "DILL: Debugging Interactively for the ParsLey Language");
     }
     
     #[test]
@@ -137,14 +137,15 @@ mod test {
         assert_eq!(response.status(), http::Status::Ok);
     }
 
+    #[test]
     fn get_returns_posted_tree() {
         let client: blocking::Client = tracked_client();
 
        /* Perform POST request to '/api/remote' */
        let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
-       .header(http::ContentType::JSON)
-       .body(r#"{"input": "this is the test parser input", "tree": "test tree"}"#)
-       .dispatch();
+            .header(http::ContentType::JSON)
+            .body(r#"{"input": "this is the test parser input", "tree": "test tree"}"#)
+            .dispatch();
    
         /* Assert that POST succeeded */
         assert_eq!(post_response.status(), http::Status::Ok); 
@@ -157,7 +158,7 @@ mod test {
 
        /* Assert that we GET the expected tree */
        assert_eq!(get_response.into_string().expect("Tree was not string"),
-       r#"{"input": "this is the test parser input", "tree": "test tree"}"#); 
+            r#"{"input": "this is the test parser input", "tree": "test tree"}"#); 
     }
     
 }
