@@ -14,7 +14,14 @@ pub fn build() -> Rocket<Build> {
     /* Placeholder parser info struct */
     let parser_info: ParserInfo = ParserInfo::new(
         String::from("This is a parser input"),
-        DebugTree { }
+        DebugTree { /* Default DebugTree to be changed by state */
+            name: String::from(""),
+            internal: String::from(""),
+            success: false,
+            input: String::from(""),
+            number: 0,
+            children: Vec::new()
+        }
     );
     
     /* Override the default config with values from Rocket.toml */
@@ -87,8 +94,8 @@ mod test {
     fn num_routes_mounted_is_correct() {
         let client: blocking::Client = server::test::tracked_client();
         
-        /* Assert the Rocket server was successfully built with 2 routes */
-        assert_eq!(client.rocket().routes().count(), 2);
+        /* Assert the Rocket server was successfully built with 3 routes */
+        assert_eq!(client.rocket().routes().count(), 3);
     }
 
     #[test]

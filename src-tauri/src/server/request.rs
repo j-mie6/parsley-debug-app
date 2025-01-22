@@ -1,28 +1,28 @@
-use std::sync::Mutex;
-use rocket::{post, serde::json::Json, http};
+use std::sync::{Mutex, MutexGuard};
+use rocket::{get, http, post, serde::json::Json};
 
 use crate::ParserInfo;
-use super::data::Data;
+use super::payload::Payload;
 
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_hello, post_tree]
+    rocket::routes![get_index, get_tree, post_tree]
 }
 
 
 /* Placeholder GET request handler to print 'Hello world!' */
-#[rocket::get("/")]
-fn get_hello() -> String {
-    String::from("Hello world!")
+#[get("/")]
+fn get_index() -> String {
+    String::from("DILL: Debugging Interactively for the ParsLey Language")
 }
 
 
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
-fn post_tree(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
+fn post_tree(data: Json<Payload>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
     /* Deserialise and unwrap json data */
-    let Data { input, tree } = data.into_inner(); 
+    let Payload { input, tree } = data.into_inner(); 
     
     /* Acquire the mutex */
     let mut state = state.lock().expect("ParserInfo mutex could not be acquired");
@@ -32,7 +32,11 @@ fn post_tree(data: Json<Data>, state: &rocket::State<Mutex<ParserInfo>>) -> http
     http::Status::Ok
 }
 
-
+#[get("/api/remote")]
+fn get_tree(state: &rocket::State<Mutex<ParserInfo>>) -> String {
+    let state: MutexGuard<ParserInfo> = state.lock().expect("ParserInfo mutex could not be acquired");
+    serde_json::to_string_pretty(&state.tree).expect("Could not serialise DebugTree to JSON")
+}
 
 #[cfg(test)]
 mod test {
@@ -43,16 +47,17 @@ mod test {
     /* Request unit testing */
     
     #[test]
-    fn get_responds_hello_world() {
+    fn get_responds_onboarding() {
         /* Launch rocket client via a blocking, tracked Client for debugging */
         let client: blocking::Client = tracked_client();
         
         /* Perform GET request to index route '/' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_hello)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_index)).dispatch();
         
         /* Assert GET request was successful and payload was correct */
         assert_eq!(response.status(), http::Status::Ok);
-        assert_eq!(response.into_string().expect("Payload was not string"), "Hello world!");
+        assert_eq!(response.into_string().expect("Payload was not string"),
+            "DILL: Debugging Interactively for the ParsLey Language");
     }
     
     #[test]
@@ -119,6 +124,41 @@ mod test {
         
         /* Assert that POST failed */
         assert_eq!(response.status(), http::Status::NotFound);
+    }
+
+    #[test]
+    fn get_returns_tree() {
+        let client: blocking::Client = tracked_client();
+        
+        /* Perform GET request to '/api/remote' */
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
+        
+        /* Assert that GET succeeded */
+        assert_eq!(response.status(), http::Status::Ok);
+    }
+
+    #[test]
+    fn get_returns_posted_tree() {
+        let client: blocking::Client = tracked_client();
+
+       /* Perform POST request to '/api/remote' */
+       let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
+            .header(http::ContentType::JSON)
+            .body(r#"{"input": "this is the test parser input", "tree": "test tree"}"#)
+            .dispatch();
+   
+        /* Assert that POST succeeded */
+        assert_eq!(post_response.status(), http::Status::Ok); 
+
+        /* Perform GET request to '/api/remote' */
+        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
+
+        /* Assert that GET succeeded */
+        assert_eq!(get_response.status(), http::Status::Ok);
+
+       /* Assert that we GET the expected tree */
+       assert_eq!(get_response.into_string().expect("Tree was not string"),
+            r#"{"input": "this is the test parser input", "tree": "test tree"}"#); 
     }
     
 }
