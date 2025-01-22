@@ -41,7 +41,7 @@ mod test {
 
     use crate::DebugTree;
     use super::ParsleyDebugTree;
-    
+
     #[test]
     fn parsley_debug_tree_into_debug_tree() {
         
@@ -63,5 +63,20 @@ mod test {
         assert_eq!(debug_tree.number, parsley_debug_tree.number);
         assert_eq!(debug_tree.input, parsley_debug_tree.input);
         assert_eq!(debug_tree.children.len(), parsley_debug_tree.children.len());
+    }
+
+    #[test]
+    fn payload_deserialises() {
+        let payload: String = r#"{"input": "Test", "tree": {"name": "Test", "internal": "Test", "success": true, "number": 0, "input": "Test", "children": []}}"#.to_string();
+        
+        let payload: super::Payload = serde_json::from_str(&payload).expect("Could not deserialise payload");
+        
+        assert_eq!(payload.input, "Test");
+        assert_eq!(payload.tree.name, "Test");
+        assert_eq!(payload.tree.internal, "Test");
+        assert_eq!(payload.tree.success, true);
+        assert_eq!(payload.tree.number, 0);
+        assert_eq!(payload.tree.input, "Test");
+        assert_eq!(payload.tree.children.len(), 0);
     }
 }
