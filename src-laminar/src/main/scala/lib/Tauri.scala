@@ -1,8 +1,9 @@
 package lib
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation._
+import scala.scalajs.js.annotation.*
 import scala.concurrent.Future
+
 
 @js.native
 @JSImport("@tauri-apps/api/core", "invoke")
