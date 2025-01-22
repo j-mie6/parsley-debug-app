@@ -17,11 +17,11 @@ COPY ./vite.config.ts ./vite.config.ts
 
 # Scala and sbt
 RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt-key add -
-    RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
-    RUN apt-get update
-    RUN apt-get install -y temurin-11-jdk
-    RUN curl -fL https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz | gzip -d > cs && chmod +x cs && echo "Y" | ./cs setup
-    RUN ./cs install sbt --install-dir /
+RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+RUN apt-get update
+RUN apt-get install -y temurin-11-jdk
+RUN curl -fL https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz | gzip -d > cs && chmod +x cs && echo "Y" | ./cs setup
+RUN ./cs install sbt --install-dir /
 
 # Tauri dependencies
 RUN apt-get update && apt-get install -y \
@@ -74,9 +74,9 @@ RUN passwd -d root
 
 # Allow accessing root and using empty passwords with X11 localhost
 RUN \    
-  sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config && \
-  sed -i "s/#PermitEmptyPasswords no/PermitEmptyPasswords yes/" /etc/ssh/sshd_config && \
-  sed -i "s/#X11UseLocalhost/X11UseLocalhost/" /etc/ssh/sshd_config 
+    sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config && \
+    sed -i "s/#PermitEmptyPasswords no/PermitEmptyPasswords yes/" /etc/ssh/sshd_config && \
+    sed -i "s/#X11UseLocalhost/X11UseLocalhost/" /etc/ssh/sshd_config 
 
 # Start the SSH server
 CMD sh -c "/usr/sbin/sshd -D"
