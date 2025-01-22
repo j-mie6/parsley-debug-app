@@ -14,11 +14,11 @@ import Display.DisplayTree
 
 
 val textSignal: Var[String] = Var("Nothing")
-val tree_text: Div = div(text <-- textSignal)
+val treeText: Div = div(text <-- textSignal)
 
 def appElement(): Div = div(
     h1("Dill - Parsley Debugging"),
-    tree_text,
+    treeText,
     button(onClick --> { _ => {
         for {
             text <- Tauri.invoke[String]("render_debug_tree")
