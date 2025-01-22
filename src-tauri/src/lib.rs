@@ -1,3 +1,4 @@
+use state::StateHandle;
 use tauri::Manager;
 use std::sync::Mutex;
 
@@ -38,7 +39,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     
     /* Mount the Rocket server to the running instance of Tauri */
     tauri::async_runtime::spawn(async move {
-        server::launch(handle).await
+        server::launch(StateHandle::new(handle)).await
             .expect("Rocket failed to initialise")
     });
     

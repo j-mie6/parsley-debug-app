@@ -6,22 +6,34 @@ pub use launch::launch;
 
 
 #[cfg(test)]
-mod test {
+pub mod test {
     
     use rocket::{http, local::blocking};
+    use crate::state::{DebugTree, MockStateManager, ParserInfo, StateHandle};
+
+    use mockall::predicate;
+
     use super::launch;
     
     /* Server integration testing */
     
-    /* Start a blocking, tracked client for rocket */
-    pub fn tracked_client() -> blocking::Client {
-        blocking::Client::tracked(launch::build(todo!("Pass Tauri AppHandle to Rocket build")))
-            .expect("Rocket failed to initialise")
+    /* Start a blocking, tracked client for rocket
+       The mock should already be set with expectations */
+    pub fn tracked_client(mock: MockStateManager) -> blocking::Client {
+        let handle = StateHandle::new(mock);
+        blocking::Client::tracked(launch::build(handle)).expect("Could not launch rocket")
     }
     
     #[test]
     fn server_handles_many_requests() {
-        let client: blocking::Client = tracked_client();
+        // TODO: make DebugTree/ParserInfo examples for testing
+        let debuginfo = DebugTree::new(String::new(), String::new(), false, String::new(), 0, vec![]);
+        let pinfo = ParserInfo::new(String::new(), debuginfo);
+
+        let mut mock = MockStateManager::new();
+        mock.expect_set_info().with(predicate::eq(pinfo));
+        
+        let client: blocking::Client = tracked_client(mock);
         
         /* Format GET request to index route '/' */
         let get_request = client.get("/");
@@ -37,6 +49,5 @@ mod test {
             assert_eq!(get_request.clone().dispatch().status(), http::Status::Ok);
             assert_eq!(post_request.clone().dispatch().status(), http::Status::Ok);
         }
-    }   
-    
+    }
 }

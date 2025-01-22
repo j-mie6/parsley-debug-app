@@ -1,12 +1,14 @@
+#[cfg(test)] use mockall::automock;
+
 /* Placeholder ParserInfo structures for state management */
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug, PartialEq)]
 pub struct ParserInfo {
     pub input: String,
     pub tree: DebugTree,
 }
 
 /* Defines tree structure used in backend that will be passed to frontend */
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug, PartialEq)]
 pub struct DebugTree {
     pub name: String, /*The internal (default) or user-defined name of the parser */
     pub internal: String, /*The internal name of the parser */
@@ -43,3 +45,28 @@ impl ParserInfo {
 }
 
 
+pub struct StateHandle(Box<dyn StateManager>);
+impl StateHandle {
+    pub fn new<S : 'static + StateManager>(state: S) -> Self {
+        StateHandle(Box::new(state))
+    }
+}
+
+impl StateManager for StateHandle {
+    fn set_info(&self, info: ParserInfo) {
+        self.0.as_ref().set_info(info);
+    }
+}
+
+
+#[cfg_attr(test, automock)]
+pub trait StateManager : Send + Sync {
+    fn set_info(&self, info: ParserInfo);
+}
+
+
+impl StateManager for tauri::AppHandle {
+    fn set_info(&self, _info: ParserInfo) {
+        todo!()
+    }
+}

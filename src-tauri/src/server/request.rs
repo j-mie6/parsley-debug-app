@@ -1,8 +1,7 @@
-use tauri::Manager;
 use std::sync::{Mutex, MutexGuard};
 use rocket::{get, post, http, serde::json::Json};
 
-use crate::{AppState, state::ParserInfo};
+use crate::state::{ParserInfo, StateManager, StateHandle};
 use super::payload::Payload;
 
 
@@ -21,16 +20,15 @@ fn get_index() -> String {
 
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
-fn post_tree(data: Json<Payload>, state: &rocket::State<tauri::AppHandle>) -> http::Status {
+fn post_tree(data: Json<Payload>, state: &rocket::State<StateHandle>) -> http::Status {
     /* Deserialise json data and convert to ParserInfo */
     let parser_info: ParserInfo = data.into_inner().into();
 
     /* Acquire the app_state via the state and mutex */
-    let tauri_state: tauri::State<Mutex<AppState>> = state.state::<Mutex<AppState>>();
-    let mut app_state: MutexGuard<AppState> = tauri_state.lock().expect("AppState mutex could not be acquired");
+    let state: &StateHandle = state.inner();
 
     /* Update the parser info */
-    app_state.parser = Some(parser_info);
+    state.set_info(parser_info);
 
     /* Return OK status */
     http::Status::Ok
@@ -45,15 +43,15 @@ fn get_tree(state: &rocket::State<Mutex<ParserInfo>>) -> String {
 #[cfg(test)]
 mod test {
     
-    use crate::server::test::tracked_client;
+    use crate::{server::test::tracked_client, state::MockStateManager};
     use rocket::{http, local::blocking};
     
     /* Request unit testing */
     
     #[test]
     fn get_responds_onboarding() {
-        /* Launch rocket client via a blocking, tracked Client for debugging */
-        let client: blocking::Client = tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = tracked_client(mock);
         
         /* Perform GET request to index route '/' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_index)).dispatch();
@@ -66,8 +64,8 @@ mod test {
     
     #[test]
     fn unrouted_get_fails() {
-        /* Launch rocket client via a blocking, tracked Client for debugging */
-        let client: blocking::Client = tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = tracked_client(mock);
         
         /* Perform GET request to non-existent route '/hello' */
         let response: blocking::LocalResponse = client.get("/hello").dispatch();
@@ -78,7 +76,8 @@ mod test {
     
     #[test]
     fn get_on_post_fails() {
-        let client: blocking::Client = tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = tracked_client(mock);
         
         /* Perform GET request to '/api/remote' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::post_tree)).dispatch();
@@ -90,7 +89,8 @@ mod test {
     
     #[test]
     fn post_tree_succeeds() {
-        let client: blocking::Client = tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = tracked_client(mock);
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
@@ -104,7 +104,8 @@ mod test {
     
     #[test]
     fn empty_post_fails() {
-        let client: blocking::Client = tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = tracked_client(mock);
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
@@ -118,7 +119,8 @@ mod test {
     
     #[test]
     fn bad_format_post_fails() {
-        let client: blocking::Client = tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = tracked_client(mock);
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
@@ -132,7 +134,8 @@ mod test {
 
     #[test]
     fn get_returns_tree() {
-        let client: blocking::Client = tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = tracked_client(mock);
         
         /* Perform GET request to '/api/remote' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
@@ -143,7 +146,8 @@ mod test {
 
     #[test]
     fn get_returns_posted_tree() {
-        let client: blocking::Client = tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = tracked_client(mock);
 
        /* Perform POST request to '/api/remote' */
        let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))

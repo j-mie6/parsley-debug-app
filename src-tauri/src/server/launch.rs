@@ -1,12 +1,14 @@
 use rocket::{Rocket, Build, Ignite, Config};
 use rocket::figment::{Figment, providers::{Format, Toml}};
 
+use crate::state::StateHandle;
+
 /* Embed Rocket.toml as a string to allow post-compilation access */
 const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
 
 
 /* Build the Rocket server */
-pub fn build(app_handle: tauri::AppHandle) -> Rocket<Build> {
+pub fn build(app_handle: StateHandle) -> Rocket<Build> {
     /* Override the default config with values from Rocket.toml */
     let figment: Figment = Figment::from(Config::default())
         .merge(Toml::string(ROCKET_CONFIG).nested());
@@ -18,7 +20,7 @@ pub fn build(app_handle: tauri::AppHandle) -> Rocket<Build> {
 }
 
 /* Launch the Rocket server */
-pub async fn launch(app_handle: tauri::AppHandle) -> Result<Rocket<Ignite>, rocket::Error> {
+pub async fn launch(app_handle: StateHandle) -> Result<Rocket<Ignite>, rocket::Error> {
     build(app_handle).launch().await
 }
 
@@ -32,13 +34,17 @@ mod test {
     use rocket::figment::providers::{self, Toml, Format};
     
     use crate::server;
+    use crate::state::{MockStateManager, StateHandle};
     use super::ROCKET_CONFIG;
     
     /* Launch unit testing */
     
     #[test]
     fn rocket_client_launches_successfully() {
-        let rocket: Rocket<Build> = super::build(todo!("Pass Tauri AppHandle to Rocket build"));
+        let mock = MockStateManager::new();
+        let handle = StateHandle::new(mock);
+
+        let rocket: Rocket<Build> = super::build(handle);
         
         /* Fails if launching rocket would fail */
         assert!(blocking::Client::tracked(rocket).is_ok())
@@ -76,7 +82,8 @@ mod test {
     
     #[test]
     fn num_routes_mounted_is_correct() {
-        let client: blocking::Client = server::test::tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = server::test::tracked_client(mock);
         
         /* Assert the Rocket server was successfully built with 3 routes */
         assert_eq!(client.rocket().routes().count(), 3);
@@ -84,7 +91,8 @@ mod test {
 
     #[test]
     fn mounted_routes_correctly_named() {
-        let client: blocking::Client = server::test::tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = server::test::tracked_client(mock);
         let routes: Vec<&str> = client.rocket()
             .routes()
             .map(|r| r.uri.as_str())
