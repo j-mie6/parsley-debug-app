@@ -124,5 +124,16 @@ mod test {
         /* Assert that POST failed */
         assert_eq!(response.status(), http::Status::NotFound);
     }
+
+    #[test]
+    fn get_returns_tree() {
+        let client: blocking::Client = tracked_client();
+        
+        /* Perform GET request to '/api/remote' */
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
+        
+        /* Assert that GET succeeded */
+        assert_eq!(response.status(), http::Status::Ok);
+    }
     
 }
