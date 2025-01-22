@@ -1,5 +1,5 @@
 use std::sync::Mutex;
-use rocket::{post, serde::json::Json, http};
+use rocket::{get, http, post, serde::json::Json};
 
 use crate::ParserInfo;
 use super::payload::Payload;
@@ -7,12 +7,12 @@ use super::payload::Payload;
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_hello, post_tree]
+    rocket::routes![get_hello, get_tree, post_tree]
 }
 
 
 /* Placeholder GET request handler to print 'Hello world!' */
-#[rocket::get("/")]
+#[get("/")]
 fn get_hello() -> String {
     String::from("Hello world!")
 }
@@ -32,7 +32,11 @@ fn post_tree(data: Json<Payload>, state: &rocket::State<Mutex<ParserInfo>>) -> h
     http::Status::Ok
 }
 
-
+#[get("/api/tree")]
+fn get_tree(state: &rocket::State<Mutex<ParserInfo>>) -> Json<String> {
+    let state: std::sync::MutexGuard<'_, ParserInfo> = state.lock().expect("ParserInfo mutex could not be acquired");
+    Json(serde_json::to_string(&state.tree).expect("Could not serialise DebugTree to JSON"))
+}
 
 #[cfg(test)]
 mod test {

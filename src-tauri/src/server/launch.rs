@@ -87,8 +87,8 @@ mod test {
     fn num_routes_mounted_is_correct() {
         let client: blocking::Client = server::test::tracked_client();
         
-        /* Assert the Rocket server was successfully built with 2 routes */
-        assert_eq!(client.rocket().routes().count(), 2);
+        /* Assert the Rocket server was successfully built with 3 routes */
+        assert_eq!(client.rocket().routes().count(), 3);
     }
 
     #[test]

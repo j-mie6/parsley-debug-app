@@ -1,11 +1,12 @@
 
 /* Placeholder ParserInfo structures for state management */
 pub struct ParserInfo {
-    input: String,
-    tree: DebugTree,
+    pub input: String,
+    pub tree: DebugTree,
 }
 
 /* Defines tree structure used in backend that will be passed to frontend */
+#[derive(serde::Serialize)]
 pub struct DebugTree {
     pub name: String, /*The internal (default) or user-defined name of the parser */
     pub success: bool, /* Whether the parser was successful */
