@@ -26,7 +26,7 @@ mod test {
 
     #[test]
     fn server_handles_one_request() {
-        let client: blocking::Client = tracked_client(request::test::mock_routes());
+        let client: blocking::Client = request::test::mocked_client();
 
         /* Format GET request to index route '/' */
         let get_request = client.get("/");
@@ -35,7 +35,7 @@ mod test {
     
     #[test]
     fn server_handles_many_requests() {
-        let client: blocking::Client = tracked_client(request::test::mock_routes());
+        let client: blocking::Client = request::test::mocked_client();
         
         /* Format GET request to index route '/' */
         let get_request = client.get("/");
@@ -51,6 +51,5 @@ mod test {
             assert_eq!(get_request.clone().dispatch().status(), http::Status::Ok);
             assert_eq!(post_request.clone().dispatch().status(), http::Status::Ok);
         }
-    }   
-    
+    }
 }

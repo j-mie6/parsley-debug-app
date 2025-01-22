@@ -45,12 +45,13 @@ pub mod test {
     use rocket::{http, local::blocking};
     use super::*;
 
+    /* GET request handler always returning a fixed value */
     #[rocket::get("/")]
     fn mock_get() -> String {
         String::from("42")
     }
 
-
+    /* POST request handler returns `Ok` if it receives 42 */
     #[rocket::post("/api/remote", format = "application/json", data = "<data>")] 
     fn mock_post(data: Json<i32>, state: &rocket::State<MockHandle>) -> http::Status {
         let _mock = state.inner();
@@ -59,20 +60,18 @@ pub mod test {
         if n == 42 {
             http::Status::Ok
         } else {
-            http::Status::UnprocessableEntity
+            http::Status::BadRequest
         }
     }
 
-    pub fn mock_routes() -> Vec<rocket::Route> {
-        rocket::routes![mock_get, mock_post]
+    /* Launch rocket client via a blocking, tracked client for debugging for our mocked requests */
+    pub fn mocked_client() -> blocking::Client {
+        tracked_client(rocket::routes![mock_get, mock_post])
     }
-    
-    /* Request unit testing */
     
     #[test]
     fn get_responds_42() {
-        /* Launch rocket client via a blocking, tracked Client for debugging */
-        let client: blocking::Client = tracked_client(mock_routes());
+        let client: blocking::Client = mocked_client();
         
         /* Perform GET request to index route '/' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(mock_get)).dispatch();
@@ -84,8 +83,7 @@ pub mod test {
     
     #[test]
     fn unrouted_get_fails() {
-        /* Launch rocket client via a blocking, tracked Client for debugging */
-        let client: blocking::Client = tracked_client(mock_routes());
+        let client: blocking::Client = mocked_client();
         
         /* Perform GET request to non-existent route '/hello' */
         let response: blocking::LocalResponse = client.get("/hello").dispatch();
@@ -96,7 +94,7 @@ pub mod test {
     
     #[test]
     fn get_on_post_fails() {
-        let client: blocking::Client = tracked_client(mock_routes());
+        let client: blocking::Client = mocked_client();
         
         /* Perform GET request to '/api/remote' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(mock_post)).dispatch();
@@ -108,7 +106,7 @@ pub mod test {
     
     #[test]
     fn post_succeeds() {
-        let client: blocking::Client = tracked_client(mock_routes());
+        let client: blocking::Client = mocked_client();
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(mock_post))
@@ -119,10 +117,24 @@ pub mod test {
         /* Assert that POST succeeded */
         assert_eq!(response.status(), http::Status::Ok);
     }
+
+    #[test]
+    fn post_received_and_fails() {
+        let client: blocking::Client = mocked_client();
+        
+        /* Perform POST request to '/api/remote' */
+        let response: blocking::LocalResponse = client.post(rocket::uri!(mock_post))
+            .header(http::ContentType::JSON)
+            .body("41")
+            .dispatch();
+        
+        /* Assert that POST was received and fails */
+        assert_eq!(response.status(), http::Status::BadRequest);
+    }
     
     #[test]
     fn empty_post_fails() {
-        let client: blocking::Client = tracked_client(mock_routes());
+        let client: blocking::Client = mocked_client();
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(mock_post))
@@ -136,7 +148,7 @@ pub mod test {
     
     #[test]
     fn bad_format_post_fails() {
-        let client: blocking::Client = tracked_client(mock_routes());
+        let client: blocking::Client = mocked_client();
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(mock_post))
@@ -147,5 +159,4 @@ pub mod test {
         /* Assert that POST failed */
         assert_eq!(response.status(), http::Status::NotFound);
     }
-    
 }
