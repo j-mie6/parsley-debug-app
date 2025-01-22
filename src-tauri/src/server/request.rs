@@ -5,23 +5,23 @@ use rocket::{http, post, serde::json::Json};
 use crate::{AppState, state::ParserInfo};
 use super::data::Data;
 
-
-/* Expose routes for mounting during launch */
-pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_hello, post_tree]
+impl super::launch::Handle for tauri::AppHandle {
+    fn routes() -> Vec<rocket::Route> {
+        rocket::routes![get_hello, post_tree]
+    }
 }
 
 
 /* Placeholder GET request handler to print 'Hello world!' */
 #[rocket::get("/")]
-fn get_hello() -> String {
+pub fn get_hello() -> String {
     String::from("Hello world!")
 }
 
 
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
-fn post_tree(data: Json<Data>, state: &rocket::State<tauri::AppHandle>) -> http::Status {
+pub fn post_tree(data: Json<Data>, state: &rocket::State<tauri::AppHandle>) -> http::Status {
     /* Deserialise json data and convert to ParserInfo */
     let parser_info: ParserInfo = data.into_inner().into();
     
@@ -49,7 +49,7 @@ mod test {
     #[test]
     fn get_responds_hello_world() {
         /* Launch rocket client via a blocking, tracked Client for debugging */
-        let client: blocking::Client = tracked_client();
+        let client: blocking::Client = tracked_client(rocket::routes![super::get_hello]);
         
         /* Perform GET request to index route '/' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_hello)).dispatch();
@@ -62,7 +62,7 @@ mod test {
     #[test]
     fn unrouted_get_fails() {
         /* Launch rocket client via a blocking, tracked Client for debugging */
-        let client: blocking::Client = tracked_client();
+        let client: blocking::Client = tracked_client(rocket::routes![super::get_hello]);
         
         /* Perform GET request to non-existent route '/hello' */
         let response: blocking::LocalResponse = client.get("/hello").dispatch();
@@ -73,7 +73,7 @@ mod test {
     
     #[test]
     fn get_on_post_fails() {
-        let client: blocking::Client = tracked_client();
+        let client: blocking::Client = tracked_client(vec![]);
         
         /* Perform GET request to '/api/remote' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::post_tree)).dispatch();
@@ -85,7 +85,7 @@ mod test {
     
     #[test]
     fn post_tree_succeeds() {
-        let client: blocking::Client = tracked_client();
+        let client: blocking::Client = tracked_client(vec![]);
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
@@ -99,7 +99,7 @@ mod test {
     
     #[test]
     fn empty_post_fails() {
-        let client: blocking::Client = tracked_client();
+        let client: blocking::Client = tracked_client(vec![]);
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
@@ -113,7 +113,7 @@ mod test {
     
     #[test]
     fn bad_format_post_fails() {
-        let client: blocking::Client = tracked_client();
+        let client: blocking::Client = tracked_client(vec![]);
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
