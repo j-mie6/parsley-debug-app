@@ -79,4 +79,60 @@ mod test {
         assert_eq!(payload.tree.input, "Test");
         assert_eq!(payload.tree.children.len(), 0);
     }
+
+    #[test]
+    fn parsley_debug_tree_with_children_into_debug_tree() {
+        let parsley_debug_tree: ParsleyDebugTree = ParsleyDebugTree {
+            name: String::from("Test"),
+            internal: String::from("Test"),
+            success: true,
+            number: 0,
+            input: String::from("Test"),
+            children: vec![
+                ParsleyDebugTree {
+                    name: String::from("Test1"),
+                    internal: String::from("Test1"),
+                    success: true,
+                    number: 0,
+                    input: String::from("Test1"),
+                    children: vec![
+                        ParsleyDebugTree {
+                            name: String::from("Test1.1"),
+                            internal: String::from("Test1.1"),
+                            success: true,
+                            number: 0,
+                            input: String::from("Test1.1"),
+                            children: Vec::new()
+                        }
+                    ]
+                },
+                ParsleyDebugTree {
+                    name: String::from("Test2"),
+                    internal: String::from("Test2"),
+                    success: true,
+                    number: 0,
+                    input: String::from("Test2"),
+                    children: vec![
+                        ParsleyDebugTree {
+                            name: String::from("Test2.1"),
+                            internal: String::from("Test2.1"),
+                            success: true,
+                            number: 0,
+                            input: String::from("Test2.1"),
+                            children: Vec::new()
+                        }
+                    ]
+                }
+            ]
+        };
+        
+        let debug_tree: DebugTree = parsley_debug_tree.into(); 
+
+        assert_eq!(debug_tree.name, parsley_debug_tree.name);
+        assert_eq!(debug_tree.internal, parsley_debug_tree.internal);
+        assert_eq!(debug_tree.success, parsley_debug_tree.success);
+        assert_eq!(debug_tree.number, parsley_debug_tree.number);
+        assert_eq!(debug_tree.input, parsley_debug_tree.input);
+        assert_eq!(debug_tree.children.len(), parsley_debug_tree.children.len());
+    }
 }
