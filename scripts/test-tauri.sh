@@ -1,5 +1,8 @@
-#!/bin/sh
-echo Testing Tauri...
+#!/bin/bash
 
-# cd src-tauri || return
-# cargo test --verbose
+printf "Testing backend...\n"
+
+cd src-tauri || return
+cargo test
+
+printf "\nDone\n"
