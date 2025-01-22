@@ -56,17 +56,28 @@ impl StateManager for StateHandle {
     fn set_info(&self, info: ParserInfo) {
         self.0.as_ref().set_info(info);
     }
+
+    fn get_tree(&self) -> DebugTree {
+        self.0.as_ref().get_tree()
+    }
 }
 
 
 #[cfg_attr(test, automock)]
 pub trait StateManager : Send + Sync {
     fn set_info(&self, info: ParserInfo);
+
+    fn get_tree(&self) -> DebugTree;
+
 }
 
 
 impl StateManager for tauri::AppHandle {
     fn set_info(&self, _info: ParserInfo) {
+        todo!()
+    }
+
+    fn get_tree(&self) -> DebugTree {
         todo!()
     }
 }

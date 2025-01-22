@@ -35,9 +35,9 @@ fn post_tree(data: Json<Payload>, state: &rocket::State<StateHandle>) -> http::S
 }
 
 #[get("/api/remote")]
-fn get_tree(state: &rocket::State<Mutex<ParserInfo>>) -> String {
-    let state: MutexGuard<ParserInfo> = state.lock().expect("ParserInfo mutex could not be acquired");
-    serde_json::to_string_pretty(&state.tree).expect("Could not serialise DebugTree to JSON")
+fn get_tree(state: &rocket::State<StateHandle>) -> String {
+    let state: &StateHandle = state.inner();
+    serde_json::to_string_pretty(&state.get_tree()).expect("Could not serialise DebugTree to JSON")
 }
 
 #[cfg(test)]
