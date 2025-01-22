@@ -32,7 +32,7 @@ fn post_tree(data: Json<Payload>, state: &rocket::State<Mutex<ParserInfo>>) -> h
     http::Status::Ok
 }
 
-#[get("/api/tree")]
+#[get("/api/remote")]
 fn get_tree(state: &rocket::State<Mutex<ParserInfo>>) -> Json<String> {
     let state: std::sync::MutexGuard<'_, ParserInfo> = state.lock().expect("ParserInfo mutex could not be acquired");
     Json(serde_json::to_string(&state.tree).expect("Could not serialise DebugTree to JSON"))

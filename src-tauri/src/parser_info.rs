@@ -9,17 +9,21 @@ pub struct ParserInfo {
 #[derive(serde::Serialize)]
 pub struct DebugTree {
     pub name: String, /*The internal (default) or user-defined name of the parser */
+    pub internal: String, /*The internal name of the parser */
     pub success: bool, /* Whether the parser was successful */
     pub input: String, /* The input string passed to the parser */
+    pub number: usize, /* The unique child number of this node */
     pub children: Vec<DebugTree>, /* The children of this node */
 }
 
 impl DebugTree {
-    pub fn new(name: String, success: bool, input: String, children: Vec<DebugTree>) -> Self {
+    pub fn new(name: String, internal: String, success: bool, input: String, number:usize, children: Vec<DebugTree>) -> Self {
         DebugTree {
             name,
+            internal,
             success,
             input,
+            number,
             children
         }
     }
@@ -27,8 +31,10 @@ impl DebugTree {
     pub fn default() -> Self {
         DebugTree {
             name: String::from(""),
+            internal: String::from(""),
             success: false,
             input: String::from(""),
+            number: 0,
             children: Vec::new()
         }
     }
