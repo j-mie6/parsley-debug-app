@@ -7,13 +7,13 @@ use super::payload::Payload;
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_onboarding, get_tree, post_tree]
+    rocket::routes![get_index, get_tree, post_tree]
 }
 
 
 /* Placeholder GET request handler to print 'Hello world!' */
 #[get("/")]
-fn get_onboarding() -> String {
+fn get_index() -> String {
     String::from("DILL: Debugging Interactively for the ParsLey Language")
 }
 
@@ -52,7 +52,7 @@ mod test {
         let client: blocking::Client = tracked_client();
         
         /* Perform GET request to index route '/' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_onboarding)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_index)).dispatch();
         
         /* Assert GET request was successful and payload was correct */
         assert_eq!(response.status(), http::Status::Ok);
@@ -137,7 +137,7 @@ mod test {
         assert_eq!(response.status(), http::Status::Ok);
     }
 
-    fn post_then_get_returns_tree() {
+    fn get_returns_posted_tree() {
         let client: blocking::Client = tracked_client();
 
        /* Perform POST request to '/api/remote' */
