@@ -38,5 +38,30 @@ pub struct Payload {
 #[cfg(test)]
 mod test {
     /* Data unit testing */
+
+    use crate::DebugTree;
+    use super::ParsleyDebugTree;
     
+    #[test]
+    fn parsley_debug_tree_into_debug_tree() {
+        
+        
+        let parsley_debug_tree: ParsleyDebugTree = ParsleyDebugTree {
+            name: String::from("Test"),
+            internal: String::from("Test"),
+            success: true,
+            number: 0,
+            input: String::from("Test"),
+            children: Vec::new()
+        };
+        
+        let debug_tree: DebugTree = parsley_debug_tree.into();
+        
+        assert_eq!(debug_tree.name, parsley_debug_tree.name);
+        assert_eq!(debug_tree.internal, parsley_debug_tree.internal);
+        assert_eq!(debug_tree.success, parsley_debug_tree.success);
+        assert_eq!(debug_tree.number, parsley_debug_tree.number);
+        assert_eq!(debug_tree.input, parsley_debug_tree.input);
+        assert_eq!(debug_tree.children.len(), parsley_debug_tree.children.len());
+    }
 }
