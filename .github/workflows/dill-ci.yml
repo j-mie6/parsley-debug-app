@@ -17,6 +17,8 @@ on:
 
 jobs:
   build:
+    name: Check, test and build DILL
+
     # Creates a job for each OS
     runs-on: ${{matrix.os}}
     strategy:
@@ -24,77 +26,32 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      
+      # Use composite action for setup 
+      - name: Setup 
+        uses: ./.github/actions/setup
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 11
-          cache: sbt
-
-      - name: Setup sbt launcher
-        uses: sbt/setup-sbt@v1
-
-      - name: Display Script Running
-        run: echo Build beginning on $RUNNER_OS architecture
-
-      - name: Run Build Script
+      - name: Test backend
         shell: bash
-        run: |
-          echo Running build.sh
-          sh scripts/build.sh
+        run: sh scripts/test-tauri.sh
 
-  test-laminar:
-    # Requires that build job is completed first
-    needs: build
-    # Creates a job for each OS
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 11
-          cache: sbt
-
-      - name: Setup sbt launcher
-        uses: sbt/setup-sbt@v1
-
-      - name: Display Script Running
-        run: echo Testing for laminar beginning on $RUNNER_OS architecture
-
-      - name: Npm Installing
-        run: npm install
-
-      - name: Run Laminar Test Script
+      - name: Test frontend
         shell: bash
         run: sh scripts/test-laminar.sh
 
-  test-tauri:
-    # Requires that build job is completed first
-    needs: build
-    # Creates a job for each OS
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Display Script Running
-        run: echo Testing for tauri beginning on $RUNNER_OS architecture
-
-      - name: Run Tauri Test Script
+      - name: Build artifact
         shell: bash
-        run: sh scripts/test-tauri.sh
+        run: sh scripts/build.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          # Name of artifact to upload
+          name: ${{ matrix.os }}-app-bundles
+
+          # Path of artifact to upload
+          path: ./src-tauri/target/release/bundle/
+
+          # Fail upload if no files are found at the path
+          if-no-files-found: error
