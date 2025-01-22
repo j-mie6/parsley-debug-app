@@ -68,6 +68,75 @@ mod test {
         assert_eq!(payload.tree.children.len(), 0);
     }
 
+    #[test]
+    fn nested_payload_deserialises() {
+        let payload: &str = r#"{
+            "input": "Test",
+            "tree": {
+                "name": "Test",
+                "internal": "Test",
+                "success": true,
+                "number": 0,
+                "input": "Test",
+                "children": [
+                    {
+                        "name": "Test1",
+                        "internal": "Test1",
+                        "success": true,
+                        "number": 0,
+                        "input": "Test1",
+                        "children": [
+                            {
+                                "name": "Test1.1",
+                                "internal": "Test1.1",
+                                "success": true,
+                                "number": 0,
+                                "input": "Test1.1",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Test2",
+                        "internal": "Test2",
+                        "success": true,
+                        "number": 0,
+                        "input": "Test2",
+                        "children": [
+                            {
+                                "name": "Test2.1",
+                                "internal": "Test2.1",
+                                "success": true,
+                                "number": 0,
+                                "input": "Test2.1",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        }"#;
+
+        let payload: super::Payload = serde_json::from_str(&payload).expect("Could not deserialise nested payload");
+        
+        /* Check that the root tree has been serialised correctly */
+        assert_eq!(payload.input, "Test");
+        assert_eq!(payload.tree.name, "Test");
+        assert_eq!(payload.tree.internal, "Test");
+        assert_eq!(payload.tree.success, true);
+        assert_eq!(payload.tree.number, 0);
+        assert_eq!(payload.tree.input, "Test");
+        assert_eq!(payload.tree.children.len(), 2);
+
+        /* Check that the children have been serialised correctly */
+        for (index, child) in payload.tree.children.iter().enumerate() {
+            assert_eq!(child.name, format!("Test{}", index + 1));
+            assert_eq!(child.internal, format!("Test{}", index + 1));
+            assert_eq!(child.success, true);
+            assert_eq!(child.number, 0);
+        }
+    }
+
     
     #[test]
     fn parsley_debug_tree_converts_into_debug_tree() {
