@@ -134,5 +134,14 @@ mod test {
         assert_eq!(debug_tree.number, parsley_debug_tree.number);
         assert_eq!(debug_tree.input, parsley_debug_tree.input);
         assert_eq!(debug_tree.children.len(), parsley_debug_tree.children.len());
+
+        for (index, child) in debug_tree.children.iter().enumerate() {
+            assert_eq!(child.name, parsley_debug_tree.children[index].name);
+            assert_eq!(child.internal, parsley_debug_tree.children[index].internal);
+            assert_eq!(child.success, parsley_debug_tree.children[index].success);
+            assert_eq!(child.number, parsley_debug_tree.children[index].number);
+            assert_eq!(child.input, parsley_debug_tree.children[index].input);
+            assert_eq!(child.children.len(), parsley_debug_tree.children[index].children.len());
+        } 
     }
 }
