@@ -2,6 +2,7 @@ package Display
 
 import com.raquo.laminar.api.L.*
 
+
 /**
   * DisplayTree creates the HTML element to display a DebugTree
   *
@@ -37,6 +38,7 @@ class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) 
         if children.isEmpty then placeholderElement else debugTreeElement
     }
 }
+
 
 object DisplayTree {
     // Example of a DisplayTree to use in testing
