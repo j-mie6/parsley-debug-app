@@ -42,7 +42,7 @@ class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) 
 
 object DisplayTree {
     // Example of a DisplayTree to use in testing
-    final val SAMPLE_TREE: DisplayTree = {
+    final val SampleTree: DisplayTree = {
         DisplayTree("root!", List(DisplayTree("alejandro", List(DisplayTree("child"))), DisplayTree("adam"), DisplayTree("kevin")))
     }
     
