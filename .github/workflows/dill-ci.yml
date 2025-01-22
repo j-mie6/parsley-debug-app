@@ -32,12 +32,6 @@ jobs:
       - name: Setup 
         uses: ./.github/actions/setup
 
-      - name: Check backend compiles
-        shell: bash
-        run: |
-          cd src-tauri
-          cargo check
-
       - name: Test backend
         shell: bash
         run: sh scripts/test-tauri.sh
@@ -46,7 +40,18 @@ jobs:
         shell: bash
         run: sh scripts/test-laminar.sh
 
-      - name: Build artefact
+      - name: Build artifact
         shell: bash
-        run: |
-          sh scripts/build.sh
+        run: sh scripts/build.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          # Name of artifact to upload
+          name: ${{ matrix.os }}-app-bundles
+
+          # Path of artifact to upload
+          path: ./src-tauri/target/release/bundle/
+
+          # Fail upload if no files are found at the path
+          if-no-files-found: error

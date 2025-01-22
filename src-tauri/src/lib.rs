@@ -70,10 +70,11 @@ fn render_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
     }
 }
 
+
+
 #[cfg(test)]
 mod test {
-
-	/* Tauri integration tests */
-
+    
+    /* Tauri integration tests */
+    
 }
-
