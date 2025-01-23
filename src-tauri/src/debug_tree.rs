@@ -37,11 +37,8 @@ impl DebugTree {
         }
     }
 
-    pub fn set_input(&mut self, input: String) {
-        self.input = input
-    }
-    
-    pub fn set_tree(&mut self, root: Node) {
-        self.root = root
+    pub fn set(&mut self, input: String, root: Node) {
+        self.input = input;
+        self.root = root;
     }
 }

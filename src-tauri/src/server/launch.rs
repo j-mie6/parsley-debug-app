@@ -11,8 +11,7 @@ const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
 
 /* Build the Rocket server */
 pub fn build() -> Rocket<Build> {
-    /* Placeholder parser info struct */
-    let parser_info: DebugTree = DebugTree::new(
+    let state: DebugTree = DebugTree::new(
         String::from("This is a parser input"),
         Node { /* Default Node to be changed by state */
             name: String::from(""),
@@ -30,7 +29,7 @@ pub fn build() -> Rocket<Build> {
     
     rocket::custom(figment) /* Build the Rocket server with a custom config */
         .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
-        .manage(Mutex::new(parser_info)) /* Manage the parser info as a mutex-protected state */
+        .manage(Mutex::new(state)) /* Manage the parser info as a mutex-protected state */
 }
 
 /* Launch the Rocket server */

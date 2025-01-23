@@ -21,7 +21,7 @@ impl Into<Node> for ParsleyNode {
             number: self.number,
             children: self.children
                 .into_iter()
-                .map(|child| child.into())
+                .map(ParsleyNode::into)
                 .collect(),
         } 
     }
@@ -36,16 +36,13 @@ pub struct ParsleyTree {
 
 
 #[cfg(test)]
-mod test {
+pub mod test {
     /* Data unit testing */
 
     use crate::Node;
-    use super::ParsleyNode;
+    use super::{ParsleyTree, ParsleyNode};
 
-
-    #[test]
-    fn parsley_tree_deserialises() {
-        let raw_tree: &str = r#"{
+    pub const RAW_TREE_SIMPLE: &str = r#"{
             "input": "Test",
             "root": {
                 "name": "Test",
@@ -56,8 +53,11 @@ mod test {
                 "children": []
             }
         }"#;
-        
-        let tree: super::ParsleyTree = serde_json::from_str(&raw_tree).expect("Could not deserialise ParsleyTree");
+
+
+    #[test]
+    fn parsley_tree_deserialises() {
+        let tree: ParsleyTree = serde_json::from_str(&RAW_TREE_SIMPLE).expect("Could not deserialise ParsleyTree");
         
         assert_eq!(tree.input, "Test");
         assert_eq!(tree.root.name, "Test");
@@ -117,7 +117,7 @@ mod test {
             }
         }"#;
 
-        let tree: super::ParsleyTree = serde_json::from_str(&raw_tree).expect("Could not deserialise nested ParsleyTree");
+        let tree: ParsleyTree = serde_json::from_str(&raw_tree).expect("Could not deserialise nested ParsleyTree");
         
         /* Check that the root tree has been serialised correctly */
         assert_eq!(tree.input, "Test");

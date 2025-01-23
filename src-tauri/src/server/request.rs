@@ -22,42 +22,27 @@ fn get_index() -> String {
 #[post("/api/remote", format = "application/json", data = "<data>")] 
 fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<Mutex<DebugTree>>) -> http::Status {
     /* Deserialise and unwrap json data */
-    let ParsleyTree { input, root } = data.into_inner(); 
+    let ParsleyTree { input, root } = data.into_inner();
     
     /* Acquire the mutex */
-    let mut state = state.lock().expect("DebugTree mutex could not be acquired");
-    state.set_input(input);
-    state.set_tree(root.into());
+    let mut state = state.lock().expect("State mutex could not be acquired");
+    state.set(input, root.into());
 
     http::Status::Ok
 }
 
 #[get("/api/remote")]
 fn get_info(state: &rocket::State<Mutex<DebugTree>>) -> String {
-    let state: MutexGuard<DebugTree> = state.inner().lock().expect("ParserInfo mutex could not be acquired");
-    serde_json::to_string_pretty(state.deref()).expect("Could not serialise ParserInfo to JSON")
+    let state: MutexGuard<DebugTree> = state.inner().lock().expect("State mutex could not be acquired");
+    serde_json::to_string_pretty(state.deref()).expect("Could not serialise State to JSON")
 }
 
 #[cfg(test)]
 pub mod test {
     
-    use crate::server::test::tracked_client;
     use rocket::{http, local::blocking};
-
-    /* Example payload JSON string for testing */
-    pub fn test_payload_str() -> &'static str {
-        r#"{
-            "input": "Test",
-            "root": {
-                "name": "Test",
-                "internal": "Test",
-                "success": true,
-                "number": 0,
-                "input": "Test",
-                "children": [] 
-            }
-        }"#
-    }
+    use crate::server::test::tracked_client;
+    use crate::server::parsley_tree::test::RAW_TREE_SIMPLE;
         
     /* Request unit testing */
     
@@ -95,7 +80,7 @@ pub mod test {
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
-            .body(&test_payload_str())
+            .body(&RAW_TREE_SIMPLE)
             .dispatch();
         
         /* Assert that POST succeeded */
@@ -149,11 +134,11 @@ pub mod test {
         /* Perform POST request to '/api/remote' */
         let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
-            .body(&test_payload_str())
+            .body(&RAW_TREE_SIMPLE)
             .dispatch();
 
         /* Assert that POST succeeded */
-        assert_eq!(post_response.status(), http::Status::Ok); 
+        assert_eq!(post_response.status(), http::Status::Ok);
 
         /* Perform GET request to '/api/remote' */
         let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
@@ -166,7 +151,7 @@ pub mod test {
             get_response.into_string()
                 .expect("get_info response is not a String")
                 .replace(" ", ""),
-            test_payload_str().replace(" ", "")
+                RAW_TREE_SIMPLE.replace(" ", "")
         );
     }
     
