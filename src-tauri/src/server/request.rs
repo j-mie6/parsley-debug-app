@@ -41,11 +41,14 @@ fn get_info(state: &rocket::State<Mutex<ParserInfo>>) -> String {
 #[cfg(test)]
 pub mod test {
     
-    use crate::server::{payload::{ParsleyDebugTree, Payload}, test::tracked_client};
+    use crate::server::test::tracked_client;
+    use crate::server::payload::{ParsleyDebugTree, Payload};
     use rocket::{http, local::blocking};
 
-    fn test_payload() -> Payload {
-        Payload {
+
+    pub fn test_payload_str() -> String {
+        serde_json::to_string_pretty(
+            &Payload {
             input: String::from("Test"),
             tree: ParsleyDebugTree {
                 name: String::from("Test"),
@@ -55,12 +58,7 @@ pub mod test {
                 input: String::from("Test"),
                 children: vec![]
             },
-        }
-
-    }
-
-    pub fn test_payload_str() -> String {
-        serde_json::to_string_pretty(&test_payload()).expect("Could not serialise Payload to JSON")
+        }).expect("Could not serialise Payload to JSON")
     }
     
     /* Request unit testing */
