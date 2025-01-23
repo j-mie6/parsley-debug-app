@@ -47,7 +47,7 @@ mod test {
     fn parsley_tree_deserialises() {
         let raw_tree: &str = r#"{
             "input": "Test",
-            "tree": {
+            "root": {
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
@@ -72,7 +72,7 @@ mod test {
     fn nested_parsley_tree_deserialises() {
         let raw_tree: &str = r#"{
             "input": "Test",
-            "tree": {
+            "root": {
                 "name": "Test",
                 "internal": "Test",
                 "success": true,

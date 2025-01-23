@@ -9,6 +9,7 @@ pub use launch::launch;
 mod test {
     
     use rocket::{http, local::blocking};
+    use super::request::test::test_payload_str;
     use super::launch;
     
     /* Server integration testing */
@@ -29,7 +30,7 @@ mod test {
         /* Format POST requests to route '/api/remote' */
         let post_request = client.post("/api/remote")
             .header(http::ContentType::JSON)
-            .body(r#"{"input": "this is the parser input", "tree": "tree"}"#);
+            .body(test_payload_str());
         
         
         /* Repeatedly perform requests */
