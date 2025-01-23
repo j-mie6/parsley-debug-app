@@ -42,26 +42,23 @@ fn get_info(state: &rocket::State<Mutex<ParserInfo>>) -> String {
 pub mod test {
     
     use crate::server::test::tracked_client;
-    use crate::server::payload::{ParsleyDebugTree, Payload};
     use rocket::{http, local::blocking};
 
-
-    pub fn test_payload_str() -> String {
-        serde_json::to_string_pretty(
-            &Payload {
-                input: String::from("Test"),
-                tree: ParsleyDebugTree {
-                    name: String::from("Test"),
-                    internal: String::from("Test"),
-                    success: true,
-                    number: 0,
-                    input: String::from("Test"),
-                    children: vec![]
-                },
+    /* Example payload JSON string for testing */
+    pub fn test_payload_str() -> &'static str {
+        r#"{
+            "input": "Test",
+            "tree": {
+                "name": "Test",
+                "internal": "Test",
+                "success": true,
+                "number": 0,
+                "input": "Test",
+                "children": [] 
             }
-        ).expect("Could not serialise Payload to JSON")
+        }"#
     }
-    
+        
     /* Request unit testing */
     
     #[test]
@@ -88,7 +85,8 @@ pub mod test {
         
         /* Assert GET request was unsuccessful with status 404 */
         assert_eq!(response.status(), http::Status::NotFound);
-    }    
+    }
+
     
     #[test]
     fn post_payload_succeeds() {
@@ -132,6 +130,7 @@ pub mod test {
         assert_eq!(response.status(), http::Status::NotFound);
     }
 
+
     #[test]
     fn get_returns_tree() {
         let client: blocking::Client = tracked_client();
@@ -147,12 +146,12 @@ pub mod test {
     fn get_returns_posted_tree() {
         let client: blocking::Client = tracked_client();
 
-       /* Perform POST request to '/api/remote' */
-       let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_payload))
+        /* Perform POST request to '/api/remote' */
+        let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_payload))
             .header(http::ContentType::JSON)
             .body(&test_payload_str())
             .dispatch();
-   
+
         /* Assert that POST succeeded */
         assert_eq!(post_response.status(), http::Status::Ok); 
 
@@ -162,9 +161,13 @@ pub mod test {
         /* Assert that GET succeeded */
         assert_eq!(get_response.status(), http::Status::Ok);
 
-       /* Assert that we GET the expected tree */
-       assert_eq!(get_response.into_string().expect("Tree was not string"),
-            test_payload_str()); 
+        /* Assert that we GET the expected tree */
+        assert_eq!(
+            get_response.into_string()
+                .expect("get_info response is not a String")
+                .replace(" ", ""),
+            test_payload_str().replace(" ", "")
+        );
     }
     
 }
