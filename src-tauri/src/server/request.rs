@@ -1,4 +1,4 @@
-use std::sync::{Mutex, MutexGuard};
+use std::{ops::Deref, sync::{Mutex, MutexGuard}};
 use rocket::{get, http, post, serde::json::Json};
 
 use crate::ParserInfo;
@@ -7,7 +7,7 @@ use super::payload::Payload;
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_index, get_tree, post_tree]
+    rocket::routes![get_index, get_info, post_payload]
 }
 
 
@@ -20,7 +20,7 @@ fn get_index() -> String {
 
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
-fn post_tree(data: Json<Payload>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
+fn post_payload(data: Json<Payload>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
     /* Deserialise and unwrap json data */
     let Payload { input, tree } = data.into_inner(); 
     
@@ -33,17 +33,32 @@ fn post_tree(data: Json<Payload>, state: &rocket::State<Mutex<ParserInfo>>) -> h
 }
 
 #[get("/api/remote")]
-fn get_tree(state: &rocket::State<Mutex<ParserInfo>>) -> String {
-    let state: MutexGuard<ParserInfo> = state.lock().expect("ParserInfo mutex could not be acquired");
-    serde_json::to_string_pretty(&state.tree).expect("Could not serialise DebugTree to JSON")
+fn get_info(state: &rocket::State<Mutex<ParserInfo>>) -> String {
+    let state: MutexGuard<ParserInfo> = state.inner().lock().expect("ParserInfo mutex could not be acquired");
+    serde_json::to_string_pretty(state.deref()).expect("Could not serialise ParserInfo to JSON")
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     
     use crate::server::test::tracked_client;
     use rocket::{http, local::blocking};
-    
+
+    /* Example payload JSON string for testing */
+    pub fn test_payload_str() -> &'static str {
+        r#"{
+            "input": "Test",
+            "tree": {
+                "name": "Test",
+                "internal": "Test",
+                "success": true,
+                "number": 0,
+                "input": "Test",
+                "children": [] 
+            }
+        }"#
+    }
+        
     /* Request unit testing */
     
     #[test]
@@ -71,27 +86,16 @@ mod test {
         /* Assert GET request was unsuccessful with status 404 */
         assert_eq!(response.status(), http::Status::NotFound);
     }
+
     
     #[test]
-    fn get_on_post_fails() {
-        let client: blocking::Client = tracked_client();
-        
-        /* Perform GET request to '/api/remote' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::post_tree)).dispatch();
-        
-        /* Assert that GET failed due to no found GET handlers */
-        assert_eq!(response.status(), http::Status::NotFound);
-    }
-    
-    
-    #[test]
-    fn post_tree_succeeds() {
+    fn post_payload_succeeds() {
         let client: blocking::Client = tracked_client();
         
         /* Perform POST request to '/api/remote' */
-        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_payload))
             .header(http::ContentType::JSON)
-            .body(r#"{"input": "this is the parser input", "tree": "tree"}"#)
+            .body(&test_payload_str())
             .dispatch();
         
         /* Assert that POST succeeded */
@@ -103,7 +107,7 @@ mod test {
         let client: blocking::Client = tracked_client();
         
         /* Perform POST request to '/api/remote' */
-        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_payload))
             .header(http::ContentType::JSON)
             .body("{}")
             .dispatch();
@@ -117,7 +121,7 @@ mod test {
         let client: blocking::Client = tracked_client();
         
         /* Perform POST request to '/api/remote' */
-        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
+        let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_payload))
             .header(http::ContentType::Text) /* Incompatible header type */
             .body("Hello world")
             .dispatch();
@@ -126,12 +130,13 @@ mod test {
         assert_eq!(response.status(), http::Status::NotFound);
     }
 
+
     #[test]
     fn get_returns_tree() {
         let client: blocking::Client = tracked_client();
         
         /* Perform GET request to '/api/remote' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
         
         /* Assert that GET succeeded */
         assert_eq!(response.status(), http::Status::Ok);
@@ -141,24 +146,28 @@ mod test {
     fn get_returns_posted_tree() {
         let client: blocking::Client = tracked_client();
 
-       /* Perform POST request to '/api/remote' */
-       let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
+        /* Perform POST request to '/api/remote' */
+        let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_payload))
             .header(http::ContentType::JSON)
-            .body(r#"{"input": "this is the test parser input", "tree": "test tree"}"#)
+            .body(&test_payload_str())
             .dispatch();
-   
+
         /* Assert that POST succeeded */
         assert_eq!(post_response.status(), http::Status::Ok); 
 
         /* Perform GET request to '/api/remote' */
-        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
+        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
 
         /* Assert that GET succeeded */
         assert_eq!(get_response.status(), http::Status::Ok);
 
-       /* Assert that we GET the expected tree */
-       assert_eq!(get_response.into_string().expect("Tree was not string"),
-            r#"{"input": "this is the test parser input", "tree": "test tree"}"#); 
+        /* Assert that we GET the expected tree */
+        assert_eq!(
+            get_response.into_string()
+                .expect("get_info response is not a String")
+                .replace(" ", ""),
+            test_payload_str().replace(" ", "")
+        );
     }
     
 }
