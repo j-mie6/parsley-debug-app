@@ -49,16 +49,17 @@ pub mod test {
     pub fn test_payload_str() -> String {
         serde_json::to_string_pretty(
             &Payload {
-            input: String::from("Test"),
-            tree: ParsleyDebugTree {
-                name: String::from("Test"),
-                internal: String::from("Test"),
-                success: true,
-                number: 0,
                 input: String::from("Test"),
-                children: vec![]
-            },
-        }).expect("Could not serialise Payload to JSON")
+                tree: ParsleyDebugTree {
+                    name: String::from("Test"),
+                    internal: String::from("Test"),
+                    success: true,
+                    number: 0,
+                    input: String::from("Test"),
+                    children: vec![]
+                },
+            }
+        ).expect("Could not serialise Payload to JSON")
     }
     
     /* Request unit testing */
