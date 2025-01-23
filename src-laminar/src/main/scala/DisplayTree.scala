@@ -12,39 +12,34 @@ import com.raquo.laminar.api.L.*
 class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) {
     
     def node(depth: Int = 1): Element = div(
-        paddingTop := "1em",
-        paddingBottom := "2em",
+        padding := s"${2.5 - depth * 0.35}em",
+        paddingLeft := "1em",
+        paddingRight := "1em",
         
-        color := "#2E2F30",
-        
-        textAlign := "center",
+        border := "1px solid #2E2F30",
+        borderRadius.px := 20,
 
-        s"${depth}: $placeholderText"
+        color := "#2E2F30",
+        backgroundColor := s"hsl(158.3, 52.2%, ${60 + depth * 8}%)",
+
+        textAlign := "center",
+        fontSize := s"${14 - depth}pt",
+
+        placeholderText
     )
 
     /* HTML element to display DisplayTree */
     def element(depth: Int = 1): Element = {
         div(
-            padding := "1em",
+            margin := "0.6em",
             
-            margin := "0.2em",
-            marginBottom := "0.1em",
-            marginTop := "0.25em",
-            
-            // border := "2px solid #ffffff",
-            borderRadius.px := 20,
-
-            color := "#2E2F30",
-            backgroundColor := s"hsl(158.3, 52.2%, ${72.9 + depth * 5}%)",
-            
-            node(depth),
-            
+            node(depth),      
+                  
             div(
                 display := "flex",
                 flexDirection := "row",
                 flexWrap := "nowrap",
 
-                // justifyContent := "space-between",
                 justifyContent := "center",
 
                 children.map((child) => 

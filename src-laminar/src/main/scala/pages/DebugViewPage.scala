@@ -78,12 +78,12 @@ object DebugViewPage extends Page {
     )
 
     private lazy val treeView: Element = div(
+        background := "#2E2F30",
         borderRadius.px := 20,
-        background := "#96DEC4",
-        border := "1px solid #96DEC4",
+        border := "2px solid #96DEC4",
         width.percent := 100,
         height.percent := 100,
-        DisplayTree.SAMPLE_TREE.element,
+        DisplayTree.SAMPLE_TREE.element(),
     )
 
     lazy val page: Element = mainTag(
