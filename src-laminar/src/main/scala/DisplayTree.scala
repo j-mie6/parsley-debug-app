@@ -11,31 +11,47 @@ import com.raquo.laminar.api.L.*
   */
 class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) {
     
-    val placeholderElement: Element = p(placeholderText)
+    def node(depth: Int = 1): Element = div(
+        paddingTop := "1em",
+        paddingBottom := "2em",
+        
+        color := "#2E2F30",
+        
+        textAlign := "center",
 
-    private val debugTreeElement: Element = {
+        s"${depth}: $placeholderText"
+    )
+
+    /* HTML element to display DisplayTree */
+    def element(depth: Int = 1): Element = {
         div(
-            paddingLeft := "0",
-            listStyleType := "none",
-            border := "2px solid tomato",
-            padding := "2px",
-            placeholderElement,
-            ul(
-                listStyleType := "none",
-                children.map((t) => li(
-                    verticalAlign := "top",
-                    padding := "2px",
-                    t.element
-                ))
+            padding := "1em",
+            
+            margin := "0.2em",
+            marginBottom := "0.1em",
+            marginTop := "0.25em",
+            
+            // border := "2px solid #ffffff",
+            borderRadius.px := 20,
+
+            color := "#2E2F30",
+            backgroundColor := s"hsl(158.3, 52.2%, ${72.9 + depth * 5}%)",
+            
+            node(depth),
+            
+            div(
+                display := "flex",
+                flexDirection := "row",
+                flexWrap := "nowrap",
+
+                // justifyContent := "space-between",
+                justifyContent := "center",
+
+                children.map((child) => 
+                    child.element(depth + 1)
+                )
             )
         )
-    }
-
-    /**
-      * HTLM element to display DisplayTree
-      */
-    def element: Element = {
-        if children.isEmpty then placeholderElement else debugTreeElement
     }
 }
 
@@ -43,7 +59,31 @@ class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) 
 object DisplayTree {
     // Example of a DisplayTree to use in testing
     final val SAMPLE_TREE: DisplayTree = {
-        DisplayTree("root!", List(DisplayTree("alejandro", List(DisplayTree("child"))), DisplayTree("adam"), DisplayTree("kevin")))
+        DisplayTree("Carmine", List(
+            DisplayTree("August", List(
+                DisplayTree("Marc"),
+                DisplayTree("Christoper", List(
+                    DisplayTree("Bailey"), 
+                    DisplayTree("Dexter")
+                )),
+                DisplayTree("Nicolas", List(DisplayTree("Kal")))
+            )),
+            DisplayTree("Francis", List(
+                DisplayTree("Gian-Carlo", List(DisplayTree("Gian-Carla"))),   
+                DisplayTree("Roman"),
+                DisplayTree("Sofia", List(
+                    DisplayTree("Romy"),
+                    DisplayTree("Cosima")
+                ))
+            )),
+            DisplayTree("Talia", List(
+                DisplayTree("Jason", List(
+                    DisplayTree("Marlowe"),
+                    DisplayTree("Una")
+                )),
+                DisplayTree("Robert"),
+            ))
+        ))
     }
     
     // Secondary constructors
