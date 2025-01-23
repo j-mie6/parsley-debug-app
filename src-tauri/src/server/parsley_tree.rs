@@ -3,8 +3,8 @@ use crate::Node;
 /* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(serde::Deserialize, Clone)]
 pub struct ParsleyNode {
-    pub name: String, /* The user-defined name of the tree */
-    pub internal: String, /*The internal name of the parser */
+    pub name: String, /* The user-defined name */
+    pub internal: String, /* The internal name of the parser */
     pub success: bool, /* Whether the parser was successful */
     pub number: usize, /* The unique child number of this node */
     pub input: String, /* The input string passed to the parser */

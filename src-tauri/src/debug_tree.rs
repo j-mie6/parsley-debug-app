@@ -1,4 +1,3 @@
-
 /* Placeholder DebugTree structures for state management */
 pub struct DebugTree {
     pub input: String,
