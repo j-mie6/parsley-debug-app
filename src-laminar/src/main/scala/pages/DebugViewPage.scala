@@ -5,6 +5,8 @@ import org.scalajs.dom
 import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
 
+import Display.DisplayTree
+
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -79,7 +81,8 @@ object DebugViewPage extends Page {
         background := "#2E2F30",
         border := "1px solid #96DEC4",
         width.percent := 100,
-        height.percent := 100
+        height.percent := 100,
+        DisplayTree.SAMPLE_TREE.element,
     )
 
     lazy val page: Element = mainTag(
