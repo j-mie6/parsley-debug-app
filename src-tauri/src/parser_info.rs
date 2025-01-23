@@ -1,5 +1,6 @@
 
 /* Placeholder ParserInfo structures for state management */
+#[derive(serde::Serialize)]
 pub struct ParserInfo {
     pub input: String,
     pub tree: DebugTree,
@@ -11,19 +12,19 @@ pub struct DebugTree {
     pub name: String, /*The internal (default) or user-defined name of the parser */
     pub internal: String, /*The internal name of the parser */
     pub success: bool, /* Whether the parser was successful */
-    pub input: String, /* The input string passed to the parser */
     pub number: usize, /* The unique child number of this node */
+    pub input: String, /* The input string passed to the parser */
     pub children: Vec<DebugTree>, /* The children of this node */
 }
 
 impl DebugTree {
-    pub fn new(name: String, internal: String, success: bool, input: String, number:usize, children: Vec<DebugTree>) -> Self {
+    pub fn new(name: String, internal: String, success: bool, number:usize, input: String, children: Vec<DebugTree>) -> Self {
         DebugTree {
             name,
             internal,
             success,
-            input,
             number,
+            input,
             children
         }
     }
