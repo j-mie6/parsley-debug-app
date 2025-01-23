@@ -70,6 +70,7 @@ object DebugViewPage extends Page {
         gridTemplateColumns := "1fr 1fr 1fr",
         marginBottom.px := 10,
         // width.percent := 100,
+
         // Elements
         headerLeft,
         title,
@@ -78,7 +79,7 @@ object DebugViewPage extends Page {
 
     private lazy val treeView: Element = div(
         borderRadius.px := 20,
-        background := "#2E2F30",
+        background := "#96DEC4",
         border := "1px solid #96DEC4",
         width.percent := 100,
         height.percent := 100,
