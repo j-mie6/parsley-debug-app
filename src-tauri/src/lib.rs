@@ -1,7 +1,7 @@
 mod server;
 mod parser_info;
 
-pub use parser_info::{ParserInfo, DebugTree};
+pub use parser_info::{DebugTree, Node};
 
 
 #[tauri::command]

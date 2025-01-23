@@ -1,8 +1,8 @@
 use std::sync::{Mutex, MutexGuard};
 use rocket::{get, http, post, serde::json::Json};
 
-use crate::ParserInfo;
-use super::payload::Payload;
+use crate::DebugTree;
+use super::parsley_tree::ParsleyTree;
 
 
 /* Expose routes for mounting during launch */
@@ -20,22 +20,22 @@ fn get_index() -> String {
 
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
-fn post_tree(data: Json<Payload>, state: &rocket::State<Mutex<ParserInfo>>) -> http::Status {
+fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<Mutex<DebugTree>>) -> http::Status {
     /* Deserialise and unwrap json data */
-    let Payload { input, tree } = data.into_inner(); 
+    let ParsleyTree { input, root } = data.into_inner(); 
     
     /* Acquire the mutex */
-    let mut state = state.lock().expect("ParserInfo mutex could not be acquired");
+    let mut state = state.lock().expect("DebugTree mutex could not be acquired");
     state.set_input(input);
-    state.set_tree(tree.into());
+    state.set_tree(root.into());
 
     http::Status::Ok
 }
 
 #[get("/api/remote")]
-fn get_tree(state: &rocket::State<Mutex<ParserInfo>>) -> String {
-    let state: MutexGuard<ParserInfo> = state.lock().expect("ParserInfo mutex could not be acquired");
-    serde_json::to_string_pretty(&state.tree).expect("Could not serialise DebugTree to JSON")
+fn get_tree(state: &rocket::State<Mutex<DebugTree>>) -> String {
+    let state: MutexGuard<DebugTree> = state.lock().expect("DebugTree mutex could not be acquired");
+    serde_json::to_string_pretty(&state.root).expect("Could not serialise Node to JSON")
 }
 
 #[cfg(test)]
@@ -54,9 +54,9 @@ mod test {
         /* Perform GET request to index route '/' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_index)).dispatch();
         
-        /* Assert GET request was successful and payload was correct */
+        /* Assert GET request was successful and ParsleyTree was correct */
         assert_eq!(response.status(), http::Status::Ok);
-        assert_eq!(response.into_string().expect("Payload was not string"),
+        assert_eq!(response.into_string().expect("ParsleyTree was not string"),
             "DILL: Debugging Interactively for the ParsLey Language");
     }
     
