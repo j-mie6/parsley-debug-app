@@ -2,7 +2,6 @@ package Display
 
 import com.raquo.laminar.api.L.*
 
-
 /**
   * DisplayTree creates the HTML element to display a DebugTree
   *
