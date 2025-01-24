@@ -1,5 +1,5 @@
 mod launch;
-mod payload;
+mod parsley_tree;
 mod request;
 
 pub use launch::launch;
@@ -9,11 +9,10 @@ pub use launch::launch;
 pub mod test {
     
     use rocket::{http, local::blocking};
-    use crate::state::{DebugTree, MockStateManager, ParserInfo, StateHandle};
-
     use mockall::predicate;
 
-    use super::launch;
+    use crate::{state::{DebugTree, MockStateManager, StateHandle}, DebugNode};
+    use super::{launch, parsley_tree::test::RAW_TREE_SIMPLE};
     
     /* Server integration testing */
     
@@ -26,12 +25,12 @@ pub mod test {
     
     #[test]
     fn server_handles_many_requests() {
-        // TODO: make DebugTree/ParserInfo examples for testing
-        let debuginfo = DebugTree::new(String::new(), String::new(), false, String::new(), 0, vec![]);
-        let pinfo = ParserInfo::new(String::new(), debuginfo);
+        // TODO: make examples for testing
+        let root = DebugNode::new(String::new(), String::new(), false, String::new(), 0, vec![]);
+        let tree = DebugTree::new(String::new(), root);
 
         let mut mock = MockStateManager::new();
-        mock.expect_set_info().with(predicate::eq(pinfo));
+            mock.expect_set().with(predicate::eq(tree));
         
         let client: blocking::Client = tracked_client(mock);
         
@@ -41,7 +40,7 @@ pub mod test {
         /* Format POST requests to route '/api/remote' */
         let post_request = client.post("/api/remote")
             .header(http::ContentType::JSON)
-            .body(r#"{"input": "this is the parser input", "tree": "tree"}"#);
+            .body(RAW_TREE_SIMPLE);
         
         
         /* Repeatedly perform requests */

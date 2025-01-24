@@ -1,13 +1,12 @@
-use std::sync::{Mutex, MutexGuard};
-use rocket::{get, post, http, serde::json::Json};
+use rocket::{get, http, post, serde::json::Json};
 
-use crate::state::{ParserInfo, StateManager, StateHandle};
-use super::payload::Payload;
+use crate::{state::{StateHandle, StateManager}, DebugTree};
+use super::parsley_tree::ParsleyTree;
 
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_index, get_tree, post_tree]
+    rocket::routes![get_index, get_info, post_tree]
 }
 
 
@@ -20,32 +19,31 @@ fn get_index() -> String {
 
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
-fn post_tree(data: Json<Payload>, state: &rocket::State<StateHandle>) -> http::Status {
-    /* Deserialise json data and convert to ParserInfo */
-    let parser_info: ParserInfo = data.into_inner().into();
+fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> http::Status {
+    /* Deserialise and unwrap json data */
+    let ParsleyTree { input, root } = data.into_inner();
+    let debug_tree = DebugTree::new(input, root.into());
 
-    /* Acquire the app_state via the state and mutex */
-    let state: &StateHandle = state.inner();
+    let handle = state.inner();
+    handle.set(debug_tree);
+    
 
-    /* Update the parser info */
-    state.set_info(parser_info);
-
-    /* Return OK status */
     http::Status::Ok
 }
 
 #[get("/api/remote")]
-fn get_tree(state: &rocket::State<StateHandle>) -> String {
-    let state: &StateHandle = state.inner();
-    serde_json::to_string_pretty(&state.get_tree()).expect("Could not serialise DebugTree to JSON")
+fn get_info(state: &rocket::State<StateHandle>) -> String {
+    let handle = state.inner();
+    serde_json::to_string_pretty(&handle.get_tree()).expect("Could not serialise State to JSON")
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     
-    use crate::{server::test::tracked_client, state::MockStateManager};
     use rocket::{http, local::blocking};
-    
+    use crate::server::{parsley_tree::test::RAW_TREE_SIMPLE, test::tracked_client};
+    use crate::state::MockStateManager;
+        
     /* Request unit testing */
     
     #[test]
@@ -56,9 +54,9 @@ mod test {
         /* Perform GET request to index route '/' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_index)).dispatch();
         
-        /* Assert GET request was successful and payload was correct */
+        /* Assert GET request was successful and ParsleyTree was correct */
         assert_eq!(response.status(), http::Status::Ok);
-        assert_eq!(response.into_string().expect("Payload was not string"),
+        assert_eq!(response.into_string().expect("ParsleyTree was not string"),
             "DILL: Debugging Interactively for the ParsLey Language");
     }
     
@@ -95,7 +93,7 @@ mod test {
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
-            .body(r#"{"input": "this is the parser input", "tree": "tree"}"#)
+            .body(&RAW_TREE_SIMPLE)
             .dispatch();
         
         /* Assert that POST succeeded */
@@ -132,13 +130,14 @@ mod test {
         assert_eq!(response.status(), http::Status::NotFound);
     }
 
+
     #[test]
     fn get_returns_tree() {
         let mock = MockStateManager::new();
         let client: blocking::Client = tracked_client(mock);
         
         /* Perform GET request to '/api/remote' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
         
         /* Assert that GET succeeded */
         assert_eq!(response.status(), http::Status::Ok);
@@ -149,24 +148,28 @@ mod test {
         let mock = MockStateManager::new();
         let client: blocking::Client = tracked_client(mock);
 
-       /* Perform POST request to '/api/remote' */
-       let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
+        /* Perform POST request to '/api/remote' */
+        let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
-            .body(r#"{"input": "this is the test parser input", "tree": "test tree"}"#)
+            .body(&RAW_TREE_SIMPLE)
             .dispatch();
-   
+
         /* Assert that POST succeeded */
-        assert_eq!(post_response.status(), http::Status::Ok); 
+        assert_eq!(post_response.status(), http::Status::Ok);
 
         /* Perform GET request to '/api/remote' */
-        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
+        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
 
         /* Assert that GET succeeded */
         assert_eq!(get_response.status(), http::Status::Ok);
 
-       /* Assert that we GET the expected tree */
-       assert_eq!(get_response.into_string().expect("Tree was not string"),
-            r#"{"input": "this is the test parser input", "tree": "test tree"}"#); 
+        /* Assert that we GET the expected tree */
+        assert_eq!(
+            get_response.into_string()
+                .expect("get_info response is not a String")
+                .replace(" ", ""),
+                RAW_TREE_SIMPLE.replace(" ", "")
+        );
     }
     
 }

@@ -8,7 +8,7 @@ const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
 
 
 /* Build the Rocket server */
-pub fn build(app_handle: StateHandle) -> Rocket<Build> {
+pub fn build(handle: StateHandle) -> Rocket<Build> {
     /* Override the default config with values from Rocket.toml */
     let figment: Figment = Figment::from(Config::default())
         .merge(Toml::string(ROCKET_CONFIG).nested());
@@ -16,12 +16,12 @@ pub fn build(app_handle: StateHandle) -> Rocket<Build> {
     /* Build the rocket server */
     rocket::custom(figment) /* Install our custom config */
         .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
-        .manage(app_handle) /* Manage the app handle using Rocket state management */
+        .manage(handle) /* Manage the app handle using Rocket state management */
 }
 
 /* Launch the Rocket server */
-pub async fn launch(app_handle: StateHandle) -> Result<Rocket<Ignite>, rocket::Error> {
-    build(app_handle).launch().await
+pub async fn launch(handle: StateHandle) -> Result<Rocket<Ignite>, rocket::Error> {
+    build(handle).launch().await
 }
 
 

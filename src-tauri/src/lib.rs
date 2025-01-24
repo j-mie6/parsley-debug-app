@@ -5,10 +5,12 @@ use std::sync::Mutex;
 mod server;
 mod state;
 
+pub use state::{DebugTree, DebugNode};
+
 
 /* Global app state managed by Tauri */
 struct AppState {
-    parser: Option<state::ParserInfo>
+    parser: Option<DebugTree>
 }
 
 impl AppState {
@@ -61,11 +63,11 @@ pub fn run() {
 #[tauri::command]
 fn render_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
     /* Acquire the state mutex to access the parser */
-    let parser: &Option<state::ParserInfo> = &state.lock().expect("State mutex could not be acquired").parser;
+    let parser: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").parser;
     
     /* If parser exists, render in JSON */
     match parser {
-        Some(parser) => serde_json::to_string_pretty(parser.get_tree())
+        Some(parser) => serde_json::to_string_pretty(parser.get_root())
             .expect("Parser info could not be serialised"),	
         None => String::from("Tree does not exist"),
     }
