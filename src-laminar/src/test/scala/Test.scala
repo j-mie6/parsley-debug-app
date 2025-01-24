@@ -4,72 +4,75 @@ import org.scalatest.matchers.*
 
 import debugger.DebugTree
 import debugger.DebugTreeHandler
+import scala.util.{Try, Success, Failure}
 
-@Test
 class Test extends AnyFlatSpec with should.Matchers {
-    val jsonTree: String = """input": "Test",
-            "root": {
-                "name": "Test",
-                "internal": "Test",
-                "success": true,
-                "number": 0,
-                "input": "Test",
-                "children": [
-                    {
-                        "name": "Test1",
-                        "internal": "Test1",
-                        "success": true,
-                        "number": 0,
-                        "input": "Test1",
-                        "children": [
-                            {
-                                "name": "Test1.1",
-                                "internal": "Test1.1",
-                                "success": true,
-                                "number": 0,
-                                "input": "Test1.1",
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "name": "Test2",
-                        "internal": "Test2",
-                        "success": true,
-                        "number": 0,
-                        "input": "Test2",
-                        "children": [
-                            {
-                                "name": "Test2.1",
-                                "internal": "Test2.1",
-                                "success": true,
-                                "number": 0,
-                                "input": "Test2.1",
-                                "children": []
-                            }
-                        ]
-                    }
-                ]
-            }
-        }"""
 
-    val handler: DebugTreeHandler = DebugTreeHandler()
-    val tree: DebugTree = handler.decodeDebugTree(jsonTree).get
+    val jsonTree: String = """{
+        "input": "Test",
+        "root": {
+            "name": "Test",
+            "internal": "Test",
+            "success": true,
+            "number": 0,
+            "input": "Test",
+            "children": [
+                {
+                    "name": "Test1",
+                    "internal": "Test1",
+                    "success": true,
+                    "number": 0,
+                    "input": "Test1",
+                    "children": [
+                        {
+                            "name": "Test1.1",
+                            "internal": "Test1.1",
+                            "success": true,
+                            "number": 0,
+                            "input": "Test1.1",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Test2",
+                    "internal": "Test2",
+                    "success": true,
+                    "number": 0,
+                    "input": "Test2",
+                    "children": [
+                        {
+                            "name": "Test2.1",
+                            "internal": "Test2.1",
+                            "success": true,
+                            "number": 0,
+                            "input": "Test2.1",
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        }
+    }"""
+
+
+    val tree: DebugTree = DebugTreeHandler.decodeDebugTree(jsonTree).get
+
     
-    "The tree" should "be serialised" in {
-        /* Check that the root tree has been serialised correctly */
+    "The tree" should "be deserialised" in {
+        /* Check that the root tree has been deserialised correctly */
         tree.input should be ("Test")
         tree.root.name should be ("Test")
         tree.root.internal should be ("Test")
         tree.root.success should be (true)
         tree.root.number should be (0)
         tree.root.input should be ("Test")
-        tree.root.children.len() should be (2)
+        tree.root.children should have length 2
 
-        /* Check that the children have been serialised correctly */
-        for ((index, child) <- tree.root.children) {
-            child.name should be (("Test" + Int.toString(index + 1)))
-            child.internal should be (("Test" + Int.toString(index + 1)))
+        /* Check that the children have been deserialised correctly */
+        for ((child, index) <- tree.root.children.zipWithIndex) {
+            child.name should be (s"Test${index + 1}")
+            child.internal should be (s"Test${index + 1}")
             child.success should be (true)
             child.number should be (0)
         }
@@ -78,6 +81,6 @@ class Test extends AnyFlatSpec with should.Matchers {
 
     it should "not be deserialised if the JSON is not properly formatted" in {
         val wrongJson: String = "Testing..."
-        handler.decodeDebugTree(jsonTree) should be a 'failure
+        DebugTreeHandler.decodeDebugTree(wrongJson) shouldBe a [Failure[_]]
     }
 }
