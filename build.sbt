@@ -55,7 +55,8 @@ lazy val dillFrontend = project
         Compile / stMinimize := Selection.AllExcept("types", "tauri-apps"),
         name := "dill-frontend",
         commonSettings,
-        libraryDependencies += "com.raquo" %%% "laminar" % "17.2.0",
+        libraryDependencies ++= Seq("com.raquo" %%% "laminar" % "17.2.0",
+                                    "com.lihaoyi" %%% "upickle" % "4.1.0"),
         externalNpm := baseDirectory.value.getParentFile(),
         Compile / packageSrc / mappings ++= {
             val base = (Compile / sourceManaged).value
