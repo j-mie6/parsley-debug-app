@@ -32,12 +32,12 @@ impl From<ParsleyNode> for DebugNode {
 #[derive(Debug, PartialEq, serde::Deserialize)]
 pub struct ParsleyTree {
     input: String,
-    root: ParsleyNode,
+    tree: ParsleyNode,
 }
 
 impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
-        DebugTree::new(tree.input, tree.root.into())
+        DebugTree::new(tree.input, tree.tree.into())
     }
 }
 
@@ -65,15 +65,15 @@ pub mod test {
 
     #[test]
     fn parsley_tree_deserialises() {
-        let tree: ParsleyTree = serde_json::from_str(&RAW_TREE_SIMPLE).expect("Could not deserialise ParsleyTree");
+        let parsley_tree: ParsleyTree = serde_json::from_str(&RAW_TREE_SIMPLE).expect("Could not deserialise ParsleyTree");
         
-        assert_eq!(tree.input, "Test");
-        assert_eq!(tree.root.name, "Test");
-        assert_eq!(tree.root.internal, "Test");
-        assert_eq!(tree.root.success, true);
-        assert_eq!(tree.root.number, 0);
-        assert_eq!(tree.root.input, "Test");
-        assert_eq!(tree.root.children.len(), 0);
+        assert_eq!(parsley_tree.input, "Test");
+        assert_eq!(parsley_tree.tree.name, "Test");
+        assert_eq!(parsley_tree.tree.internal, "Test");
+        assert_eq!(parsley_tree.tree.success, true);
+        assert_eq!(parsley_tree.tree.number, 0);
+        assert_eq!(parsley_tree.tree.input, "Test");
+        assert_eq!(parsley_tree.tree.children.len(), 0);
     }
 
     #[test]
@@ -125,19 +125,19 @@ pub mod test {
             }
         }"#;
 
-        let tree: ParsleyTree = serde_json::from_str(&raw_tree).expect("Could not deserialise nested ParsleyTree");
+        let parsley_tree: ParsleyTree = serde_json::from_str(&raw_tree).expect("Could not deserialise nested ParsleyTree");
         
         /* Check that the root tree has been serialised correctly */
-        assert_eq!(tree.input, "Test");
-        assert_eq!(tree.root.name, "Test");
-        assert_eq!(tree.root.internal, "Test");
-        assert_eq!(tree.root.success, true);
-        assert_eq!(tree.root.number, 0);
-        assert_eq!(tree.root.input, "Test");
-        assert_eq!(tree.root.children.len(), 2);
+        assert_eq!(parsley_tree.input, "Test");
+        assert_eq!(parsley_tree.tree.name, "Test");
+        assert_eq!(parsley_tree.tree.internal, "Test");
+        assert_eq!(parsley_tree.tree.success, true);
+        assert_eq!(parsley_tree.tree.number, 0);
+        assert_eq!(parsley_tree.tree.input, "Test");
+        assert_eq!(parsley_tree.tree.children.len(), 2);
 
         /* Check that the children have been serialised correctly */
-        for (index, child) in tree.root.children.iter().enumerate() {
+        for (index, child) in parsley_tree.tree.children.iter().enumerate() {
             assert_eq!(child.name, format!("Test{}", index + 1));
             assert_eq!(child.internal, format!("Test{}", index + 1));
             assert_eq!(child.success, true);
