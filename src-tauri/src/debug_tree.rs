@@ -1,25 +1,24 @@
-
-/* Placeholder ParserInfo structures for state management */
+/* Placeholder DebugTree structures for state management */
 #[derive(serde::Serialize)]
-pub struct ParserInfo {
+pub struct DebugTree {
     pub input: String,
-    pub tree: DebugTree,
+    pub root: Node,
 }
 
 /* Defines tree structure used in backend that will be passed to frontend */
 #[derive(serde::Serialize)]
-pub struct DebugTree {
+pub struct Node {
     pub name: String, /*The internal (default) or user-defined name of the parser */
     pub internal: String, /*The internal name of the parser */
     pub success: bool, /* Whether the parser was successful */
     pub number: usize, /* The unique child number of this node */
     pub input: String, /* The input string passed to the parser */
-    pub children: Vec<DebugTree>, /* The children of this node */
+    pub children: Vec<Node>, /* The children of this node */
 }
 
-impl DebugTree {
-    pub fn new(name: String, internal: String, success: bool, number:usize, input: String, children: Vec<DebugTree>) -> Self {
-        DebugTree {
+impl Node {
+    pub fn new(name: String, internal: String, success: bool, number:usize, input: String, children: Vec<Node>) -> Self {
+        Node {
             name,
             internal,
             success,
@@ -30,19 +29,16 @@ impl DebugTree {
     }
 }
 
-impl ParserInfo {
-    pub fn new(input: String, tree: DebugTree) -> Self {
-        ParserInfo { 
+impl DebugTree {
+    pub fn new(input: String, root: Node) -> Self {
+        DebugTree { 
             input,
-            tree
+            root
         }
     }
 
-    pub fn set_input(&mut self, input: String) {
-        self.input = input
-    }
-    
-    pub fn set_tree(&mut self, tree: DebugTree) {
-        self.tree = tree
+    pub fn set(&mut self, input: String, root: Node) {
+        self.input = input;
+        self.root = root;
     }
 }
