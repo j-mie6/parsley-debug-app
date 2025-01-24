@@ -46,10 +46,12 @@ jobs:
         run: sh scripts/test-laminar.sh
 
       - name: Build artifact
+        if: github.ref == 'refs/heads/release'
         shell: bash
         run: sh scripts/build.sh
 
       - name: Upload artifact
+        if: github.ref == 'refs/heads/release'
         uses: actions/upload-artifact@v4
         with:
           # Name of artifact to upload
