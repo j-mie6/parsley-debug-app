@@ -8,7 +8,7 @@ class DebugTreeHandler {
     def decodeDebugTree(jsonString: String): DebugTree = {
         up.read[DebugTree](jsonString) match {
             case tree: DebugTree => tree
-            case _ => throw new Exception(s"Error while decoding JSON")
+            case null => throw new Exception(s"Error while decoding JSON")
         }
     }
 }
