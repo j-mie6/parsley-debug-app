@@ -5,7 +5,7 @@ import com.raquo.laminar.api.L.*
 
 import lib.Tauri
 import Display.DisplayTree
-
+import Display.DebugTreeHandler
 
 @main def app = renderOnDomContentLoaded(
     dom.document.getElementById("app"),
