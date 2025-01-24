@@ -30,7 +30,7 @@ pub mod test {
         let tree = DebugTree::new(String::new(), root);
 
         let mut mock = MockStateManager::new();
-            mock.expect_set().with(predicate::eq(tree));
+            mock.expect_set_tree().with(predicate::eq(tree));
         
         let client: blocking::Client = tracked_client(mock);
         

@@ -59,8 +59,8 @@ impl StateHandle {
 }
 
 impl StateManager for StateHandle {
-    fn set(&self, info: DebugTree) {
-        self.0.as_ref().set(info);
+    fn set_tree(&self, tree: DebugTree) {
+        self.0.as_ref().set_tree(tree);
     }
 
     fn get_tree(&self) -> DebugTree {
@@ -71,15 +71,15 @@ impl StateManager for StateHandle {
 
 #[cfg_attr(test, automock)]
 pub trait StateManager : Send + Sync + 'static {
-    fn set(&self, info: DebugTree);
+    fn set_tree(&self, info: DebugTree);
 
     fn get_tree(&self) -> DebugTree;
 }
 
 
 impl StateManager for tauri::AppHandle {
-    fn set(&self, info: DebugTree) {
-        self.state::<Mutex<AppState>>().lock().unwrap().parser = Some(info)
+    fn set_tree(&self, tree: DebugTree) {
+        self.state::<Mutex<AppState>>().lock().unwrap().parser = Some(tree)
     }
     
     fn get_tree(&self) -> DebugTree {
