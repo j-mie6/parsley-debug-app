@@ -3,7 +3,7 @@ use std::sync::Mutex;
 use rocket::{Rocket, Build, Ignite, Config};
 use rocket::figment::{Figment, providers::{Format, Toml}};
 
-use crate::{Node, DebugTree};
+use crate::{DebugNode, DebugTree};
 
 /* Embed Rocket.toml as a string to allow post-compilation access */
 const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
@@ -13,7 +13,7 @@ const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
 pub fn build() -> Rocket<Build> {
     let state: DebugTree = DebugTree::new(
         String::from("This is a parser input"),
-        Node { /* Default Node to be changed by state */
+        DebugNode { /* Default Node to be changed by state */
             name: String::from(""),
             internal: String::from(""),
             success: false,

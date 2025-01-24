@@ -1,7 +1,7 @@
 mod server;
 mod debug_tree;
 
-pub use debug_tree::{DebugTree, Node};
+pub use debug_tree::{DebugTree, DebugNode};
 
 
 #[tauri::command]
