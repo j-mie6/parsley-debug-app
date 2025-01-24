@@ -21,21 +21,23 @@ fn get_index() -> String {
 #[post("/api/remote", format = "application/json", data = "<data>")] 
 fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> http::Status {
     /* Deserialise and unwrap json data */
-    let ParsleyTree { input, root } = data.into_inner();
-    let debug_tree = DebugTree::new(input, root.into());
-
+    let parsley_tree: ParsleyTree = data.into_inner();
+    let debug_tree: DebugTree = parsley_tree.into();    
+    
     let handle = state.inner();
     handle.set_tree(debug_tree);
-    
 
     http::Status::Ok
 }
 
+/* Return posted DebugTree as JSON string */
 #[get("/api/remote")]
 fn get_info(state: &rocket::State<StateHandle>) -> String {
     let handle = state.inner();
     serde_json::to_string_pretty(&handle.get_tree()).expect("Could not serialise State to JSON")
 }
+
+
 
 #[cfg(test)]
 pub mod test {
@@ -53,8 +55,8 @@ pub mod test {
                 String::from("Test"), 
                 String::from("Test"), 
                 true, 
+                0,
                 String::from("Test"), 
-                0, 
                 vec![]
             )
         )

@@ -1,8 +1,8 @@
 /* Placeholder ParserInfo structures for state management */
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
 pub struct DebugTree {
-    pub input: String,
-    pub root: DebugNode,
+    input: String,
+    root: DebugNode,
 }
 
 impl DebugTree {
@@ -31,7 +31,7 @@ pub struct DebugNode {
 }
 
 impl DebugNode {
-    pub fn new(name: String, internal: String, success: bool, input: String, number:usize, children: Vec<DebugNode>) -> Self {
+    pub fn new(name: String, internal: String, success: bool, number: usize, input: String, children: Vec<DebugNode>) -> Self {
         DebugNode {
             name,
             internal,

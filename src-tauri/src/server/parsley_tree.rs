@@ -1,38 +1,46 @@
-use crate::DebugNode;
+use crate::{DebugNode, DebugTree};
+
 
 /* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct ParsleyNode {
-    pub name: String, /* The user-defined name */
-    pub internal: String, /* The internal name of the parser */
-    pub success: bool, /* Whether the parser was successful */
-    pub number: usize, /* The unique child number of this node */
-    pub input: String, /* The input string passed to the parser */
-    pub children: Vec<ParsleyNode>, /* The children of this node */
+    name: String, /* The user-defined name */
+    internal: String, /* The internal name of the parser */
+    success: bool, /* Whether the parser was successful */
+    number: usize, /* The unique child number of this node */
+    input: String, /* The input string passed to the parser */
+    children: Vec<ParsleyNode>, /* The children of this node */
 }
 
-impl Into<DebugNode> for ParsleyNode {
-    fn into(self) -> DebugNode {
-        DebugNode { 
-            name: self.name,
-            internal: self.internal,
-            success: self.success,
-            input: self.input,
-            number: self.number,
-            children: self.children
+impl From<ParsleyNode> for DebugNode {
+    fn from(node: ParsleyNode) -> Self {
+        DebugNode::new( 
+            node.name,
+            node.internal,
+            node.success,
+            node.number,
+            node.input,
+            node.children
                 .into_iter()
                 .map(ParsleyNode::into)
-                .collect(),
-        } 
+                .collect()
+        )
     }
 }
 
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 pub struct ParsleyTree {
-    pub input: String,
-    pub root: ParsleyNode,
+    input: String,
+    root: ParsleyNode,
 }
+
+impl From<ParsleyTree> for DebugTree {
+    fn from(tree: ParsleyTree) -> Self {
+        DebugTree::new(tree.input, tree.root.into())
+    }
+}
+
 
 
 #[cfg(test)]

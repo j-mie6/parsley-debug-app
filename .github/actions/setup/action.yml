@@ -17,4 +17,4 @@ runs:
       - name: Run Setup Script
         shell: bash
         run: sh scripts/setup.sh
-        
+            
