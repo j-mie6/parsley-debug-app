@@ -13,14 +13,14 @@ const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
 pub fn build() -> Rocket<Build> {
     let state: DebugTree = DebugTree::new(
         String::from("This is a parser input"),
-        DebugNode { /* Default Node to be changed by state */
-            name: String::from(""),
-            internal: String::from(""),
-            success: false,
-            input: String::from(""),
-            number: 0,
-            children: Vec::new()
-        }
+        DebugNode::new( /* Default Node to be changed by state */
+            String::from(""),
+            String::from(""),
+            false,
+            0,
+            String::from(""),
+            Vec::new()
+        )
     );
     
     /* Override the default config with values from Rocket.toml */

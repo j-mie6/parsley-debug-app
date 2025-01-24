@@ -2,18 +2,23 @@ name: Dill-CI
 
 # Defines when the pipeline will be invoked
 on:
-  push:
-    branches: 
-      - main
-      - dev
-      
-  pull_request:
-    branches:
-      - main 
-      - dev
+    push:
+        branches: 
+            - main
+            - dev
+        
+    pull_request:
+        branches:
+            - main 
+            - dev
 
-  # Allows us to run the workflow whenever we want from GitHub Actions
-  workflow_dispatch:
+    # Allows us to run the workflow whenever we want from GitHub Actions
+    workflow_dispatch:
+
+# Defines the jobs that will be executed
+concurrency:
+  group: dill-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -41,10 +46,12 @@ jobs:
         run: sh scripts/test-laminar.sh
 
       - name: Build artifact
+        if: github.ref == 'refs/heads/release'
         shell: bash
         run: sh scripts/build.sh
 
       - name: Upload artifact
+        if: github.ref == 'refs/heads/release'
         uses: actions/upload-artifact@v4
         with:
           # Name of artifact to upload
