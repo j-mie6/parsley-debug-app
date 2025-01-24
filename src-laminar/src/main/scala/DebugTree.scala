@@ -2,4 +2,8 @@ package Display
 import upickle.default.{ReadWriter => RW, macroRW}
 
 case class DebugTree(name: String, internal: String, success: Boolean,
-     input: String, number: Int, children: List[DebugTree]) derives RW
+     input: String, number: Int, children: List[DebugTree])
+    
+object DebugTree {
+    implicit val rw: RW[DebugTree] = macroRW
+}

@@ -56,7 +56,7 @@ lazy val dillFrontend = project
         name := "dill-frontend",
         commonSettings,
         libraryDependencies ++= Seq("com.raquo" %%% "laminar" % "17.2.0",
-                                    "com.lihaoyi" %% "upickle" % "4.1.0"),
+                                    "com.lihaoyi" %%% "upickle" % "4.1.0"),
         externalNpm := baseDirectory.value.getParentFile(),
         Compile / packageSrc / mappings ++= {
             val base = (Compile / sourceManaged).value

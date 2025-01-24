@@ -4,11 +4,11 @@ import upickle.default as up
 import upickle.default.{ReadWriter => RW, macroRW}
 import scala.util.{Try, Success, Failure}
 
-class DebugTreeHandler {
+object DebugTreeHandler {
     def decodeDebugTree(jsonString: String): DebugTree = {
-        up.read[DebugTree](jsonString) match {
-            case tree: DebugTree => tree
-            case null => throw new Exception(s"Error while decoding JSON")
+        Try(up.read[DebugTree](jsonString)) match {
+            case Success(tree) => tree
+            case Failure(err) => throw new Exception(s"Error while decoding JSON: ${err.getMessage()}", err)
         }
     }
 }
