@@ -1,40 +1,27 @@
-use std::sync::Mutex;
-
 use rocket::{Rocket, Build, Ignite, Config};
 use rocket::figment::{Figment, providers::{Format, Toml}};
 
-use crate::{DebugNode, DebugTree};
+use crate::state::StateHandle;
 
 /* Embed Rocket.toml as a string to allow post-compilation access */
 const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
 
 
 /* Build the Rocket server */
-pub fn build() -> Rocket<Build> {
-    let state: DebugTree = DebugTree::new(
-        String::from("This is a parser input"),
-        DebugNode::new( /* Default Node to be changed by state */
-            String::from(""),
-            String::from(""),
-            false,
-            0,
-            String::from(""),
-            Vec::new()
-        )
-    );
-    
+pub fn build(handle: StateHandle) -> Rocket<Build> {
     /* Override the default config with values from Rocket.toml */
     let figment: Figment = Figment::from(Config::default())
-    .merge(Toml::string(ROCKET_CONFIG).nested());
-    
-    rocket::custom(figment) /* Build the Rocket server with a custom config */
+        .merge(Toml::string(ROCKET_CONFIG).nested());
+
+    /* Build the rocket server */
+    rocket::custom(figment) /* Install our custom config */
         .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
-        .manage(Mutex::new(state)) /* Manage the parser info as a mutex-protected state */
+        .manage(handle) /* Manage the app handle using Rocket state management */
 }
 
 /* Launch the Rocket server */
-pub async fn launch() -> Result<Rocket<Ignite>, rocket::Error> {
-    build().launch().await
+pub async fn launch(handle: StateHandle) -> Result<Rocket<Ignite>, rocket::Error> {
+    build(handle).launch().await
 }
 
 
@@ -47,13 +34,17 @@ mod test {
     use rocket::figment::providers::{self, Toml, Format};
     
     use crate::server;
+    use crate::state::{MockStateManager, StateHandle};
     use super::ROCKET_CONFIG;
     
     /* Launch unit testing */
     
     #[test]
     fn rocket_client_launches_successfully() {
-        let rocket: Rocket<Build> = super::build();
+        let mock = MockStateManager::new();
+        let handle = StateHandle::new(mock);
+
+        let rocket: Rocket<Build> = super::build(handle);
         
         /* Fails if launching rocket would fail */
         assert!(blocking::Client::tracked(rocket).is_ok())
@@ -91,7 +82,8 @@ mod test {
     
     #[test]
     fn num_routes_mounted_is_correct() {
-        let client: blocking::Client = server::test::tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = server::test::tracked_client(mock);
         
         /* Assert the Rocket server was successfully built with 3 routes */
         assert_eq!(client.rocket().routes().count(), 3);
@@ -99,7 +91,8 @@ mod test {
 
     #[test]
     fn mounted_routes_correctly_named() {
-        let client: blocking::Client = server::test::tracked_client();
+        let mock = MockStateManager::new();
+        let client: blocking::Client = server::test::tracked_client(mock);
         let routes: Vec<&str> = client.rocket()
             .routes()
             .map(|r| r.uri.as_str())

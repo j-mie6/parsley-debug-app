@@ -22,7 +22,7 @@ def appElement(): Div = div(
     treeText,
     button(onClick --> { _ => {
         for {
-            text <- Tauri.invoke[String]("tree_text")
+            text <- Tauri.invoke[String]("fetch_debug_tree")
         } do {
             DebugTreeHandler.decodeDebugTree(text) match {
                 case Success(tree) => textVar.set(tree.toString())
