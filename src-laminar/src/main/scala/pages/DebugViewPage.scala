@@ -100,7 +100,7 @@ object DebugViewPage extends Page {
     private lazy val reloadButton: Element = button(
         onClick --> { _ => {
             for {
-                text <- Tauri.invoke[String]("tree_text")
+                text <- Tauri.invoke[String]("fetch_debug_tree")
             } do {
                 // tree.set(p(text))
                 DebugTreeHandler.decodeDebugTree(text) match {
