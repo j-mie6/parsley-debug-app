@@ -13,8 +13,7 @@ import scala.util.{Try, Success, Failure}
     appElement()
 )
 
-
-val textSignal: Var[String] = Var("Nothing")
+val textVar: Var[String] = Var("Nothing")
 val treeText: Div = div(text <-- textSignal)
 
 def appElement(): Div = div(
@@ -25,8 +24,8 @@ def appElement(): Div = div(
             text <- Tauri.invoke[String]("tree_text")
         } do {
             DebugTreeHandler.decodeDebugTree(text) match {
-                case Success(tree) => textSignal.set(tree.toString())
-                case Failure(err) => textSignal.set(err.getMessage())
+                case Success(tree) => textVar.set(tree.toString())
+                case Failure(err) => textVar.set(err.getMessage())
             }
         }
     }}, "Reload tree"),
