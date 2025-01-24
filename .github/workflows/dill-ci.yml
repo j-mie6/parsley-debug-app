@@ -15,43 +15,50 @@ on:
     # Allows us to run the workflow whenever we want from GitHub Actions
     workflow_dispatch:
 
+# Defines the jobs that will be executed
+concurrency:
+  group: dill-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-    build:
-        name: Check, test and build DILL
+  build:
+    name: Check, test and build DILL
 
-        # Creates a job for each OS
-        runs-on: ${{matrix.os}}
-        strategy:
-            matrix:
-                os: [ubuntu-latest, macos-latest, windows-latest]
+    # Creates a job for each OS
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
-        steps:
-          - uses: actions/checkout@v4
-            
-            # Use composite action for setup 
-          - name: Setup 
-            uses: ./.github/actions/setup
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Use composite action for setup 
+      - name: Setup 
+        uses: ./.github/actions/setup
 
-          - name: Test backend
-            shell: bash
-            run: sh scripts/test-tauri.sh
+      - name: Test backend
+        shell: bash
+        run: sh scripts/test-tauri.sh
 
-          - name: Test frontend
-            shell: bash
-            run: sh scripts/test-laminar.sh
+      - name: Test frontend
+        shell: bash
+        run: sh scripts/test-laminar.sh
 
-          - name: Build artifact
-            shell: bash
-            run: sh scripts/build.sh
+      - name: Build artifact
+        if: github.ref == 'refs/heads/release'
+        shell: bash
+        run: sh scripts/build.sh
 
-          - name: Upload artifact
-            uses: actions/upload-artifact@v4
-            with:
-                # Name of artifact to upload
-                name: ${{ matrix.os }}-app-bundles
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/release'
+        uses: actions/upload-artifact@v4
+        with:
+          # Name of artifact to upload
+          name: ${{ matrix.os }}-app-bundles
 
-                # Path of artifact to upload
-                path: ./src-tauri/target/release/bundle/
+          # Path of artifact to upload
+          path: ./src-tauri/target/release/bundle/
 
-                # Fail upload if no files are found at the path
-                if-no-files-found: error
+          # Fail upload if no files are found at the path
+          if-no-files-found: error
