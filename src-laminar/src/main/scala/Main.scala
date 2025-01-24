@@ -14,7 +14,7 @@ import scala.util.{Try, Success, Failure}
     appElement()
 )
 
-val textVar: Var[String] = Var("Nothing")
+val textVar: Var[String] = Var("")
 val treeText: Div = div(text <-- textVar)
 
 def appElement(): Div = div(

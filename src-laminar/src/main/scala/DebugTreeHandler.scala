@@ -16,7 +16,7 @@ import scala.util.{Try, Success, Failure}
 object DebugTreeHandler {
     def decodeDebugTree(jsonString: String): Try[DebugTree] = {
         Try(up.read[DebugTree](jsonString)) match {
-            case Success(tree) => Success(tree)
+            case tree: Success[_] => tree
             case Failure(err) => Failure(Exception(s"Error while decoding JSON: ${err.getMessage()}", err))
         }
     }
