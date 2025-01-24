@@ -1,84 +1,77 @@
+use state::StateHandle;
+use tauri::Manager;
+use std::sync::Mutex;
+
 mod server;
+mod state;
 mod debug_tree;
 
 pub use debug_tree::{DebugTree, DebugNode};
 
 
-#[tauri::command]
-fn tree_text() -> String {
-    String::from(r#"
-    {
-        "input": "Test",
-        "root": {
-            "name": "Test",
-            "internal": "Test",
-            "success": true,
-            "number": 0,
-            "input": "Test",
-            "children": [
-                {
-                    "name": "Test1",
-                    "internal": "Test1",
-                    "success": true,
-                    "number": 0,
-                    "input": "Test1",
-                    "children": [
-                        {
-                            "name": "Test1.1",
-                            "internal": "Test1.1",
-                            "success": true,
-                            "number": 0,
-                            "input": "Test1.1",
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "name": "Test2",
-                    "internal": "Test2",
-                    "success": true,
-                    "number": 0,
-                    "input": "Test2",
-                    "children": [
-                        {
-                            "name": "Test2.1",
-                            "internal": "Test2.1",
-                            "success": true,
-                            "number": 0,
-                            "input": "Test2.1",
-                            "children": []
-                        }
-                    ]
-                }
-            ]
+/* Global app state managed by Tauri */
+struct AppState {
+    tree: Option<DebugTree>
+}
+
+impl AppState {
+    /* Create new AppState with no parser */
+    fn new() -> Self {
+        AppState {
+            tree: None,
         }
     }
-    "#)
-    // String::from(r#"{ "name": "~>", "internal": "~>", "success": true, "input": "hello world!", "number": 0, "children": [ { "name": "~>", "internal": "~>", "success": true, "input": "hello world!", "number": 1, "children": [ { "name": "'h'", "internal": "'h'", "success": true, "input": "hello world!", "number": 1, "children": [] }, { "name": "|", "internal": "|", "success": true, "input": "hello world!", "number": 2, "children": [ { "name": "\"ello\"", "internal": "\"ello\"", "success": true, "input": "hello world!", "number": 1, "children": [] } ] } ] }, { "name": "\" world!\"", "internal": "\" world!\"", "success": true, "input": "hello world!", "number": 2, "children": [] } ] }"#)
 }
 
 
+/* Setup Tauri app */
+fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    if cfg!(debug_assertions) {
+        app.handle().plugin(
+            tauri_plugin_log::Builder::default()
+            .level(log::LevelFilter::Info)
+            .build(),
+        )?;
+    }
+    
+    /* Manage the app state using Tauri */
+    app.manage(Mutex::new(AppState::new()));
+    
+    /* Clone the app handle for use by Rocket state */
+    let handle: tauri::AppHandle = app.handle().clone();
+    
+    /* Mount the Rocket server to the running instance of Tauri */
+    tauri::async_runtime::spawn(async move {
+        server::launch(StateHandle::new(handle)).await
+            .expect("Rocket failed to initialise")
+    });
+    
+    
+    Ok(())
+}
+
+/* Run the Tauri app */
 pub fn run() {
     tauri::Builder::default()
-        .setup(|app| {
-            if cfg!(debug_assertions) {
-                app.handle().plugin(
-                    tauri_plugin_log::Builder::default()
-                    .level(log::LevelFilter::Info)
-                    .build(),
-                )?;
-            }
-            
-            /* Mount the Rocket server to the running instance of Tauri */
-            tauri::async_runtime::spawn(async {
-                server::launch().await.expect("Rocket failed to initialise")
-            });
-            
-            Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![tree_text])
-        .run(tauri::generate_context!())
+        .setup(|app| setup(app)) /* Run app setup */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree]) /* Expose render_debug_tree() to frontend */
+        .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
+}
+
+
+/* Frontend-accessible debug render */
+#[tauri::command]
+fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
+    /* Acquire the state mutex to access the parser */
+    let tree: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").tree;
+    
+    /* If parser exists, render in JSON */
+    match tree {
+        Some(tree) => serde_json::to_string_pretty(tree)
+            .expect("Debug tree could not be serialised"),
+        None => String::from("Tree does not exist"),
+    }
 }
 
 
