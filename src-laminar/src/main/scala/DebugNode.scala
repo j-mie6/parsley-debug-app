@@ -12,4 +12,4 @@ import upickle.default.ReadWriter
   * @param children list of children nodes
   */
 case class DebugNode(name: String, internal: String, success: Boolean,
-     input: String, number: Int, children: List[DebugNode]) derives ReadWriter
+    input: String, number: Int, children: List[DebugNode]) derives ReadWriter

@@ -1,11 +1,15 @@
 package pages
 
 import org.scalajs.dom
+import scala.util.{Try, Success, Failure}
 
 import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
+import scala.concurrent.ExecutionContext.Implicits.global
+import lib.Tauri
 
-import Display.DisplayTree
+import displays.DisplayTree
+import debugger.DebugTreeHandler
 
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -83,7 +87,29 @@ object DebugViewPage extends Page {
         border := "2px solid #96DEC4",
         width.percent := 100,
         height.percent := 100,
-        DisplayTree.SAMPLE_TREE.element(),
+        // DisplayTree.SampleTree.element,
+        // tree match {
+        //     case Some(tree) => tree.element()
+        //     case None => p("Tree does not exist")
+        // }
+        child <-- tree
+    )
+    
+    private val tree: Var[Element] = Var(p("None"))
+
+    private lazy val reloadButton: Element = button(
+        onClick --> { _ => {
+            for {
+                text <- Tauri.invoke[String]("tree_text")
+            } do {
+                // tree.set(p(text))
+                DebugTreeHandler.decodeDebugTree(text) match {
+                    case Success(t) => tree.set(DisplayTree.from(t.root).element())
+                    case Failure(err) => ()
+                }
+            }
+        }},
+        "Reload tree"
     )
 
     lazy val page: Element = mainTag(
@@ -93,8 +119,10 @@ object DebugViewPage extends Page {
         color := "#96DEC4",
         width.px := viewWidth,
         height.vh := viewHeight,
+
         // Elements
         headerView,
+        reloadButton,
         treeView
     )
 }

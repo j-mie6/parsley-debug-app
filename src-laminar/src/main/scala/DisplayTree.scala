@@ -2,15 +2,17 @@ package displays
 
 import com.raquo.laminar.api.L.*
 
+import debugger.DebugNode
+
 /**
   * DisplayTree creates the HTML element to display a DebugTree
   *
   * @param placeholderText placeholder comment at the top of file
   * @param children list of children of display tree's root node
   */
-class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) {
-    
-    def node(depth: Int = 1): Element = div(
+class DisplayTree(val node: Element, val children: List[DisplayTree]) {
+
+    def nodeElement(depth: Int = 1): Element = div(
         padding := s"${2.5 - depth * 0.35}em",
         paddingLeft := "1em",
         paddingRight := "1em",
@@ -24,7 +26,8 @@ class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) 
         textAlign := "center",
         fontSize := s"${14 - depth}pt",
 
-        placeholderText
+        // placeholderText
+        node
     )
 
     /* HTML element to display DisplayTree */
@@ -32,7 +35,7 @@ class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) 
         div(
             margin := "0.6em",
             
-            node(depth),      
+            nodeElement(depth),      
                   
             div(
                 display := "flex",
@@ -51,36 +54,49 @@ class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) 
 
 
 object DisplayTree {
-    // Example of a DisplayTree to use in testing
-    final val SampleTree: DisplayTree = {
-        DisplayTree("Carmine", List(
-            DisplayTree("August", List(
-                DisplayTree("Marc"),
-                DisplayTree("Christoper", List(
-                    DisplayTree("Bailey"), 
-                    DisplayTree("Dexter")
-                )),
-                DisplayTree("Nicolas", List(DisplayTree("Kal")))
-            )),
-            DisplayTree("Francis", List(
-                DisplayTree("Gian-Carlo", List(DisplayTree("Gian-Carla"))),   
-                DisplayTree("Roman"),
-                DisplayTree("Sofia", List(
-                    DisplayTree("Romy"),
-                    DisplayTree("Cosima")
-                ))
-            )),
-            DisplayTree("Talia", List(
-                DisplayTree("Jason", List(
-                    DisplayTree("Marlowe"),
-                    DisplayTree("Una")
-                )),
-                DisplayTree("Robert"),
-            ))
-        ))
-    }
+//     // Example of a DisplayTree to use in testing
+//     final val SampleTree: DisplayTree = {
+//         DisplayTree(p("Carmine"), List(
+//             DisplayTree(p(text = "August"), List(
+//                 DisplayTree(p("Marc")),
+//                 DisplayTree(p("Christoper"), List(
+//                     DisplayTree(p("Bailey")), 
+//                     DisplayTree(p("Dexter"))
+//                 )),
+//                 DisplayTree(p("Nicolas"), List(DisplayTree(p("Kal")))
+//             )),
+//             DisplayTree(p("Francis"), List(
+//                 DisplayTree(p("Gian-Carlo"), List(DisplayTree(p("Gian-Carla")))),   
+//                 DisplayTree(p("Roman")),
+//                 DisplayTree(p("Sofia"), List(
+//                     DisplayTree(p("Romy")),
+//                     DisplayTree(p("Cosima"))
+//                 ))
+//             )),
+//             DisplayTree(p("Talia"), List(
+//                 DisplayTree(p("Jason"), List(
+//                     DisplayTree(p("Marlowe")),
+//                     DisplayTree(p("Una"))
+//                 )),
+//                 DisplayTree(p("Robert")),
+//             ))
+//         )))
+//    }
     
     // Secondary constructors
-    def apply(placeholderText: String, children: List[DisplayTree]): DisplayTree = new DisplayTree(placeholderText, children)
-    def apply(placeholderText: String): DisplayTree = DisplayTree(placeholderText, List[DisplayTree]())
+    def apply(node: Element): DisplayTree = DisplayTree(node, List[DisplayTree]())
+    def apply(node: Element, children: List[DisplayTree]): DisplayTree = new DisplayTree(node, children)
+
+    private def debugNodeElement(tree: DebugNode): Element = {
+        p(tree.name)
+    }
+    
+    def from(tree: DebugNode): DisplayTree = {
+        DisplayTree(
+            DisplayTree.debugNodeElement(tree), 
+            tree.children.map(child => DisplayTree.from(child))
+        )
+    }
+
+    
 }
