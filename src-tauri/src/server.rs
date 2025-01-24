@@ -1,5 +1,5 @@
 mod launch;
-mod data;
+mod parsley_tree;
 mod request;
 
 pub use launch::launch;
@@ -9,7 +9,7 @@ pub use launch::launch;
 mod test {
     
     use rocket::{http, local::blocking};
-    use super::launch;
+    use super::{launch, parsley_tree::test::RAW_TREE_SIMPLE};
     
     /* Server integration testing */
     
@@ -29,7 +29,7 @@ mod test {
         /* Format POST requests to route '/api/remote' */
         let post_request = client.post("/api/remote")
             .header(http::ContentType::JSON)
-            .body(r#"{"input": "this is the parser input", "tree": "tree"}"#);
+            .body(RAW_TREE_SIMPLE);
         
         
         /* Repeatedly perform requests */

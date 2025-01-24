@@ -10,6 +10,5 @@ import Display.DisplayTree
 
 @main def app = renderOnDomContentLoaded(
     dom.document.getElementById("app"),
-    // DebugViewPage()
     DebugViewPage.page
 )
