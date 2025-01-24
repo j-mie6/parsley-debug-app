@@ -11,8 +11,9 @@ pub mod test {
     use rocket::{http, local::blocking};
     use mockall::predicate;
 
-    use crate::{state::{DebugTree, MockStateManager, StateHandle}, DebugNode};
+    use crate::state::{MockStateManager, StateHandle};
     use super::{launch, parsley_tree::test::RAW_TREE_SIMPLE};
+    use super::request::test::test_tree;
     
     /* Server integration testing */
     
@@ -22,16 +23,13 @@ pub mod test {
         let handle = StateHandle::new(mock);
         blocking::Client::tracked(launch::build(handle)).expect("Could not launch rocket")
     }
-    
+
     #[test]
     fn server_handles_many_requests() {
-        // TODO: make examples for testing
-        let root = DebugNode::new(String::new(), String::new(), false, String::new(), 0, vec![]);
-        let tree = DebugTree::new(String::new(), root);
-
         let mut mock = MockStateManager::new();
-            mock.expect_set_tree().with(predicate::eq(tree));
-        
+
+        mock.expect_set_tree().with(predicate::eq(test_tree())).times(100).return_const(());
+
         let client: blocking::Client = tracked_client(mock);
         
         /* Format GET request to index route '/' */

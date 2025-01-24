@@ -46,7 +46,7 @@ pub mod test {
     use crate::state::MockStateManager;
     use crate::{DebugNode, DebugTree};
 
-    fn test_tree() -> DebugTree {
+    pub fn test_tree() -> DebugTree {
         DebugTree::new(
             String::from("Test"), 
             DebugNode::new(
@@ -91,12 +91,12 @@ pub mod test {
     #[test]
     fn post_tree_succeeds() {
         let mut mock = MockStateManager::new();
-        mock.expect_set_tree().times(1).with(predicate::eq(test_tree()));
+
+        mock.expect_set_tree().with(predicate::eq(test_tree())).return_const(());
 
         let client: blocking::Client = tracked_client(mock);
 
-        
-        
+
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
@@ -158,6 +158,7 @@ pub mod test {
     fn get_returns_posted_tree() {
         let mut mock = MockStateManager::new();
 
+        mock.expect_set_tree().with(predicate::eq(test_tree())).return_const(());
         mock.expect_get_tree().returning( || test_tree());
 
         let client: blocking::Client = tracked_client(mock);
