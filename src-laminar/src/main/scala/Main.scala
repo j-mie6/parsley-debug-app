@@ -22,17 +22,12 @@ def appElement(): Div = div(
     treeText,
     button(onClick --> { _ => {
         for {
-<<<<<<< HEAD
             text <- Tauri.invoke[String]("fetch_debug_tree")
-        } do textSignal.set(text)
-=======
-            text <- Tauri.invoke[String]("tree_text")
         } do {
             DebugTreeHandler.decodeDebugTree(text) match {
                 case Success(tree) => textVar.set(tree.toString())
                 case Failure(err) => textVar.set(err.getMessage())
             }
         }
->>>>>>> origin/dev
     }}, "Reload tree"),
 )
