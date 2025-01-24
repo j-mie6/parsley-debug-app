@@ -15,6 +15,11 @@ on:
   # Allows us to run the workflow whenever we want from GitHub Actions
   workflow_dispatch:
 
+# Defines the jobs that will be executed
+concurrency:
+  group: dill-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Check, test and build DILL
