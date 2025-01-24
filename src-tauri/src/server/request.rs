@@ -185,11 +185,23 @@ pub mod test {
         assert_eq!(get_response.status(), http::Status::Ok);
 
         /* Assert that we GET the expected tree */
+        let expected_tree: &str = r#"{
+            "input": "Test",
+            "root": {
+                "name": "Test",
+                "internal": "Test",
+                "success": true,
+                "input": "Test",
+                "number": 0,
+                "children": []
+            }
+        }"#;
+
         assert_eq!(
             get_response.into_string()
                 .expect("get_info response is not a String")
                 .replace(" ", ""),
-                RAW_TREE_SIMPLE.replace(" ", "")
+            expected_tree.replace(" ", "")
         );
     }
     
