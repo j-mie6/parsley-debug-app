@@ -1,4 +1,4 @@
-package Display
+package debugger
 
 import upickle.default as up
 import scala.util.{Try, Success, Failure}

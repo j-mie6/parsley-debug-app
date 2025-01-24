@@ -1,4 +1,4 @@
-package Display
+package displays
 
 import com.raquo.laminar.api.L.*
 
