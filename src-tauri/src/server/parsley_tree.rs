@@ -1,4 +1,4 @@
-use crate::Node;
+use crate::DebugNode;
 
 /* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(serde::Deserialize, Clone)]
@@ -11,9 +11,9 @@ pub struct ParsleyNode {
     pub children: Vec<ParsleyNode>, /* The children of this node */
 }
 
-impl Into<Node> for ParsleyNode {
-    fn into(self) -> Node {
-        Node { 
+impl Into<DebugNode> for ParsleyNode {
+    fn into(self) -> DebugNode {
+        DebugNode { 
             name: self.name,
             internal: self.internal,
             success: self.success,
@@ -39,7 +39,7 @@ pub struct ParsleyTree {
 pub mod test {
     /* Data unit testing */
 
-    use crate::Node;
+    use crate::DebugNode;
     use super::{ParsleyTree, ParsleyNode};
 
     pub const RAW_TREE_SIMPLE: &str = r#"{
@@ -149,7 +149,7 @@ pub mod test {
             children: Vec::new()
         };
         
-        let debug_tree: Node = parsley_debug_tree.clone().into();
+        let debug_tree: DebugNode = parsley_debug_tree.clone().into();
         
         assert_eq!(debug_tree.name, parsley_debug_tree.name);
         assert_eq!(debug_tree.internal, parsley_debug_tree.internal);
@@ -206,7 +206,7 @@ pub mod test {
             ]
         };
         
-        let debug_tree: Node = parsley_debug_tree.clone().into(); 
+        let debug_tree: DebugNode = parsley_debug_tree.clone().into();
 
         /* Check ParsleyNode to Node conversion */
         assert_eq!(debug_tree.name, parsley_debug_tree.name);
