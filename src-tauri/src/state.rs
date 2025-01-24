@@ -8,7 +8,7 @@ pub struct StateHandle(Box<dyn StateManager>);
 
 #[cfg_attr(test, automock)]
 pub trait StateManager : Send + Sync + 'static {
-    fn set_tree(&self, info: DebugTree);
+    fn set_tree(&self, tree: DebugTree);
 
     fn get_tree(&self) -> DebugTree;
 }

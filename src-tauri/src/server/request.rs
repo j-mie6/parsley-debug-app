@@ -17,7 +17,7 @@ fn get_index() -> String {
 }
 
 
-/* Post request handler to accept parser info */
+/* Post request handler to accept debug tree */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
 fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> http::Status {
     /* Deserialise and unwrap json data */

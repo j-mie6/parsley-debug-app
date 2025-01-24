@@ -1,5 +1,5 @@
 /* Placeholder ParserInfo structures for state management */
-#[derive(serde::Serialize, Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize)]
 pub struct DebugTree {
     pub input: String,
     pub root: DebugNode,

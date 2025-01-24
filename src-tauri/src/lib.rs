@@ -68,8 +68,8 @@ fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
     
     /* If parser exists, render in JSON */
     match tree {
-        Some(tree) => serde_json::to_string_pretty(tree.get_root())
-            .expect("Parser info could not be serialised"),	
+        Some(tree) => serde_json::to_string_pretty(tree)
+            .expect("Debug tree could not be serialised"),
         None => String::from("Tree does not exist"),
     }
 }
