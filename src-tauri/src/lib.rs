@@ -4,20 +4,21 @@ use std::sync::Mutex;
 
 mod server;
 mod state;
+mod debug_tree;
 
-pub use state::{DebugTree, DebugNode};
+pub use debug_tree::{DebugTree, DebugNode};
 
 
 /* Global app state managed by Tauri */
 struct AppState {
-    parser: Option<DebugTree>
+    tree: Option<DebugTree>
 }
 
 impl AppState {
     /* Create new AppState with no parser */
     fn new() -> Self {
         AppState {
-            parser: None,
+            tree: None,
         }
     }
 }
@@ -53,7 +54,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| setup(app)) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![render_debug_tree]) /* Expose render_debug_tree() to frontend */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
@@ -61,13 +62,13 @@ pub fn run() {
 
 /* Frontend-accessible debug render */
 #[tauri::command]
-fn render_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
+fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
     /* Acquire the state mutex to access the parser */
-    let parser: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").parser;
+    let tree: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").tree;
     
     /* If parser exists, render in JSON */
-    match parser {
-        Some(parser) => serde_json::to_string_pretty(parser.get_root())
+    match tree {
+        Some(tree) => serde_json::to_string_pretty(tree.get_root())
             .expect("Parser info could not be serialised"),	
         None => String::from("Tree does not exist"),
     }

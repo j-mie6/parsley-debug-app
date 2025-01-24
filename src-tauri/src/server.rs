@@ -27,8 +27,10 @@ pub mod test {
     #[test]
     fn server_handles_many_requests() {
         let mut mock = MockStateManager::new();
-
-        mock.expect_set_tree().with(predicate::eq(test_tree())).times(100).return_const(());
+        mock.expect_set_tree()
+            .with(predicate::eq(test_tree()))
+            .times(100)
+            .return_const(());
 
         let client: blocking::Client = tracked_client(mock);
         

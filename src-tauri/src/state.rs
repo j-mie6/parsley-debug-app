@@ -2,55 +2,16 @@
 use tauri::Manager;
 use std::sync::Mutex;
 
-use crate::AppState;
-
-/* Placeholder ParserInfo structures for state management */
-#[derive(serde::Serialize, Clone, Debug, PartialEq)]
-pub struct DebugTree {
-    pub input: String,
-    pub root: DebugNode,
-}
-
-impl DebugTree {
-    pub fn new(input: String, root: DebugNode) -> Self {
-        DebugTree { 
-            input,
-            root
-        }
-    }
-    
-    pub fn get_root(&self) -> &DebugNode {
-        &self.root
-    }
-}
-
-
-/* Defines tree structure used in backend that will be passed to frontend */
-#[derive(Debug, Clone, PartialEq, serde::Serialize)]
-pub struct DebugNode {
-    pub name: String, /*The internal (default) or user-defined name of the parser */
-    pub internal: String, /*The internal name of the parser */
-    pub success: bool, /* Whether the parser was successful */
-    pub input: String, /* The input string passed to the parser */
-    pub number: usize, /* The unique child number of this node */
-    pub children: Vec<DebugNode>, /* The children of this node */
-}
-
-impl DebugNode {
-    pub fn new(name: String, internal: String, success: bool, input: String, number:usize, children: Vec<DebugNode>) -> Self {
-        DebugNode {
-            name,
-            internal,
-            success,
-            input,
-            number,
-            children
-        }
-    }
-}
-
+use crate::{AppState, DebugTree};
 
 pub struct StateHandle(Box<dyn StateManager>);
+
+#[cfg_attr(test, automock)]
+pub trait StateManager : Send + Sync + 'static {
+    fn set_tree(&self, info: DebugTree);
+
+    fn get_tree(&self) -> DebugTree;
+}
 
 impl StateHandle {
     pub fn new<S : StateManager>(state: S) -> Self {
@@ -68,21 +29,12 @@ impl StateManager for StateHandle {
     }
 }
 
-
-#[cfg_attr(test, automock)]
-pub trait StateManager : Send + Sync + 'static {
-    fn set_tree(&self, info: DebugTree);
-
-    fn get_tree(&self) -> DebugTree;
-}
-
-
 impl StateManager for tauri::AppHandle {
     fn set_tree(&self, tree: DebugTree) {
-        self.state::<Mutex<AppState>>().lock().unwrap().parser = Some(tree)
+        self.state::<Mutex<AppState>>().lock().unwrap().tree = Some(tree)
     }
     
     fn get_tree(&self) -> DebugTree {
-        self.state::<Mutex<AppState>>().lock().unwrap().parser.as_ref().unwrap().clone()
+        self.state::<Mutex<AppState>>().lock().unwrap().tree.as_ref().unwrap().clone()
     }
 }

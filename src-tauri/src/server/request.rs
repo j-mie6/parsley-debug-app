@@ -91,8 +91,9 @@ pub mod test {
     #[test]
     fn post_tree_succeeds() {
         let mut mock = MockStateManager::new();
-
-        mock.expect_set_tree().with(predicate::eq(test_tree())).return_const(());
+        mock.expect_set_tree()
+            .with(predicate::eq(test_tree()))
+            .return_const(());
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -141,8 +142,8 @@ pub mod test {
     #[test]
     fn get_returns_tree() {
         let mut mock = MockStateManager::new();
-
-        mock.expect_get_tree().returning( || test_tree());
+        mock.expect_get_tree()
+            .returning( || test_tree());
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -157,9 +158,12 @@ pub mod test {
     #[test]
     fn get_returns_posted_tree() {
         let mut mock = MockStateManager::new();
+        mock.expect_set_tree()
+            .with(predicate::eq(test_tree()))
+            .return_const(());
 
-        mock.expect_set_tree().with(predicate::eq(test_tree())).return_const(());
-        mock.expect_get_tree().returning( || test_tree());
+        mock.expect_get_tree()
+            .returning( || test_tree());
 
         let client: blocking::Client = tracked_client(mock);
 
