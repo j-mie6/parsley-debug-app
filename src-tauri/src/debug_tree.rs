@@ -1,8 +1,8 @@
 /* Placeholder DebugTree structures for state management */
 #[derive(serde::Serialize)]
 pub struct DebugTree {
-    pub input: String,
-    pub root: DebugNode,
+    input: String,
+    root: DebugNode,
 }
 
 /* Defines tree structure used in backend that will be passed to frontend */
@@ -17,7 +17,7 @@ pub struct DebugNode {
 }
 
 impl DebugNode {
-    pub fn new(name: String, internal: String, success: bool, number:usize, input: String, children: Vec<DebugNode>) -> Self {
+    pub fn new(name: String, internal: String, success: bool, number: usize, input: String, children: Vec<DebugNode>) -> Self {
         DebugNode {
             name,
             internal,
@@ -35,10 +35,5 @@ impl DebugTree {
             input,
             root
         }
-    }
-
-    pub fn set(&mut self, input: String, root: DebugNode) {
-        self.input = input;
-        self.root = root;
     }
 }

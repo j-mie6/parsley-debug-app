@@ -1,4 +1,5 @@
-use std::{ops::Deref, sync::{Mutex, MutexGuard}};
+use std::ops::Deref; 
+use std::sync::{Mutex, MutexGuard};
 use rocket::{get, http, post, serde::json::Json};
 
 use crate::DebugTree;
@@ -17,25 +18,30 @@ fn get_index() -> String {
     String::from("DILL: Debugging Interactively for the ParsLey Language")
 }
 
-
 /* Post request handler to accept parser info */
 #[post("/api/remote", format = "application/json", data = "<data>")] 
 fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<Mutex<DebugTree>>) -> http::Status {
     /* Deserialise and unwrap json data */
-    let ParsleyTree { input, root } = data.into_inner();
+    let parsley_tree: ParsleyTree = data.into_inner();
+    let debug_tree: DebugTree = parsley_tree.into();    
     
     /* Acquire the mutex */
-    let mut state = state.lock().expect("State mutex could not be acquired");
-    state.set(input, root.into());
+    let mut state: MutexGuard<DebugTree> = state.lock()
+        .expect("State mutex could not be acquired");
+
+    *state = debug_tree;
 
     http::Status::Ok
 }
 
+/* Return posted DebugTree as JSON string */
 #[get("/api/remote")]
 fn get_info(state: &rocket::State<Mutex<DebugTree>>) -> String {
     let state: MutexGuard<DebugTree> = state.inner().lock().expect("State mutex could not be acquired");
     serde_json::to_string_pretty(state.deref()).expect("Could not serialise State to JSON")
 }
+
+
 
 #[cfg(test)]
 pub mod test {
