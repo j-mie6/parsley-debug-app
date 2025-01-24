@@ -6,6 +6,7 @@ import com.raquo.laminar.api.L.*
 import lib.Tauri
 import Display.DisplayTree
 import Display.DebugTreeHandler
+import scala.util.{Try, Success, Failure}
 
 @main def app = renderOnDomContentLoaded(
     dom.document.getElementById("app"),
@@ -22,6 +23,11 @@ def appElement(): Div = div(
     button(onClick --> { _ => {
         for {
             text <- Tauri.invoke[String]("tree_text")
-        } do textSignal.set(DebugTreeHandler.decodeDebugTree(text).toString())
+        } do {
+            DebugTreeHandler.decodeDebugTree(text) match {
+                case Success(tree) => textSignal.set(tree.toString())
+                case Failure(err) => textSignal.set(err.getMessage())
+            }
+        }
     }}, "Reload tree"),
 )
