@@ -25,7 +25,7 @@ fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> htt
     let debug_tree = DebugTree::new(input, root.into());
 
     let handle = state.inner();
-    handle.set(debug_tree);
+    handle.set_tree(debug_tree);
     
 
     http::Status::Ok
