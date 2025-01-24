@@ -1,7 +1,7 @@
 use crate::DebugNode;
 
 /* Represents tree received from parsley-debug-views' Remote View*/
-#[derive(serde::Deserialize, Clone)]
+#[derive(serde::Deserialize, Clone, Debug, PartialEq)]
 pub struct ParsleyNode {
     pub name: String, /* The user-defined name */
     pub internal: String, /* The internal name of the parser */
@@ -28,7 +28,7 @@ impl Into<DebugNode> for ParsleyNode {
 }
 
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize,Debug, PartialEq)]
 pub struct ParsleyTree {
     pub input: String,
     pub root: ParsleyNode,
@@ -48,8 +48,8 @@ pub mod test {
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
-                "number": 0,
                 "input": "Test",
+                "number": 0,
                 "children": []
             }
         }"#;

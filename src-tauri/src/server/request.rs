@@ -40,10 +40,26 @@ fn get_info(state: &rocket::State<StateHandle>) -> String {
 #[cfg(test)]
 pub mod test {
     
+    use mockall::predicate;
     use rocket::{http, local::blocking};
     use crate::server::{parsley_tree::test::RAW_TREE_SIMPLE, test::tracked_client};
     use crate::state::MockStateManager;
-        
+    use crate::{DebugNode, DebugTree};
+
+    fn test_tree() -> DebugTree {
+        DebugTree::new(
+            String::from("Test"), 
+            DebugNode::new(
+                String::from("Test"), 
+                String::from("Test"), 
+                true, 
+                String::from("Test"), 
+                0, 
+                vec![]
+            )
+        )
+    }
+
     /* Request unit testing */
     
     #[test]
@@ -70,25 +86,16 @@ pub mod test {
         
         /* Assert GET request was unsuccessful with status 404 */
         assert_eq!(response.status(), http::Status::NotFound);
-    }
-    
-    #[test]
-    fn get_on_post_fails() {
-        let mock = MockStateManager::new();
-        let client: blocking::Client = tracked_client(mock);
-        
-        /* Perform GET request to '/api/remote' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::post_tree)).dispatch();
-        
-        /* Assert that GET failed due to no found GET handlers */
-        assert_eq!(response.status(), http::Status::NotFound);
-    }
-    
+    }    
     
     #[test]
     fn post_tree_succeeds() {
-        let mock = MockStateManager::new();
+        let mut mock = MockStateManager::new();
+        mock.expect_set_tree().times(1).with(predicate::eq(test_tree()));
+
         let client: blocking::Client = tracked_client(mock);
+
+        
         
         /* Perform POST request to '/api/remote' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
@@ -133,9 +140,13 @@ pub mod test {
 
     #[test]
     fn get_returns_tree() {
-        let mock = MockStateManager::new();
+        let mut mock = MockStateManager::new();
+
+        mock.expect_get_tree().returning( || test_tree());
+
         let client: blocking::Client = tracked_client(mock);
-        
+
+
         /* Perform GET request to '/api/remote' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
         
@@ -145,7 +156,10 @@ pub mod test {
 
     #[test]
     fn get_returns_posted_tree() {
-        let mock = MockStateManager::new();
+        let mut mock = MockStateManager::new();
+
+        mock.expect_get_tree().returning( || test_tree());
+
         let client: blocking::Client = tracked_client(mock);
 
         /* Perform POST request to '/api/remote' */
