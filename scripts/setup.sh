@@ -57,4 +57,10 @@ fi
 # Common steps for all platforms
 npm install
 
+if [ $? -ne 0 ]
+then
+    printf "\n\e[31mError while setting up DILL App\e[0m\n\n"
+    exit 1
+fi
+
 printf "\nDone\n"
