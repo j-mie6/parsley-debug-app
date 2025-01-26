@@ -34,6 +34,18 @@ jobs:
             shell: bash
             run: sh scripts/build.sh
 
+          - name: Upload app executable
+            uses: actions/upload-artifact@v4
+            with:
+                # Name of executable to upload
+                name: dill-${{ matrix.os }}.exe
+
+                # Path of executable
+                path: ./src-tauri/target/release/parsley-debug-app.exe
+
+                # Fail upload if no executable found at path
+                if-no-files-found: error
+
           - name: Upload app bundles
             uses: actions/upload-artifact@v4
             with:
