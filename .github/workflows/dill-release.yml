@@ -1,0 +1,47 @@
+name: Dill-Release
+
+# Only run release pipeline on release branches
+on:
+    push:
+        branches: 
+            - release
+        
+    pull_request:
+        branches:
+            - release 
+
+    # Allows us to run the workflow whenever we want from GitHub Actions
+    workflow_dispatch:
+
+jobs:
+    build:
+        name: "Build release artifacts"
+
+        # Creates a job for each OS
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest, windows-latest]
+
+        steps:
+          - uses: actions/checkout@v4
+        
+            # Use composite action for setup 
+          - name: Setup 
+            uses: ./.github/actions/setup
+
+          - name: Build artifact
+            shell: bash
+            run: sh scripts/build.sh
+
+          - name: Upload app bundles
+            uses: actions/upload-artifact@v4
+            with:
+                # Name of app bundle
+                name: dill-bundles-${{ matrix.os }}
+
+                # Path of bundles to upload
+                path: ./src-tauri/target/release/bundle/
+
+                # Fail upload if no files are found at the path
+                if-no-files-found: error
