@@ -9,6 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import lib.Tauri
 
 import displays.DisplayTree
+import debugger.DebugTree
 import debugger.DebugTreeHandler
 
 
@@ -57,7 +58,7 @@ object DebugViewPage extends Page {
         display.flex,
         flexDirection.row,
         justifyContent.center,
-        h1("DILL", marginTop.px := 0, marginBottom.px := 0)
+        h1("Dill", marginTop.px := 0, marginBottom.px := 0)
     )
 
     private lazy val headerRight: Element = div(
@@ -82,42 +83,64 @@ object DebugViewPage extends Page {
     )
 
     private lazy val treeView: Element = div(
+        boxSizing := "border-box",
         background := "#2E2F30",
         borderRadius.px := 20,
         border := "2px solid #96DEC4",
-        width.percent := 100,
-        height.percent := 100,
-        // DisplayTree.SampleTree.element,
-        // tree match {
-        //     case Some(tree) => tree.element()
-        //     case None => p("Tree does not exist")
-        // }
-        child <-- tree
+
+        padding.em := 1,
+        
+        child <-- displayTree
     )
     
-    private val tree: Var[Element] = Var(p("None"))
+    private val displayTree: Var[Element] = Var(noTree)
+    private lazy val noTree: Element = h1(
+        textAlign := "center",
+        "no tree"
+    )
+
 
     private lazy val reloadButton: Element = button(
+        border := "2px solid #2E2F30",
+        backgroundColor := "#96DEC4",
+        
+        borderRadius.px := 20,
+        
+        color := "#2E2F30",
+        textAlign := "center",
+
+        padding.em := 0.8,
+        paddingLeft.vw := 2,
+        paddingRight.vw := 2,
+
+        marginBottom.em := 0.5,
+
+        "Reload tree",
+        
         onClick --> { _ => {
             for {
-                text <- Tauri.invoke[String]("fetch_debug_tree")
+                treeString <- Tauri.invoke[String]("fetch_debug_tree")
             } do {
-                // tree.set(p(text))
-                DebugTreeHandler.decodeDebugTree(text) match {
-                    case Success(t) => tree.set(DisplayTree.from(t.root).element())
-                    case Failure(err) => ()
-                }
+                displayTree.set(
+                    if treeString.isEmpty then noTree else 
+                        DebugTreeHandler.decodeDebugTree(treeString) match {
+                            case Success(tree: DebugTree) => DisplayTree(tree).element
+                            case Failure(err) => p(err.toString())
+                    }
+                )
             }
-        }},
-        "Reload tree"
+        }}
     )
 
     lazy val page: Element = mainTag(
         // Styles
+        boxSizing := "border-box",
         padding.px := 30,
+        
         background := "#242526",
         color := "#96DEC4",
-        width.px := viewWidth,
+
+        width.vw := 100,
         height.vh := viewHeight,
 
         // Elements
