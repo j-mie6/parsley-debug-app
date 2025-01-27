@@ -37,13 +37,13 @@ jobs:
           - name: Setup 
             uses: ./.github/actions/setup
 
-          - name: Test backend
-            shell: bash
-            run: sh scripts/test-tauri.sh
-
           - name: Test frontend
             shell: bash
             run: sh scripts/test-laminar.sh
+
+          - name: Test backend
+            shell: bash
+            run: sh scripts/test-tauri.sh
           
           - name: Build app
             shell: bash
