@@ -54,6 +54,8 @@ if [ "$RUNNER_OS" = "macOS" ] || [ "$RUNNER_OS" = "Windows" ]; then
     fi
 fi
 
+coursier update
+
 # Common steps for all platforms
 npm install
 
