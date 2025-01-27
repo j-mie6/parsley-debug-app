@@ -3,10 +3,11 @@ import com.raquo.laminar.api.L.*
 
 import debugger.DebugNode
 
-/**
-
+/** Renderer for single DebugNode
+  * @param debugNode case class for holding debug values to be rendered
   */
 class DisplayNode(debugNode: DebugNode) {
+    /* Element rendering node's values */
     private lazy val node: Element = div(
         className := s"${if debugNode.success then "success" else "fail"}-node",
         
@@ -34,6 +35,7 @@ class DisplayNode(debugNode: DebugNode) {
         )
     )
 
+    /* Flexbox to hold children of debugNode */
     private lazy val children: Element = div(
         display := "flex",
         flexDirection := "row",
@@ -46,6 +48,7 @@ class DisplayNode(debugNode: DebugNode) {
         debugNode.children.map((child) => DisplayNode(child).element)
     )
 
+    /* Element for rendering as HTML */
     lazy val element: Element = div(
         node,
         children
