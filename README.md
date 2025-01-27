@@ -24,7 +24,7 @@ If you encounter a bug when using Dill, try and minimise the example of the pars
 
 ## How does it work?
 
-- A `RemoteView` backend for `parsley-debug` connectw to a HTTP server that is cross-platform against 9 different Scala targets
+- A `RemoteView` backend for `parsley-debug` connects to a HTTP server that is cross-platform against 9 different Scala targets
 - Cross-platform HTTP requests are implemented using the Scala library `sttp`
 - The parser sends a HTTP request to a running instance of the debugger
 - The debugger can render the resulting parse tree and process it independently
