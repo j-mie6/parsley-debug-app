@@ -2,50 +2,42 @@ package displays
 
 import com.raquo.laminar.api.L.*
 
+import debugger.DebugTree
+import displays.DisplayNode
+
 /**
   * DisplayTree creates the HTML element to display a DebugTree
   *
-  * @param placeholderText placeholder comment at the top of file
-  * @param children list of children of display tree's root node
+  * @param debugTree a DebugTree parsed from JSON
   */
-class DisplayTree(val placeholderText: String, val children: List[DisplayTree]) {
-    
-    val placeholderElement: Element = p(placeholderText)
+class DisplayTree(debugTree: DebugTree) {
+    /* Element to render input text */
+    // TODO: move to input page
+    private lazy val input: Element = h1(
+        textAlign := "center", 
+        debugTree.input
+    )
 
-    private val debugTreeElement: Element = {
-        div(
-            paddingLeft := "0",
-            listStyleType := "none",
-            border := "2px solid tomato",
-            padding := "2px",
-            placeholderElement,
-            ul(
-                listStyleType := "none",
-                children.map((t) => li(
-                    verticalAlign := "top",
-                    padding := "2px",
-                    t.element
-                ))
-            )
-        )
-    }
+    /* Flexbox to hold DisplayTree */
+    private lazy val root: Element = div(
+        display := "flex",
+        flexDirection := "row",
+        flexWrap := "nowrap",
+        flexBasis := "auto",
+        justifyContent := "space-evenly",
+        alignItems := "space-evenly",
+        DisplayNode(debugTree.root).element
+    )
 
-    /**
-      * HTLM element to display DisplayTree
-      */
-    def element: Element = {
-        if children.isEmpty then placeholderElement else debugTreeElement
-    }
+    /* HTML element exposed to be rendered */
+    lazy val element: Element = div(
+        input,
+        root
+    )
 }
 
 
 object DisplayTree {
-    // Example of a DisplayTree to use in testing
-    final val SampleTree: DisplayTree = {
-        DisplayTree("root!", List(DisplayTree("alejandro", List(DisplayTree("child"))), DisplayTree("adam"), DisplayTree("kevin")))
-    }
-    
-    // Secondary constructors
-    def apply(placeholderText: String, children: List[DisplayTree]): DisplayTree = new DisplayTree(placeholderText, children)
-    def apply(placeholderText: String): DisplayTree = DisplayTree(placeholderText, List[DisplayTree]())
+    // Example DisplayTree to use in testing
+    final val Sample: DisplayTree = DisplayTree(DebugTree.Sample)
 }
