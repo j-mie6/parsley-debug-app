@@ -7,35 +7,32 @@ import debugger.DebugNode
 
   */
 class DisplayNode(debugNode: DebugNode) {
-    private lazy val node: Element = {
+    private lazy val node: Element = div(
+        className := s"${if debugNode.success then "success" else "fail"}-node",
+        
+        padding.rem := 0.5,
+        paddingBottom.rem := 0.2,
+        paddingTop.rem := 0.5,
+        
+        borderRadius.px := 10,
+
+        margin.px := 2,
+        
+        borderWidth.px := 2,
+        borderColor := "#96DEC4",
+        borderStyle := {if debugNode.success then "solid" else "dashed"},
+
+        color := {if debugNode.success then "#2E2F30" else "#96DEC4"},
+        backgroundColor := s"rgba(150, 222, 196, ${if debugNode.success then 0.6 else 0.05})",
+
+        textAlign := "center",
+        width := "auto",
+        
         div(
-            className := s"${if debugNode.success then "success" else "fail"}-node",
-          
-            padding.rem := 0.5,
-            paddingBottom.rem := 0.2,
-            paddingTop.rem := 0.5,
-            
-            borderRadius.px := 10,
-
-            margin.px := 2,
-            
-            borderWidth.px := 2,
-
-            borderColor := "#96DEC4",
-            borderStyle := {if debugNode.success then "solid" else "dashed"},
-
-            color := {if debugNode.success then "#2E2F30" else "#96DEC4"},
-            backgroundColor := s"rgba(150, 222, 196, ${if debugNode.success then 0.6 else 0.05})",
-
-            textAlign := "center",
-            width := "auto",
-          
-            div(
-                p(fontWeight := "bold", debugNode.name), 
-                p(fontStyle := "italic", debugNode.input)
-            )
+            p(fontWeight := "bold", debugNode.name), 
+            p(fontStyle := "italic", debugNode.input)
         )
-    }
+    )
 
     private lazy val children: Element = div(
         display := "flex",
