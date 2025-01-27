@@ -9,9 +9,9 @@ Dill (**Debugging Interactively in the Parsley Library**) is a cross-platform, v
 
 Dill is distributed as a binary executable and can be installed below according to your machine's operating system:
 
-- [Linux](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-- [MacOS](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-- [Windows](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+- [Linux]()
+- [MacOS]()
+- [Windows]()
 
 ### Examples
 
@@ -23,3 +23,9 @@ Dill is distributed as a binary executable and can be installed below according 
 If you encounter a bug when using Dill, try and minimise the example of the parser input that triggers the bug. If possible, make a self contained example: this will help to identify the issue without too much issue.
 
 ## How does it work?
+
+- A `RemoteView` backend for `parsley-debug` connectw to a HTTP server that is cross-platform against 9 different Scala targets
+- Cross-platform HTTP requests are implemented using the Scala library `sttp`
+- The parser sends a HTTP request to a running instance of the debugger
+- The debugger can render the resulting parse tree and process it independently
+- A renderer (in `Tauri`) handles the debug trees
