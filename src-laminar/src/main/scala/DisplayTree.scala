@@ -11,12 +11,15 @@ import displays.DisplayNode
   * @param debugTree a DebugTree parsed from JSON
   */
 class DisplayTree(debugTree: DebugTree) {
-    lazy val input: Element = h1(
+    /* Element to render input text */
+    // TODO: move to input page
+    private lazy val input: Element = h1(
         textAlign := "center", 
         debugTree.input
     )
 
-    lazy val root: Element = div(
+    /* Flexbox to hold DisplayTree */
+    private lazy val root: Element = div(
         display := "flex",
         flexDirection := "row",
         flexWrap := "nowrap",
@@ -26,6 +29,7 @@ class DisplayTree(debugTree: DebugTree) {
         DisplayNode(debugTree.root).element
     )
 
+    /* HTML element exposed to be rendered */
     lazy val element: Element = div(
         input,
         root
