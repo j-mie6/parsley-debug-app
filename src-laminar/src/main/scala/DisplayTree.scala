@@ -20,17 +20,18 @@ class DisplayTree(debugTree: DebugTree) {
 
     /* Flexbox to hold DisplayTree */
     private lazy val root: Element = div(
-        display := "flex",
-        flexDirection := "row",
-        flexWrap := "nowrap",
-        flexBasis := "auto",
-        justifyContent := "space-evenly",
-        alignItems := "space-evenly",
         DisplayNode(debugTree.root).element
     )
 
     /* HTML element exposed to be rendered */
     lazy val element: Element = div(
+        display.flex,
+        flexDirection.column,
+        flexWrap.nowrap,
+        flexBasis.auto,
+        justifyContent := "flex-start",
+        alignItems := "center",
+
         input,
         root
     )
