@@ -1,38 +1,24 @@
 :root {
-  --background-primary: rgb(243, 242, 238);
-  --background-secondary: white;
-  --background-tertiary: #fbd93013;
-  --font-color-primary: rgba(0, 0, 0, 0.9);
-  --font-color-secondary: #015CAB;
-  --accent-color: #656565;
-  --button-color: #FBD930;
-  --button-press: #fbaa30;
-  --button-press-highlight: #fb6330;
-  --font-family-title: Righteous, Verdana, Geneva, Tahoma, sans-serif;
-  --font-family: Verdana, Geneva, Tahoma, sans-serif;
-  --red: red;
-  --green: rgb(0, 200, 0);
-  --background-transparent: rgba(243, 242, 238, 0.6);
-  --background-transparent-2: rgba(243, 242, 238, 0.1);
+  --background-primary: rgb(36, 37, 38);
+  --background-secondary: rgb(46, 47, 48);
+  --font-color-primary: #96DEC4;
+  --font-color-secondary: rgb(36, 37, 38);
+  --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif;
 }
 
-[data-theme='dark'] {
-  --background-primary: rgb(30, 30, 30);
-  --background-secondary: rgb(60, 60, 60);
-  --background-tertiary: #015cab1e;
-  --font-color-primary: rgb(230, 230, 230);
-  --font-color-secondary: #FBD930;
-  --accent-color: #656565;
-  --button-color: #015CAB;
-  --button-press: #019aab;
-  --button-press-highlight: #01ab81;
-  --background-transparent: rgb(30, 30, 30, 0.6);
-  --background-transparent-2: rgb(30, 30, 30, 0.3);
+[data-theme="light"] {
+  --background-primary: rgb(150, 222, 196);
+  --background-secondary: rgb(184, 238, 218);
+  --font-color-primary: rgb(36, 37, 38);
+  --font-color-secondary: #96DEC4;
 }
 
 body {
+  background-color: var(--background-primary);
+  color: var(--font-color-primary);
   margin: 0;
   padding: 0;
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

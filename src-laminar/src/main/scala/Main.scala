@@ -7,18 +7,13 @@ import com.raquo.laminar.api.L.*
 
 import lib.Tauri
 
-// import pages.DebugViewPage
-import pages.BasePage
-import pages.TreeView
-import pages.Page
-import debugger.DebugTreeHandler
-import debugger.DebugNode
+import pages.TreeViewPage
 
-def funct() = {
-    dom.window.localStorage.setItem("", "1")
+@main def app = {
+    val darkPreferred : Boolean = dom.window.matchMedia("(prefers-color-scheme: dark)").matches
+    dom.document.documentElement.setAttribute("data-theme", if darkPreferred then "dark" else "light")
+    renderOnDomContentLoaded(
+        dom.document.getElementById("app"),
+        TreeViewPage()
+    )
 }
-
-@main def app = renderOnDomContentLoaded(
-    dom.document.getElementById("app"),
-    TreeView().render()
-)
