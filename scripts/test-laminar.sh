@@ -2,7 +2,7 @@
 
 printf "Testing frontend...\n"
 
-sbt test
+sbt -v test
 
 if [ $? -ne 0 ]
 then
