@@ -89,6 +89,10 @@ object DebugViewPage extends Page {
         border := "2px solid #96DEC4",
 
         padding.em := 1,
+
+        overflow.auto,
+
+        maxHeight.percent := 85,
         
         child <-- displayTree
     )
@@ -165,6 +169,8 @@ object DebugViewPage extends Page {
 
         width.vw := 100,
         height.vh := 100,
+
+        overflow.hidden,
 
         // Elements
         headerView,
