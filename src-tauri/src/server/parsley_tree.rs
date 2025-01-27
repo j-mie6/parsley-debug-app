@@ -3,6 +3,7 @@ use crate::{DebugNode, DebugTree};
 
 /* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ParsleyNode {
     name: String, /* The user-defined name */
     internal: String, /* The internal name of the parser */
@@ -58,9 +59,9 @@ pub mod test {
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
-                "child_id": 0,
-                "from_offset": 0,
-                "to_offset": 3,
+                "childId": 0,
+                "fromOffset": 0,
+                "toOffset": 3,
                 "input": "Test",
                 "children": []
             }
@@ -106,27 +107,27 @@ pub mod test {
                 "name": "0",
                 "internal": "0",
                 "success": true,
-                "child_id": 0,
-                "from_offset": 0,
-                "to_offset": 0,
+                "childId": 0,
+                "fromOffset": 0,
+                "toOffset": 0,
                 "input": "01234",
                 "children": [
                     {
                         "name": "1",
                         "internal": "1",
                         "success": true,
-                        "child_id": 1,
-                        "from_offset": 1,
-                        "to_offset": 1,
+                        "childId": 1,
+                        "fromOffset": 1,
+                        "toOffset": 1,
                         "input": "01234",
                         "children": [
                             {
                                 "name": "2",
                                 "internal": "2",
                                 "success": true,
-                                "child_id": 2,
-                                "from_offset": 2,
-                                "to_offset": 2,
+                                "childId": 2,
+                                "fromOffset": 2,
+                                "toOffset": 2,
                                 "input": "01234",
                                 "children": []
                             }
@@ -136,18 +137,18 @@ pub mod test {
                         "name": "3",
                         "internal": "3",
                         "success": true,
-                        "child_id": 3,
-                        "from_offset": 3,
-                        "to_offset": 3,
+                        "childId": 3,
+                        "fromOffset": 3,
+                        "toOffset": 3,
                         "input": "01234",
                         "children": [
                             {
                                 "name": "4",
                                 "internal": "4",
                                 "success": true,
-                                "child_id": 4,
-                                "from_offset": 4,
-                                "to_offset": 4,
+                                "childId": 4,
+                                "fromOffset": 4,
+                                "toOffset": 4,
                                 "input": "01234",
                                 "children": []
                             }
