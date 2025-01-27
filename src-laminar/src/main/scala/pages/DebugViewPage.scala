@@ -84,6 +84,7 @@ object DebugViewPage extends Page {
     private lazy val treeView: Element = div(
         boxSizing := "border-box",
         background := "#2E2F30",
+
         borderRadius.px := 20,
         border := "2px solid #96DEC4",
 
@@ -145,7 +146,7 @@ object DebugViewPage extends Page {
             } do {
                 displayTree.set(
                     if treeString.isEmpty then warning("No tree found") else 
-                        DebugTreeHandler.decodeDebugTree("AAAAAAAAAAA") match {
+                        DebugTreeHandler.decodeDebugTree(treeString) match {
                             case Success[DebugTree](tree) => DisplayTree(tree).element
                             case Failure(err) => warning(err.toString())
                     }
@@ -163,7 +164,7 @@ object DebugViewPage extends Page {
         color := "#96DEC4",
 
         width.vw := 100,
-        height.vh := viewHeight,
+        height.vh := 100,
 
         // Elements
         headerView,
