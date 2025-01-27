@@ -1,9 +1,9 @@
-# Dill: Debugging Interactively in the Parsley Library ![Github Workflow Status](https://img.shields.io/github/actions/workflow/status/j-mie6/parsley-debug-app/dill-ci.yml?branch=release) ![Github release](https://img.shields.io/github/v/release/j-mie6/parsley-debug-app) ![Github license](https://img.shields.io/github/license/j-mie6/parsley-debug-app) 
+# Dill ![Github Workflow Status](https://img.shields.io/github/actions/workflow/status/j-mie6/parsley-debug-app/dill-ci.yml?branch=release) ![Github release](https://img.shields.io/github/v/release/j-mie6/parsley-debug-app) ![Github license](https://img.shields.io/github/license/j-mie6/parsley-debug-app) 
 
 
 ## What is Dill?
 
-Dill is a cross-platform, visual, reactive and interactive debugger to be used with the parser combinator library for Scala, [Parsley](https://github.com/j-mie6/parsley).
+Dill (**Debugging Interactively in the Parsley Library**) is a cross-platform, visual, reactive and interactive debugger to be used with the parser combinator library for Scala, [Parsley](https://github.com/j-mie6/parsley).
 
 ## How do I use it?
 
