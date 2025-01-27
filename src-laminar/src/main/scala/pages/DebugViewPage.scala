@@ -8,6 +8,7 @@ import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Try, Success, Failure}
 
+import lib.State
 import lib.Tauri
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -16,8 +17,8 @@ abstract class DebugViewPage extends Page {
     private lazy val treeIcon: Element = i(className := "bi bi-tree-fill", fontSize.px := 30)
     private lazy val fileIcon: Element = i(className := "bi bi-file-earmark-text-fill", fontSize.px := 25)
     private lazy val gitIcon: Element = i(className := "bi bi-github", fontSize.px := 40)
-    private lazy val sunIcon: Element = i(className := "bi bi-brightness-high-fill", fontSize.px := 40)
-    private lazy val moonIcon: Element = i(className := "bi bi-moon-fill", fontSize.px := 40)
+    private lazy val sunIcon: Element = i(className := "bi bi-brightness-high-fill", fontSize.px := 33)
+    private lazy val moonIcon: Element = i(className := "bi bi-moon-fill", fontSize.px := 33)
 
     private lazy val headerLeft: Element = div(
         className := "debug-view-header-left",
@@ -41,6 +42,13 @@ abstract class DebugViewPage extends Page {
 
     private lazy val headerRight: Element = div(
         className := "debug-view-header-right",
+        div(
+            child <-- State.isLightMode.signal.map((project: Boolean) => if project then moonIcon else sunIcon),
+            cursor.pointer,
+            alignContent.center,
+            marginRight.px := 20,
+            onClick --> {_ => State.toggleTheme()}
+        ),
         gitIcon
     )
 

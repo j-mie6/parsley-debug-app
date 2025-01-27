@@ -14,64 +14,38 @@ import lib.Tauri
 import lib.DebugTreeHandler
 import lib._debug_tree_sample
 
-def toggleTheme() = {
-    println("Theme Change")
-    dom.document.documentElement.setAttribute("data-theme", if dom.document.documentElement.getAttribute("data-theme") == "dark" then "light" else "dark");
-}
-
 
 object TreeViewPage extends DebugViewPage {
     private val displayTree: Var[HtmlElement] = Var(DebugTreeDisplay(_debug_tree_sample))
+    
+    private lazy val reloadIcon: HtmlElement = i(className := "bi bi-arrow-clockwise", fontSize.px := 25, marginRight.px := 10)
+
+    private def reloadTree(): Unit = 
+        for {
+            treeString <- Tauri.invoke[String]("fetch_debug_tree")
+        } do {
+            displayTree.set(
+                if treeString.isEmpty then div("No tree found") else 
+                    DebugTreeHandler.decodeDebugTree(treeString) match {
+                        case Failure(exception) => println(s"Error in decoding debug tree : ${exception.getMessage()}"); div()
+                        case Success(debugTree) => DebugTreeDisplay(debugTree)
+                    }
+            )
+        }
 
     private lazy val reloadButton: Element = button(
-        border := "2px solid #2E2F30",
-        borderRadius.px := 20,
+        className := "tree-view-reload",
         
-        textAlign := "center",
-
-        padding.em := 0.8,
-        paddingLeft.vw := 2,
-        paddingRight.vw := 2,
-
-        marginBottom.em := 0.5,
-
+        reloadIcon,
         "Reload tree",
-        
-        onClick --> { _ => {
-            for {
-                treeString <- Tauri.invoke[String]("fetch_debug_tree")
-            } do {
-                displayTree.set(
-                    if treeString.isEmpty then div("No tree found") else 
-                        DebugTreeHandler.decodeDebugTree(treeString) match {
-                            case Failure(exception) => println(s"Error in decoding debug tree : ${exception.getMessage()}"); div()
-                            case Success(debugTree) => DebugTreeDisplay(debugTree)
-                        }
-                )
-            }
-        }}
+
+        onClick --> { _ => reloadTree()}
     )
 
     def apply(): HtmlElement = super.render(Some(div(
-        boxSizing := "border-box",
-        borderRadius.px := 20,
-
-        border := "1px solid var(--font-color-primary)",
-
-        padding.em := 1,
-
-        overflow.auto,
-
-        maxHeight.percent := 85,
+        className := "tree-view-page",
 
         reloadButton,
-
-        button(
-            "Toggle Theme",
-            onClick --> { _ => {
-                toggleTheme()
-            }}
-        ),
         child <-- displayTree
     )))
 }
