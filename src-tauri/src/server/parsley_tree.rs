@@ -7,7 +7,9 @@ pub struct ParsleyNode {
     name: String, /* The user-defined name */
     internal: String, /* The internal name of the parser */
     success: bool, /* Whether the parser was successful */
-    number: usize, /* The unique child number of this node */
+    child_id: usize, /* The unique child number of this node */
+    from_offset: usize, /* Offset into the input in which this node's parse attempt starts */
+    to_offset: usize, /* Offset into the input in which this node's parse attempt finished */
     input: String, /* The input string passed to the parser */
     children: Vec<ParsleyNode>, /* The children of this node */
 }
@@ -18,8 +20,8 @@ impl From<ParsleyNode> for DebugNode {
             node.name,
             node.internal,
             node.success,
-            node.number,
-            node.input,
+            node.child_id,
+            String::from(&node.input[node.from_offset..node.to_offset]),
             node.children
                 .into_iter()
                 .map(ParsleyNode::into)
