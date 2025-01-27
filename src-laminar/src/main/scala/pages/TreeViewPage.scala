@@ -56,6 +56,8 @@ object TreeViewPage extends DebugViewPage {
         boxSizing := "border-box",
         borderRadius.px := 20,
 
+        border := "1px solid var(--font-color-primary)",
+
         padding.em := 1,
 
         overflow.auto,

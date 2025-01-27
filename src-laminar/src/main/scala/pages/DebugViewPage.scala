@@ -20,92 +20,41 @@ abstract class DebugViewPage extends Page {
     private lazy val moonIcon: Element = i(className := "bi bi-moon-fill", fontSize.px := 40)
 
     private lazy val headerLeft: Element = div(
-        display.flex,
-        justifyContent.flexStart,
-        alignItems.center,
-        flexDirection.row,
+        className := "debug-view-header-left",
         div(
-            margin.px := 0,
-            display.flex,
-            flexDirection.row,
-            alignItems.center,
+            className := "debug-view-header-left-container",
             treeIcon,
-            h2("Tree View", marginLeft.px := 10, marginTop.px := 0, marginBottom.px := 0)
+            h2("Tree View", marginLeft.px := 7)
         ),
+        div(className := "debug-view-header-left-vbar"),
         div(
-            width.px := 1,
-            height.px := 40,
-            // background := "#96DEC4",
-            border := "1px solid #96DEC4",
-            margin := "0 10px 0 10px"
-        ),
-        div(
-            display.flex,
-            flexDirection.row,
-            alignItems.center,
+            className := "debug-view-header-left-container",
             fileIcon,
-            h2("Input View", marginLeft.px := 10, marginTop.px := 0, marginBottom.px := 0)
+            h2("Input View", marginLeft.px := 12)
         )
     )
 
     private lazy val title: Element = div(
-        display.flex,
-        flexDirection.row,
-        justifyContent.center,
-        h1("Dill", marginTop.px := 0, marginBottom.px := 0)
+        className := "debug-view-header-title",
+        h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
     private lazy val headerRight: Element = div(
-        display.flex,
-        flexDirection.rowReverse,
-        alignItems.center,
+        className := "debug-view-header-right",
         gitIcon
     )
 
-    private lazy val headerView: Element = headTag(
-        // Styles
-        display.grid,
-        columnCount := 3,
-        gridTemplateColumns := "1fr 1fr 1fr",
-        marginBottom.px := 10,
+    private lazy val headerView: Element = headerTag(
+        className := "debug-view-header",
 
-        // Elements
         headerLeft,
         title,
         headerRight,
     )
 
-    lazy val page: Element = mainTag(
-        // Styles
-        boxSizing := "border-box",
-        padding.px := 30,
-        
-        // background := "#242526",
-        // color := "#96DEC4",
-
-        width.vw := 100,
-        height.vh := 100,
-
-        overflow.hidden,
-
-        // Elements
-        headerView
-    )
-
     override def render(child: Option[HtmlElement]): HtmlElement = super.render(Some(mainTag(
-        // Styles
-        boxSizing := "border-box",
-        padding.px := 30,
-        
-        // background := "#242526",
-        color := "#96DEC4",
+        className := "debug-view-page",
 
-        width.vw := 100,
-        height.vh := 100,
-
-        overflow.hidden,
-
-        // Elements
         headerView,
         child.getOrElse(div())
     )))
