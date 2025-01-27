@@ -9,7 +9,6 @@ runs:
         with:
             distribution: temurin
             java-version: 17
-            cache: sbt
             
       - name: Setup sbt launcher
         uses: sbt/setup-sbt@v1
