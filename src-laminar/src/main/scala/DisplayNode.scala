@@ -58,6 +58,5 @@ class DisplayNode(debugNode: DebugNode) {
 
 
 object DisplayNode {
-    // Example DisplayNode to use in testing
-    final val Sample: DisplayNode = ???
+
 }

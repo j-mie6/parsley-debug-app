@@ -92,12 +92,35 @@ object DebugViewPage extends Page {
         child <-- displayTree
     )
     
-    private val displayTree: Var[Element] = Var(noTree)
-    private lazy val noTree: Element = h1(
-        textAlign := "center",
-        "no tree"
+    private val displayTree: Var[Element] = Var(warning("No tree found"))
+    private def warning(text: String): Element = div(
+        h1(textAlign := "center", text),
+        useSampleButton
     )
 
+    private lazy val useSampleButton: Element = button(
+        border := "2px solid #2E2F30",
+        backgroundColor := "#96DEC4",
+        
+        borderRadius.px := 20,
+        
+        color := "#2E2F30",
+        textAlign := "center",
+
+        padding.em := 0.8,
+        paddingLeft.vw := 2,
+        paddingRight.vw := 2,
+
+        marginBottom.em := 0.5,
+
+        float := "right",
+
+        "Use sample tree",
+
+        onClick --> { _ => 
+            displayTree.set(DisplayTree.Sample.element)
+        }
+    )
 
     private lazy val reloadButton: Element = button(
         border := "2px solid #2E2F30",
@@ -121,10 +144,10 @@ object DebugViewPage extends Page {
                 treeString <- Tauri.invoke[String]("fetch_debug_tree")
             } do {
                 displayTree.set(
-                    if treeString.isEmpty then noTree else 
-                        DebugTreeHandler.decodeDebugTree(treeString) match {
-                            case Success(tree: DebugTree) => DisplayTree(tree).element
-                            case Failure(err) => p(err.toString())
+                    if treeString.isEmpty then warning("No tree found") else 
+                        DebugTreeHandler.decodeDebugTree("AAAAAAAAAAA") match {
+                            case Success[DebugTree](tree) => DisplayTree(tree).element
+                            case Failure(err) => warning(err.toString())
                     }
                 )
             }

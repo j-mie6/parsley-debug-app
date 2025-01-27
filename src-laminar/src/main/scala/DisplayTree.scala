@@ -39,5 +39,5 @@ class DisplayTree(debugTree: DebugTree) {
 
 object DisplayTree {
     // Example DisplayTree to use in testing
-    final val Sample: DisplayTree = ???
+    final val Sample: DisplayTree = DisplayTree(DebugTree.Sample)
 }
