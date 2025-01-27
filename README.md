@@ -3,7 +3,7 @@
 
 ## What is Dill?
 
-Dill (**Debugging Interactively in the Parsley Library**) is a cross-platform, visual, reactive and interactive debugger to be used with the parser combinator library for Scala, [Parsley](https://github.com/j-mie6/parsley).
+Dill (**Debugging Interactively in the Parsley Library**) is a cross-platform, visual, reactive and interactive debugger to be used with the _modern_ parser combinator library for Scala, [`Parsley`](https://github.com/j-mie6/parsley).
 
 ## How do I use it?
 
@@ -13,7 +13,10 @@ Dill is distributed as a binary executable and can be installed below according 
 - [MacOS](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 - [Windows](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
-## Examples
+### Examples
+
+![Debugging "hi world!"](readme/images/DillHiWorld.png)
+![Debugging multiplication](readme/images/DillMultiplication.png)
 
 ## Bug Reports
 
