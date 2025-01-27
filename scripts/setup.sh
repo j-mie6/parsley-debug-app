@@ -23,9 +23,6 @@ fi
 if [ "$RUNNER_OS" = "macOS" ] || [ "$RUNNER_OS" = "Windows" ]; then
     echo "Setting up prerequisites for macOS and Windows using npm..."
 
-    npm install -g n
-    n stable
-
     # Use npm to install cross-platform tools
     npm install -g webkitgtk \
         curl \
