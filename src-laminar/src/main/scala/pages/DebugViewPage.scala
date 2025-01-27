@@ -18,12 +18,12 @@ val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 trait DebugViewPage extends Page { }
 
 object DebugViewPage extends Page {
-    private lazy val treeIcon: Element = i(className := "bi bi-tree-fill", fontSize.px := 30)
-    private lazy val fileIcon: Element = i(className := "bi bi-file-earmark-text-fill", fontSize.px := 25)
-    private lazy val gitIcon: Element = i(className := "bi bi-github", fontSize.px := 40)
+//     private lazy val treeIcon: Element = i(className := "bi bi-tree-fill", fontSize.px := 30)
+//     private lazy val fileIcon: Element = i(className := "bi bi-file-earmark-text-fill", fontSize.px := 25)
+//     private lazy val gitIcon: Element = i(className := "bi bi-github", fontSize.px := 40)
 
-    private lazy val viewWidth = Math.max(dom.document.documentElement.clientWidth, dom.window.innerWidth) 
-    private lazy val viewHeight = Math.max(dom.document.documentElement.clientHeight, dom.window.innerHeight)
+//     private lazy val viewWidth = Math.max(dom.document.documentElement.clientWidth, dom.window.innerWidth) 
+//     private lazy val viewHeight = Math.max(dom.document.documentElement.clientHeight, dom.window.innerHeight)
 
     private lazy val headerLeft: Element = div(
         display.flex,
@@ -54,19 +54,19 @@ object DebugViewPage extends Page {
         )
     )
 
-    private lazy val title: Element = div(
-        display.flex,
-        flexDirection.row,
-        justifyContent.center,
-        h1("Dill", marginTop.px := 0, marginBottom.px := 0)
-    )
+// //     private lazy val title: Element = div(
+// //         display.flex,
+// //         flexDirection.row,
+// //         justifyContent.center,
+// //         h1("Dill", marginTop.px := 0, marginBottom.px := 0)
+// //     )
 
-    private lazy val headerRight: Element = div(
-        display.flex,
-        flexDirection.rowReverse,
-        alignItems.center,
-        gitIcon
-    )
+// //     private lazy val headerRight: Element = div(
+// //         display.flex,
+// //         flexDirection.rowReverse,
+// //         alignItems.center,
+// //         gitIcon
+// //     )
 
     private lazy val headerView: Element = headTag(
         // Styles
@@ -75,11 +75,11 @@ object DebugViewPage extends Page {
         gridTemplateColumns := "1fr 1fr 1fr",
         marginBottom.px := 10,
 
-        // Elements
-        headerLeft,
-        title,
-        headerRight,
-    )
+// //         // Elements
+// //         headerLeft,
+// //         title,
+// //         headerRight,
+// //     )
 
     private lazy val treeView: Element = div(
         boxSizing := "border-box",
@@ -94,8 +94,8 @@ object DebugViewPage extends Page {
 
         maxHeight.percent := 85,
         
-        child <-- displayTree
-    )
+// //         child <-- displayTree
+// //     )
     
     private val displayTree: Var[Element] = Var(warning("No tree found"))
     private def warning(text: String): Element = div(
@@ -127,22 +127,22 @@ object DebugViewPage extends Page {
         }
     )
 
-    private lazy val reloadButton: Element = button(
-        border := "2px solid #2E2F30",
-        backgroundColor := "#96DEC4",
+// //     private lazy val reloadButton: Element = button(
+// //         border := "2px solid #2E2F30",
+// //         backgroundColor := "#96DEC4",
         
-        borderRadius.px := 20,
+// //         borderRadius.px := 20,
         
-        color := "#2E2F30",
-        textAlign := "center",
+// //         color := "#2E2F30",
+// //         textAlign := "center",
 
-        padding.em := 0.8,
-        paddingLeft.vw := 2,
-        paddingRight.vw := 2,
+// //         padding.em := 0.8,
+// //         paddingLeft.vw := 2,
+// //         paddingRight.vw := 2,
 
-        marginBottom.em := 0.5,
+// //         marginBottom.em := 0.5,
 
-        "Reload tree",
+// //         "Reload tree",
         
         onClick --> { _ => {
             for {
@@ -159,25 +159,25 @@ object DebugViewPage extends Page {
         }}
     )
 
-    lazy val page: Element = mainTag(
-        // Styles
-        boxSizing := "border-box",
-        padding.px := 30,
+// //     lazy val page: Element = mainTag(
+// //         // Styles
+// //         boxSizing := "border-box",
+// //         padding.px := 30,
         
-        background := "#242526",
-        color := "#96DEC4",
+// //         background := "#242526",
+// //         color := "#96DEC4",
 
         width.vw := 100,
         height.vh := 100,
 
         overflow.hidden,
 
-        // Elements
-        headerView,
-        reloadButton,
-        treeView
-    )
-}
+// //         // Elements
+// //         headerView,
+// //         reloadButton,
+// //         treeView
+// //     )
+// // }
 
 
-trait DebugView extends Page { }
+// // trait DebugView extends Page { }

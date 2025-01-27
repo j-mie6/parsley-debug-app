@@ -7,13 +7,18 @@ import com.raquo.laminar.api.L.*
 
 import lib.Tauri
 
-import pages.DebugViewPage
+// import pages.DebugViewPage
+import pages.BasePage
+import pages.TreeView
+import pages.Page
 import debugger.DebugTreeHandler
 import debugger.DebugNode
 
-private val tree: Var[Element] = Var(p("None"))
+def funct() = {
+    dom.window.localStorage.setItem("", "1")
+}
 
 @main def app = renderOnDomContentLoaded(
     dom.document.getElementById("app"),
-    DebugViewPage.page
+    TreeView().render()
 )
