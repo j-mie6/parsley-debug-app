@@ -50,7 +50,7 @@ object DebugViewPage extends Page {
             flexDirection.row,
             alignItems.center,
             fileIcon,
-            h2("Source View", marginLeft.px := 10, marginTop.px := 0, marginBottom.px := 0)
+            h2("Input View", marginLeft.px := 10, marginTop.px := 0, marginBottom.px := 0)
         )
     )
 
@@ -74,7 +74,6 @@ object DebugViewPage extends Page {
         columnCount := 3,
         gridTemplateColumns := "1fr 1fr 1fr",
         marginBottom.px := 10,
-        // width.percent := 100,
 
         // Elements
         headerLeft,
