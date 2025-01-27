@@ -15,11 +15,10 @@ class DisplayNode(debugNode: DebugNode) {
         paddingBottom.rem := 0.2,
         paddingTop.rem := 0.5,
         
-        borderRadius.px := 10,
-
         margin.px := 2,
         
         borderWidth.px := 2,
+        borderRadius.px := 10,
         borderColor := "#96DEC4",
         borderStyle := {if debugNode.success then "solid" else "dashed"},
 
