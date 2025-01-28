@@ -92,8 +92,8 @@ buildFrontend := {
     
     IO.listFiles(fm)
         .map { file =>
-            val (name, ext) = file.baseAndExt
-            val out = outDir / (name + "." + ext)
+            val (_, ext) = file.baseAndExt
+            val out = outDir / ("dill" + "." + ext)
 
             IO.copyFile(file, out)
 
