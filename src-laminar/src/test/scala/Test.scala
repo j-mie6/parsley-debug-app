@@ -14,21 +14,21 @@ class Test extends AnyFlatSpec with should.Matchers {
             "name": "Test",
             "internal": "Test",
             "success": true,
-            "number": 0,
+            "childId": 0,
             "input": "Test",
             "children": [
                 {
                     "name": "Test1",
                     "internal": "Test1",
                     "success": true,
-                    "number": 0,
+                    "childId": 0,
                     "input": "Test1",
                     "children": [
                         {
                             "name": "Test1.1",
                             "internal": "Test1.1",
                             "success": true,
-                            "number": 0,
+                            "childId": 0,
                             "input": "Test1.1",
                             "children": []
                         }
@@ -38,14 +38,14 @@ class Test extends AnyFlatSpec with should.Matchers {
                     "name": "Test2",
                     "internal": "Test2",
                     "success": true,
-                    "number": 0,
+                    "childId": 0,
                     "input": "Test2",
                     "children": [
                         {
                             "name": "Test2.1",
                             "internal": "Test2.1",
                             "success": true,
-                            "number": 0,
+                            "childId": 0,
                             "input": "Test2.1",
                             "children": []
                         }
@@ -65,7 +65,7 @@ class Test extends AnyFlatSpec with should.Matchers {
         tree.root.name should be ("Test")
         tree.root.internal should be ("Test")
         tree.root.success should be (true)
-        tree.root.number should be (0)
+        tree.root.childId should be (0)
         tree.root.input should be ("Test")
         tree.root.children should have length 2
 
@@ -74,7 +74,7 @@ class Test extends AnyFlatSpec with should.Matchers {
             child.name should be (s"Test${index + 1}")
             child.internal should be (s"Test${index + 1}")
             child.success should be (true)
-            child.number should be (0)
+            child.childId should be (0)
         }
 
     }

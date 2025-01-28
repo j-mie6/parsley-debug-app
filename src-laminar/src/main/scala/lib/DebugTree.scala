@@ -15,24 +15,25 @@ case class DebugTree(input: String, root: DebugNode) derives ReadWriter
   * @param name user defined name of the debug tree node
   * @param internal internal name of the debug tree node
   * @param success whether the input was successfully consumed
+  * @param childId an unique identifier number for the tree node
   * @param input the input string the tree node has to parse
-  * @param number an unique identifier number for the tree node
   * @param children list of children nodes
   */
 case class DebugNode(name: String, internal: String, success: Boolean,
-    input: String, number: Int, children: List[DebugNode]) derives ReadWriter
+    childId: Int, input: String, children: List[DebugNode]) derives ReadWriter
 
-
-lazy final val debug_tree_sample: DebugTree = DebugTree(
+object DebugTree {
+    lazy final val Sample: DebugTree = DebugTree(
         "hi world!",
-        DebugNode("~>", "~>", true, "hi world!", 0, List[DebugNode](
-            DebugNode("~>", "~>", true, "hi world!", 1, List[DebugNode](
-                DebugNode("'h'", "'h'", true, "hi world!", 1, List[DebugNode]()),
-                DebugNode("|", "|", true, "hi world!", 2, List[DebugNode](
-                    DebugNode("\"ello\"", "\"ello\"", false, "hi world!", 0, List[DebugNode]()),
-                    DebugNode("\"i\"", "\"i\"", true, "hi world!", 1, List[DebugNode]())
+        DebugNode("~>", "~>", true, 0, "hi world!", List[DebugNode](
+            DebugNode("~>", "~>", true, 1, "hi", List[DebugNode](
+                DebugNode("'h'", "'h'", true, 1, "h", List[DebugNode]()),
+                DebugNode("|", "|", true, 2, "i", List[DebugNode](
+                    DebugNode("\"ello\"", "\"ello\"", false, 0, "", List[DebugNode]()),
+                    DebugNode("\"i\"", "\"i\"", true, 1, "i", List[DebugNode]())
                 ))
             )),
-            DebugNode("\" world!\"", "\" world!\"", true, "hi world!", 2, List[DebugNode]())
+            DebugNode("\" world!\"", "\" world!\"", true, 2, "world!", List[DebugNode]())
         ))
     )
+}

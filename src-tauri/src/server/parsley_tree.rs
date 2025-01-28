@@ -8,29 +8,11 @@ pub struct ParsleyNode {
     name: String, /* The user-defined name */
     internal: String, /* The internal name of the parser */
     success: bool, /* Whether the parser was successful */
-    child_id: usize, /* The unique child number of this node */
-    from_offset: usize, /* Offset into the input in which this node's parse attempt starts */
-    to_offset: usize, /* Offset into the input in which this node's parse attempt finished */
-    input: String, /* The input string passed to the parser */
+    child_id: i64, /* The unique child number of this node */
+    from_offset: i32, /* Offset into the input in which this node's parse attempt starts */
+    to_offset: i32, /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
 }
-
-impl From<ParsleyNode> for DebugNode {
-    fn from(node: ParsleyNode) -> Self {
-        DebugNode::new( 
-            node.name,
-            node.internal,
-            node.success,
-            node.child_id,
-            String::from(&node.input[node.from_offset..=node.to_offset]),
-            node.children
-                .into_iter()
-                .map(ParsleyNode::into)
-                .collect()
-        )
-    }
-}
-
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 pub struct ParsleyTree {
@@ -38,9 +20,40 @@ pub struct ParsleyTree {
     root: ParsleyNode,
 }
 
+/* Convert from ParsleyTree to DebugTree */
 impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
-        DebugTree::new(tree.input, tree.root.into())
+        /* Helper function used to convert a ParsleyNode given the total input string */
+        fn convert_node(node: ParsleyNode, input: &str) -> DebugNode {
+            /* Convert child_id, handling -1 case */
+            let child_id: Option<u32> = node.child_id.try_into().ok();
+            
+            /* Slice the input into input consumed by this node, handling -1 case */
+            let input_slice: String = usize::try_from(node.from_offset)
+                .and_then(|from: usize| Ok(from..usize::try_from(node.to_offset)?))
+                .map_or("", |range| &input[range])
+                .to_string();
+
+            /* Recursively convert children into DebugNodes */
+            let children: Vec<DebugNode> = node.children
+                .into_iter()
+                .map(|child| convert_node(child, input))
+                .collect();
+
+            /* Instantiate DebugNode */
+            DebugNode::new( 
+                node.name,
+                node.internal,
+                node.success,
+                child_id,
+                input_slice,
+                children,
+            )
+        }
+
+        /* Convert the root node and return DebugTree */
+        let node: DebugNode = convert_node(tree.root, &tree.input);
+        DebugTree::new(tree.input, node)
     }
 }
 
@@ -62,8 +75,7 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "fromOffset": 0,
-                "toOffset": 3,
-                "input": "Test",
+                "toOffset": 4,
                 "children": []
             }
         }"#;
@@ -77,8 +89,7 @@ pub mod test {
                 success: true,
                 child_id: 0,
                 from_offset: 0,
-                to_offset: 3,
-                input: String::from("Test"),
+                to_offset: 4,
                 children: vec![]
             }
         }
@@ -95,8 +106,7 @@ pub mod test {
         assert_eq!(parsley_tree.root.success, true);
         assert_eq!(parsley_tree.root.child_id, 0);
         assert_eq!(parsley_tree.root.from_offset, 0);
-        assert_eq!(parsley_tree.root.to_offset, 3);
-        assert_eq!(parsley_tree.root.input, "Test");
+        assert_eq!(parsley_tree.root.to_offset, 4);
         assert_eq!(parsley_tree.root.children.len(), 0);
     }
 
@@ -110,8 +120,7 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "fromOffset": 0,
-                "toOffset": 0,
-                "input": "01234",
+                "toOffset": 1,
                 "children": [
                     {
                         "name": "1",
@@ -119,8 +128,7 @@ pub mod test {
                         "success": true,
                         "childId": 1,
                         "fromOffset": 1,
-                        "toOffset": 1,
-                        "input": "01234",
+                        "toOffset": 2,
                         "children": [
                             {
                                 "name": "2",
@@ -128,8 +136,7 @@ pub mod test {
                                 "success": true,
                                 "childId": 2,
                                 "fromOffset": 2,
-                                "toOffset": 2,
-                                "input": "01234",
+                                "toOffset": 3,
                                 "children": []
                             }
                         ]
@@ -140,8 +147,7 @@ pub mod test {
                         "success": true,
                         "childId": 3,
                         "fromOffset": 3,
-                        "toOffset": 3,
-                        "input": "01234",
+                        "toOffset": 4,
                         "children": [
                             {
                                 "name": "4",
@@ -149,8 +155,7 @@ pub mod test {
                                 "success": true,
                                 "childId": 4,
                                 "fromOffset": 4,
-                                "toOffset": 4,
-                                "input": "01234",
+                                "toOffset": 5,
                                 "children": []
                             }
                         ]
@@ -168,8 +173,7 @@ pub mod test {
         assert_eq!(parsley_tree.root.success, true);
         assert_eq!(parsley_tree.root.child_id, 0);
         assert_eq!(parsley_tree.root.from_offset, 0);
-        assert_eq!(parsley_tree.root.to_offset, 0);
-        assert_eq!(parsley_tree.root.input, "01234");
+        assert_eq!(parsley_tree.root.to_offset, 1);
         assert_eq!(parsley_tree.root.children.len(), 2);
 
         /* Check the first child */
@@ -179,8 +183,7 @@ pub mod test {
         assert_eq!(child1.success, true);
         assert_eq!(child1.child_id, 1);
         assert_eq!(child1.from_offset, 1);
-        assert_eq!(child1.to_offset, 1);
-        assert_eq!(child1.input, "01234");
+        assert_eq!(child1.to_offset, 2);
         assert_eq!(child1.children.len(), 1);
 
         /* Check the first grandchild of the first child */
@@ -190,8 +193,7 @@ pub mod test {
         assert_eq!(child1_1.success, true);
         assert_eq!(child1_1.child_id, 2);
         assert_eq!(child1_1.from_offset, 2);
-        assert_eq!(child1_1.to_offset, 2);
-        assert_eq!(child1_1.input, "01234");
+        assert_eq!(child1_1.to_offset, 3);
         assert_eq!(child1_1.children.len(), 0);
 
         /* Check the second child */
@@ -201,8 +203,7 @@ pub mod test {
         assert_eq!(child2.success, true);
         assert_eq!(child2.child_id, 3);
         assert_eq!(child2.from_offset, 3);
-        assert_eq!(child2.to_offset, 3);
-        assert_eq!(child2.input, "01234");
+        assert_eq!(child2.to_offset, 4);
         assert_eq!(child2.children.len(), 1);
 
         /* Check the first grandchild of the second child */
@@ -212,8 +213,7 @@ pub mod test {
         assert_eq!(child2_1.success, true);
         assert_eq!(child2_1.child_id, 4);
         assert_eq!(child2_1.from_offset, 4);
-        assert_eq!(child2_1.to_offset, 4);
-        assert_eq!(child2_1.input, "01234");
+        assert_eq!(child2_1.to_offset, 5);
         assert_eq!(child2_1.children.len(), 0);
     }
 
@@ -237,8 +237,7 @@ pub mod test {
                 success: true,
                 child_id: 0,
                 from_offset: 0,
-                to_offset: 0,
-                input: String::from("01234"),
+                to_offset: 1,
                 children: vec![
                     ParsleyNode {
                         name: String::from("1"),
@@ -246,8 +245,7 @@ pub mod test {
                         success: true,
                         child_id: 1,
                         from_offset: 1,
-                        to_offset: 1,
-                        input: String::from("01234"),
+                        to_offset: 2,
                         children: vec![
                             ParsleyNode {
                                 name: String::from("2"),
@@ -255,8 +253,7 @@ pub mod test {
                                 success: true,
                                 child_id: 2,
                                 from_offset: 2,
-                                to_offset: 2,
-                                input: String::from("01234"),
+                                to_offset: 3,
                                 children: Vec::new()
                             }
                         ]
@@ -267,17 +264,15 @@ pub mod test {
                         success: true,
                         child_id: 3,
                         from_offset: 3,
-                        to_offset: 3,
-                        input: String::from("01234"),
+                        to_offset: 4,
                         children: vec![
                             ParsleyNode {
                                 name: String::from("4"),
                                 internal: String::from("4"),
                                 success: true,
-                                child_id: 4,
+                                child_id: -1,
                                 from_offset: 4,
-                                to_offset: 4,
-                                input: String::from("01234"),
+                                to_offset: 5,
                                 children: Vec::new()
                             }
                         ]
@@ -292,21 +287,21 @@ pub mod test {
                 String::from("0"), 
                 String::from("0"), 
                 true, 
-                0, 
+                Some(0), 
                 String::from("0"), 
                 vec![
                     DebugNode::new(
                         String::from("1"), 
                         String::from("1"), 
                         true, 
-                        1, 
+                        Some(1), 
                         String::from("1"), 
                         vec![
                             DebugNode::new(
                                 String::from("2"), 
                                 String::from("2"), 
                                 true, 
-                                2, 
+                                Some(2), 
                                 String::from("2"), 
                                 vec![]
                             )
@@ -316,14 +311,14 @@ pub mod test {
                         String::from("3"), 
                         String::from("3"), 
                         true, 
-                        3, 
+                        Some(3), 
                         String::from("3"), 
                         vec![
                             DebugNode::new(
                                 String::from("4"), 
                                 String::from("4"), 
                                 true, 
-                                4, 
+                                None, 
                                 String::from("4"), 
                                 vec![]
                             )
