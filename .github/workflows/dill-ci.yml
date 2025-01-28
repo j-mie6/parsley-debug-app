@@ -76,6 +76,7 @@ jobs:
           rm -rf "C:/Users/runneradmin/.ivy2/cache"
           rm -rf "C:/Users/runneradmin/.sbt"
           echo "SBT_OPTS=-Dfile.encoding=UTF-8" >> $GITHUB_ENV
+          cs 
           
 
       - name: Setup sbt
@@ -87,6 +88,9 @@ jobs:
           distribution: temurin
           java-version: 11
           cache: sbt
+      
+      - name: Pre-fetch Scala 3 Compiler
+        run: cs fetch org.scala-lang:scala3-compiler_3:3.3.3
 
       - name: Update sbt
         shell: bash

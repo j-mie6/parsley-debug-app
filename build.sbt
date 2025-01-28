@@ -37,7 +37,8 @@ lazy val commonSettings = Seq(
     resolvers ++= Opts.resolver.sonatypeOssReleases, // Will speed up MiMA during fast back-to-back releases
     resolvers ++= Opts.resolver.sonatypeOssSnapshots, // needed during flux periods
     libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % scalatestVersion % Test
+        "org.scalatest" %%% "scalatest" % scalatestVersion % Test,
+        "org.scala-lang" %% "scala3-compiler" % "3.3.3"
     ),
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oI"),
     Test / parallelExecution := false,
