@@ -87,6 +87,7 @@ jobs:
       #     +update
 
       - name: Test frontend
+        shell: bash
         run: |
           sbt \
           -Dsbt.coursier.parallel-downloads=1 \
