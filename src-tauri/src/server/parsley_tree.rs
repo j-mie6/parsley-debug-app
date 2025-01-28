@@ -35,12 +35,12 @@ impl From<ParsleyNode> for DebugNode {
 #[derive(Debug, PartialEq, serde::Deserialize)]
 pub struct ParsleyTree {
     input: String,
-    tree: ParsleyNode,
+    root: ParsleyNode,
 }
 
 impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
-        DebugTree::new(tree.input, tree.tree.into())
+        DebugTree::new(tree.input, tree.root.into())
     }
 }
 
@@ -56,7 +56,7 @@ pub mod test {
 
     pub const RAW_TREE_SIMPLE: &str = r#"{
             "input": "Test",
-            "tree": {
+            "root": {
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
@@ -71,7 +71,7 @@ pub mod test {
     fn test_parsley_tree() -> ParsleyTree {
         ParsleyTree {
             input: String::from("Test"),
-            tree: ParsleyNode {
+            root: ParsleyNode {
                 name: String::from("Test"),
                 internal: String::from("Test"),
                 success: true,
@@ -90,21 +90,21 @@ pub mod test {
         let parsley_tree: ParsleyTree = serde_json::from_str(&RAW_TREE_SIMPLE).expect("Could not deserialise ParsleyTree");
         
         assert_eq!(parsley_tree.input, "Test");
-        assert_eq!(parsley_tree.tree.name, "Test");
-        assert_eq!(parsley_tree.tree.internal, "Test");
-        assert_eq!(parsley_tree.tree.success, true);
-        assert_eq!(parsley_tree.tree.child_id, 0);
-        assert_eq!(parsley_tree.tree.from_offset, 0);
-        assert_eq!(parsley_tree.tree.to_offset, 3);
-        assert_eq!(parsley_tree.tree.input, "Test");
-        assert_eq!(parsley_tree.tree.children.len(), 0);
+        assert_eq!(parsley_tree.root.name, "Test");
+        assert_eq!(parsley_tree.root.internal, "Test");
+        assert_eq!(parsley_tree.root.success, true);
+        assert_eq!(parsley_tree.root.child_id, 0);
+        assert_eq!(parsley_tree.root.from_offset, 0);
+        assert_eq!(parsley_tree.root.to_offset, 3);
+        assert_eq!(parsley_tree.root.input, "Test");
+        assert_eq!(parsley_tree.root.children.len(), 0);
     }
 
     #[test]
     fn nested_parsley_tree_deserialises() {
         let raw_tree: &str = r#"{
             "input": "01234",
-            "tree": {
+            "root": {
                 "name": "0",
                 "internal": "0",
                 "success": true,
@@ -163,17 +163,17 @@ pub mod test {
         
         /* Check that the root tree has been serialised correctly */
         assert_eq!(parsley_tree.input, "01234");
-        assert_eq!(parsley_tree.tree.name, "0");
-        assert_eq!(parsley_tree.tree.internal, "0");
-        assert_eq!(parsley_tree.tree.success, true);
-        assert_eq!(parsley_tree.tree.child_id, 0);
-        assert_eq!(parsley_tree.tree.from_offset, 0);
-        assert_eq!(parsley_tree.tree.to_offset, 0);
-        assert_eq!(parsley_tree.tree.input, "01234");
-        assert_eq!(parsley_tree.tree.children.len(), 2);
+        assert_eq!(parsley_tree.root.name, "0");
+        assert_eq!(parsley_tree.root.internal, "0");
+        assert_eq!(parsley_tree.root.success, true);
+        assert_eq!(parsley_tree.root.child_id, 0);
+        assert_eq!(parsley_tree.root.from_offset, 0);
+        assert_eq!(parsley_tree.root.to_offset, 0);
+        assert_eq!(parsley_tree.root.input, "01234");
+        assert_eq!(parsley_tree.root.children.len(), 2);
 
         /* Check the first child */
-        let child1 = &parsley_tree.tree.children[0];
+        let child1 = &parsley_tree.root.children[0];
         assert_eq!(child1.name, "1");
         assert_eq!(child1.internal, "1");
         assert_eq!(child1.success, true);
@@ -195,7 +195,7 @@ pub mod test {
         assert_eq!(child1_1.children.len(), 0);
 
         /* Check the second child */
-        let child2 = &parsley_tree.tree.children[1];
+        let child2 = &parsley_tree.root.children[1];
         assert_eq!(child2.name, "3");
         assert_eq!(child2.internal, "3");
         assert_eq!(child2.success, true);
@@ -231,7 +231,7 @@ pub mod test {
         /* Root tree to test */
         let parsley_debug_tree: ParsleyTree = ParsleyTree {
             input: String::from("01234"),
-            tree: ParsleyNode {
+            root: ParsleyNode {
                 name: String::from("0"),
                 internal: String::from("0"),
                 success: true,
