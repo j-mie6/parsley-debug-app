@@ -93,7 +93,7 @@ jobs:
         run: |
           curl -fLo cs.exe https://git.io/coursier-cli
           chmod +x cs.exe
-          mv cs.exe C:\Windows\System32
+          echo "PATH=$PATH:$PWD" >> $GITHUB_ENV
       
       - name: Install Coursier (Linux and macOS)
         if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
@@ -101,15 +101,15 @@ jobs:
         run: |
           curl -fLo cs https://git.io/coursier-cli
           chmod +x cs
-          sudo mv cs /usr/local/bin/
+          echo "PATH=$PATH:$PWD" >> $GITHUB_ENV
 
       - name: Pre-fetch Scala 3 Compiler (Windows only)
         if: matrix.platform == 'windows-latest'
-        run: cs.exe fetch org.scala-lang:scala3-compiler_3:3.3.3
+        run: ./cs.exe fetch org.scala-lang:scala3-compiler_3:3.3.3
 
       - name: Pre-fetch Scala 3 Compiler (Linux and macOS)
         if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
-        run: cs fetch org.scala-lang:scala3-compiler_3:3.3.3
+        run: ./cs fetch org.scala-lang:scala3-compiler_3:3.3.3
 
       - name: Update sbt
         shell: bash
