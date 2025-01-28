@@ -8,7 +8,7 @@ import lib.DebugNode
 /**
   * DisplayTree creates the HTML element to display a DebugTree
   *
-  * @param debugTree a DebugTree parsed from JSON
+  * @param tree A DebugTree parsed from JSON
   */
 object DebugTreeDisplay {
     def apply(tree: DebugTree): HtmlElement = div(
@@ -23,13 +23,6 @@ object DebugTreeDisplay {
         )
     )
 }
-
-
-// object DisplayTree {
-//     // Example DisplayTree to use in testing
-//     final val Sample: DisplayTree = DisplayTree(DebugTree.Sample)
-// }
-
 
 /** Renderer for single DebugNode
   * @param debugNode case class for holding debug values to be rendered
@@ -52,7 +45,3 @@ object DebugNodeDisplay {
     )
 }
 
-
-// object DisplayNode {
-
-// }

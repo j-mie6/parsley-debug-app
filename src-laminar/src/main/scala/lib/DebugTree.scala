@@ -23,7 +23,7 @@ case class DebugNode(name: String, internal: String, success: Boolean,
     input: String, number: Int, children: List[DebugNode]) derives ReadWriter
 
 
-lazy final val _debug_tree_sample: DebugTree = DebugTree(
+lazy final val debug_tree_sample: DebugTree = DebugTree(
         "hi world!",
         DebugNode("~>", "~>", true, "hi world!", 0, List[DebugNode](
             DebugNode("~>", "~>", true, "hi world!", 1, List[DebugNode](

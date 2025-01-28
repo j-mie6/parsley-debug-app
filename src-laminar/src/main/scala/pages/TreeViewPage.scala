@@ -12,11 +12,11 @@ import displays.DebugTreeDisplay
 
 import lib.Tauri
 import lib.DebugTreeHandler
-import lib._debug_tree_sample
+import lib.debug_tree_sample
 
 
 object TreeViewPage extends DebugViewPage {
-    private val displayTree: Var[HtmlElement] = Var(DebugTreeDisplay(_debug_tree_sample))
+    private val displayTree: Var[HtmlElement] = Var(DebugTreeDisplay(debug_tree_sample))
     
     private lazy val reloadIcon: HtmlElement = i(className := "bi bi-arrow-clockwise", fontSize.px := 25, marginRight.px := 10)
 

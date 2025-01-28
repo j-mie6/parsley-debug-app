@@ -9,7 +9,6 @@
 
 .debug-tree-title {
   text-align: center;
-  /* margin: ; */
   margin-bottom: 10px;
 }
 
@@ -26,12 +25,12 @@
 .debug-tree-node-success {
   border-style: solid;
   color: var(--font-color-secondary);
-  background-color: var(--background-primary-60);
+  background-color: var(--background-tertiary-60);
 }
 
 .debug-tree-node-fail {
   border-style: dashed;
-  background-color: var(--background-primary-20);
+  background-color: var(--background-tertiary-20);
 }
 
 .debug-tree-node-container {
