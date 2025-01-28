@@ -96,7 +96,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dill-${{ matrix.platform }}.exe
-          path: ./src-tauri/target/release/dill.exe
+          path: ./src-tauri/target/release/parsley-debug-app.exe
           if-no-files-found: error
       
       - name: Upload app executable (Linux and MacOS)
@@ -104,7 +104,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dill-${{ matrix.platform }}
-          path: ./src-tauri/target/release/dill
+          path: ./src-tauri/target/release/parsley-debug-app
           if-no-files-found: error
 
       - name: Upload app bundles
