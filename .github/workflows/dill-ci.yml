@@ -81,7 +81,8 @@ jobs:
         run: sbt +update
 
       - name: Test frontend
-        run: sbt test
+        run: |
+          sbt -Dsbt.coursier.parallel-downloads=1 test
 
       - name: Test backend
         run: |
