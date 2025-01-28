@@ -6,7 +6,7 @@ use super::parsley_tree::ParsleyTree;
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_index, get_info, post_tree]
+    rocket::routes![get_index, get_tree, post_tree]
 }
 
 
@@ -18,23 +18,25 @@ fn get_index() -> String {
 
 
 /* Post request handler to accept debug tree */
-#[post("/api/remote", format = "application/json", data = "<data>")] 
+#[post("/api/remote/tree", format = "application/json", data = "<data>")] 
 fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> http::Status {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
     let debug_tree: DebugTree = parsley_tree.into();    
     
-    let handle = state.inner();
+    let handle: &StateHandle = state.inner();
     handle.set_tree(debug_tree);
 
     http::Status::Ok
 }
 
 /* Return posted DebugTree as JSON string */
-#[get("/api/remote")]
-fn get_info(state: &rocket::State<StateHandle>) -> String {
-    let handle = state.inner();
-    serde_json::to_string_pretty(&handle.get_tree()).expect("Could not serialise State to JSON")
+#[get("/api/remote/tree")]
+fn get_tree(state: &rocket::State<StateHandle>) -> String {
+    let handle: &StateHandle = state.inner();
+
+    serde_json::to_string_pretty(&handle.get_tree())
+        .expect("Could not serialise State to JSON")
 }
 
 
@@ -100,7 +102,7 @@ pub mod test {
         let client: blocking::Client = tracked_client(mock);
 
 
-        /* Perform POST request to '/api/remote' */
+        /* Perform POST request to '/api/remote/tree' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
             .body(&RAW_TREE_SIMPLE)
@@ -115,7 +117,7 @@ pub mod test {
         let mock = MockStateManager::new();
         let client: blocking::Client = tracked_client(mock);
         
-        /* Perform POST request to '/api/remote' */
+        /* Perform POST request to '/api/remote/tree' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
             .body("{}")
@@ -130,7 +132,7 @@ pub mod test {
         let mock = MockStateManager::new();
         let client: blocking::Client = tracked_client(mock);
         
-        /* Perform POST request to '/api/remote' */
+        /* Perform POST request to '/api/remote/tree' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::Text) /* Incompatible header type */
             .body("Hello world")
@@ -150,8 +152,8 @@ pub mod test {
         let client: blocking::Client = tracked_client(mock);
 
 
-        /* Perform GET request to '/api/remote' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
+        /* Perform GET request to '/api/remote/tree' */
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
         
         /* Assert that GET succeeded */
         assert_eq!(response.status(), http::Status::Ok);
@@ -169,7 +171,7 @@ pub mod test {
 
         let client: blocking::Client = tracked_client(mock);
 
-        /* Perform POST request to '/api/remote' */
+        /* Perform POST request to '/api/remote/tree' */
         let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
             .body(&RAW_TREE_SIMPLE)
@@ -178,8 +180,8 @@ pub mod test {
         /* Assert that POST succeeded */
         assert_eq!(post_response.status(), http::Status::Ok);
 
-        /* Perform GET request to '/api/remote' */
-        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
+        /* Perform GET request to '/api/remote/tree' */
+        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
 
         /* Assert that GET succeeded */
         assert_eq!(get_response.status(), http::Status::Ok);

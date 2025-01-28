@@ -100,7 +100,7 @@ mod test {
 
         /* Assert the Rocket server was built with the correct routes */
         assert!(routes.contains(&"/"));
-        assert!(routes.contains(&"/api/remote"));
+        assert!(routes.contains(&"/api/remote/tree"));
     }
     
 }
