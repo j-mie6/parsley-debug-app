@@ -96,6 +96,8 @@ jobs:
         if: matrix.platform == 'macos-latest'
         shell: bash
         run: |
+          rustup target add aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
           RELEASE=true sbt buildFrontend 
           npx tauri build -- --target universal-apple-darwin
 
