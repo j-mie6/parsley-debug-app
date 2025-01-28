@@ -11,21 +11,20 @@ pub struct ParsleyNode {
     child_id: i64, /* The unique child number of this node */
     from_offset: usize, /* Offset into the input in which this node's parse attempt starts */
     to_offset: usize, /* Offset into the input in which this node's parse attempt finished */
-    input: String, /* The input string passed to the parser */
     children: Vec<ParsleyNode>, /* The children of this node */
 }
 
-impl From<ParsleyNode> for DebugNode {
-    fn from(node: ParsleyNode) -> Self {
+impl From<(ParsleyNode, &String)> for DebugNode {
+    fn from((node, input): (ParsleyNode, &String)) -> Self {
         DebugNode::new( 
             node.name,
             node.internal,
             node.success,
             node.child_id.try_into().ok(),
-            String::from(&node.input[node.from_offset..=node.to_offset]),
+            String::from(&input[node.from_offset..=node.to_offset]),
             node.children
                 .into_iter()
-                .map(ParsleyNode::into)
+                .map(|child| DebugNode::from((child, input)))
                 .collect()
         )
     }
@@ -40,7 +39,8 @@ pub struct ParsleyTree {
 
 impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
-        DebugTree::new(tree.input, tree.root.into())
+        let node: DebugNode = (tree.root, &tree.input).into();
+        DebugTree::new(tree.input, node)
     }
 }
 
@@ -63,7 +63,6 @@ pub mod test {
                 "childId": 0,
                 "fromOffset": 0,
                 "toOffset": 3,
-                "input": "Test",
                 "children": []
             }
         }"#;
@@ -78,7 +77,6 @@ pub mod test {
                 child_id: 0,
                 from_offset: 0,
                 to_offset: 3,
-                input: String::from("Test"),
                 children: vec![]
             }
         }
@@ -96,7 +94,6 @@ pub mod test {
         assert_eq!(parsley_tree.root.child_id, 0);
         assert_eq!(parsley_tree.root.from_offset, 0);
         assert_eq!(parsley_tree.root.to_offset, 3);
-        assert_eq!(parsley_tree.root.input, "Test");
         assert_eq!(parsley_tree.root.children.len(), 0);
     }
 
@@ -111,7 +108,6 @@ pub mod test {
                 "childId": 0,
                 "fromOffset": 0,
                 "toOffset": 0,
-                "input": "01234",
                 "children": [
                     {
                         "name": "1",
@@ -120,7 +116,6 @@ pub mod test {
                         "childId": 1,
                         "fromOffset": 1,
                         "toOffset": 1,
-                        "input": "01234",
                         "children": [
                             {
                                 "name": "2",
@@ -129,7 +124,6 @@ pub mod test {
                                 "childId": 2,
                                 "fromOffset": 2,
                                 "toOffset": 2,
-                                "input": "01234",
                                 "children": []
                             }
                         ]
@@ -141,7 +135,6 @@ pub mod test {
                         "childId": 3,
                         "fromOffset": 3,
                         "toOffset": 3,
-                        "input": "01234",
                         "children": [
                             {
                                 "name": "4",
@@ -150,7 +143,6 @@ pub mod test {
                                 "childId": 4,
                                 "fromOffset": 4,
                                 "toOffset": 4,
-                                "input": "01234",
                                 "children": []
                             }
                         ]
@@ -169,7 +161,6 @@ pub mod test {
         assert_eq!(parsley_tree.root.child_id, 0);
         assert_eq!(parsley_tree.root.from_offset, 0);
         assert_eq!(parsley_tree.root.to_offset, 0);
-        assert_eq!(parsley_tree.root.input, "01234");
         assert_eq!(parsley_tree.root.children.len(), 2);
 
         /* Check the first child */
@@ -180,7 +171,6 @@ pub mod test {
         assert_eq!(child1.child_id, 1);
         assert_eq!(child1.from_offset, 1);
         assert_eq!(child1.to_offset, 1);
-        assert_eq!(child1.input, "01234");
         assert_eq!(child1.children.len(), 1);
 
         /* Check the first grandchild of the first child */
@@ -191,7 +181,6 @@ pub mod test {
         assert_eq!(child1_1.child_id, 2);
         assert_eq!(child1_1.from_offset, 2);
         assert_eq!(child1_1.to_offset, 2);
-        assert_eq!(child1_1.input, "01234");
         assert_eq!(child1_1.children.len(), 0);
 
         /* Check the second child */
@@ -202,7 +191,6 @@ pub mod test {
         assert_eq!(child2.child_id, 3);
         assert_eq!(child2.from_offset, 3);
         assert_eq!(child2.to_offset, 3);
-        assert_eq!(child2.input, "01234");
         assert_eq!(child2.children.len(), 1);
 
         /* Check the first grandchild of the second child */
@@ -213,7 +201,6 @@ pub mod test {
         assert_eq!(child2_1.child_id, 4);
         assert_eq!(child2_1.from_offset, 4);
         assert_eq!(child2_1.to_offset, 4);
-        assert_eq!(child2_1.input, "01234");
         assert_eq!(child2_1.children.len(), 0);
     }
 
@@ -238,7 +225,6 @@ pub mod test {
                 child_id: 0,
                 from_offset: 0,
                 to_offset: 0,
-                input: String::from("01234"),
                 children: vec![
                     ParsleyNode {
                         name: String::from("1"),
@@ -247,7 +233,6 @@ pub mod test {
                         child_id: 1,
                         from_offset: 1,
                         to_offset: 1,
-                        input: String::from("01234"),
                         children: vec![
                             ParsleyNode {
                                 name: String::from("2"),
@@ -256,7 +241,6 @@ pub mod test {
                                 child_id: 2,
                                 from_offset: 2,
                                 to_offset: 2,
-                                input: String::from("01234"),
                                 children: Vec::new()
                             }
                         ]
@@ -268,7 +252,6 @@ pub mod test {
                         child_id: 3,
                         from_offset: 3,
                         to_offset: 3,
-                        input: String::from("01234"),
                         children: vec![
                             ParsleyNode {
                                 name: String::from("4"),
@@ -277,7 +260,6 @@ pub mod test {
                                 child_id: -1,
                                 from_offset: 4,
                                 to_offset: 4,
-                                input: String::from("01234"),
                                 children: Vec::new()
                             }
                         ]
