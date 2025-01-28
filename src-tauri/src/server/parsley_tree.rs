@@ -50,7 +50,8 @@ impl From<ParsleyTree> for DebugTree {
 pub mod test {
     /* Data unit testing */
 
-    use crate::{server::request::test::test_tree, DebugNode, DebugTree};
+    use crate::server::request::test::test_tree;
+    use crate::{DebugNode, DebugTree};
     use super::{ParsleyTree, ParsleyNode};
 
     pub const RAW_TREE_SIMPLE: &str = r#"{
