@@ -24,7 +24,7 @@ impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
         fn convert_node(node: ParsleyNode, input: &str) -> DebugNode {
             let input_slice: String = match (usize::try_from(node.from_offset), usize::try_from(node.to_offset)) {
-                (Ok(from), Ok(to)) => &input[from..to],
+                (Ok(from), Ok(to)) => &input[from..=to],
                 _ => "",
             }.to_string();
 
