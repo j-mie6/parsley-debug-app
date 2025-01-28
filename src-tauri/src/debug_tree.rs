@@ -21,6 +21,7 @@ impl DebugTree {
 
 /* Defines tree structure used in backend that will be passed to frontend */
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DebugNode {
     pub name: String, /*The internal (default) or user-defined name of the parser */
     pub internal: String, /*The internal name of the parser */
