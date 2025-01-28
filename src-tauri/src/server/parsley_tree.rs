@@ -20,27 +20,38 @@ pub struct ParsleyTree {
     root: ParsleyNode,
 }
 
+/* Convert from ParsleyTree to DebugTree */
 impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
+        /* Helper function used to convert a ParsleyNode given the total input string */
         fn convert_node(node: ParsleyNode, input: &str) -> DebugNode {
-            let input_slice: String = match (usize::try_from(node.from_offset), usize::try_from(node.to_offset)) {
-                (Ok(from), Ok(to)) => &input[from..=to],
-                _ => "",
-            }.to_string();
+            /* Convert child_id, handling -1 case */
+            let child_id: Option<u32> = node.child_id.try_into().ok();
+            
+            /* Slice the input into input consumed by this node, handling -1 case */
+            let input_slice: String = usize::try_from(node.from_offset)
+                .and_then(|from: usize| Ok(from..=usize::try_from(node.to_offset)?))
+                .map_or("", |range| &input[range])
+                .to_string();
 
+            /* Recursively convert children into DebugNodes */
+            let children: Vec<DebugNode> = node.children
+                .into_iter()
+                .map(|child| convert_node(child, input))
+                .collect();
+
+            /* Instantiate DebugNode */
             DebugNode::new( 
                 node.name,
                 node.internal,
                 node.success,
-                node.child_id.try_into().ok(),
+                child_id,
                 input_slice,
-                node.children
-                    .into_iter()
-                    .map(|child| convert_node(child, input))
-                    .collect()
+                children,
             )
         }
 
+        /* Convert the root node and return DebugTree */
         let node: DebugNode = convert_node(tree.root, &tree.input);
         DebugTree::new(tree.input, node)
     }
