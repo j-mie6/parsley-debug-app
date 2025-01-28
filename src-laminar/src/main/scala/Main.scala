@@ -5,15 +5,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.raquo.laminar.api.L.*
 
+import lib.State
 import lib.Tauri
 
-import pages.DebugViewPage
-import debugger.DebugTreeHandler
-import debugger.DebugNode
+import pages.TreeViewPage
 
-private val tree: Var[Element] = Var(p("None"))
-
-@main def app = renderOnDomContentLoaded(
-    dom.document.getElementById("app"),
-    DebugViewPage.page
-)
+@main def app = {
+    dom.document.documentElement.setAttribute("data-theme", if State.isLightMode.now() then "light" else "dark")
+    renderOnDomContentLoaded(
+        dom.document.getElementById("app"),
+        TreeViewPage()
+    )
+}

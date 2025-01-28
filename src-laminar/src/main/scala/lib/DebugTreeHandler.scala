@@ -1,10 +1,9 @@
-package debugger
+package lib
 
 import upickle.default as up
 import scala.util.{Try, Success, Failure}
 
 /**
-  * 
   * DebugTreeHandler is responsible for deserialising the JSON string passed by the backend
   * into the DebugTree case class
   * 
