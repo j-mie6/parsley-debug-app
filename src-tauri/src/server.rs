@@ -26,11 +26,18 @@ pub mod test {
 
     #[test]
     fn server_handles_many_requests() {
+        const NUM_REPEATS: usize = 1000;
+        
         let mut mock = MockStateManager::new();
+        
         mock.expect_set_tree()
             .with(predicate::eq(test_tree()))
-            .times(100)
+            .times(NUM_REPEATS)
             .return_const(());
+
+        mock.expect_get_tree()
+            .times(NUM_REPEATS)
+            .returning(|| test_tree());
 
         let client: blocking::Client = tracked_client(mock);
         
@@ -41,12 +48,14 @@ pub mod test {
         let post_tree = client.post("/api/remote/tree")
             .header(http::ContentType::JSON)
             .body(RAW_TREE_SIMPLE);
-        
+    
+        let get_tree = client.get("/api/remote/tree");
         
         /* Repeatedly perform requests */
-        for _ in 0..100 {
+        for _ in 0..NUM_REPEATS {
             assert_eq!(get_index.clone().dispatch().status(), http::Status::Ok);
             assert_eq!(post_tree.clone().dispatch().status(), http::Status::Ok);
+            assert_eq!(get_tree.clone().dispatch().status(), http::Status::Ok);
         }
     }
 }
