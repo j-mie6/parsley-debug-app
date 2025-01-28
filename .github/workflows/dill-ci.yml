@@ -68,13 +68,15 @@ jobs:
           workspaces: './src-tauri -> target'
 
       
-      - name: Clean SBT caches (Windows only)
+      - name: Clean SBT caches and set env (Windows only)
         if: matrix.platform == 'windows-latest'
         shell: bash
         run: |
           rm -rf "$GITHUB_WORKSPACE/.coursier-cache"
           rm -rf "C:/Users/runneradmin/.ivy2/cache"
           rm -rf "C:/Users/runneradmin/.sbt"
+          echo "SBT_OPTS=-Dfile.encoding=UTF-8" >> $GITHUB_ENV
+          
 
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
@@ -86,25 +88,13 @@ jobs:
           java-version: 11
           cache: sbt
 
-      # - name: Update sbt
-      #   shell: bash
-      #   run: |
-      #     sbt \
-      #     -Dsbt.coursier.parallel-downloads=1 \
-      #     -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
-      #     -Dsbt.parallelExecution=false \
-      #     +update
+      - name: Update sbt
+        shell: bash
+        run: sbt update
 
       - name: Test frontend
         shell: bash
-        run: |
-          sbt --no-server \
-          -Dsbt.server.forcestart=false \
-          -Dsbt.server.autostart=false \
-          -Dsbt.parallelExecution=false \
-          -Dsbt.coursier.parallel-downloads=1 \
-          -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
-          test
+        run: sbt test
 
 
       - name: Test backend
