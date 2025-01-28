@@ -14,22 +14,6 @@ pub struct ParsleyNode {
     children: Vec<ParsleyNode>, /* The children of this node */
 }
 
-impl From<(ParsleyNode, &String)> for DebugNode {
-    fn from((node, input): (ParsleyNode, &String)) -> Self {
-        DebugNode::new( 
-            node.name,
-            node.internal,
-            node.success,
-            node.child_id.try_into().ok(),
-            String::from(&input[node.from_offset..=node.to_offset]),
-            node.children
-                .into_iter()
-                .map(|child| DebugNode::from((child, input)))
-                .collect()
-        )
-    }
-}
-
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 pub struct ParsleyTree {
@@ -39,7 +23,21 @@ pub struct ParsleyTree {
 
 impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
-        let node: DebugNode = (tree.root, &tree.input).into();
+        fn convert_node(node: ParsleyNode, input: &str) -> DebugNode {
+            DebugNode::new( 
+                node.name,
+                node.internal,
+                node.success,
+                node.child_id.try_into().ok(),
+                String::from(&input[node.from_offset..=node.to_offset]),
+                node.children
+                    .into_iter()
+                    .map(|child| convert_node(child, input))
+                    .collect()
+            )
+        }
+
+        let node: DebugNode = convert_node(tree.root, &tree.input);
         DebugTree::new(tree.input, node)
     }
 }
