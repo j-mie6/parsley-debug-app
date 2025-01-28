@@ -77,16 +77,21 @@ jobs:
           java-version: 11
           cache: sbt
 
-      - name: Update sbt
-        shell: bash
-        run: |
-          sbt \
-          -Dsbt.coursier.parallel-downloads=1 \
-          -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
-          +update
+      # - name: Update sbt
+      #   shell: bash
+      #   run: |
+      #     sbt \
+      #     -Dsbt.coursier.parallel-downloads=1 \
+      #     -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
+      #     -Dsbt.parallelExecution=false \
+      #     +update
 
       - name: Test frontend
-        run: sbt -Dsbt.coursier.parallel-downloads=1 test
+        run: sbt sbt \
+          -Dsbt.coursier.parallel-downloads=1 \
+          -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
+          -Dsbt.parallelExecution=false \
+          test
 
       - name: Test backend
         run: |
