@@ -35,18 +35,18 @@ pub mod test {
         let client: blocking::Client = tracked_client(mock);
         
         /* Format GET request to index route '/' */
-        let get_request = client.get("/");
+        let get_index = client.get("/");
         
-        /* Format POST requests to route '/api/remote' */
-        let post_request = client.post("/api/remote")
+        /* Format POST requests to route '/api/remote/tree' */
+        let post_tree = client.post("/api/remote/tree")
             .header(http::ContentType::JSON)
             .body(RAW_TREE_SIMPLE);
         
         
         /* Repeatedly perform requests */
         for _ in 0..100 {
-            assert_eq!(get_request.clone().dispatch().status(), http::Status::Ok);
-            assert_eq!(post_request.clone().dispatch().status(), http::Status::Ok);
+            assert_eq!(get_index.clone().dispatch().status(), http::Status::Ok);
+            assert_eq!(post_tree.clone().dispatch().status(), http::Status::Ok);
         }
     }
 }

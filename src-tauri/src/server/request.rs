@@ -100,7 +100,7 @@ pub mod test {
         let client: blocking::Client = tracked_client(mock);
 
 
-        /* Perform POST request to '/api/remote' */
+        /* Perform POST request to '/api/remote/tree' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
             .body(&RAW_TREE_SIMPLE)
@@ -115,7 +115,7 @@ pub mod test {
         let mock = MockStateManager::new();
         let client: blocking::Client = tracked_client(mock);
         
-        /* Perform POST request to '/api/remote' */
+        /* Perform POST request to '/api/remote/tree' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
             .body("{}")
@@ -130,7 +130,7 @@ pub mod test {
         let mock = MockStateManager::new();
         let client: blocking::Client = tracked_client(mock);
         
-        /* Perform POST request to '/api/remote' */
+        /* Perform POST request to '/api/remote/tree' */
         let response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::Text) /* Incompatible header type */
             .body("Hello world")
@@ -150,7 +150,7 @@ pub mod test {
         let client: blocking::Client = tracked_client(mock);
 
 
-        /* Perform GET request to '/api/remote' */
+        /* Perform GET request to '/api/remote/tree' */
         let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
         
         /* Assert that GET succeeded */
@@ -169,7 +169,7 @@ pub mod test {
 
         let client: blocking::Client = tracked_client(mock);
 
-        /* Perform POST request to '/api/remote' */
+        /* Perform POST request to '/api/remote/tree' */
         let post_response: blocking::LocalResponse = client.post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
             .body(&RAW_TREE_SIMPLE)
@@ -178,7 +178,7 @@ pub mod test {
         /* Assert that POST succeeded */
         assert_eq!(post_response.status(), http::Status::Ok);
 
-        /* Perform GET request to '/api/remote' */
+        /* Perform GET request to '/api/remote/tree' */
         let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
 
         /* Assert that GET succeeded */
