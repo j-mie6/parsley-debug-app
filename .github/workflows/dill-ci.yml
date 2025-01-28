@@ -78,10 +78,11 @@ jobs:
           cache: sbt
 
       - name: Update sbt
+        shell: bash
         run: |
-          sbt -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
-          -Dsbt.ivy.home="$GITHUB_WORKSPACE/.ivy2" \
+          sbt \
           -Dsbt.coursier.parallel-downloads=1 \
+          -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
           +update
 
       - name: Test frontend
