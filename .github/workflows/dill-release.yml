@@ -61,6 +61,15 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
+      - name: Clean SBT caches and set env (Windows only)
+        if: matrix.platform == 'windows-latest'
+        shell: bash
+        run: |
+          rm -rf "$GITHUB_WORKSPACE/.coursier-cache"
+          rm -rf "C:/Users/runneradmin/.ivy2/cache"
+          rm -rf "C:/Users/runneradmin/.sbt"
+          echo "SBT_OPTS=-Dfile.encoding=UTF-8" >> $GITHUB_ENV
+
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
