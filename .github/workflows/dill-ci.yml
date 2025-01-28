@@ -76,52 +76,25 @@ jobs:
           rm -rf "C:/Users/runneradmin/.ivy2/cache"
           rm -rf "C:/Users/runneradmin/.sbt"
           echo "SBT_OPTS=-Dfile.encoding=UTF-8" >> $GITHUB_ENV
-          
-      - name: Setup sbt
-        uses: sbt/setup-sbt@v1
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 11
-          cache: sbt
-
-      
-      - name: Install Coursier (Windows only)
-        if: matrix.platform == 'windows-latest'
-        shell: bash
-        run: |
-          curl -fLo cs.exe https://git.io/coursier-cli
-          chmod +x cs.exe
-          echo "PATH=$PATH:$PWD" >> $GITHUB_ENV
-      
-      - name: Install Coursier (Linux and macOS)
-        if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
-        shell: bash
-        run: |
-          curl -fLo cs https://git.io/coursier-cli
-          chmod +x cs
-          echo "PATH=$PATH:$PWD" >> $GITHUB_ENV
-
-      - name: Pre-fetch Scala 3 Compiler (Windows only)
-        if: matrix.platform == 'windows-latest'
-        run: ./cs.exe fetch org.scala-lang:scala3-compiler_3:3.3.3
-
-      - name: Pre-fetch Scala 3 Compiler (Linux and macOS)
-        if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
-        run: ./cs fetch org.scala-lang:scala3-compiler_3:3.3.3
+          
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Update sbt
         shell: bash
-        run: | 
+        run: |
           sbt clean
-          sbt update
+          sbt -Djava.io.tmpdir=$RUNNER_TEMP update
 
       - name: Test frontend
         shell: bash
         run: sbt test
-
 
       - name: Test backend
         run: |

@@ -91,7 +91,6 @@ buildFrontend := {
     val outDir = (ThisBuild / baseDirectory).value / "static"
     
     IO.listFiles(fm)
-        .toList
         .map { file =>
             val (name, ext) = file.baseAndExt
             val out = outDir / (name + "." + ext)
