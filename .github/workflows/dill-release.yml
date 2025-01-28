@@ -72,7 +72,9 @@ jobs:
           cache: sbt
 
       - name: Update sbt
-        run: sbt +update
+        run: |
+          sbt clean
+          sbt -Djava.io.tmpdir=$RUNNER_TEMP update
 
       - name: Build artifact
         shell: bash
