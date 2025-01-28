@@ -88,6 +88,7 @@ jobs:
 
       - name: Clean SBT caches (Windows only)
         if: matrix.platform == 'windows-latest'
+        shell: bash
         run: |
           rm -rf "$GITHUB_WORKSPACE/.coursier-cache"
           rm -rf "C:/Users/runneradmin/.ivy2/cache"
