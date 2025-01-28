@@ -82,11 +82,20 @@ jobs:
           RELEASE=true sbt buildFrontend 
           npx tauri build
 
-      - name: Upload app executable
+      - name: Upload app executable (Windows only)
+        if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: dill-${{ matrix.platform }}.exe
-          path: ./src-tauri/target/release/parsley-debug-app.exe
+          path: ./src-tauri/target/release/dill.exe
+          if-no-files-found: error
+      
+      - name: Upload app executable (Linux and MacOS)
+        if: matrix.platform != 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dill-${{ matrix.platform }}
+          path: ./src-tauri/target/release/dill
           if-no-files-found: error
 
       - name: Upload app bundles
