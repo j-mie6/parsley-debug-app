@@ -85,11 +85,18 @@ jobs:
           sbt clean
           sbt -Djava.io.tmpdir=$RUNNER_TEMP update
 
-      - name: Build artifact
+      - name: Build artifact (Linux and Windows)
         shell: bash
         run: |
           RELEASE=true sbt buildFrontend 
           npx tauri build
+      
+      - name: Build artifact (MacOS)
+        if: matrix.platform == 'macos-latest'
+        shell: bash
+        run: |
+          RELEASE=true sbt buildFrontend 
+          npx tauri build -- --target universal-apple-darwin
 
       - name: Upload app executable (Windows only)
         if: matrix.platform == 'windows-latest'
