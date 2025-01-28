@@ -193,7 +193,7 @@ pub mod test {
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
-                "child_id": 0,
+                "childId": 0,
                 "input": "Test",
                 "children": []
             }

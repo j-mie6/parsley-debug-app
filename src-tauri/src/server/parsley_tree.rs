@@ -75,7 +75,7 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "fromOffset": 0,
-                "toOffset": 3,
+                "toOffset": 4,
                 "children": []
             }
         }"#;
@@ -89,7 +89,7 @@ pub mod test {
                 success: true,
                 child_id: 0,
                 from_offset: 0,
-                to_offset: 3,
+                to_offset: 4,
                 children: vec![]
             }
         }
@@ -106,7 +106,7 @@ pub mod test {
         assert_eq!(parsley_tree.root.success, true);
         assert_eq!(parsley_tree.root.child_id, 0);
         assert_eq!(parsley_tree.root.from_offset, 0);
-        assert_eq!(parsley_tree.root.to_offset, 3);
+        assert_eq!(parsley_tree.root.to_offset, 4);
         assert_eq!(parsley_tree.root.children.len(), 0);
     }
 
@@ -120,7 +120,7 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "fromOffset": 0,
-                "toOffset": 0,
+                "toOffset": 1,
                 "children": [
                     {
                         "name": "1",
@@ -128,7 +128,7 @@ pub mod test {
                         "success": true,
                         "childId": 1,
                         "fromOffset": 1,
-                        "toOffset": 1,
+                        "toOffset": 2,
                         "children": [
                             {
                                 "name": "2",
@@ -136,7 +136,7 @@ pub mod test {
                                 "success": true,
                                 "childId": 2,
                                 "fromOffset": 2,
-                                "toOffset": 2,
+                                "toOffset": 3,
                                 "children": []
                             }
                         ]
@@ -147,7 +147,7 @@ pub mod test {
                         "success": true,
                         "childId": 3,
                         "fromOffset": 3,
-                        "toOffset": 3,
+                        "toOffset": 4,
                         "children": [
                             {
                                 "name": "4",
@@ -155,7 +155,7 @@ pub mod test {
                                 "success": true,
                                 "childId": 4,
                                 "fromOffset": 4,
-                                "toOffset": 4,
+                                "toOffset": 5,
                                 "children": []
                             }
                         ]
@@ -173,7 +173,7 @@ pub mod test {
         assert_eq!(parsley_tree.root.success, true);
         assert_eq!(parsley_tree.root.child_id, 0);
         assert_eq!(parsley_tree.root.from_offset, 0);
-        assert_eq!(parsley_tree.root.to_offset, 0);
+        assert_eq!(parsley_tree.root.to_offset, 1);
         assert_eq!(parsley_tree.root.children.len(), 2);
 
         /* Check the first child */
@@ -183,7 +183,7 @@ pub mod test {
         assert_eq!(child1.success, true);
         assert_eq!(child1.child_id, 1);
         assert_eq!(child1.from_offset, 1);
-        assert_eq!(child1.to_offset, 1);
+        assert_eq!(child1.to_offset, 2);
         assert_eq!(child1.children.len(), 1);
 
         /* Check the first grandchild of the first child */
@@ -193,7 +193,7 @@ pub mod test {
         assert_eq!(child1_1.success, true);
         assert_eq!(child1_1.child_id, 2);
         assert_eq!(child1_1.from_offset, 2);
-        assert_eq!(child1_1.to_offset, 2);
+        assert_eq!(child1_1.to_offset, 3);
         assert_eq!(child1_1.children.len(), 0);
 
         /* Check the second child */
@@ -203,7 +203,7 @@ pub mod test {
         assert_eq!(child2.success, true);
         assert_eq!(child2.child_id, 3);
         assert_eq!(child2.from_offset, 3);
-        assert_eq!(child2.to_offset, 3);
+        assert_eq!(child2.to_offset, 4);
         assert_eq!(child2.children.len(), 1);
 
         /* Check the first grandchild of the second child */
@@ -213,7 +213,7 @@ pub mod test {
         assert_eq!(child2_1.success, true);
         assert_eq!(child2_1.child_id, 4);
         assert_eq!(child2_1.from_offset, 4);
-        assert_eq!(child2_1.to_offset, 4);
+        assert_eq!(child2_1.to_offset, 5);
         assert_eq!(child2_1.children.len(), 0);
     }
 
@@ -237,7 +237,7 @@ pub mod test {
                 success: true,
                 child_id: 0,
                 from_offset: 0,
-                to_offset: 0,
+                to_offset: 1,
                 children: vec![
                     ParsleyNode {
                         name: String::from("1"),
@@ -245,7 +245,7 @@ pub mod test {
                         success: true,
                         child_id: 1,
                         from_offset: 1,
-                        to_offset: 1,
+                        to_offset: 2,
                         children: vec![
                             ParsleyNode {
                                 name: String::from("2"),
@@ -253,7 +253,7 @@ pub mod test {
                                 success: true,
                                 child_id: 2,
                                 from_offset: 2,
-                                to_offset: 2,
+                                to_offset: 3,
                                 children: Vec::new()
                             }
                         ]
@@ -264,7 +264,7 @@ pub mod test {
                         success: true,
                         child_id: 3,
                         from_offset: 3,
-                        to_offset: 3,
+                        to_offset: 4,
                         children: vec![
                             ParsleyNode {
                                 name: String::from("4"),
@@ -272,7 +272,7 @@ pub mod test {
                                 success: true,
                                 child_id: -1,
                                 from_offset: 4,
-                                to_offset: 4,
+                                to_offset: 5,
                                 children: Vec::new()
                             }
                         ]
