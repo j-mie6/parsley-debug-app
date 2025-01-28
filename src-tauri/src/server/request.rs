@@ -6,7 +6,7 @@ use super::parsley_tree::ParsleyTree;
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_index, get_info, post_tree]
+    rocket::routes![get_index, get_tree, post_tree]
 }
 
 
@@ -24,7 +24,7 @@ fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> htt
     let parsley_tree: ParsleyTree = data.into_inner();
     let debug_tree: DebugTree = parsley_tree.into();    
     
-    let handle = state.inner();
+    let handle: &StateHandle = state.inner();
     handle.set_tree(debug_tree);
 
     http::Status::Ok
@@ -32,9 +32,11 @@ fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> htt
 
 /* Return posted DebugTree as JSON string */
 #[get("/api/remote/tree")]
-fn get_info(state: &rocket::State<StateHandle>) -> String {
-    let handle = state.inner();
-    serde_json::to_string_pretty(&handle.get_tree()).expect("Could not serialise State to JSON")
+fn get_tree(state: &rocket::State<StateHandle>) -> String {
+    let handle: &StateHandle = state.inner();
+
+    serde_json::to_string_pretty(&handle.get_tree())
+        .expect("Could not serialise State to JSON")
 }
 
 
@@ -151,7 +153,7 @@ pub mod test {
 
 
         /* Perform GET request to '/api/remote/tree' */
-        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
+        let response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
         
         /* Assert that GET succeeded */
         assert_eq!(response.status(), http::Status::Ok);
@@ -179,7 +181,7 @@ pub mod test {
         assert_eq!(post_response.status(), http::Status::Ok);
 
         /* Perform GET request to '/api/remote/tree' */
-        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_info)).dispatch();
+        let get_response: blocking::LocalResponse = client.get(rocket::uri!(super::get_tree)).dispatch();
 
         /* Assert that GET succeeded */
         assert_eq!(get_response.status(), http::Status::Ok);
