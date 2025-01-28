@@ -11,7 +11,10 @@ rm -rf static/
 rm -rf target/
 printf "done\n"
 
-printf "Removing Tauri and Laminar targets... "
+printf "Removing Tauri targets... "
 rm -rf src-tauri/target/
+printf "done\n"
+
+printf "Removing Laminar targets... "
 rm -rf src-laminar/target/
 printf "done\n"

@@ -1,0 +1,54 @@
+.debug-view-header {
+  display: grid;
+  columns: 3;
+  padding-inline: 20px;
+  padding-block: 10px;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.debug-view-header-right {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.debug-view-header-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.debug-view-header-left {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+}
+
+.debug-view-header-left-container {
+  display: flex;
+  cursor: pointer;
+  flex-direction: row;
+  text-wrap: nowrap;
+  align-items: center;
+}
+
+.debug-view-header-left-vbar {
+  width: 0.5px;
+  height: 40px;
+  border: 1px solid var(--font-color-primary);
+  background-color: var(--font-color-primary);
+  margin-inline: 20px;
+  margin-block: auto;
+}
+
+.debug-view-page {
+  box-sizing: border-box;
+  padding: 30px;
+  padding-top: 10px;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
