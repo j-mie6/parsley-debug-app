@@ -23,22 +23,17 @@ pub struct ParsleyTree {
 impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
         fn convert_node(node: ParsleyNode, input: &str) -> DebugNode {
-            let from: Option<usize> = usize::try_from(node.from_offset).ok();
-            let to: Option<usize> = usize::try_from(node.to_offset).ok();
-    
-            let rng = from.zip(to).map(|(s, e)| s..=e);
-            let res = rng.map(|r| &input[r]);
-            let slice: String = match res {
-                Some(sl) => String::from(sl),
-                None => String::from("")
-            };
+            let input_slice: String = match (usize::try_from(node.from_offset), usize::try_from(node.to_offset)) {
+                (Ok(from), Ok(to)) => &input[from..to],
+                _ => "",
+            }.to_string();
 
             DebugNode::new( 
                 node.name,
                 node.internal,
                 node.success,
                 node.child_id.try_into().ok(),
-                slice,
+                input_slice,
                 node.children
                     .into_iter()
                     .map(|child| convert_node(child, input))
