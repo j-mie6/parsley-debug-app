@@ -87,7 +87,8 @@ jobs:
       #     +update
 
       - name: Test frontend
-        run: sbt \
+        run: |
+          sbt \
           -Dsbt.coursier.parallel-downloads=1 \
           -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
           -Dsbt.parallelExecution=false \
