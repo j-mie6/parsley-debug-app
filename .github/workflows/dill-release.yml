@@ -86,6 +86,7 @@ jobs:
           sbt -Djava.io.tmpdir=$RUNNER_TEMP update
 
       - name: Build artifact (Linux and Windows)
+        if: matrix.platform == 'windows-latest' || matrix.platform == 'ubuntu-latest'
         shell: bash
         run: |
           RELEASE=true sbt buildFrontend 
