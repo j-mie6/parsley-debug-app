@@ -1,27 +1,21 @@
-name: Dill-CI
+name: Dill-Release
 
+# Only run release pipeline on release branches
 on:
   push:
     branches: 
-      - main
-      - dev
-    
+      - release
+        
   pull_request:
     branches:
-      - main
-      - dev
+      - release 
 
   # Allows us to run the workflow whenever we want from GitHub Actions
   workflow_dispatch:
-        
-
-concurrency:
-  group: dill-ci-${{ github.ref }}
-  cancel-in-progress: true
 
 
 jobs:
-  pipeline:
+  build:
 
     strategy:
       matrix:
@@ -67,7 +61,6 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
-      
       - name: Clean SBT caches and set env (Windows only)
         if: matrix.platform == 'windows-latest'
         shell: bash
@@ -77,26 +70,46 @@ jobs:
           rm -rf "C:/Users/runneradmin/.sbt"
           echo "SBT_OPTS=-Dfile.encoding=UTF-8" >> $GITHUB_ENV
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 11
-          
-      - name: Setup sbt
-        uses: sbt/setup-sbt@v1
+          cache: sbt
 
       - name: Update sbt
-        shell: bash
         run: |
           sbt clean
           sbt -Djava.io.tmpdir=$RUNNER_TEMP update
 
-      - name: Test frontend
+      - name: Build artifact
         shell: bash
-        run: sbt test
-
-      - name: Test backend
         run: |
-          cd src-tauri
-          cargo test
+          RELEASE=true sbt buildFrontend 
+          npx tauri build
+
+      - name: Upload app executable (Windows only)
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dill-${{ matrix.platform }}.exe
+          path: ./src-tauri/target/release/parsley-debug-app.exe
+          if-no-files-found: error
+      
+      - name: Upload app executable (Linux and MacOS)
+        if: matrix.platform != 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dill-${{ matrix.platform }}
+          path: ./src-tauri/target/release/parsley-debug-app
+          if-no-files-found: error
+
+      - name: Upload app bundles
+        uses: actions/upload-artifact@v4
+        with:
+            name: dill-bundles-${{ matrix.platform }}
+            path: ./src-tauri/target/release/bundle/
+            if-no-files-found: error
