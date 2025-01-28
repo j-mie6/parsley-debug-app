@@ -7,9 +7,3 @@ sbt buildFrontend
 
 printf "\nStarting app...\n\n"
 npm run tauri dev
-
-if [ $? -ne 0 ]
-then
-    printf "\n\e[31mError while starting DILL App\e[0m\n\n"
-    exit 1
-fi

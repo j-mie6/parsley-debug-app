@@ -37,7 +37,8 @@ lazy val commonSettings = Seq(
     resolvers ++= Opts.resolver.sonatypeOssReleases, // Will speed up MiMA during fast back-to-back releases
     resolvers ++= Opts.resolver.sonatypeOssSnapshots, // needed during flux periods
     libraryDependencies ++= Seq(
-        "org.scalatest" %%% "scalatest" % scalatestVersion % Test
+        "org.scalatest" %%% "scalatest" % scalatestVersion % Test,
+        "org.scala-lang" %% "scala3-compiler" % "3.3.3"
     ),
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oI"),
     Test / parallelExecution := false,
@@ -55,7 +56,11 @@ lazy val dillFrontend = project
         Compile / stMinimize := Selection.AllExcept("types", "tauri-apps"),
         name := "dill-frontend",
         commonSettings,
-        libraryDependencies += "com.raquo" %%% "laminar" % "17.2.0",
+        libraryDependencies ++= Seq(
+            "com.raquo" %%% "laminar" % "17.2.0",
+            "com.vladsch.flexmark" % "flexmark-all" % "0.61.26",
+            "com.lihaoyi" %%% "upickle" % "4.1.0"
+        ),
         externalNpm := baseDirectory.value.getParentFile(),
         Compile / packageSrc / mappings ++= {
             val base = (Compile / sourceManaged).value
@@ -86,7 +91,6 @@ buildFrontend := {
     val outDir = (ThisBuild / baseDirectory).value / "static"
     
     IO.listFiles(fm)
-        .toList
         .map { file =>
             val (name, ext) = file.baseAndExt
             val out = outDir / (name + "." + ext)
