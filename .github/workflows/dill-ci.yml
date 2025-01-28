@@ -90,6 +90,7 @@ jobs:
       
       - name: Install Coursier (Windows only)
         if: matrix.platform == 'windows-latest'
+        shell: bash
         run: |
           curl -fLo cs.exe https://git.io/coursier-cli
           chmod +x cs.exe
@@ -113,7 +114,9 @@ jobs:
 
       - name: Update sbt
         shell: bash
-        run: sbt update
+        run: | 
+          sbt clean
+          sbt update
 
       - name: Test frontend
         shell: bash
