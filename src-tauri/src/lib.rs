@@ -1,0 +1,84 @@
+use state::StateHandle;
+use tauri::Manager;
+use std::sync::Mutex;
+
+mod server;
+mod state;
+mod debug_tree;
+
+pub use debug_tree::{DebugTree, DebugNode};
+
+
+/* Global app state managed by Tauri */
+struct AppState {
+    tree: Option<DebugTree>
+}
+
+impl AppState {
+    /* Create new AppState with no parser */
+    fn new() -> Self {
+        AppState {
+            tree: None,
+        }
+    }
+}
+
+
+/* Setup Tauri app */
+fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    if cfg!(debug_assertions) {
+        app.handle().plugin(
+            tauri_plugin_log::Builder::default()
+            .level(log::LevelFilter::Info)
+            .build(),
+        )?;
+    }
+    
+    /* Manage the app state using Tauri */
+    app.manage(Mutex::new(AppState::new()));
+    
+    /* Clone the app handle for use by Rocket state */
+    let handle: tauri::AppHandle = app.handle().clone();
+    
+    /* Mount the Rocket server to the running instance of Tauri */
+    tauri::async_runtime::spawn(async move {
+        server::launch(StateHandle::new(handle)).await
+            .expect("Rocket failed to initialise")
+    });
+    
+    
+    Ok(())
+}
+
+/* Run the Tauri app */
+pub fn run() {
+    tauri::Builder::default()
+        .setup(|app| setup(app)) /* Run app setup */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree]) /* Expose render_debug_tree() to frontend */
+        .run(tauri::generate_context!()) /* Start up the app */
+        .expect("error while running tauri application");
+}
+
+
+/* Frontend-accessible debug render */
+#[tauri::command]
+fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
+    /* Acquire the state mutex to access the parser */
+    let tree: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").tree;
+    
+    /* If parser exists, render in JSON */
+    match tree {
+        Some(tree) => serde_json::to_string_pretty(tree)
+            .expect("Debug tree could not be serialised"),
+        None => String::from(""),
+    }
+}
+
+
+
+#[cfg(test)]
+mod test {
+    
+    /* Tauri integration tests */
+    
+}

@@ -1,0 +1,115 @@
+name: Dill-Release
+
+# Only run release pipeline on release branches
+on:
+  push:
+    branches: 
+      - release
+        
+  pull_request:
+    branches:
+      - release 
+
+  # Allows us to run the workflow whenever we want from GitHub Actions
+  workflow_dispatch:
+
+
+jobs:
+  build:
+
+    strategy:
+      matrix:
+        include:
+          - platform: 'ubuntu-latest'
+          - platform: 'macos-latest'
+          - platform: 'windows-latest'
+
+    runs-on: ${{ matrix.platform }}
+
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt install libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          
+      - name: Install Node dependencies
+        run: npm install
+    
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+  
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Clean SBT caches and set env (Windows only)
+        if: matrix.platform == 'windows-latest'
+        shell: bash
+        run: |
+          rm -rf "$GITHUB_WORKSPACE/.coursier-cache"
+          rm -rf "C:/Users/runneradmin/.ivy2/cache"
+          rm -rf "C:/Users/runneradmin/.sbt"
+          echo "SBT_OPTS=-Dfile.encoding=UTF-8" >> $GITHUB_ENV
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: sbt
+
+      - name: Update sbt
+        run: |
+          sbt clean
+          sbt -Djava.io.tmpdir=$RUNNER_TEMP update
+
+      - name: Build artifact
+        shell: bash
+        run: |
+          RELEASE=true sbt buildFrontend 
+          npx tauri build
+
+      - name: Upload app executable (Windows only)
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dill-${{ matrix.platform }}.exe
+          path: ./src-tauri/target/release/parsley-debug-app.exe
+          if-no-files-found: error
+      
+      - name: Upload app executable (Linux and MacOS)
+        if: matrix.platform != 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dill-${{ matrix.platform }}
+          path: ./src-tauri/target/release/parsley-debug-app
+          if-no-files-found: error
+
+      - name: Upload app bundles
+        uses: actions/upload-artifact@v4
+        with:
+            name: dill-bundles-${{ matrix.platform }}
+            path: ./src-tauri/target/release/bundle/
+            if-no-files-found: error
