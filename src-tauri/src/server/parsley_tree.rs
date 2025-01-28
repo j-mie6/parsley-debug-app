@@ -30,7 +30,7 @@ impl From<ParsleyTree> for DebugTree {
             
             /* Slice the input into input consumed by this node, handling -1 case */
             let input_slice: String = usize::try_from(node.from_offset)
-                .and_then(|from: usize| Ok(from..=usize::try_from(node.to_offset)?))
+                .and_then(|from: usize| Ok(from..usize::try_from(node.to_offset)?))
                 .map_or("", |range| &input[range])
                 .to_string();
 
