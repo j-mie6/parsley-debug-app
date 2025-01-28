@@ -9,19 +9,29 @@ pub struct ParsleyNode {
     internal: String, /* The internal name of the parser */
     success: bool, /* Whether the parser was successful */
     child_id: i64, /* The unique child number of this node */
-    from_offset: usize, /* Offset into the input in which this node's parse attempt starts */
-    to_offset: usize, /* Offset into the input in which this node's parse attempt finished */
+    from_offset: i32, /* Offset into the input in which this node's parse attempt starts */
+    to_offset: i32, /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
 }
 
 impl From<(ParsleyNode, &String)> for DebugNode {
     fn from((node, input): (ParsleyNode, &String)) -> Self {
+        let from: Option<usize> = usize::try_from(node.from_offset).ok();
+        let to: Option<usize> = usize::try_from(node.to_offset).ok();
+
+        let rng = from.zip(to).map(|(s, e)| s..=e);
+        let res = rng.map(|r| &input[r]);
+        let slice: String = match res {
+            Some(sl) => String::from(sl),
+            None => String::from("")
+        };
+
         DebugNode::new( 
             node.name,
             node.internal,
             node.success,
             node.child_id.try_into().ok(),
-            String::from(&input[node.from_offset..=node.to_offset]),
+            slice,
             node.children
                 .into_iter()
                 .map(|child| DebugNode::from((child, input)))
