@@ -76,9 +76,7 @@ jobs:
           rm -rf "C:/Users/runneradmin/.ivy2/cache"
           rm -rf "C:/Users/runneradmin/.sbt"
           echo "SBT_OPTS=-Dfile.encoding=UTF-8" >> $GITHUB_ENV
-          cs 
           
-
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
