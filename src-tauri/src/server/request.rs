@@ -55,7 +55,7 @@ pub mod test {
                 String::from("Test"), 
                 String::from("Test"), 
                 true, 
-                0,
+                Some(0),
                 String::from("Test"), 
                 vec![]
             )

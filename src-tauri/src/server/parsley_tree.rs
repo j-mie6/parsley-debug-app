@@ -8,7 +8,7 @@ pub struct ParsleyNode {
     name: String, /* The user-defined name */
     internal: String, /* The internal name of the parser */
     success: bool, /* Whether the parser was successful */
-    child_id: usize, /* The unique child number of this node */
+    child_id: i64, /* The unique child number of this node */
     from_offset: usize, /* Offset into the input in which this node's parse attempt starts */
     to_offset: usize, /* Offset into the input in which this node's parse attempt finished */
     input: String, /* The input string passed to the parser */
@@ -21,7 +21,7 @@ impl From<ParsleyNode> for DebugNode {
             node.name,
             node.internal,
             node.success,
-            node.child_id,
+            node.child_id.try_into().ok(),
             String::from(&node.input[node.from_offset..=node.to_offset]),
             node.children
                 .into_iter()
@@ -274,7 +274,7 @@ pub mod test {
                                 name: String::from("4"),
                                 internal: String::from("4"),
                                 success: true,
-                                child_id: 4,
+                                child_id: -1,
                                 from_offset: 4,
                                 to_offset: 4,
                                 input: String::from("01234"),
@@ -292,21 +292,21 @@ pub mod test {
                 String::from("0"), 
                 String::from("0"), 
                 true, 
-                0, 
+                Some(0), 
                 String::from("0"), 
                 vec![
                     DebugNode::new(
                         String::from("1"), 
                         String::from("1"), 
                         true, 
-                        1, 
+                        Some(1), 
                         String::from("1"), 
                         vec![
                             DebugNode::new(
                                 String::from("2"), 
                                 String::from("2"), 
                                 true, 
-                                2, 
+                                Some(2), 
                                 String::from("2"), 
                                 vec![]
                             )
@@ -316,14 +316,14 @@ pub mod test {
                         String::from("3"), 
                         String::from("3"), 
                         true, 
-                        3, 
+                        Some(3), 
                         String::from("3"), 
                         vec![
                             DebugNode::new(
                                 String::from("4"), 
                                 String::from("4"), 
                                 true, 
-                                4, 
+                                None, 
                                 String::from("4"), 
                                 vec![]
                             )
