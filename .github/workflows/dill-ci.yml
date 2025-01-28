@@ -86,14 +86,24 @@ jobs:
       #     -Dsbt.parallelExecution=false \
       #     +update
 
+      - name: Clean SBT caches (Windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          rm -rf "$GITHUB_WORKSPACE/.coursier-cache"
+          rm -rf "C:/Users/runneradmin/.ivy2/cache"
+          rm -rf "C:/Users/runneradmin/.sbt"
+
       - name: Test frontend
         shell: bash
         run: |
           sbt \
+          -Dsbt.server.forcestart=false \
+          -Dsbt.server.autostart=false \
+          -Dsbt.parallelExecution=false \
           -Dsbt.coursier.parallel-downloads=1 \
           -Dsbt.coursier.cache.dir="$GITHUB_WORKSPACE/.coursier-cache" \
-          -Dsbt.parallelExecution=false \
           test
+
 
       - name: Test backend
         run: |
