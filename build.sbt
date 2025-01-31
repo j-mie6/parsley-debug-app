@@ -61,7 +61,10 @@ lazy val dillFrontend = project
             "com.vladsch.flexmark" % "flexmark-all" % "0.61.26",
             "com.lihaoyi" %%% "upickle" % "4.1.0"
         ),
-        externalNpm := baseDirectory.value.getParentFile(),
+        externalNpm := {
+            sys.process.Process("npm", baseDirectory.value).!
+            baseDirectory.value.getParentFile()
+        },
         Compile / packageSrc / mappings ++= {
             val base = (Compile / sourceManaged).value
             val files = (Compile / managedSources).value
