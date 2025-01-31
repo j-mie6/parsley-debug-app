@@ -1,6 +1,7 @@
 use state::StateHandle;
 use tauri::Manager;
 use std::sync::Mutex;
+use std::collections::HashMap;
 
 mod server;
 mod state;
@@ -11,7 +12,8 @@ pub use debug_tree::{DebugTree, DebugNode};
 
 /* Global app state managed by Tauri */
 struct AppState {
-    tree: Option<DebugTree>
+    tree: Option<DebugTree>,
+    map: HashMap<u32, DebugNode>,
 }
 
 impl AppState {
@@ -19,7 +21,24 @@ impl AppState {
     fn new() -> Self {
         AppState {
             tree: None,
+            map: HashMap::new(),
         }
+    }
+
+    /* Set the parser tree */
+    pub fn set_tree(&mut self, tree: DebugTree) {
+        self.map.clear();
+        self.map_tree(tree.get_root());
+        self.tree = Some(tree);
+    }
+
+    fn map_tree(&mut self, debug_node: &DebugNode) {
+        self.map.insert(debug_node.node_id, debug_node.clone());
+        debug_node.children.iter().for_each(|child| self.map_tree(child));
+    }
+
+    pub fn get_debug_node(&self, node_id: u32) -> Option<&DebugNode> {
+        self.map.get(&node_id)
     }
 }
 
@@ -54,11 +73,10 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| setup(app)) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![fetch_debug_tree]) /* Expose render_debug_tree() to frontend */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_children_tree]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
-
 
 /* Frontend-accessible debug render */
 #[tauri::command]
@@ -74,7 +92,25 @@ fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
     }
 }
 
+/* Backend reactive fetch children */
+#[tauri::command]
+fn fetch_children_tree(state: tauri::State<Mutex<AppState>>, node_id: u32) -> Result<String, BackendErr> {
 
+    /* Acquire the state mutex to access the corresponding debug node */
+    let state_guard = state.lock().expect("");
+    let node = state_guard
+        .get_debug_node(node_id)
+        .ok_or(BackendErr::NodeNotFound(node_id))?;
+
+    serde_json::to_string_pretty(node)
+        .map_err(|_|BackendErr::SerdeError)
+}
+
+#[derive(Debug, serde::Serialize)]
+enum BackendErr {
+    NodeNotFound(u32),
+    SerdeError,
+}
 
 #[cfg(test)]
 mod test {
