@@ -104,7 +104,7 @@ buildFrontend := {
 val cleanMore = taskKey[Unit]("Clean")
 
 cleanMore := {
-    println("Removing Scala files... ")
+    println("\nRemoving Scala files... ")
     "rm -rf .metals/".!
     "rm -rf .bloop/".!
     "rm -rf .bsp/".!
