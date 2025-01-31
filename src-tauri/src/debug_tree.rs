@@ -23,6 +23,7 @@ impl DebugTree {
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DebugNode {
+    pub node_id: u32, /* The unique number of this node */
     pub name: String, /*The internal (default) or user-defined name of the parser */
     pub internal: String, /*The internal name of the parser */
     pub success: bool, /* Whether the parser was successful */
@@ -32,8 +33,9 @@ pub struct DebugNode {
 }
 
 impl DebugNode {
-    pub fn new(name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
+    pub fn new(node_id: u32, name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
         DebugNode {
+            node_id,
             name,
             internal,
             success,

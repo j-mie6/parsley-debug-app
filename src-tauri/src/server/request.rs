@@ -54,6 +54,7 @@ pub mod test {
         DebugTree::new(
             String::from("Test"), 
             DebugNode::new(
+                0u32,
                 String::from("Test"), 
                 String::from("Test"), 
                 true, 
