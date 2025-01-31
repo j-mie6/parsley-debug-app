@@ -70,6 +70,7 @@ pub mod test {
         DebugTree::new(
             String::from("Test"), 
             DebugNode::new(
+                0u32,
                 String::from("Test"), 
                 String::from("Test"), 
                 true, 
@@ -206,6 +207,7 @@ pub mod test {
         let expected_tree: &str = r#"{
             "input": "Test",
             "root": {
+                "nodeId": 0,
                 "name": "Test",
                 "internal": "Test",
                 "success": true,

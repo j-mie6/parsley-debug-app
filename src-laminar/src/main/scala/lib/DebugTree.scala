@@ -12,6 +12,7 @@ case class DebugTree(input: String, root: DebugNode) derives ReadWriter
 /**
   * Case class used to represent tauri's debug tree automatically using upickle.
   *
+  * @param nodeId an unique identifier number for the tree node
   * @param name user defined name of the debug tree node
   * @param internal internal name of the debug tree node
   * @param success whether the input was successfully consumed
@@ -19,21 +20,21 @@ case class DebugTree(input: String, root: DebugNode) derives ReadWriter
   * @param input the input string the tree node has to parse
   * @param children list of children nodes
   */
-case class DebugNode(name: String, internal: String, success: Boolean,
+case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
     childId: Int, input: String, children: List[DebugNode]) derives ReadWriter
 
 object DebugTree {
     lazy final val Sample: DebugTree = DebugTree(
         "hi world!",
-        DebugNode("~>", "~>", true, 0, "hi world!", List[DebugNode](
-            DebugNode("~>", "~>", true, 1, "hi", List[DebugNode](
-                DebugNode("'h'", "'h'", true, 1, "h", List[DebugNode]()),
-                DebugNode("|", "|", true, 2, "i", List[DebugNode](
-                    DebugNode("\"ello\"", "\"ello\"", false, 0, "", List[DebugNode]()),
-                    DebugNode("\"i\"", "\"i\"", true, 1, "i", List[DebugNode]())
+        DebugNode(0, "~>", "~>", true, 0, "hi world!", List[DebugNode](
+            DebugNode(1, "~>", "~>", true, 1, "hi", List[DebugNode](
+                DebugNode(2, "'h'", "'h'", true, 1, "h", List[DebugNode]()),
+                DebugNode(3, "|", "|", true, 2, "i", List[DebugNode](
+                    DebugNode(4, "\"ello\"", "\"ello\"", false, 0, "", List[DebugNode]()),
+                    DebugNode(5, "\"i\"", "\"i\"", true, 1, "i", List[DebugNode]())
                 ))
             )),
-            DebugNode("\" world!\"", "\" world!\"", true, 2, "world!", List[DebugNode]())
+            DebugNode(6, "\" world!\"", "\" world!\"", true, 2, "world!", List[DebugNode]())
         ))
     )
 }
