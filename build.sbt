@@ -1,5 +1,5 @@
 import org.scalajs.linker.interface.Report
-
+import sys.process.*
 
 val Scala213 = "2.13.14"
 val Scala212 = "2.12.18"
@@ -100,4 +100,18 @@ buildFrontend := {
             file.name -> out
         }
         .toMap
+}
+
+lazy val buildBackendDev = taskKey[Unit]("Start the backend in development mode.")
+
+lazy val start = taskKey[Unit]("Build and start the DILL project.")
+
+start := {
+    val front = buildFrontend.value
+    val back = buildBackendDev.value
+}
+
+buildBackendDev := {
+    "npm i".!
+    "npm run tauri dev".!
 }
