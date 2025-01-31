@@ -47,7 +47,7 @@ You will then be able to view a representation of the abstract syntax tree gener
 ## Building
 The frontend of the application is written using ScalaJS, and uses the `sbt` build system, the frontend compiles down to a single `JavaScript` file located in `./static`. The backend uses the `Tauri` package to host the frontend, and the `Rocket` package to host a server to receive the tree from `Parsley`. We use `npm` to manage the various packages.
 
-### To run the project, execute `sbt run`.
+### To run the project, execute `sbt start`.
 
 This will install the node packages required to build the project, build the front and backend, and then start the generated executable.
 
