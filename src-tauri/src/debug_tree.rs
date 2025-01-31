@@ -16,6 +16,10 @@ impl DebugTree {
     pub fn get_root(&self) -> &DebugNode {
         &self.root
     }
+
+    pub fn get_input(&self) -> &String {
+        &self.input
+    }
 }
 
 
