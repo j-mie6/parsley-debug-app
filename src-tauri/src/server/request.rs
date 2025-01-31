@@ -191,6 +191,7 @@ pub mod test {
         let expected_tree: &str = r#"{
             "input": "Test",
             "root": {
+                "nodeId": 0,
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
