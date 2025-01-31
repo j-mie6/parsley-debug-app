@@ -1,5 +1,5 @@
 import org.scalajs.linker.interface.Report
-
+import sys.process.*
 
 val Scala213 = "2.13.14"
 val Scala212 = "2.12.18"
@@ -11,7 +11,6 @@ val Version = "0.1"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / excludeLintKeys += dillFrontend / Compile / stMinimize
-
 
 inThisBuild(List(
     version := Version,
@@ -32,7 +31,6 @@ inThisBuild(List(
     scalaVersion := Scala3,
 ))
 
-
 lazy val commonSettings = Seq(
     resolvers ++= Opts.resolver.sonatypeOssReleases, // Will speed up MiMA during fast back-to-back releases
     resolvers ++= Opts.resolver.sonatypeOssSnapshots, // needed during flux periods
@@ -43,8 +41,7 @@ lazy val commonSettings = Seq(
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oI"),
     Test / parallelExecution := false,
 )
-  
-  
+
 lazy val dillFrontend = project
     .in(file("src-laminar"))
     .enablePlugins(ScalaJSPlugin, ScalablyTypedConverterExternalNpmPlugin)
@@ -69,13 +66,15 @@ lazy val dillFrontend = project
         }
     )
 
+var sbtRelease = false
 
-lazy val isRelease = sys.env.get("RELEASE").contains("true")
+lazy val sysRelease = sys.env.get("RELEASE").contains("true")
+
+lazy val isRelease = sysRelease || sbtRelease
 
 lazy val buildFrontend = taskKey[Map[String, File]]("")
 
 lazy val frontendReport = taskKey[(Report, File)]("")
-
 
 ThisBuild / frontendReport := {
     if (isRelease)
@@ -100,4 +99,48 @@ buildFrontend := {
             file.name -> out
         }
         .toMap
+}
+
+val cleanMore = taskKey[Unit]("Clean")
+
+cleanMore := {
+    println("Removing Scala files... ")
+    "rm -rf .metals/".!
+    "rm -rf .bloop/".!
+    "rm -rf .bsp/".!
+    println("done\n")
+    println("Removing compiled App files... ")
+    "rm -rf static/".!
+    "rm -rf target/".!
+    println("done\n")
+    println("Removing Tauri targets... ")
+    "rm -rf src-tauri/target/".!
+    println("done\n")
+    println("Removing Laminar targets... ")
+    "rm -rf src-laminar/target/".!
+    println("done\n")
+}
+
+clean := {
+    val cleaned = clean.value
+    cleanMore.value
+}
+
+val build = taskKey[Unit]("Build the project into packages and executables.")
+
+build := {
+    sbtRelease = true
+    val front = buildFrontend.value
+    "npm run tauri build".!
+}
+
+val dockerBuild = taskKey[Unit]("Build the project onto a docker machine, running the application")
+
+dockerBuild := {
+    println("Copying Files... ")
+    "scp -o StrictHostKeyChecking=no -r -P 2222 ./src ./src-tauri root@localhost:/home >> logs".!
+    println("done\n")
+    println("Building frontend...\n\n")
+    "echo \"cd /home && sbt buildFrontend\" | ssh -o StrictHostKeyChecking=no -p 2222 root@localhost >> logs 2>&1".!
+    println("\nDone\n")
 }
