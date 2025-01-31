@@ -66,23 +66,23 @@ lazy val dillFrontend = project
         }
     )
 
-var sbtRelease = false
-
-lazy val sysRelease = sys.env.get("RELEASE").contains("true")
-
-lazy val isRelease = sysRelease || sbtRelease
+lazy val isRelease = sys.env.get("RELEASE").contains("true")
 
 lazy val buildFrontend = taskKey[Map[String, File]]("")
 
 lazy val frontendReport = taskKey[(Report, File)]("")
 
 ThisBuild / frontendReport := {
-    if (isRelease)
+    if (isRelease) {
+        println("Building in release mode")
         (dillFrontend / Compile / fullLinkJS).value.data ->
             (dillFrontend / Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
-    else
+    }
+    else {
+        println("Building in quick compile mode, to build in release mode, set RELEASE environment variable to \"true\"")
         (dillFrontend / Compile / fastLinkJS).value.data ->
             (dillFrontend / Compile / fastLinkJS / scalaJSLinkerOutputDirectory).value
+    }
 }
 
 buildFrontend := {
@@ -129,7 +129,6 @@ clean := {
 val build = taskKey[Unit]("Build the project into packages and executables.")
 
 build := {
-    sbtRelease = true
     val front = buildFrontend.value
     "npm run tauri build".!
 }
