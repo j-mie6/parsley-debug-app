@@ -1,7 +1,6 @@
 #[cfg(test)] use mockall::automock;
 use tauri::Manager;
 use std::sync::Mutex;
-use std::collections::HashMap;
 
 use crate::{AppState, DebugTree, DebugNode};
 

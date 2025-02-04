@@ -213,7 +213,8 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "input": "Test",
-                "children": []
+                "children": [],
+                "isLeaf": true
             }
         }"#;
 
