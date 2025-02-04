@@ -72,7 +72,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 /* Run the Tauri app */
 pub fn run() {
     tauri::Builder::default()
-        .setup(|app| setup(app)) /* Run app setup */
+        .setup(setup) /* Run app setup */
         .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_children_tree]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
