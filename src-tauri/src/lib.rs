@@ -94,20 +94,20 @@ fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
 
 /* Backend reactive fetch children */
 #[tauri::command]
-fn fetch_children_tree(state: tauri::State<Mutex<AppState>>, node_id: u32) -> Result<String, FetchChildrenErr> {
+fn fetch_children_tree(state: tauri::State<Mutex<AppState>>, node_id: u32) -> Result<String, FetchChildrenError> {
 
     /* Acquire the state mutex to access the corresponding debug node */
-    let state_guard = state.lock().map_err(|_| FetchChildrenErr::LockFailed)?;
+    let state_guard = state.lock().map_err(|_| FetchChildrenError::LockFailed)?;
     let node = state_guard
         .get_debug_node(node_id)
-        .ok_or(FetchChildrenErr::NodeNotFound(node_id))?;
+        .ok_or(FetchChildrenError::NodeNotFound(node_id))?;
 
     serde_json::to_string_pretty(node)
-        .map_err(|_|FetchChildrenErr::SerdeError)
+        .map_err(|_| FetchChildrenError::SerdeError)
 }
 
 #[derive(Debug, serde::Serialize)]
-enum FetchChildrenErr {
+enum FetchChildrenError {
     LockFailed,
     NodeNotFound(u32),
     SerdeError,
