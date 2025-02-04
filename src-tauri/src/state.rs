@@ -39,24 +39,24 @@ impl StateManager for tauri::AppHandle {
     fn set_tree(&self, tree: DebugTree) {
         self.state::<Mutex<AppState>>()
             .lock()
-            .unwrap()
+            .expect("Failed to acquire lock")
             .set_tree(tree);
     }
     
     fn get_tree(&self) -> DebugTree {
         self.state::<Mutex<AppState>>()
             .lock()
-            .unwrap()
+            .expect("Failed to acquire lock")
             .tree
             .as_ref()
-            .unwrap()
+            .expect("Tree has not been loaded")
             .clone()
     }
 
     fn get_debug_node(&self, node_id: u32) -> DebugNode {
         self.state::<Mutex<AppState>>()
             .lock()
-            .unwrap()
+            .expect("Failed to acquire lock")
             .get_debug_node(node_id)
             .unwrap_or_else(|| panic!("Expected a debug node for {}", node_id))
             .clone()
