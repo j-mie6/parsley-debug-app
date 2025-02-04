@@ -34,9 +34,11 @@ class Test extends AnyFlatSpec with should.Matchers {
                             "success": true,
                             "childId": 0,
                             "input": "Test1.1",
-                            "children": []
+                            "children": [],
+                            "isLeaf": true
                         }
-                    ]
+                    ],
+                    "isLeaf": false
                 },
                 {
                     "nodeId": 3,
@@ -53,11 +55,14 @@ class Test extends AnyFlatSpec with should.Matchers {
                             "success": true,
                             "childId": 0,
                             "input": "Test2.1",
-                            "children": []
+                            "children": [],
+                            "isLeaf": true
                         }
-                    ]
+                    ],
+                    "isLeaf": false
                 }
-            ]
+            ],
+            "isLeaf": false
         }
     }"""
 
@@ -75,6 +80,7 @@ class Test extends AnyFlatSpec with should.Matchers {
         tree.root.childId should be (0)
         tree.root.input should be ("Test")
         tree.root.children should have length 2
+        tree.root.isLeaf should be (false)
 
         /* Check that the children have been deserialised correctly */
         var current_id = 0
@@ -86,6 +92,7 @@ class Test extends AnyFlatSpec with should.Matchers {
             current.success should be (true)
             current.childId should be (0)
             current.children.foreach(test_node)
+            current.isLeaf should be (current.children.isEmpty)
         }
 
     }
