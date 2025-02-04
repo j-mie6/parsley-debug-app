@@ -30,7 +30,7 @@ impl StateManager for StateHandle {
         self.0.as_ref().get_tree()
     }
 
-    fn get_debug_node(&self,node_id:u32) -> DebugNode {
+    fn get_debug_node(&self, node_id:u32) -> DebugNode {
         self.0.as_ref().get_debug_node(node_id)
     }
 }
@@ -53,12 +53,12 @@ impl StateManager for tauri::AppHandle {
             .clone()
     }
 
-    fn get_debug_node(&self,node_id:u32) -> DebugNode {
+    fn get_debug_node(&self, node_id:u32) -> DebugNode {
         self.state::<Mutex<AppState>>()
             .lock()
             .unwrap()
             .get_debug_node(node_id)
-            .expect(format!("Expected a debug node for {}", node_id).as_str())
+            .unwrap_or_else(|| panic!("Expected a debug node for {}", node_id))
             .clone()
     }
 }
