@@ -28,13 +28,13 @@ impl AppState {
     /* Set the parser tree */
     pub fn set_tree(&mut self, tree: DebugTree) {
         self.map.clear();
-        self.map_tree(tree.get_root());
+        self.setup_map(tree.get_root());
         self.tree = Some(tree);
     }
 
-    fn map_tree(&mut self, debug_node: &DebugNode) {
+    fn setup_map(&mut self, debug_node: &DebugNode) {
         self.map.insert(debug_node.node_id, debug_node.clone());
-        debug_node.children.iter().for_each(|child| self.map_tree(child));
+        debug_node.children.iter().for_each(|child| self.setup_map(child));
     }
 
     pub fn get_debug_node(&self, node_id: u32) -> Option<&DebugNode> {
@@ -73,7 +73,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     tauri::Builder::default()
         .setup(setup) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_children_tree]) /* Expose render_debug_tree() to frontend */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
@@ -94,7 +94,7 @@ fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
 
 /* Backend reactive fetch children */
 #[tauri::command]
-fn fetch_children_tree(state: tauri::State<Mutex<AppState>>, node_id: u32) -> Result<String, FetchChildrenError> {
+fn fetch_node_children(state: tauri::State<Mutex<AppState>>, node_id: u32) -> Result<String, FetchChildrenError> {
 
     /* Acquire the state mutex to access the corresponding debug node */
     let state_guard = state.lock().map_err(|_| FetchChildrenError::LockFailed)?;
