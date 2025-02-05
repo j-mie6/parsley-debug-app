@@ -145,6 +145,14 @@ run := {
 }
 
 
+/* Setup required dependencies */
+lazy val setup = taskKey[Unit]("Install required dependencies")
+
+setup := {
+    convertCmd("npm install").!
+}
+
+
 /* Build project in Docker */
 val dockerBuild = taskKey[Unit]("Build the project onto a docker machine, running the application")
 
