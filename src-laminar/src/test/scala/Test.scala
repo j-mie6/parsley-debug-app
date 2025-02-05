@@ -1,11 +1,12 @@
 import org.scalatest
 import org.scalatest.flatspec.AnyFlatSpec   
 import org.scalatest.matchers.*
-
-import lib.DebugTree
-import lib.DebugTreeHandler
-import lib.DebugNode
 import scala.util.{Try, Success, Failure}
+
+import model.DebugTree
+
+import controller.DebugTreeHandler
+
 
 class Test extends AnyFlatSpec with should.Matchers {
 
