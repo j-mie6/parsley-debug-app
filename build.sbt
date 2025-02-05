@@ -1,5 +1,5 @@
 import org.scalajs.linker.interface.Report
-
+import sys.process.*
 
 val Scala213 = "2.13.14"
 val Scala212 = "2.12.18"
@@ -13,11 +13,21 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / excludeLintKeys += dillFrontend / Compile / stMinimize
 
 
+/* Handle OS specific usage of commands */
+def convertCmd(cmd: String): String = (
+    sys.props("os.name").toLowerCase() match {
+        case osName if osName contains "windows" => "cmd /C " ++ cmd
+        case _ => cmd
+    }
+) 
+
+
+/* Global project settings */
 inThisBuild(List(
     version := Version,
     organization := "com.github.j-mie6",
     organizationName := "Parsley Debug App Contributors <https://github.com/j-mie6/parsley-debug-app/graphs/contributors>",
-    startYear := Some(2024),
+    startYear := Some(2025),
     licenses := List("BSD-3-Clause" -> url("https://opensource.org/licenses/BSD-3-Clause")),
     developers := List(
         Developer("j-mie6", "Jamie Willis", "", url("https://github.com/j-mie6/parsley-debug-app")),
@@ -32,40 +42,50 @@ inThisBuild(List(
     scalaVersion := Scala3,
 ))
 
-
+/* Setup project dependencies */
 lazy val commonSettings = Seq(
-    resolvers ++= Opts.resolver.sonatypeOssReleases, // Will speed up MiMA during fast back-to-back releases
-    resolvers ++= Opts.resolver.sonatypeOssSnapshots, // needed during flux periods
+    resolvers ++= Opts.resolver.sonatypeOssReleases, /* Will speed up MiMA during fast back-to-back releases */
+    resolvers ++= Opts.resolver.sonatypeOssSnapshots, /* Needed during flux periods */
+
+    /* Dependencies required throughout project */
     libraryDependencies ++= Seq(
         "org.scalatest" %%% "scalatest" % scalatestVersion % Test,
         "org.scala-lang" %% "scala3-compiler" % "3.3.3"
     ),
+
+    /* Test settings */
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oI"),
     Test / parallelExecution := false,
 )
-  
-  
+
+/* Setup for Laminar */
 lazy val dillFrontend = project
     .in(file("src-laminar"))
     .enablePlugins(ScalaJSPlugin, ScalablyTypedConverterExternalNpmPlugin)
     .settings(
+        /* Scala JS/ScalablyTyped settings */
         scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)),
         scalaJSUseMainModuleInitializer := true,
         stUseScalaJsDom := true,
         stIgnore += "type-fest",
         Compile / stMinimize := Selection.AllExcept("types", "tauri-apps"),
+
+        /* Frontend settings */        
         name := "dill-frontend",
-        commonSettings,
-        libraryDependencies ++= Seq(
+        commonSettings, 
+        libraryDependencies ++= Seq( /* Extra dependencies required for frontend */
             "com.raquo" %%% "laminar" % "17.2.0",
             "com.vladsch.flexmark" % "flexmark-all" % "0.61.26",
             "com.lihaoyi" %%% "upickle" % "4.1.0"
         ),
+
+        /* Run npm to link with ScalablyTyped */
         externalNpm := {
-            val npmCmd = if (sys.props("os.name").toLowerCase().contains("windows")) "npm.cmd" else "npm"
-            sys.process.Process(npmCmd, baseDirectory.value).!
+            convertCmd("npm > log.txt").!
             baseDirectory.value.getParentFile()
         },
+
+        /* Compile the frontend */
         Compile / packageSrc / mappings ++= {
             val base = (Compile / sourceManaged).value
             val files = (Compile / managedSources).value
@@ -74,24 +94,26 @@ lazy val dillFrontend = project
     )
 
 
-lazy val isRelease = sys.env.get("RELEASE").contains("true")
+lazy val isRelease = sys.env.get("RELEASE").contains("true") /* Compile in release mode (not dev) */
 
-lazy val buildFrontend = taskKey[Map[String, File]]("")
+/* Report frontend build setup */
+lazy val reportFrontend = taskKey[(Report, File)]("")
+ThisBuild / reportFrontend := {
+    if (isRelease) {
+        println("Building in release mode")
+    } else {
+        println("Building in quick compile mode. To build in release mode, set RELEASE environment variable to \"true\"")
+    }
 
-lazy val frontendReport = taskKey[(Report, File)]("")
-
-
-ThisBuild / frontendReport := {
-    if (isRelease)
-        (dillFrontend / Compile / fullLinkJS).value.data ->
-            (dillFrontend / Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
-    else
-        (dillFrontend / Compile / fastLinkJS).value.data ->
-            (dillFrontend / Compile / fastLinkJS / scalaJSLinkerOutputDirectory).value
+    (dillFrontend / Compile / fullLinkJS).value.data -> (dillFrontend / Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
 }
 
+
+/* Build Dill frontend */
+lazy val buildFrontend = taskKey[Map[String, File]]("")
+
 buildFrontend := {
-    val (report, fm) = frontendReport.value
+    val (report, fm) = reportFrontend.value
     val outDir = (ThisBuild / baseDirectory).value / "static"
     
     IO.listFiles(fm)
@@ -105,3 +127,66 @@ buildFrontend := {
         }
         .toMap
 }
+
+
+/* Build project into an executable */
+val build = taskKey[Unit]("Build the project into packages and executables.")
+
+build := {
+    val front = buildFrontend.value
+    convertCmd("npm run tauri build >> log.txt").!
+}
+
+
+/* Run project */
+run := {
+    val front = buildFrontend.value
+    convertCmd("npm run tauri dev").!
+}
+
+
+/* Build project in Docker */
+val dockerBuild = taskKey[Unit]("Build the project onto a docker machine, running the application")
+
+dockerBuild := {
+    print("Copying Files... ")
+    "scp -o StrictHostKeyChecking=no -r -P 2222 ./src ./src-tauri root@localhost:/home >> logs".!
+    println("done")
+
+    println("Building frontend... ")
+    "echo \"cd /home && sbt buildFrontend\" | ssh -o StrictHostKeyChecking=no -p 2222 root@localhost >> logs 2>&1".!
+    println("Done")
+}
+
+
+/* Clean all generated files */
+val cleanHard = taskKey[Unit]("Clean")
+
+cleanHard := {
+    print("Removing npm dependencies... ")
+    "rm -rf .vscode/".!
+    println("done")
+
+    print("Removing Scala files... ")
+    "rm -rf .metals/".!
+    "rm -rf .bloop/".!
+    "rm -rf .bsp/".!
+    "rm -rf .scala-build/".!
+    println("done")
+    
+    print("Removing targets... ")
+    "rm -rf static/".!
+    println("done")
+
+    print("Removing Tauri targets... ")
+    "rm -rf src-tauri/target/".!
+    println("done")
+    
+    print("Removing Laminar targets... ")
+    "rm -rf src-laminar/target/".!
+    println("done")
+
+    /* Apply default clean */
+    clean.value
+}
+
