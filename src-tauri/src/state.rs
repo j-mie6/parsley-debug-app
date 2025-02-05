@@ -58,7 +58,7 @@ impl StateManager for tauri::AppHandle {
             .lock()
             .expect("Failed to acquire lock")
             .get_debug_node(node_id)
-            .unwrap_or_else(|| panic!("Expected a debug node for {}", node_id))
+            .expect(format!("Expected a debug node for {}", node_id).as_str())
             .clone()
     }
 }
