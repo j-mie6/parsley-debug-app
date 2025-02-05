@@ -4,6 +4,10 @@ use crate::{state::{StateHandle, StateManager}, DebugTree};
 use super::parsley_tree::ParsleyTree;
 
 
+/* Length of input slice returned in post response */
+const RESPONSE_INPUT_LEN: usize = 16; 
+
+
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
     rocket::routes![get_index, get_tree, post_tree]
@@ -19,15 +23,27 @@ fn get_index() -> String {
 
 /* Post request handler to accept debug tree */
 #[post("/api/remote/tree", format = "application/json", data = "<data>")] 
-fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> http::Status {
+fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> (http::Status, String) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
     let debug_tree: DebugTree = parsley_tree.into();    
     
+    /* Format informative response for RemoteView */
+    let input: &str = debug_tree.get_input();
+    let response: String = format!(
+        "Posted parser tree handling input: \"{}{}\" to Dill", 
+        
+        /* Include first few chars of input */
+        &input[..std::cmp::min(input.len(), RESPONSE_INPUT_LEN)],
+        if input.len() > RESPONSE_INPUT_LEN { "..." } else { "" },
+    );
+    
+    /* Update state with new debug_tree */
     let handle: &StateHandle = state.inner();
     handle.set_tree(debug_tree);
 
-    http::Status::Ok
+    /* Return response */
+    (http::Status::Ok, response)
 }
 
 /* Return posted DebugTree as JSON string */
@@ -54,6 +70,7 @@ pub mod test {
         DebugTree::new(
             String::from("Test"), 
             DebugNode::new(
+                0u32,
                 String::from("Test"), 
                 String::from("Test"), 
                 true, 
@@ -190,6 +207,7 @@ pub mod test {
         let expected_tree: &str = r#"{
             "input": "Test",
             "root": {
+                "nodeId": 0,
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
