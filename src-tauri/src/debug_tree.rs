@@ -34,10 +34,12 @@ pub struct DebugNode {
     pub child_id: Option<u32>, /* The unique child number of this node */
     pub input: String, /* The input string passed to the parser */
     pub children: Vec<DebugNode>, /* The children of this node */
+    pub is_leaf: bool,
 }
 
 impl DebugNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
+        let is_leaf: bool = children.is_empty();
         DebugNode {
             node_id,
             name,
@@ -45,7 +47,8 @@ impl DebugNode {
             success,
             child_id,
             input,
-            children
+            children,
+            is_leaf,
         }
     }
 }
