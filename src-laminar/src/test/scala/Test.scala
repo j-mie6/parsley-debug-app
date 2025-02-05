@@ -95,6 +95,7 @@ class Test extends AnyFlatSpec with should.Matchers {
             current.isLeaf should be (current.children.isEmpty)
         }
 
+        test_node(tree.root)
     }
 
     it should "not be deserialised if the JSON is not properly formatted" in {
