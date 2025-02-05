@@ -1,8 +1,17 @@
 package controller
 
 import com.raquo.laminar.api.L.*
+import scala.util.{Try, Success, Failure}
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class TreeController {
+import view.DebugTreeDisplay
+
+/**
+  * DisplayTree creates the HTML element to display a DebugTree
+  *
+  * @param displayTree Display tree HTML element
+  */
+object TreeController {
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         for {
             treeString <- Tauri.invoke[String]("fetch_debug_tree")

@@ -8,6 +8,8 @@ import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Try, Success, Failure}
 
+import model.Page
+
 import controller.State
 import controller.Tauri
 

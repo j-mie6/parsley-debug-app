@@ -3,6 +3,7 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.DebugTree
+import model.DebugNode
 
 /**
   * DisplayTree creates the HTML element to display a DebugTree

@@ -4,7 +4,6 @@ import com.raquo.laminar.api.L.*
 
 import org.scalajs.dom
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Failure
 import scala.util.Success
 
