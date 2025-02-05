@@ -5,6 +5,7 @@ import scala.util.{Try, Success, Failure}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import view.DebugTreeDisplay
+import org.scalablytyped.runtime.StringDictionary
 
 /**
   * DisplayTree creates the HTML element to display a DebugTree
@@ -14,6 +15,7 @@ import view.DebugTreeDisplay
 object TreeController {
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         for {
+            // treeString <- Tauri.invoke[String]("fetch_node_children", StringDictionary(("nodeId", 0)))
             treeString <- Tauri.invoke[String]("fetch_debug_tree")
         } do {
             displayTree.set(
