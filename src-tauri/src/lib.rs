@@ -12,8 +12,8 @@ pub use debug_tree::{DebugTree, DebugNode};
 
 /* Global app state managed by Tauri */
 struct AppState {
-    tree: Option<DebugTree>,
-    map: HashMap<u32, DebugNode>,
+    tree: Option<DebugTree>, /* Parser tree that we may have */
+    map: HashMap<u32, DebugNode>, /* Map from node_id to the respective node */
 }
 
 impl AppState {
