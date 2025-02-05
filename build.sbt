@@ -134,7 +134,7 @@ val build = taskKey[Unit]("Build the project into packages and executables.")
 
 build := {
     val front = buildFrontend.value
-    convertCmd("npm run tauri build >> log.txt").!
+    convertCmd("npm run tauri build").!
 }
 
 
