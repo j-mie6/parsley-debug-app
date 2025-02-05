@@ -164,7 +164,7 @@ val cleanHard = taskKey[Unit]("Clean")
 
 cleanHard := {
     print("Removing npm dependencies... ")
-    "rm -rf .vscode/".!
+    "rm -rf node_modules/".!
     println("done")
 
     print("Removing Scala files... ")
