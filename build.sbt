@@ -1,6 +1,5 @@
 import org.scalajs.linker.interface.Report
 import sys.process.*
-import sys.process.*
 
 val Scala213 = "2.13.14"
 val Scala212 = "2.12.18"
