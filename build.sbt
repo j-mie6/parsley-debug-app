@@ -16,7 +16,7 @@ Global / excludeLintKeys += dillFrontend / Compile / stMinimize
 /* Handle OS specific usage of commands */
 def convertCmd(cmd: String): String = (
     sys.props("os.name").toLowerCase() match {
-        case osName if osName contains "windows" => "cmd /C" ++ cmd
+        case osName if osName contains "windows" => "cmd /C " ++ cmd
         case _ => cmd
     }
 ) 
