@@ -160,6 +160,11 @@ dockerBuild := {
 
 
 /* Clean all generated files */
+clean := {
+    "rm log.txt".!
+    clean.value
+}
+
 val cleanHard = taskKey[Unit]("Clean")
 
 cleanHard := {
