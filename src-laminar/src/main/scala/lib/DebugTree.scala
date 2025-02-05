@@ -19,6 +19,7 @@ case class DebugTree(input: String, root: DebugNode) derives ReadWriter
   * @param childId an unique identifier number for the tree node
   * @param input the input string the tree node has to parse
   * @param children list of children nodes
+  * @param isLeaf if a node is a leaf
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
     childId: Int, input: String, children: List[DebugNode], isLeaf: Boolean) derives ReadWriter
