@@ -16,15 +16,18 @@ pub struct ParsleyNode {
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 pub struct ParsleyTree {
-    input: String,
-    root: ParsleyNode,
+    input: String, /* The input string being parsed */
+    root: ParsleyNode, /* Root node of the debug tree */
 }
 
 /* Convert from ParsleyTree to DebugTree */
 impl From<ParsleyTree> for DebugTree {
     fn from(tree: ParsleyTree) -> Self {
         /* Helper function used to convert a ParsleyNode given the total input string */
-        fn convert_node(node: ParsleyNode, input: &str) -> DebugNode {
+        fn convert_node(node: ParsleyNode, input: &str, current_id: &mut u32) -> DebugNode {
+            let node_id = *current_id; /* Holding the current node id to be passed on*/
+            *current_id += 1; /* Incrementing the current node id for the next pass */
+
             /* Convert child_id, handling -1 case */
             let child_id: Option<u32> = node.child_id.try_into().ok();
             
@@ -37,11 +40,12 @@ impl From<ParsleyTree> for DebugTree {
             /* Recursively convert children into DebugNodes */
             let children: Vec<DebugNode> = node.children
                 .into_iter()
-                .map(|child| convert_node(child, input))
+                .map(|child| convert_node(child, input, current_id))
                 .collect();
 
             /* Instantiate DebugNode */
-            DebugNode::new( 
+            DebugNode::new(
+                node_id, 
                 node.name,
                 node.internal,
                 node.success,
@@ -51,8 +55,11 @@ impl From<ParsleyTree> for DebugTree {
             )
         }
 
+        /* BFS traversal for node_id */
+        let mut current_id: u32 = 0;
+
         /* Convert the root node and return DebugTree */
-        let node: DebugNode = convert_node(tree.root, &tree.input);
+        let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
         DebugTree::new(tree.input, node)
     }
 }
@@ -284,6 +291,7 @@ pub mod test {
         let debug_tree: DebugTree = DebugTree::new(
             String::from("01234"), 
             DebugNode::new(
+                0u32,
                 String::from("0"), 
                 String::from("0"), 
                 true, 
@@ -291,6 +299,7 @@ pub mod test {
                 String::from("0"), 
                 vec![
                     DebugNode::new(
+                        1u32,
                         String::from("1"), 
                         String::from("1"), 
                         true, 
@@ -298,6 +307,7 @@ pub mod test {
                         String::from("1"), 
                         vec![
                             DebugNode::new(
+                                2u32,
                                 String::from("2"), 
                                 String::from("2"), 
                                 true, 
@@ -308,6 +318,7 @@ pub mod test {
                         ]
                     ),
                     DebugNode::new(
+                        3u32,
                         String::from("3"), 
                         String::from("3"), 
                         true, 
@@ -315,6 +326,7 @@ pub mod test {
                         String::from("3"), 
                         vec![
                             DebugNode::new(
+                                4u32,
                                 String::from("4"), 
                                 String::from("4"), 
                                 true, 

@@ -12,6 +12,16 @@ val Version = "0.1"
 Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / excludeLintKeys += dillFrontend / Compile / stMinimize
 
+
+/* Handle OS specific usage of commands */
+def convertCmd(cmd: String): String = (
+    sys.props("os.name").toLowerCase() match {
+        case osName if osName contains "windows" => "cmd /C" ++ cmd
+        case _ => cmd
+    }
+) 
+
+
 /* Global project settings */
 inThisBuild(List(
     version := Version,
@@ -68,7 +78,12 @@ lazy val dillFrontend = project
             "com.vladsch.flexmark" % "flexmark-all" % "0.61.26",
             "com.lihaoyi" %%% "upickle" % "4.1.0"
         ),
-        externalNpm := baseDirectory.value.getParentFile(),
+
+        /* Run npm to link with ScalablyTyped */
+        externalNpm := {
+            convertCmd("npm > log.txt").!
+            baseDirectory.value.getParentFile()
+        },
 
         /* Compile the frontend */
         Compile / packageSrc / mappings ++= {
@@ -114,21 +129,12 @@ buildFrontend := {
 }
 
 
-/* Handle OS specific usage of commands */
-def convertCmd(cmd: String): String = (
-    sys.props("os.name").toLowerCase() match {
-        case osName if osName contains "windows" => "cmd /C" ++ cmd
-        case _ => cmd
-    }
-) 
-
-
 /* Build project into an executable */
 val build = taskKey[Unit]("Build the project into packages and executables.")
 
 build := {
     val front = buildFrontend.value
-    convertCmd("npm run tauri build").!
+    convertCmd("npm run tauri build >> log.txt").!
 }
 
 
