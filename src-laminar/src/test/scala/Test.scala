@@ -33,7 +33,7 @@ class Test extends AnyFlatSpec with should.Matchers {
                             "internal": "Test2",
                             "success": true,
                             "childId": 0,
-                            "input": "Test1.1",
+                            "input": "Test2",
                             "children": [],
                             "isLeaf": true
                         }
@@ -45,8 +45,8 @@ class Test extends AnyFlatSpec with should.Matchers {
                     "name": "Test3",
                     "internal": "Test3",
                     "success": true,
-                    "childId": 0,
-                    "input": "Test2",
+                    "childId": 1,
+                    "input": "Test3",
                     "children": [
                         {
                             "nodeId": 4,
@@ -54,7 +54,7 @@ class Test extends AnyFlatSpec with should.Matchers {
                             "internal": "Test4",
                             "success": true,
                             "childId": 0,
-                            "input": "Test2.1",
+                            "input": "Test4",
                             "children": [],
                             "isLeaf": true
                         }
@@ -84,18 +84,19 @@ class Test extends AnyFlatSpec with should.Matchers {
 
         /* Check that the children have been deserialised correctly */
         var current_id = 0
+
         def test_node(current: DebugNode): Unit = {
             current_id += 1
             current.nodeId should be (current_id)
             current.name should be (s"Test${current_id}")
             current.internal should be (s"Test${current_id}")
             current.success should be (true)
-            current.childId should be (0)
+            current.input should be (s"Test${current_id}")
             current.children.foreach(test_node)
             current.isLeaf should be (current.children.isEmpty)
         }
 
-        test_node(tree.root)
+        tree.root.children.foreach(test_node)
     }
 
     it should "not be deserialised if the JSON is not properly formatted" in {
