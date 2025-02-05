@@ -4,6 +4,7 @@ import org.scalatest.matchers.*
 import scala.util.{Try, Success, Failure}
 
 import model.DebugTree
+import model.DebugNode
 
 import controller.DebugTreeHandler
 
