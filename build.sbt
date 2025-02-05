@@ -62,7 +62,8 @@ lazy val dillFrontend = project
             "com.lihaoyi" %%% "upickle" % "4.1.0"
         ),
         externalNpm := {
-            sys.process.Process("npm", baseDirectory.value).!
+            val npmCmd = if (sys.props("os.name").toLowerCase().contains("windows")) "npm.cmd" else "npm"
+            sys.process.Process(npmCmd, baseDirectory.value).!
             baseDirectory.value.getParentFile()
         },
         Compile / packageSrc / mappings ++= {
