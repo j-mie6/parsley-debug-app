@@ -3,12 +3,8 @@ package lib
 import scala.scalajs.js
 import scala.scalajs.js.annotation.*
 import scala.concurrent.Future
-
-
-@js.native
-@JSImport("@tauri-apps/api/core", "invoke")
-private def tauriInvokeInternal[T](cmd: String): js.Promise[T] = js.native
+import typings.tauriAppsApi.coreMod.{invoke => invokeInternal}
 
 object Tauri {
-    def invoke[T](cmd: String): Future[T] = tauriInvokeInternal(cmd).toFuture
+    def invoke[T](cmd: String): Future[T] = invokeInternal(cmd).toFuture
 }
