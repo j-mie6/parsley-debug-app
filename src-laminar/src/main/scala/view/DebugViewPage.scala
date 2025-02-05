@@ -1,4 +1,4 @@
-package pages
+package view
 
 import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
@@ -8,8 +8,10 @@ import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Try, Success, Failure}
 
-import lib.State
-import lib.Tauri
+import model.Page
+
+import controller.State
+import controller.Tauri
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -43,7 +45,8 @@ abstract class DebugViewPage extends Page {
     private lazy val headerRight: Element = div(
         className := "debug-view-header-right",
         div(
-            child <-- State.isLightMode.signal.map((project: Boolean) => if project then moonIcon else sunIcon),
+            child <-- State.isLightMode.signal
+                .map((project: Boolean) => if project then moonIcon else sunIcon),
             cursor.pointer,
             alignContent.center,
             marginRight.px := 20,

@@ -1,4 +1,5 @@
-package lib
+package model
+
 import upickle.default.ReadWriter
 
 /**
