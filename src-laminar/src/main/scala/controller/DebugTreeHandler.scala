@@ -21,4 +21,11 @@ object DebugTreeHandler {
             case Failure(err) => Failure(Exception(s"Error while decoding JSON: ${err.getMessage()}", err))
         }
     }
+
+    def decodeDebugTrees(jsonString: String): Try[List[DebugTree]] = {
+        Try(up.read[List[DebugTree]](jsonString)) match {
+            case trees: Success[_] => trees
+            case Failure(err) => Failure(Exception(s"Error while decoding JSON: ${err.getMessage()}", err))
+        }
+    }
 }
