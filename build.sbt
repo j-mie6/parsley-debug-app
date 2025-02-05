@@ -81,7 +81,7 @@ lazy val dillFrontend = project
 
         /* Run npm to link with ScalablyTyped */
         externalNpm := {
-            convertCmd("npm -V > log.txt").!
+            convertCmd("npm").!
             baseDirectory.value.getParentFile()
         },
 
