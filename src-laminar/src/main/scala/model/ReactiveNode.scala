@@ -8,7 +8,12 @@ import com.raquo.laminar.api.L.*
 import model.DebugNode
 import controller.{Tauri, DebugTreeHandler}
 
-
+/**
+  * Wrapper for DebugNode to add reactive children
+  *
+  * @param debugNode holds information about debug node
+  * @param children reactive children updated at runtime
+  */
 case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
     def resetChildren(): Unit = { 
         children.set(List[DebugNode]())

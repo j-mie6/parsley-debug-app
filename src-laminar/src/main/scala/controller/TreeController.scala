@@ -8,14 +8,11 @@ import view.DebugTreeDisplay
 import org.scalablytyped.runtime.StringDictionary
 
 /**
-  * DisplayTree creates the HTML element to display a DebugTree
-  *
-  * @param displayTree Display tree HTML element
+  * TreeController provides interface for updating DebugTree
   */
 object TreeController {
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         for {
-            // treeString <- Tauri.invoke[String]("fetch_node_children", StringDictionary(("nodeId", 0)))
             treeString <- Tauri.invoke[String]("fetch_debug_tree")
         } do {
             displayTree.set(
