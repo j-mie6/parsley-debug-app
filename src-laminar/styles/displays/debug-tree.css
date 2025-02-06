@@ -67,3 +67,8 @@
   color: var(--font-color-secondary);
   background-color: var(--background-tertiary);
 }
+
+.type-box {
+  border-style: dashed;
+  padding: 20px;
+}

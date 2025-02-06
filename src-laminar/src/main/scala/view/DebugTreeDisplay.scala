@@ -40,11 +40,13 @@ object ReactiveNodeDisplay {
                 )
             })
         ),
-
         div(
-            className := "debug-tree-node-container",
-            children <-- node.children.signal.map(_.map((child) => ReactiveNodeDisplay(ReactiveNode(child))))
-        ),
+            className := {if node.debugNode.internal != node.debugNode.name then "type-box" else ""},
+            div(
+                className := "debug-tree-node-container",
+                children <-- node.children.signal.map(_.map((child) => ReactiveNodeDisplay(ReactiveNode(child))))
+             ),
+        )
     )
 }
 
@@ -53,14 +55,15 @@ object ReactiveNodeDisplay {
   * @param debugNode case class for holding debug values to be rendered
   */
 object DebugNodeDisplay {
-    def apply(debugNode: DebugNode, buttons: HtmlElement): HtmlElement ={
+    def apply(debugNode: DebugNode, buttons: HtmlElement): HtmlElement = {
         val showButtons: Var[Boolean] = Var(false)
         div(
             className := s"debug-tree-node debug-tree-node-${if debugNode.success then "success" else "fail"}",
             onMouseEnter --> { _ => showButtons.set(true)},
             onMouseLeave --> { _ => showButtons.set(false)},
             div(
-                p(fontWeight := "bold", debugNode.name, marginBottom.px := 5), 
+                p(fontWeight := "bold", s"Name: ${debugNode.name}", marginBottom.px := 5),
+                p(fontWeight := "bold", s"Internal: ${debugNode.internal}", marginBottom.px := 5),
                 p(fontStyle := "italic", debugNode.input)
             ),
             buttons.amend(display <-- showButtons.signal.map(if (_) "block" else "none"))
