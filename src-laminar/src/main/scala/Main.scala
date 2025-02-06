@@ -5,10 +5,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.raquo.laminar.api.L.*
 
-import lib.State
-import lib.Tauri
+import view.TreeViewPage
 
-import pages.TreeViewPage
+import controller.State
+import controller.Tauri
+
 
 @main def app = {
     dom.document.documentElement.setAttribute("data-theme", if State.isLightMode.now() then "light" else "dark")

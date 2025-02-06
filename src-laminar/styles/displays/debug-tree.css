@@ -40,3 +40,30 @@
   flex-basis: auto;
   justify-content: space-evenly;
 }
+
+.debug-tree-node-button {
+  border-radius: 5px;
+  padding-inline: 10px;
+  padding-block: 3px;
+  margin-top: 7px;
+  font-size: 10px;
+  font-weight: bold;
+  border: 1px solid var(--font-color-primary);
+  transition: all 0.5s;
+  cursor: pointer;
+}
+
+.debug-tree-node-button-compress {
+  color: var(--font-color-secondary);
+  background-color: var(--background-tertiary);
+}
+
+.debug-tree-node-button-expand {
+  color: var(--font-color-secondary);
+  background-color: var(--background-tertiary-60);
+}
+
+.debug-tree-node-button:hover {
+  color: var(--font-color-secondary);
+  background-color: var(--background-tertiary);
+}

@@ -1,4 +1,4 @@
-package lib
+package controller
 
 import com.raquo.laminar.api.L.*
 

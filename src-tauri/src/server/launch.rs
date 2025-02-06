@@ -66,7 +66,7 @@ mod test {
         if let Ok(data) = user_config.data() {    
             
             /* If config file differs from default */
-            if !data.is_empty() && data != Config::default().data().unwrap() {
+            if !data.is_empty() && data != Config::default().data().expect("Expected data in config") {
                 
                 /* Override the default config with values from Rocket.toml */
                 let figment: Figment = Figment::from(Config::default())
