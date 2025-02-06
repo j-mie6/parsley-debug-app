@@ -7,6 +7,7 @@ import scala.scalajs.js.annotation.*
 import scala.concurrent.Future
 
 import typings.tauriAppsApi.coreMod.{invoke => invokeInternal, InvokeArgs}
+import org.scalablytyped.runtime.StringDictionary
 
 /**
   * DisplayTree creates the HTML element to display a DebugTree
@@ -15,6 +16,6 @@ import typings.tauriAppsApi.coreMod.{invoke => invokeInternal, InvokeArgs}
   */
 object Tauri {
     def invoke[T](cmd: String): Future[T] = invokeInternal(cmd).toFuture
-    def invoke[T](cmd: String, args: InvokeArgs): Future[T] = invokeInternal(cmd, args).toFuture
+    def invoke[T](cmd: String, args: Map[String, Any]): Future[T] = invokeInternal(cmd, StringDictionary(args.toSeq: _*)).toFuture
 }
 
