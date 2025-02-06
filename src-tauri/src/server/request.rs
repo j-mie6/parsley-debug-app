@@ -5,7 +5,7 @@ use super::parsley_tree::ParsleyTree;
 
 
 /* Length of input slice returned in post response */
-const RESPONSE_INPUT_LEN: usize = 16; 
+const RESPONSE_INPUT_LEN: usize = 16;
 
 
 /* Expose routes for mounting during launch */
@@ -26,7 +26,7 @@ fn get_index() -> String {
 fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<StateHandle>) -> (http::Status, String) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
-    let debug_tree: DebugTree = parsley_tree.into();    
+    let debug_tree: DebugTree = parsley_tree.into();
     
     /* Format informative response for RemoteView */
     let input: &str = debug_tree.get_input();
