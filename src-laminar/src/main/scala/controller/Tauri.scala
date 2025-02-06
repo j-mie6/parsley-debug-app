@@ -4,7 +4,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.*
 import scala.concurrent.Future
 import typings.tauriAppsApi.coreMod.{invoke => invokeInternal}
-import typings.tauriAppsApi.eventMod.{listen => listenInternal, EventCallback => EventCallbackInternal}
+import typings.tauriAppsApi.eventMod.{EventCallback => EventCallbackInternal, listen => listenInternal}
 
 /**
   * DisplayTree creates the HTML element to display a DebugTree
