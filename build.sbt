@@ -81,7 +81,7 @@ lazy val dillFrontend = project
 
         /* Run npm to link with ScalablyTyped */
         externalNpm := {
-            convertCmd("npm > log.txt").!
+            convertCmd("npm").!
             baseDirectory.value.getParentFile()
         },
 
@@ -134,7 +134,7 @@ val build = taskKey[Unit]("Build the project into packages and executables.")
 
 build := {
     val front = buildFrontend.value
-    convertCmd("npm run tauri build >> log.txt").!
+    convertCmd("npm run tauri build").!
 }
 
 
@@ -142,6 +142,14 @@ build := {
 run := {
     val front = buildFrontend.value
     convertCmd("npm run tauri dev").!
+}
+
+
+/* Setup required dependencies */
+lazy val setup = taskKey[Unit]("Install required dependencies")
+
+setup := {
+    convertCmd("npm install").!
 }
 
 
@@ -160,11 +168,16 @@ dockerBuild := {
 
 
 /* Clean all generated files */
+clean := {
+    "rm log.txt".!
+    clean.value
+}
+
 val cleanHard = taskKey[Unit]("Clean")
 
 cleanHard := {
     print("Removing npm dependencies... ")
-    "rm -rf .vscode/".!
+    "rm -rf node_modules/".!
     println("done")
 
     print("Removing Scala files... ")
