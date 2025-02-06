@@ -23,7 +23,6 @@ impl StateHandle {
 
 impl StateManager for StateHandle {
     fn set_tree(&self, tree: DebugTree) {
-        
         self.0.as_ref().set_tree(tree);
     }
 
