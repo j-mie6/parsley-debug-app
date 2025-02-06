@@ -11,6 +11,7 @@ import model.DebugTree
 
 import controller.DebugTreeHandler
 import controller.TreeController
+import controller.Tauri
 
 
 object TreeViewPage extends DebugViewPage {
@@ -27,10 +28,13 @@ object TreeViewPage extends DebugViewPage {
         onClick --> { _ => TreeController.reloadTree(displayTree)}
     )
 
-    def apply(): HtmlElement = super.render(Some(div(
-        className := "tree-view-page",
+    def apply(): HtmlElement = {
+        Tauri.listen[Unit]("tree-ready", {_ => TreeController.reloadTree(displayTree)})
+        super.render(Some(div(
+            className := "tree-view-page",
 
-        reloadButton,
-        child <-- displayTree
-    )))
+            reloadButton,
+            child <-- displayTree
+        )))
+    }
 }
