@@ -5,11 +5,10 @@ import scala.util.{Try, Success, Failure}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import view.DebugTreeDisplay
+import org.scalablytyped.runtime.StringDictionary
 
 /**
-  * DisplayTree creates the HTML element to display a DebugTree
-  *
-  * @param displayTree Display tree HTML element
+  * TreeController provides interface for updating DebugTree
   */
 object TreeController {
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
