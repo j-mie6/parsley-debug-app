@@ -3,7 +3,7 @@ package controller
 import upickle.default as up
 import scala.util.{Try, Success, Failure}
 
-import model.DebugTree
+import model.{DebugTree, DebugNode}
 
 /**
   * DebugTreeHandler is responsible for deserialising the JSON string passed by the backend
@@ -22,9 +22,9 @@ object DebugTreeHandler {
         }
     }
 
-    def decodeDebugTrees(jsonString: String): Try[List[DebugTree]] = {
-        Try(up.read[List[DebugTree]](jsonString)) match {
-            case trees: Success[_] => trees
+    def decodeDebugNodes(jsonString: String): Try[List[DebugNode]] = {
+        Try(up.read[List[DebugNode]](jsonString)) match {
+            case nodes: Success[_] => nodes
             case Failure(err) => Failure(Exception(s"Error while decoding JSON: ${err.getMessage()}", err))
         }
     }
