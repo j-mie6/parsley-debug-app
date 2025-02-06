@@ -33,7 +33,7 @@ pub struct DebugNode {
     pub success: bool, /* Whether the parser was successful */
     pub child_id: Option<u32>, /* The unique child number of this node */
     pub input: String, /* The input string passed to the parser */
-    pub children: Vec<DebugNode>, /* The children of this node */
+    #[serde(skip_serializing)] pub children: Vec<DebugNode>, /* The children of this node */
     pub is_leaf: bool,
 }
 
