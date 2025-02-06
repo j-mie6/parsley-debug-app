@@ -23,7 +23,6 @@ impl StateHandle {
 
 impl StateManager for StateHandle {
     fn set_tree(&self, tree: DebugTree) {
-        
         self.0.as_ref().set_tree(tree);
     }
 
@@ -44,9 +43,7 @@ impl StateManager for tauri::AppHandle {
             .set_tree(tree);
 
         /* EMIT TO FRONTEND FROM HERE */
-        self.emit("tree-ready", {
-            
-        }).expect("Could not find ready tree");
+        self.emit("tree-ready", ()).expect("Could not find ready tree");
     }
     
     fn get_tree(&self) -> DebugTree {
