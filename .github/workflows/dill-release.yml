@@ -25,6 +25,7 @@ jobs:
           - platform: 'windows-latest'
 
     runs-on: ${{ matrix.platform }}
+    timeout-minutes: 60
 
 
     steps:
@@ -85,31 +86,58 @@ jobs:
           sbt clean
           sbt -Djava.io.tmpdir=$RUNNER_TEMP update
 
-      - name: Build artifact
+      - name: Build artifact (Linux and Windows)
+        if: matrix.platform == 'windows-latest' || matrix.platform == 'ubuntu-latest'
         shell: bash
         run: |
           RELEASE=true sbt buildFrontend 
           npx tauri build
+      
+      - name: Build artifact (MacOS)
+        if: matrix.platform == 'macos-latest'
+        shell: bash
+        run: |
+          rustup target add aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
+          RELEASE=true sbt buildFrontend 
+          npm run tauri build -- --target universal-apple-darwin
 
-      - name: Upload app executable (Windows only)
+      - name: Upload app executable (Windows)
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: dill-${{ matrix.platform }}.exe
-          path: ./src-tauri/target/release/parsley-debug-app.exe
+          path: ./src-tauri/target/release/dill.exe
           if-no-files-found: error
       
-      - name: Upload app executable (Linux and MacOS)
-        if: matrix.platform != 'windows-latest'
+      - name: Upload app executable (Linux)
+        if: matrix.platform == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: dill-${{ matrix.platform }}
-          path: ./src-tauri/target/release/parsley-debug-app
+          path: ./src-tauri/target/release/dill
           if-no-files-found: error
 
-      - name: Upload app bundles
+      - name: Upload app executable (MacOS)
+        if: matrix.platform == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dill-${{ matrix.platform }}
+          path: ./src-tauri/target/universal-apple-darwin/release/dill
+          if-no-files-found: error
+
+      - name: Upload app bundles (Linux and Windows)
+        if: matrix.platform == 'windows-latest' || matrix.platform == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
             name: dill-bundles-${{ matrix.platform }}
             path: ./src-tauri/target/release/bundle/
+            if-no-files-found: error
+      
+      - name: Upload app bundles (MacOS)
+        if: matrix.platform == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+            name: dill-bundles-${{ matrix.platform }}
+            path: ./src-tauri/target/universal-apple-darwin/release/bundle/
             if-no-files-found: error

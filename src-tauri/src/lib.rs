@@ -1,6 +1,7 @@
 use state::StateHandle;
 use tauri::Manager;
-use std::sync::Mutex;
+use std::sync::{Mutex, MutexGuard};
+use std::collections::HashMap;
 
 mod server;
 mod state;
@@ -11,7 +12,8 @@ pub use debug_tree::{DebugTree, DebugNode};
 
 /* Global app state managed by Tauri */
 struct AppState {
-    tree: Option<DebugTree>
+    tree: Option<DebugTree>, /* Parser tree that we may have */
+    map: HashMap<u32, DebugNode>, /* Map from node_id to the respective node */
 }
 
 impl AppState {
@@ -19,7 +21,24 @@ impl AppState {
     fn new() -> Self {
         AppState {
             tree: None,
+            map: HashMap::new(),
         }
+    }
+
+    /* Set the parser tree */
+    pub fn set_tree(&mut self, tree: DebugTree) {
+        self.map.clear();
+        self.setup_map(tree.get_root());
+        self.tree = Some(tree);
+    }
+
+    fn setup_map(&mut self, debug_node: &DebugNode) {
+        self.map.insert(debug_node.node_id, debug_node.clone());
+        debug_node.children.iter().for_each(|child| self.setup_map(child));
+    }
+
+    pub fn get_debug_node(&self, node_id: u32) -> Option<&DebugNode> {
+        self.map.get(&node_id)
     }
 }
 
@@ -53,12 +72,11 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 /* Run the Tauri app */
 pub fn run() {
     tauri::Builder::default()
-        .setup(|app| setup(app)) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![fetch_debug_tree]) /* Expose render_debug_tree() to frontend */
+        .setup(setup) /* Run app setup */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
-
 
 /* Frontend-accessible debug render */
 #[tauri::command]
@@ -74,7 +92,28 @@ fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
     }
 }
 
+/* Backend reactive fetch children */
+#[tauri::command]
+fn fetch_node_children(state: tauri::State<Mutex<AppState>>, node_id: u32) -> Result<String, FetchChildrenError> {
+    /* Acquire the state mutex to access the corresponding debug node */
+    let state_guard: MutexGuard<AppState> = state.lock().map_err(|_| FetchChildrenError::LockFailed)?;
 
+    /* Find node with corresponding node id */
+    let node: &DebugNode = state_guard
+        .get_debug_node(node_id)
+        .ok_or(FetchChildrenError::NodeNotFound(node_id))?;
+
+    /* Serialise children */
+    serde_json::to_string_pretty(&node.children)
+        .map_err(|_| FetchChildrenError::SerdeError)
+}
+
+#[derive(Debug, serde::Serialize)]
+enum FetchChildrenError {
+    LockFailed,
+    NodeNotFound(u32),
+    SerdeError,
+}
 
 #[cfg(test)]
 mod test {
