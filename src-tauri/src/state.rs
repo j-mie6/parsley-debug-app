@@ -1,5 +1,5 @@
 #[cfg(test)] use mockall::automock;
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 use std::sync::Mutex;
 
 use crate::{AppState, DebugTree, DebugNode};
@@ -23,6 +23,7 @@ impl StateHandle {
 
 impl StateManager for StateHandle {
     fn set_tree(&self, tree: DebugTree) {
+        
         self.0.as_ref().set_tree(tree);
     }
 
@@ -41,6 +42,11 @@ impl StateManager for tauri::AppHandle {
             .lock()
             .expect("Failed to acquire lock")
             .set_tree(tree);
+
+        /* EMIT TO FRONTEND FROM HERE */
+        self.emit("tree-ready", {
+            
+        }).expect("Could not find ready tree");
     }
     
     fn get_tree(&self) -> DebugTree {
