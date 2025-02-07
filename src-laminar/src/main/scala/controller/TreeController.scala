@@ -1,16 +1,21 @@
 package controller
 
 import com.raquo.laminar.api.L.*
-import scala.util.{Try, Success, Failure}
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Try, Success, Failure}
 
 import view.DebugTreeDisplay
-import org.scalablytyped.runtime.StringDictionary
 
 /**
-  * TreeController provides interface for updating DebugTree
+  * Object containing methods for manipulating the DebugTree.
   */
 object TreeController {
+    /**
+      * Fetch the debug tree root from the tauri backend.
+      *
+      * @param displayTree The var that the display tree HTML element will be written into.
+      */
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         for {
             treeString <- Tauri.invoke[String]("fetch_debug_tree")

@@ -7,23 +7,26 @@ import com.raquo.laminar.api.L
 import org.scalajs.dom.console
 
 /**
-  * DisplayTree creates the HTML element to display a DebugTree
-  *
-  * @param child The child HTML element to be rendered
+  * Base class of the Dill Page.
   */
 sealed abstract class BasePage {
-    def render(child: Option[HtmlElement]): HtmlElement
-    final def render(): HtmlElement = render(None)
+  def render(child: Option[HtmlElement]): HtmlElement
+  final def render(): HtmlElement = render(None)
 }
 
 /**
-  * DisplayTree creates the HTML element to display a DebugTree
-  *
-  * @param child The child HTML element to be rendered
+  * Abstract class for a Dill Page.
   */
 abstract class Page extends BasePage {
-    override def render(child: Option[HtmlElement]): HtmlElement = child match {
-        case None => div()
-        case Some(child) => child
-    }
+  
+  /**
+    * Render a page.
+    *
+    * @param child The content to be rendered on the page.
+    * @return
+    */
+  override def render(child: Option[HtmlElement]): HtmlElement = child match {
+      case None => div()
+      case Some(child) => child
+  }
 }
