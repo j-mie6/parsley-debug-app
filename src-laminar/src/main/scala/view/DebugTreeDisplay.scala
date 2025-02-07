@@ -30,8 +30,8 @@ object ReactiveNodeDisplay {
     def apply(node: ReactiveNode): HtmlElement = {
         val newType =  node.debugNode.internal != node.debugNode.name
         div(
-            className := {if newType then "type-box" else ""},
-            p(className := "type-name", {if newType then node.debugNode.name else ""}),
+            className := {if newType then "debug-tree-node-type-box" else ""},
+            p(className := "debug-tree-node-type-name", {if newType then node.debugNode.name else ""}),
     
             DebugNodeDisplay(node.debugNode, 
                 div(when (! node.debugNode.isLeaf) {
@@ -65,9 +65,8 @@ object DebugNodeDisplay {
             onMouseEnter --> { _ => showButtons.set(true)},
             onMouseLeave --> { _ => showButtons.set(false)},
             div(
-                p(fontWeight := "bold", s"Name: ${debugNode.name}", marginBottom.px := 5),
-                p(fontWeight := "bold", s"Internal: ${debugNode.internal}", marginBottom.px := 5),
-                p(fontStyle := "italic", debugNode.input)
+                p(className := "debug-tree-node-name", debugNode.internal),
+                p(className := "italic-text", debugNode.input)
             ),
             buttons.amend(display <-- showButtons.signal.map(if (_) "block" else "none"))
         )

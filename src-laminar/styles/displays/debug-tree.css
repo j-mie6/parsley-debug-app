@@ -68,7 +68,7 @@
   background-color: var(--background-tertiary);
 }
 
-.type-box {
+.debug-tree-node-type-box {
   position: relative;
   padding: 10px;
   top: 5px;
@@ -76,11 +76,21 @@
   border-radius: 10px;
 }
 
-.type-box .type-name {
+.debug-tree-node-type-name {
   position: absolute;
   top: -13px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--background-secondary);
   padding: 0 5px;
+  font-weight: bold;
+}
+
+.debug-tree-node-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.italic-text {
+   font-style: italic;
 }
