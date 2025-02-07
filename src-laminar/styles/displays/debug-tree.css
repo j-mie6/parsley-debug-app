@@ -69,6 +69,18 @@
 }
 
 .type-box {
+  position: relative;
+  padding: 10px;
+  top: 5px;
   border-style: dashed;
-  padding: 20px;
+  border-radius: 10px;
+}
+
+.type-box .type-name {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background-secondary);
+  padding: 0 5px;
 }

@@ -27,27 +27,30 @@ object DebugTreeDisplay {
 
 
 object ReactiveNodeDisplay {
-    def apply(node: ReactiveNode): HtmlElement = div(
-        DebugNodeDisplay(node.debugNode, 
-            div(when (! node.debugNode.isLeaf) {
-                div(
-                    child <-- node.children.signal.map(_.isEmpty).map(
-                        if (_) 
-                            button("Expand", className := "debug-tree-node-button debug-tree-node-button-expand", onClick --> { _ => node.reloadChildren() }) 
-                        else 
-                            button("Compress", className := "debug-tree-node-button debug-tree-node-button-compress", onClick --> { _ => node.resetChildren() })
-                    )
-                )
-            })
-        ),
+    def apply(node: ReactiveNode): HtmlElement = {
+        val newType =  node.debugNode.internal != node.debugNode.name
         div(
-            className := {if node.debugNode.internal != node.debugNode.name then "type-box" else ""},
+            className := {if newType then "type-box" else ""},
+            p(className := "type-name", {if newType then node.debugNode.name else ""}),
+    
+            DebugNodeDisplay(node.debugNode, 
+                div(when (! node.debugNode.isLeaf) {
+                    div(
+                        child <-- node.children.signal.map(_.isEmpty).map(
+                            if (_) 
+                                button("Expand", className := "debug-tree-node-button debug-tree-node-button-expand", onClick --> { _ => node.reloadChildren() }) 
+                            else 
+                                button("Compress", className := "debug-tree-node-button debug-tree-node-button-compress", onClick --> { _ => node.resetChildren() })
+                        )
+                    )
+                })
+            ),
             div(
                 className := "debug-tree-node-container",
                 children <-- node.children.signal.map(_.map((child) => ReactiveNodeDisplay(ReactiveNode(child))))
              ),
         )
-    )
+    }
 }
 
 
