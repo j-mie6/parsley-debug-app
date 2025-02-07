@@ -1,13 +1,13 @@
 import org.scalatest
 import org.scalatest.flatspec.AnyFlatSpec   
 import org.scalatest.matchers.*
+
 import scala.util.{Try, Success, Failure}
 
 import model.DebugTree
 import model.DebugNode
 
 import controller.DebugTreeHandler
-
 
 class Test extends AnyFlatSpec with should.Matchers {
 
@@ -23,7 +23,6 @@ class Test extends AnyFlatSpec with should.Matchers {
             "isLeaf": false
         }
     }"""
-
 
     val tree: DebugTree = DebugTreeHandler.decodeDebugTree(jsonTree).get
     

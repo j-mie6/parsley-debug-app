@@ -15,38 +15,38 @@ import controller.{Tauri, DebugTreeHandler}
   * @param children reactive children updated at runtime
   */
 case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
-    /**
-      * Clear the children from this mode.
-      */
-    def resetChildren(): Unit = { 
-        children.set(Nil)
-    }
-    
-    /**
-      * Query the tauri backend to get the children of this node.
-      */
-    def reloadChildren(): Unit = {
-        for {
-            nodesString: String <- Tauri.invoke[String]("fetch_node_children", Map("nodeId" -> debugNode.nodeId))
-        } do {
-            if (!nodesString.isEmpty) {
-                children.set(
-                    DebugTreeHandler.decodeDebugNodes(nodesString) match {
-                        case Success(nodes) => nodes
-                        case Failure(exception) => {
-                            println(s"Error in decoding debug tree: ${exception.getMessage()}") 
-                            Nil
-                        }
-                    }
-                )
+  /**
+    * Clear the children from this mode.
+    */
+  def resetChildren(): Unit = { 
+    children.set(Nil)
+  }
+  
+  /**
+    * Query the tauri backend to get the children of this node.
+    */
+  def reloadChildren(): Unit = {
+    for {
+      nodesString: String <- Tauri.invoke[String]("fetch_node_children", Map("nodeId" -> debugNode.nodeId))
+    } do {
+      if (!nodesString.isEmpty) {
+        children.set(
+          DebugTreeHandler.decodeDebugNodes(nodesString) match {
+            case Success(nodes) => nodes
+            case Failure(exception) => {
+              println(s"Error in decoding debug tree: ${exception.getMessage()}") 
+              Nil
             }
-        }
+          }
+        )
+      }
     }
+  }
 }
 
 /**
   * Companion object for a ReactiveNode.
   */
 object ReactiveNode {
-    def apply(debugNode: DebugNode): ReactiveNode = ReactiveNode(debugNode, Var(Nil))
+  def apply(debugNode: DebugNode): ReactiveNode = ReactiveNode(debugNode, Var(Nil))
 }

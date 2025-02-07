@@ -26,7 +26,7 @@ abstract class Page extends BasePage {
     * @return
     */
   override def render(child: Option[HtmlElement]): HtmlElement = child match {
-      case None => div()
-      case Some(child) => child
+    case None => div()
+    case Some(child) => child
   }
 }
