@@ -33,7 +33,7 @@ inThisBuild(List(
         Developer("j-mie6", "Jamie Willis", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("Riley-horrix", "Riley Horrix", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("aniket1101", "Aniket Gupta", "", url("https://github.com/j-mie6/parsley-debug-app")),
-        Developer("PriyanshC", "Priyansh Chung", "", url("https://github.com/j-mie6/parsley-debug-app")),
+        Developer("PriyanshC", "Priyansh Chugh", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("Aito0", "Alejandro Perez Fadon", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("AdamW1087", "Adam Watson", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("josh-ja-walker", "Josh Walker", "", url("https://github.com/j-mie6/parsley-debug-app"))
