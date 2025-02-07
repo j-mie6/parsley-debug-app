@@ -3,15 +3,20 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
+
 import controller.Tauri
 
-
 /**
-  * DisplayTree creates the HTML element to display a DebugTree
-  *
-  * @param tree A DebugTree parsed from JSON
+  * Object containing rendering methods for the Debug Tree
   */
 object DebugTreeDisplay {
+    /**
+      * Render the entire tree from the root node downwards.
+      *
+      * @param tree The debug tree to render.
+      * 
+      * @return HTML element representing the whole tree.
+      */
     def apply(tree: DebugTree): HtmlElement = div(
         className := "debug-tree-display",
         h1(
@@ -25,8 +30,20 @@ object DebugTreeDisplay {
     )
 }
 
+/**
+  * Object containing rendering methods for a reactive node (and children).
+  */
+private object ReactiveNodeDisplay {
 
-object ReactiveNodeDisplay {
+    /**
+      * Render a reactive node display. This display enables optional rendering
+      * of children nodes, toggled by ReactiveNode.reloadChildren() and 
+      * ReactiveNode.resetChildren().
+      *
+      * @param node The reactive node structure.
+      * 
+      * @return HTML element representing a reactive node with optional children.
+      */
     def apply(node: ReactiveNode): HtmlElement = div(
         DebugNodeDisplay(node.debugNode, 
             div(when (! node.debugNode.isLeaf) {
@@ -48,11 +65,20 @@ object ReactiveNodeDisplay {
     )
 }
 
-
-/** Renderer for single DebugNode
-  * @param debugNode case class for holding debug values to be rendered
+/**
+  * Object containing render methods for a single debug node.
   */
-object DebugNodeDisplay {
+private object DebugNodeDisplay {
+    /**
+      * Render a debug node. This function returns an HTML element representing
+      * a single node of the tree.
+      *
+      * @param debugNode Representation of the debug node structure.
+      * @param buttons Collapse / expand buttons. They are passed in here so
+      * that the onClick functions can affect the reactive node (parent) object.
+      * 
+      * @return HTML Element representing a debug node.
+      */
     def apply(debugNode: DebugNode, buttons: HtmlElement): HtmlElement ={
         val showButtons: Var[Boolean] = Var(false)
         div(
@@ -67,4 +93,3 @@ object DebugNodeDisplay {
         )
     }
 }
-

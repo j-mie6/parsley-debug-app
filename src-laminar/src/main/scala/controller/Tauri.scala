@@ -9,6 +9,20 @@ import org.scalablytyped.runtime.StringDictionary
 
 import typings.tauriAppsApi.coreMod.{invoke => invokeInternal, InvokeArgs}
 import typings.tauriAppsApi.eventMod.{EventCallback => EventCallbackInternal, listen => listenInternal}
+// import typings.tauriAppsApi.pathMod.
+
+// // import { open } from '@tauri-apps/api/shell';
+// // const openFacebookPage = () => {
+// //   open("https://www.facebook.com/aiocean.io/")
+// // }
+
+// @js.native
+// @JSImport("@tauri-apps/plugin-shell", "open")
+// private def openUrlInternal[T](cmd: String): js.Promise[T] = js.native
+
+// object Tauri {
+//     def invoke[T](cmd: String): Future[T] = tauriInvokeInternal(cmd).toFuture
+
 
 /* Tauri backend interface */
 object Tauri {
@@ -37,4 +51,6 @@ object Tauri {
       * @return Future holding a function to unlisten to the event
       */
     def listen[T](event: String, handler: EventCallbackInternal[T]): Future[js.Function0[Unit]] = listenInternal(event, handler).toFuture
+
+    // def openUrl[T](cmd: String): Future[T] = openUrlInternal(cmd).toFuture
 }

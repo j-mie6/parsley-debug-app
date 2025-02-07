@@ -1,13 +1,14 @@
-#[cfg(test)] use mockall::automock;
-use tauri::{Emitter, Manager};
+#[cfg(test)]
+use mockall::automock;
 use std::sync::Mutex;
+use tauri::{Emitter, Manager};
 
-use crate::{AppState, DebugTree, DebugNode};
+use crate::{AppState, DebugNode, DebugTree};
 
 pub struct StateHandle(Box<dyn StateManager>);
 
 #[cfg_attr(test, automock)]
-pub trait StateManager : Send + Sync + 'static {
+pub trait StateManager: Send + Sync + 'static {
     fn set_tree(&self, tree: DebugTree);
 
     fn get_tree(&self) -> DebugTree;
@@ -16,7 +17,7 @@ pub trait StateManager : Send + Sync + 'static {
 }
 
 impl StateHandle {
-    pub fn new<S : StateManager>(state: S) -> Self {
+    pub fn new<S: StateManager>(state: S) -> Self {
         StateHandle(Box::new(state))
     }
 }
@@ -43,9 +44,10 @@ impl StateManager for tauri::AppHandle {
             .set_tree(tree);
 
         /* EMIT TO FRONTEND FROM HERE */
-        self.emit("tree-ready", ()).expect("Could not find ready tree");
+        self.emit("tree-ready", ())
+            .expect("Could not find ready tree");
     }
-    
+
     fn get_tree(&self) -> DebugTree {
         self.state::<Mutex<AppState>>()
             .lock()

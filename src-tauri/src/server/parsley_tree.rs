@@ -1,22 +1,21 @@
 use crate::{DebugNode, DebugTree};
 
-
 /* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ParsleyNode {
-    name: String, /* The user-defined name */
-    internal: String, /* The internal name of the parser */
-    success: bool, /* Whether the parser was successful */
-    child_id: i64, /* The unique child number of this node */
+    name: String,               /* The user-defined name */
+    internal: String,           /* The internal name of the parser */
+    success: bool,              /* Whether the parser was successful */
+    child_id: i64,              /* The unique child number of this node */
     from_offset: i32, /* Offset into the input in which this node's parse attempt starts */
-    to_offset: i32, /* Offset into the input in which this node's parse attempt finished */
+    to_offset: i32,   /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 pub struct ParsleyTree {
-    input: String, /* The input string being parsed */
+    input: String,     /* The input string being parsed */
     root: ParsleyNode, /* Root node of the debug tree */
 }
 
@@ -30,7 +29,7 @@ impl From<ParsleyTree> for DebugTree {
 
             /* Convert child_id, handling -1 case */
             let child_id: Option<u32> = node.child_id.try_into().ok();
-            
+
             /* Slice the input into input consumed by this node, handling -1 case */
             let input_slice: String = usize::try_from(node.from_offset)
                 .and_then(|from: usize| Ok(from..usize::try_from(node.to_offset)?))
@@ -38,14 +37,15 @@ impl From<ParsleyTree> for DebugTree {
                 .to_string();
 
             /* Recursively convert children into DebugNodes */
-            let children: Vec<DebugNode> = node.children
+            let children: Vec<DebugNode> = node
+                .children
                 .into_iter()
                 .map(|child| convert_node(child, input, current_id))
                 .collect();
 
             /* Instantiate DebugNode */
             DebugNode::new(
-                node_id, 
+                node_id,
                 node.name,
                 node.internal,
                 node.success,
@@ -64,15 +64,13 @@ impl From<ParsleyTree> for DebugTree {
     }
 }
 
-
-
 #[cfg(test)]
 pub mod test {
     /* Data unit testing */
 
+    use super::{ParsleyNode, ParsleyTree};
     use crate::server::request::test::test_tree;
     use crate::{DebugNode, DebugTree};
-    use super::{ParsleyTree, ParsleyNode};
 
     pub const RAW_TREE_SIMPLE: &str = r#"{
             "input": "Test",
@@ -97,16 +95,16 @@ pub mod test {
                 child_id: 0,
                 from_offset: 0,
                 to_offset: 4,
-                children: vec![]
-            }
+                children: vec![],
+            },
         }
     }
 
-
     #[test]
     fn parsley_tree_deserialises() {
-        let parsley_tree: ParsleyTree = serde_json::from_str(&RAW_TREE_SIMPLE).expect("Could not deserialise ParsleyTree");
-        
+        let parsley_tree: ParsleyTree =
+            serde_json::from_str(&RAW_TREE_SIMPLE).expect("Could not deserialise ParsleyTree");
+
         assert_eq!(parsley_tree.input, "Test");
         assert_eq!(parsley_tree.root.name, "Test");
         assert_eq!(parsley_tree.root.internal, "Test");
@@ -171,8 +169,9 @@ pub mod test {
             }
         }"#;
 
-        let parsley_tree: ParsleyTree = serde_json::from_str(&raw_tree).expect("Could not deserialise nested ParsleyTree");
-        
+        let parsley_tree: ParsleyTree =
+            serde_json::from_str(&raw_tree).expect("Could not deserialise nested ParsleyTree");
+
         /* Check that the root tree has been serialised correctly */
         assert_eq!(parsley_tree.input, "01234");
         assert_eq!(parsley_tree.root.name, "0");
@@ -224,12 +223,11 @@ pub mod test {
         assert_eq!(child2_1.children.len(), 0);
     }
 
-    
     #[test]
     fn parsley_debug_tree_converts_into_debug_tree() {
         let parsley_tree: ParsleyTree = test_parsley_tree();
         let debug_tree: DebugTree = test_tree();
-        
+
         assert_eq!(debug_tree, parsley_tree.into());
     }
 
@@ -253,17 +251,15 @@ pub mod test {
                         child_id: 1,
                         from_offset: 1,
                         to_offset: 2,
-                        children: vec![
-                            ParsleyNode {
-                                name: String::from("2"),
-                                internal: String::from("2"),
-                                success: true,
-                                child_id: 2,
-                                from_offset: 2,
-                                to_offset: 3,
-                                children: Vec::new()
-                            }
-                        ]
+                        children: vec![ParsleyNode {
+                            name: String::from("2"),
+                            internal: String::from("2"),
+                            success: true,
+                            child_id: 2,
+                            from_offset: 2,
+                            to_offset: 3,
+                            children: Vec::new(),
+                        }],
                     },
                     ParsleyNode {
                         name: String::from("3"),
@@ -272,74 +268,68 @@ pub mod test {
                         child_id: 3,
                         from_offset: 3,
                         to_offset: 4,
-                        children: vec![
-                            ParsleyNode {
-                                name: String::from("4"),
-                                internal: String::from("4"),
-                                success: true,
-                                child_id: -1,
-                                from_offset: 4,
-                                to_offset: 5,
-                                children: Vec::new()
-                            }
-                        ]
-                    }
-                ]
-            }
+                        children: vec![ParsleyNode {
+                            name: String::from("4"),
+                            internal: String::from("4"),
+                            success: true,
+                            child_id: -1,
+                            from_offset: 4,
+                            to_offset: 5,
+                            children: Vec::new(),
+                        }],
+                    },
+                ],
+            },
         };
 
         let debug_tree: DebugTree = DebugTree::new(
-            String::from("01234"), 
+            String::from("01234"),
             DebugNode::new(
                 0u32,
-                String::from("0"), 
-                String::from("0"), 
-                true, 
-                Some(0), 
-                String::from("0"), 
+                String::from("0"),
+                String::from("0"),
+                true,
+                Some(0),
+                String::from("0"),
                 vec![
                     DebugNode::new(
                         1u32,
-                        String::from("1"), 
-                        String::from("1"), 
-                        true, 
-                        Some(1), 
-                        String::from("1"), 
-                        vec![
-                            DebugNode::new(
-                                2u32,
-                                String::from("2"), 
-                                String::from("2"), 
-                                true, 
-                                Some(2), 
-                                String::from("2"), 
-                                vec![]
-                            )
-                        ]
+                        String::from("1"),
+                        String::from("1"),
+                        true,
+                        Some(1),
+                        String::from("1"),
+                        vec![DebugNode::new(
+                            2u32,
+                            String::from("2"),
+                            String::from("2"),
+                            true,
+                            Some(2),
+                            String::from("2"),
+                            vec![],
+                        )],
                     ),
                     DebugNode::new(
                         3u32,
-                        String::from("3"), 
-                        String::from("3"), 
-                        true, 
-                        Some(3), 
-                        String::from("3"), 
-                        vec![
-                            DebugNode::new(
-                                4u32,
-                                String::from("4"), 
-                                String::from("4"), 
-                                true, 
-                                None, 
-                                String::from("4"), 
-                                vec![]
-                            )
-                        ]
-                    )
-                ]
-            )
+                        String::from("3"),
+                        String::from("3"),
+                        true,
+                        Some(3),
+                        String::from("3"),
+                        vec![DebugNode::new(
+                            4u32,
+                            String::from("4"),
+                            String::from("4"),
+                            true,
+                            None,
+                            String::from("4"),
+                            vec![],
+                        )],
+                    ),
+                ],
+            ),
         );
-        
+
         /* Check ParsleyNode to Node conversion */
         assert_eq!(debug_tree, parsley_debug_tree.into());
     }
