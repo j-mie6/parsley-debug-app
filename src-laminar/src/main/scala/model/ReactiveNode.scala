@@ -16,7 +16,7 @@ import controller.{Tauri, DebugTreeHandler}
   */
 case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
     def resetChildren(): Unit = { 
-        children.set(List[DebugNode]())
+        children.set(Nil)
     }
     
     def reloadChildren(): Unit = {
@@ -28,8 +28,8 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
                     DebugTreeHandler.decodeDebugNodes(nodesString) match {
                         case Success(nodes) => nodes
                         case Failure(exception) => {
-                            println(s"Error in decoding debug tree: ${exception.getMessage()}") 
-                            List[DebugNode]()
+                            println(s"Error in decoding debug tree: ${exception.getMessage}") 
+                            Nil
                         }
                     }
                 )
@@ -40,5 +40,5 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
 
 
 object ReactiveNode {
-    def apply(debugNode: DebugNode): ReactiveNode = ReactiveNode(debugNode, Var(List[DebugNode]()))
+    def apply(debugNode: DebugNode): ReactiveNode = ReactiveNode(debugNode, Var(Nil))
 }
