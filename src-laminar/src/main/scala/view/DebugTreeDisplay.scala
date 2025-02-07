@@ -30,8 +30,10 @@ object ReactiveNodeDisplay {
     def apply(node: ReactiveNode): HtmlElement = {
         val newType =  node.debugNode.internal != node.debugNode.name
         div(
-            className := {if newType then "debug-tree-node-type-box" else ""},
-            p(className := "debug-tree-node-type-name", {if newType then node.debugNode.name else ""}),
+            cls("debug-tree-node-type-box") := newType,
+            when (newType) {
+                p(className := "debug-tree-node-type-name", node.debugNode.name)
+            },
     
             DebugNodeDisplay(node.debugNode, 
                 div(when (! node.debugNode.isLeaf) {
