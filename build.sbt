@@ -169,10 +169,6 @@ dockerBuild := {
 
 
 /* Clean all generated files */
-clean := {
-    clean.value
-}
-
 val cleanHard = taskKey[Unit]("Clean")
 
 cleanHard := {
