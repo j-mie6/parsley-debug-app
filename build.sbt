@@ -82,6 +82,7 @@ lazy val dillFrontend = project
         /* Run npm to link with ScalablyTyped */
         externalNpm := {
             convertCmd("npm").!
+            println()
             baseDirectory.value.getParentFile()
         },
 
@@ -168,11 +169,6 @@ dockerBuild := {
 
 
 /* Clean all generated files */
-clean := {
-    "rm log.txt".!
-    clean.value
-}
-
 val cleanHard = taskKey[Unit]("Clean")
 
 cleanHard := {
