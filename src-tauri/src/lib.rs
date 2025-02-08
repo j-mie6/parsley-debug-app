@@ -3,11 +3,16 @@ use tauri::Manager;
 use std::sync::{Mutex, MutexGuard};
 use std::collections::HashMap;
 
+use std::fs::File;
+use std::io::Write;
+
 mod server;
 mod state;
 mod debug_tree;
+mod saved_tree;
 
 pub use debug_tree::{DebugTree, DebugNode};
+pub use saved_tree::SavedTree;
 
 
 /* Global app state managed by Tauri */
@@ -73,7 +78,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     tauri::Builder::default()
         .setup(setup) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children]) /* Expose render_debug_tree() to frontend */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children, save_debug_tree]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
@@ -113,6 +118,32 @@ enum FetchChildrenError {
     LockFailed,
     NodeNotFound(u32),
     SerdeError,
+}
+
+/* Saves current tree to saved_trees/tree_name.json */
+#[tauri::command]
+fn save_debug_tree(state: tauri::State<Mutex<AppState>>) -> () {
+    /* Acquire the state mutex to access the parser */
+    let tree: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").tree;
+    
+    /* If parser exists, get the JSON equivalent */
+    let tree_json = match tree {
+        Some(tree) => {
+            serde_json::to_string_pretty(&SavedTree::from(tree))
+                .expect("Debug tree could not be serialised")
+        },
+            
+        None => String::from(""),
+    };
+
+    let tree_name: String = String::from("test");
+
+    let file_path = format!("saved_trees/{}.json", tree_name);
+    /* Create the json file to store the tree */
+    let mut data_file = File::create(file_path).expect("File creation failed");
+
+    /* Write tree json to the json file */
+    data_file.write(tree_json.as_bytes()).expect("File write failed");
 }
 
 #[cfg(test)]
