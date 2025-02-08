@@ -22,9 +22,9 @@ case class DebugTree(input: String, root: DebugNode) derives ReadWriter
   * @param children list of children nodes
   * @param isLeaf if a node is a leaf
   */
-case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean) derives ReadWriter
+case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean, 
+        childId: Int, input: String, isLeaf: Boolean) derives ReadWriter
 
 object DebugTree {
-  lazy final val Sample: DebugTree = DebugTree("hi world!", DebugNode(0, "~>", "~>", true, 0, "hi world!", false))
+    lazy final val Sample: DebugTree = DebugTree("hi world!", DebugNode(0, "~>", "~>", true, 0, "hi world!", false))
 }
