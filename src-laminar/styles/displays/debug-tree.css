@@ -67,3 +67,26 @@
   color: var(--font-color-secondary);
   background-color: var(--background-tertiary);
 }
+
+.debug-tree-node-type-box {
+  position: relative;
+  padding: 10px;
+  top: 5px;
+  border-style: dashed;
+  border-radius: 10px;
+}
+
+.debug-tree-node-type-name {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background-secondary);
+  padding: 0 5px;
+  font-weight: bold;
+}
+
+.debug-tree-node-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
