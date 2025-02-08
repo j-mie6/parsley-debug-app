@@ -1,25 +1,25 @@
 .tree-view-page {
-  background-color: var(--background-secondary);
-  padding: 10px;
-  max-height: 85%;
-  overflow: auto;
-  border: 1px solid var(--font-color-primary);
-  border-radius: 20px;
-  box-sizing: border-box;
+    background-color: var(--background-secondary);
+    padding: 10px;
+    max-height: 85%;
+    overflow: auto;
+    border: 1px solid var(--font-color-primary);
+    border-radius: 20px;
+    box-sizing: border-box;
 }
 
 .tree-view-reload {
-  padding-block: 10px;
-  padding-inline: 20px;
-  margin: 0;
-  background: none;
-  text-align: center;
-  color: inherit;
-  border: none;
-  font: inherit;
-  outline: inherit;
-  cursor: pointer;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+    padding-block: 10px;
+    padding-inline: 20px;
+    margin: 0;
+    background: none;
+    text-align: center;
+    color: inherit;
+    border: none;
+    font: inherit;
+    outline: inherit;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }

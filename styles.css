@@ -3,59 +3,59 @@
 @import url('src-laminar/styles/displays/debug-tree.css');
 
 :root {
-  --background-primary: #242526;
-  /* Dark grey. */
-  --background-secondary: #2e2f30;
-  /* Grey. */
-  --background-tertiary: #96dec4;
-  /* Parsley green 60% transparency. */
-  --background-tertiary-60: #96dec499;
-  /* Parsley green 60% transparency. */
-  --background-tertiary-40: #96dec466;
-  /* Parsley green 20% transparency. */
-  --background-tertiary-20: #96dec433;
-  /* Parsley green 20% transparency. */
-  --font-color-primary: #96DEC4;
-  /* Parsley green. */
-  --font-color-secondary: #242526;
-  /* Dark grey. */
-  --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif;
+    --background-primary: #242526;
+    /* Dark grey. */
+    --background-secondary: #2e2f30;
+    /* Grey. */
+    --background-tertiary: #96dec4;
+    /* Parsley green 60% transparency. */
+    --background-tertiary-60: #96dec499;
+    /* Parsley green 60% transparency. */
+    --background-tertiary-40: #96dec466;
+    /* Parsley green 20% transparency. */
+    --background-tertiary-20: #96dec433;
+    /* Parsley green 20% transparency. */
+    --font-color-primary: #96DEC4;
+    /* Parsley green. */
+    --font-color-secondary: #242526;
+    /* Dark grey. */
+    --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif;
 }
 
 [data-theme="light"] {
-  --background-primary: #96dec4;
-  /* Parsley green. */
-  --background-secondary: #b8eeda;
-  /* Lighter grey. */
-  --background-tertiary: #242526;
-  /* Grey 60% transparency. */
-  --background-tertiary-60: #24252699;
-  /* Grey 60% transparency. */
-  --background-tertiary-40: #24252666;
-  /* Grey 60% transparency. */
-  --background-tertiary-20: #24252633;
-  /* Grey 20% transparancy. */
-  --font-color-primary: #242526;
-  /* Black. */
-  --font-color-secondary: #96DEC4;
-  /* Parsley green. */
+    --background-primary: #96dec4;
+    /* Parsley green. */
+    --background-secondary: #b8eeda;
+    /* Lighter grey. */
+    --background-tertiary: #242526;
+    /* Grey 60% transparency. */
+    --background-tertiary-60: #24252699;
+    /* Grey 60% transparency. */
+    --background-tertiary-40: #24252666;
+    /* Grey 60% transparency. */
+    --background-tertiary-20: #24252633;
+    /* Grey 20% transparancy. */
+    --font-color-primary: #242526;
+    /* Black. */
+    --font-color-secondary: #96DEC4;
+    /* Parsley green. */
 }
 
 body {
-  background-color: var(--background-primary);
-  color: var(--font-color-primary);
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-family);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    background-color: var(--background-primary);
+    color: var(--font-color-primary);
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 * {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 a {
-  color: inherit;
+    color: inherit;
 }
