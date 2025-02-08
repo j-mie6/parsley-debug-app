@@ -17,15 +17,15 @@ import controller.Tauri
 object TreeViewPage extends DebugViewPage {
     private val displayTree: Var[HtmlElement] = Var(DebugTreeDisplay(DebugTree.Sample))
     
-    private lazy val reloadIcon: HtmlElement = i(className := "bi bi-arrow-clockwise", fontSize.px := 25, marginRight.px := 10)
+    private lazy val saveIcon: HtmlElement = i(className := "bi bi-download", fontSize.px := 25, marginRight.px := 10)
 
-    private lazy val reloadButton: Element = button(
-        className := "tree-view-reload",
+    private lazy val saveButton: Element = button(
+        className := "tree-view-save",
         
-        reloadIcon,
-        "Reload tree",
+        saveIcon,
+        "Save tree",
 
-        onClick --> { _ => TreeController.reloadTree(displayTree)}
+        onClick --> { _ => TreeController.saveTree(displayTree)}
     )
 
     def apply(): HtmlElement = {
@@ -33,7 +33,7 @@ object TreeViewPage extends DebugViewPage {
         super.render(Some(div(
             className := "tree-view-page",
 
-            reloadButton,
+            saveButton,
             child <-- displayTree
         )))
     }

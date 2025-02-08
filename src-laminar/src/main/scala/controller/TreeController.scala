@@ -23,4 +23,9 @@ object TreeController {
                     }
             )
         }
+
+    def saveTree(displayTree: Var[HtmlElement]): Unit = {
+        Tauri.invoke[String]("save_debug_tree")
+    }
+
 }
