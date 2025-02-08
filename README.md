@@ -1,4 +1,4 @@
-# Dill ![Github Workflow Status](https://img.shields.io/github/actions/workflow/status/j-mie6/parsley-debug-app/dill-ci.yml?branch=release) ![Github release](https://img.shields.io/github/v/release/j-mie6/parsley-debug-app) ![Github license](https://img.shields.io/github/license/j-mie6/parsley-debug-app) 
+# Dill ![Github Workflow Status](https://img.shields.io/github/actions/workflow/status/j-mie6/parsley-debug-app/dill-ci.yml?branch=main) ![Github release](https://img.shields.io/github/v/release/j-mie6/parsley-debug-app) ![Github license](https://img.shields.io/github/license/j-mie6/parsley-debug-app) 
 
 
 ## What is Dill?
