@@ -23,7 +23,7 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
     }
   
     /**
-      * Query the tauri backend to get the children of this node.
+      * Query the Tauri backend to get the children of this node.
       */
     def reloadChildren(): Unit = {
         for {
