@@ -68,7 +68,7 @@ object DebugNodeDisplay {
             onMouseLeave --> { _ => showButtons.set(false)},
             div(
                 p(className := "debug-tree-node-name", debugNode.internal),
-                p(className := "italic-text", debugNode.input)
+                p(fontStyle := "italic", debugNode.input)
             ),
             buttons.amend(display <-- showButtons.signal.map(if (_) "block" else "none"))
         )
