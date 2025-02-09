@@ -154,7 +154,7 @@ build := {
 }
 
 
-/* Run project - instal dependencies, build frontend then run backend */
+/* Run project - install dependencies, build frontend then run backend */
 run := {
     setup.value
     buildFrontend.value
