@@ -11,7 +11,7 @@
 .tree-view-error {
   color: var(--font-color-error); 
   background-color: var(--background-tertiary);
-  border: 3px solid var(--font-color-error);
+  border: 2px solid var(--font-color-error);
 
   font-weight: bold;
   text-align: center;
