@@ -171,7 +171,7 @@ setup := {
 
 
 /* Build project in Docker */
-val dockerBuild = taskKey[Unit]("Build the project onto a docker machine, running the application.")
+val dockerBuild = taskKey[Unit]("Build the project onto a Docker machine, running the application.")
 
 dockerBuild := {
     print("Copying Files... ")
