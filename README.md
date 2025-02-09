@@ -20,14 +20,14 @@ You will first need to [install](#how-do-i-install-it) / [build](#building) the 
 - Import the `DillRemoteView` object from `parsley.debug`.
 - Then on the parser which you would like to debug, attach the `DillRemoteView` object, before the parse step.
 
-**`test.sc`**: the following `scala` script uses `Parsley 5.0.0-M10`
+**`test.sc`**: the following `scala` script uses `Parsley 5.0.0-M12`
 
 ```scala
 
 //> using repository sonatype-s01:snapshots
 
-//> using dep com.github.j-mie6::parsley:5.0.0-M10
-//> using dep com.github.j-mie6::parsley-debug:5.0.0-M10 
+//> using dep com.github.j-mie6::parsley:5.0.0-M12
+//> using dep com.github.j-mie6::parsley-debug:5.0.0-M12 
 //> using dep com.github.j-mie6::parsley-debug-remote::0.1-ac6943f-SNAPSHOT
 //> using options -experimental
 
