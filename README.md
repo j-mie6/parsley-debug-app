@@ -58,7 +58,7 @@ You will then be able to view a representation of the abstract syntax tree gener
 
 ## Building
 
-The frontend of the application is written using `ScalaJS`, and uses the `sbt` build system, the frontend compiles down to a single `JavaScript` file located in `./static`. The backend uses the `Tauri` package to host the frontend, and the `Rocket` package to host a server to receive the tree from `Parsley`. We use `npm` to manage the various packages.
+The frontend of the application is written using [`ScalaJS`](https://www.scala-js.org/) and [`Laminar`](https://laminar.dev/), and uses the `sbt` build system, the frontend compiles down to a single `JavaScript` file located in `./static`. The backend uses the [`Tauri`](https://v2.tauri.app/) package to host the frontend, and the [`Rocket`](https://rocket.rs/) package to host a server to receive the tree from `Parsley`. We use `npm` to manage the various packages.
 
 **To run the project, execute `sbt run`:**
 
@@ -66,7 +66,7 @@ This will install the node packages required to build the project, build the fro
 
 **To run the project in development mode, execute:**
 - `sbt ~buildFrontend` to start the sbt frontend development server.
-- `sbt runBackend` in a different terminal to start the `Tauri` app.
+- `sbt runBackend` in a different terminal to start the [`Tauri`](https://v2.tauri.app/) app.
 
 _This will cause a quick-reload when any of the source files are modified._
 
@@ -79,7 +79,7 @@ Then, create a new [issue](https://github.com/j-mie6/parsley-debug-app/issues) -
 
 ## How does it work?
 
-- The `remote-view` backend for `parsley-debug` posts the debug tree from the parser to the Rocket HTTP server running within the `Dill` debugger.
-- The `Rocket` server transforms and passes off a representation of the debug tree to the `Tauri` application in `Rust`.
-- The frontend then queries the `Tauri` application for the debug tree.
+- The `remote-view` backend for `parsley-debug` posts the debug tree from the parser to the [`Rocket`](https://rocket.rs/) HTTP server running within the `Dill` debugger.
+- The [`Rocket`](https://rocket.rs/) server transforms and passes off a representation of the debug tree to the [`Tauri`](https://v2.tauri.app/) application in `Rust`.
+- The frontend then queries the [`Tauri`](https://v2.tauri.app/) application for the debug tree.
 - Upon receiving of the tree, the frontend renders the tree on the screen.
