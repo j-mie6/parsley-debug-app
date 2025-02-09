@@ -12,13 +12,13 @@ pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
 /* Frontend-accessible debug render */
 #[tauri::command]
 fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
-    /* Acquire the state mutex to access the parser */
-    let tree: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").tree;
+    /* Acquire the state mutex to access the tree */
+    let state_guard: MutexGuard<AppState> = state.lock().expect("State mutex could not be acquired");
+    let tree: Option<&DebugTree> = state_guard.get_tree();
     
     /* If parser exists, render in JSON */
     match tree {
-        Some(tree) => serde_json::to_string_pretty(tree)
-            .expect("Debug tree could not be serialised"),
+        Some(tree) => serde_json::to_string_pretty(tree).expect("Debug tree could not be serialised"),
         None => String::from(""),
     }
 }
