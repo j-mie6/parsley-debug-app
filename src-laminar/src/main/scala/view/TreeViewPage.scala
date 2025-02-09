@@ -19,6 +19,7 @@ object TreeViewPage extends DebugViewPage {
     
     private lazy val saveIcon: HtmlElement = i(className := "bi bi-download", fontSize.px := 25, marginRight.px := 10)
 
+    /* Adds ability to save and store current tree. */
     private lazy val saveButton: Element = button(
         className := "tree-view-save",
         
@@ -28,8 +29,11 @@ object TreeViewPage extends DebugViewPage {
         onClick --> { _ => TreeController.saveTree()}
     )
 
+    /* List of file names (excluding path and ext) wrapped in Var*/
     var fileNames: Var[List[String]] = Var(List())
 
+    /* Renders a list of buttons which will reload to 
+        whatever tree is pressed on */
     val treeList: Var[HtmlElement] = Var(
       div(
         children <-- fileNames.signal.map(names =>
@@ -41,6 +45,7 @@ object TreeViewPage extends DebugViewPage {
       )
     )
 
+    /* Button which updates fileNames with json file names. */
     private lazy val getButton: Element = button(
         className := "tree-view-save",
         
@@ -54,10 +59,12 @@ object TreeViewPage extends DebugViewPage {
         super.render(Some(div(
             className := "tree-view-page",
 
-            saveButton,
-            getButton,
             child <-- displayTree,
+            /* 
+            This will display the name of each json file stored
             child <-- treeList.signal
+            */
+            
         )))
     }
 }
