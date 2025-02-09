@@ -4,7 +4,7 @@ use std::sync::{Mutex, MutexGuard};
 use std::collections::HashMap;
 
 
-use std::fs::{File, read_dir};
+use std::fs::{File, read_dir, read_to_string};
 use std::io::Write;
 
 mod server;
@@ -79,7 +79,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     tauri::Builder::default()
         .setup(setup) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children, save_debug_tree, get_saved_trees]) /* Expose render_debug_tree() to frontend */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children, save_debug_tree, get_saved_trees, reload_tree]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
@@ -165,6 +165,30 @@ fn get_saved_trees() -> Result<String, FetchChildrenError>  {
     serde_json::to_string_pretty(&names)
         .map_err(|_| FetchChildrenError::SerdeError)
 }
+
+#[tauri::command]
+fn reload_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<String, FetchChildrenError>  {
+    let dir: &str = "./saved_trees/";
+    let ext: &str = ".json";
+
+
+    let file_path = format!("{}{}{}", dir, name, ext);
+
+    let contents = read_to_string(file_path)
+        .expect("Should have been able to read the file");
+
+    let saved_tree: SavedTree = serde_json::from_str(&contents).expect("Could not deserialise SavedTree");
+    let tree = DebugTree::from(&saved_tree);
+
+    state
+        .lock()
+        .expect("Failed to acquire lock")
+        .set_tree(tree);
+
+    Ok(String::from("Successfully reloaded the tree"))
+
+}
+
 #[cfg(test)]
 mod test {
     

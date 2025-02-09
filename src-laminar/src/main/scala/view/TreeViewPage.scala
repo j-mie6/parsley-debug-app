@@ -33,7 +33,10 @@ object TreeViewPage extends DebugViewPage {
     val treeList: Var[HtmlElement] = Var(
       div(
         children <-- fileNames.signal.map(names =>
-          names.map(item => div(item)): Seq[HtmlElement]
+          names.map(name => button(
+            name,
+            onClick --> {_ => TreeController.reloadTree(name, displayTree)}
+            )): Seq[HtmlElement]
         )
       )
     )

@@ -1,13 +1,13 @@
 use crate::{DebugNode, DebugTree};
 
 /* Struct identical to DebugTree that allows serialized saving */
-#[derive(serde::Serialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SavedTree {
     input: String,
     root: SavedNode,
 }
 
-#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SavedNode {
     pub node_id: u32,
     pub name: String,
@@ -22,37 +22,46 @@ pub struct SavedNode {
 impl From<&DebugTree> for SavedTree {
     fn from(debug_tree: &DebugTree) -> Self {
 
-      fn convert_node(node: DebugNode) -> SavedNode {
-        /* Recursively convert children into SavedNodes */
-        let children: Vec<SavedNode> = node.children
-            .into_iter()
-            .map(|child| convert_node(child))
-            .collect();
-
-        /* Instantiate SavedNode */
-        SavedNode::new(
-            node.node_id, 
-            node.name,
-            node.internal,
-            node.success,
-            node.child_id,
-            node.input,
-            children,
-            node.is_leaf
-        )
-      }
-      let node: SavedNode = convert_node(debug_tree.get_root().clone());
-
-      SavedTree::new(debug_tree.get_input().clone(), node)
+        fn convert_node(node: DebugNode) -> SavedNode {
+            /* Recursively convert children into SavedNodes */
+            let children: Vec<SavedNode> = node.children
+                .into_iter()
+                .map(|child| convert_node(child))
+                .collect();
+    
+            /* Instantiate SavedNode */
+            SavedNode::new(
+                node.node_id, 
+                node.name,
+                node.internal,
+                node.success,
+                node.child_id,
+                node.input,
+                children,
+                node.is_leaf
+            )
+        }
+        let node: SavedNode = convert_node(debug_tree.get_root().clone());
+  
+        SavedTree::new(debug_tree.get_input().clone(), node)
     }
 }
+
 impl SavedTree {
-  pub fn new(input: String, root: SavedNode) -> Self {
-      SavedTree { 
-          input,
-          root
-      }
-  }
+    pub fn new(input: String, root: SavedNode) -> Self {
+        SavedTree { 
+            input,
+            root
+        }
+    }
+
+    pub fn get_root(&self) -> &SavedNode {
+        &self.root
+    }
+
+    pub fn get_input(&self) -> &String {
+        &self.input
+    }
 }
 
 impl SavedNode {
