@@ -1,6 +1,6 @@
-@import url('src-laminar/styles/pages/debug-view.css');
-@import url('src-laminar/styles/pages/tree-view.css');
-@import url('src-laminar/styles/displays/debug-tree.css');
+@import url('frontend/styles/pages/debug-view.css');
+@import url('frontend/styles/pages/tree-view.css');
+@import url('frontend/styles/displays/debug-tree.css');
 
 :root {
   --background-primary: #242526;	/* Dark grey. */
