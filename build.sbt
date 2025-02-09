@@ -60,7 +60,7 @@ lazy val commonSettings = Seq(
 
 /* Setup for Laminar */
 lazy val dillFrontend = project
-    .in(file("src-laminar"))
+    .in(file("frontend"))
     .enablePlugins(ScalaJSPlugin, ScalablyTypedConverterExternalNpmPlugin)
     .settings(
         /* Scala JS/ScalablyTyped settings */
@@ -159,7 +159,7 @@ val dockerBuild = taskKey[Unit]("Build the project onto a docker machine, runnin
 
 dockerBuild := {
     print("Copying Files... ")
-    "scp -o StrictHostKeyChecking=no -r -P 2222 ./src ./src-tauri root@localhost:/home >> logs".!
+    "scp -o StrictHostKeyChecking=no -r -P 2222 ./src ./backend root@localhost:/home >> logs".!
     println("done")
 
     println("Building frontend... ")
@@ -187,12 +187,12 @@ cleanHard := {
     "rm -rf static/".!
     println("done")
 
-    print("Removing Tauri targets... ")
-    "rm -rf src-tauri/target/".!
+    print("Removing backend targets... ")
+    "rm -rf backend/target/".!
     println("done")
     
-    print("Removing Laminar targets... ")
-    "rm -rf src-laminar/target/".!
+    print("Removing frontend targets... ")
+    "rm -rf frontend/target/".!
     println("done")
 
     /* Apply default clean */
