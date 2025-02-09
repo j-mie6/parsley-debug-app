@@ -15,7 +15,7 @@ import controller.Tauri
 
 
 object TreeViewPage extends DebugViewPage {
-    private val displayTree: Var[HtmlElement] = Var(DebugTreeDisplay(DebugTree.Sample))
+    private val displayTree: Var[HtmlElement] = Var(p("No tree found - start debugging by attaching DillRemoteView to a parser"))
     
     def apply(): HtmlElement = {
         Tauri.listen[Unit]("tree-ready", {_ => TreeController.reloadTree(displayTree)})
