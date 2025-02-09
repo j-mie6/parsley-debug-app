@@ -3,23 +3,29 @@
   padding: 10px;
   max-height: 85%;
   overflow: auto;
-  border: 1px solid var(--font-color-primary);
+  border: 2px solid var(--font-color-primary);
   border-radius: 20px;
   box-sizing: border-box;
 }
 
-.tree-view-reload {
-  padding-block: 10px;
-  padding-inline: 20px;
-  margin: 0;
-  background: none;
+.tree-view-error {
+  color: var(--font-color-error); 
+  background-color: var(--background-tertiary);
+  border: 3px solid var(--font-color-error);
+
+  font-weight: bold;
   text-align: center;
-  color: inherit;
-  border: none;
-  font: inherit;
-  outline: inherit;
-  cursor: pointer;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+
+  width: 30%;
+
+  margin: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+
+  padding: 1.5em;
+  padding-right: 2em;
+  padding-left: 2em;
+  
+  border-radius: 20px;
+  box-sizing: border-box;
 }
