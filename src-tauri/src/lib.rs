@@ -1,11 +1,12 @@
 use state::StateHandle;
 use tauri::Manager;
-use std::sync::{Mutex, MutexGuard};
+use std::sync::Mutex;
 use std::collections::HashMap;
 
 mod server;
 mod state;
 mod debug_tree;
+mod commands;
 
 pub use debug_tree::{DebugTree, DebugNode};
 
@@ -73,47 +74,12 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     tauri::Builder::default()
         .setup(setup) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children]) /* Expose render_debug_tree() to frontend */
+        .invoke_handler(commands::handlers()) /* Expose Tauri commands to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
 
-/* Frontend-accessible debug render */
-#[tauri::command]
-fn fetch_debug_tree(state: tauri::State<Mutex<AppState>>) -> String {
-    /* Acquire the state mutex to access the parser */
-    let tree: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").tree;
-    
-    /* If parser exists, render in JSON */
-    match tree {
-        Some(tree) => serde_json::to_string_pretty(tree)
-            .expect("Debug tree could not be serialised"),
-        None => String::from(""),
-    }
-}
 
-/* Backend reactive fetch children */
-#[tauri::command]
-fn fetch_node_children(state: tauri::State<Mutex<AppState>>, node_id: u32) -> Result<String, FetchChildrenError> {
-    /* Acquire the state mutex to access the corresponding debug node */
-    let state_guard: MutexGuard<AppState> = state.lock().map_err(|_| FetchChildrenError::LockFailed)?;
-
-    /* Find node with corresponding node id */
-    let node: &DebugNode = state_guard
-        .get_debug_node(node_id)
-        .ok_or(FetchChildrenError::NodeNotFound(node_id))?;
-
-    /* Serialise children */
-    serde_json::to_string_pretty(&node.children)
-        .map_err(|_| FetchChildrenError::SerdeError)
-}
-
-#[derive(Debug, serde::Serialize)]
-enum FetchChildrenError {
-    LockFailed,
-    NodeNotFound(u32),
-    SerdeError,
-}
 
 #[cfg(test)]
 mod test {
