@@ -24,8 +24,13 @@ object TreeController {
             )
         }
 
-    def saveTree(displayTree: Var[HtmlElement]): Unit = {
+    def saveTree(): Unit = 
         Tauri.invoke[String]("save_debug_tree")
-    }
+    
 
+    def getTrees(fileNames: Var[List[String]]): Unit = {
+        Tauri.invoke[String]("get_saved_trees").foreach { names =>
+            fileNames.update(_ => names.split(",").toList)
+        }
+    }
 }

@@ -25,7 +25,25 @@ object TreeViewPage extends DebugViewPage {
         saveIcon,
         "Save tree",
 
-        onClick --> { _ => TreeController.saveTree(displayTree)}
+        onClick --> { _ => TreeController.saveTree()}
+    )
+
+    var fileNames: Var[List[String]] = Var(List())
+
+    val treeList: Var[HtmlElement] = Var(
+      div(
+        children <-- fileNames.signal.map(names =>
+          names.map(item => div(item)): Seq[HtmlElement]
+        )
+      )
+    )
+
+    private lazy val getButton: Element = button(
+        className := "tree-view-save",
+        
+        "Get trees",
+
+        onClick --> { _ => TreeController.getTrees(fileNames)}
     )
 
     def apply(): HtmlElement = {
@@ -34,7 +52,9 @@ object TreeViewPage extends DebugViewPage {
             className := "tree-view-page",
 
             saveButton,
-            child <-- displayTree
+            getButton,
+            child <-- displayTree,
+            child <-- treeList.signal
         )))
     }
 }

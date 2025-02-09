@@ -3,7 +3,8 @@ use tauri::Manager;
 use std::sync::{Mutex, MutexGuard};
 use std::collections::HashMap;
 
-use std::fs::File;
+
+use std::fs::{File, read_dir};
 use std::io::Write;
 
 mod server;
@@ -78,7 +79,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     tauri::Builder::default()
         .setup(setup) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children, save_debug_tree]) /* Expose render_debug_tree() to frontend */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children, save_debug_tree, get_saved_trees]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
@@ -146,6 +147,24 @@ fn save_debug_tree(state: tauri::State<Mutex<AppState>>) -> () {
     data_file.write(tree_json.as_bytes()).expect("File write failed");
 }
 
+#[tauri::command]
+fn get_saved_trees() -> Result<String, FetchChildrenError>  {
+    let dir: &str = "./saved_trees/";
+    let ext: &str = ".json";
+
+    let paths = read_dir(dir).unwrap();
+
+    let mut names: Vec<String> = Vec::new();
+    for path in paths {
+        let file_name: String = path.unwrap().file_name().into_string().ok().expect("Error getting filename");
+        let name: &str = file_name.strip_suffix(ext).expect("File extension should be json");
+        names.push(String::from(name));
+    }
+
+    /* Serialise names */
+    serde_json::to_string_pretty(&names)
+        .map_err(|_| FetchChildrenError::SerdeError)
+}
 #[cfg(test)]
 mod test {
     
