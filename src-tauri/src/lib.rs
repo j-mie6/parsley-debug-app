@@ -167,28 +167,28 @@ enum SaveTreeError {
 
 /* Returns a list of filenames in saved_trees */
 #[tauri::command]
-fn get_saved_trees() -> Result<String, TreeFilesError>  {
+fn get_saved_trees() -> Result<String, TreeSaveError>  {
     const DIR: &str = "./saved_trees/";
 
     /* Get all path names inside the saved_trees folder */
     let paths: ReadDir = read_dir(DIR).unwrap();
 
     /* Strip off the extension and add only the name to names */
-    let mut names: Vec<String> = Vec::new();
-    for path in paths {
-        let file_name: String = path.map_err(|_| TreeFilesError::ReadPathError)?.file_name().into_string().map_err(|_| TreeFilesError::IntoStringError)?;
-        let name: &str = file_name.strip_suffix(".json").ok_or(TreeFilesError::StripSuffixError)?;
-
-        names.push(String::from(name));
-    }
+    let names: Vec<String> = paths.into_iter()
+        .map(|path| {
+            let path = path.map_err(|_| TreeSaveError::ReadPathError)?;
+            let file_name = path.file_name().into_string().map_err(|_| TreeSaveError::IntoStringError)?;
+            let name = file_name.strip_suffix(".json").ok_or(TreeSaveError::StripSuffixError)?;
+            Ok(name.to_string())
+        }).collect::<Result<Vec<String>, TreeSaveError>>()?;
 
     /* Serialise names */
     serde_json::to_string_pretty(&names)
-        .map_err(|_| TreeFilesError::SerdeError)
+        .map_err(|_| TreeSaveError::SerdeError)
 }
 
 #[derive(Debug, serde::Serialize)]
-enum TreeFilesError {
+enum TreeSaveError {
     ReadPathError,
     IntoStringError,
     StripSuffixError,
