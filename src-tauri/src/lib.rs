@@ -4,7 +4,7 @@ use std::sync::{Mutex, MutexGuard};
 use std::collections::HashMap;
 
 
-use std::fs::{File, read_dir, read_to_string};
+use std::fs::{read_dir, read_to_string, File, ReadDir};
 use std::io::Write;
 
 mod server;
@@ -121,72 +121,105 @@ enum FetchChildrenError {
     SerdeError,
 }
 
-/* Saves current tree to saved_trees/tree_name.json */
+/* Saves current tree to saved_trees/name.json */
 #[tauri::command]
-fn save_debug_tree(state: tauri::State<Mutex<AppState>>) -> () {
+fn save_debug_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), SaveTreeError> {
     /* Acquire the state mutex to access the parser */
-    let tree: &Option<DebugTree> = &state.lock().expect("State mutex could not be acquired").tree;
+    let guard: MutexGuard<AppState> = state.lock().map_err(|_| SaveTreeError::LockFailed)?; // Use `map_err` to convert the error
+    let tree: &Option<DebugTree> = &guard.tree; // Access the `tree` field from the locked state
     
-    /* If parser exists, get the JSON equivalent */
-    let tree_json = match tree {
+    /* If tree exists, get the JSON equivalent */
+    let tree_json: String = match tree {
         Some(tree) => {
             serde_json::to_string_pretty(&SavedTree::from(tree))
-                .expect("Debug tree could not be serialised")
+                .map_err(|_| SaveTreeError::SerdeError)?
         },
             
         None => String::from(""),
     };
 
-    let tree_name: String = String::from("test");
+    if !tree_json.is_empty() {
+        /* Create the json file to store the tree */
+        let file_path: String = format!("saved_trees/{}.json", name);
+        let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateError)?;
 
-    let file_path = format!("saved_trees/{}.json", tree_name);
-    /* Create the json file to store the tree */
-    let mut data_file = File::create(file_path).expect("File creation failed");
+        /* Write tree json to the json file */
+        data_file.write(tree_json.as_bytes()).map_err(|_| SaveTreeError::WriteError)?;
+    }
 
-    /* Write tree json to the json file */
-    data_file.write(tree_json.as_bytes()).expect("File write failed");
+    Ok(())
 }
 
+#[derive(Debug, serde::Serialize)]
+enum SaveTreeError {
+    LockFailed,
+    SerdeError,
+    CreateError,
+    WriteError,
+}
+
+/* Returns a list of filenames in saved_trees */
 #[tauri::command]
-fn get_saved_trees() -> Result<String, FetchChildrenError>  {
+fn get_saved_trees() -> Result<String, GetTreesError>  {
     let dir: &str = "./saved_trees/";
     let ext: &str = ".json";
 
-    let paths = read_dir(dir).unwrap();
+    /* Get all path names inside the saved_trees folder */
+    let paths: ReadDir = read_dir(dir).unwrap();
 
+    /* Strip off the extension and add only the name to names */
     let mut names: Vec<String> = Vec::new();
     for path in paths {
-        let file_name: String = path.unwrap().file_name().into_string().ok().expect("Error getting filename");
-        let name: &str = file_name.strip_suffix(ext).expect("File extension should be json");
+        let file_name: String = path.map_err(|_| GetTreesError::ReadPathError)?.file_name().into_string().map_err(|_| GetTreesError::IntoStringError)?;
+        let name: &str = file_name.strip_suffix(ext).ok_or(GetTreesError::StripSuffixError)?;
+
         names.push(String::from(name));
     }
 
     /* Serialise names */
     serde_json::to_string_pretty(&names)
-        .map_err(|_| FetchChildrenError::SerdeError)
+        .map_err(|_| GetTreesError::SerdeError)
 }
 
+#[derive(Debug, serde::Serialize)]
+enum GetTreesError {
+    ReadPathError,
+    IntoStringError,
+    StripSuffixError,
+    SerdeError,
+}
+
+/* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
-fn reload_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<String, FetchChildrenError>  {
+fn reload_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), ReloadTreeError>  {
     let dir: &str = "./saved_trees/";
     let ext: &str = ".json";
 
+    /* Get the file path of the tree to be reloaded */
+    let file_path: String = format!("{}{}{}", dir, name, ext);
 
-    let file_path = format!("{}{}{}", dir, name, ext);
+    /* Read the contents of the file as a string */
+    let contents: String = read_to_string(file_path)
+        .map_err(|_| ReloadTreeError::ReadFileError)?;
 
-    let contents = read_to_string(file_path)
-        .expect("Should have been able to read the file");
+    /* Deserialize the tree into SavedTree, then convert to DebugTree */
+    let saved_tree: SavedTree = serde_json::from_str(&contents).map_err(|_| ReloadTreeError::SerdeError)?;
+    let tree: DebugTree = DebugTree::from(&saved_tree);
 
-    let saved_tree: SavedTree = serde_json::from_str(&contents).expect("Could not deserialise SavedTree");
-    let tree = DebugTree::from(&saved_tree);
-
+    /* Update the global tauri state with the reloaded tree */
     state
         .lock()
-        .expect("Failed to acquire lock")
+        .map_err(|_| ReloadTreeError::LockingError)?
         .set_tree(tree);
 
-    Ok(String::from("Successfully reloaded the tree"))
+    Ok(())
+}
 
+#[derive(Debug, serde::Serialize)]
+enum ReloadTreeError {
+    ReadFileError,
+    SerdeError,
+    LockingError,
 }
 
 #[cfg(test)]
