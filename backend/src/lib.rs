@@ -2,13 +2,19 @@ use std::sync::Mutex;
 
 use tauri::Manager;
 
-mod debug_tree;
 mod server;
 mod state;
 mod commands;
+mod saved_tree;
+mod debug_tree;
 
-pub use debug_tree::{DebugTree, DebugNode};
+use debug_tree::{DebugTree, DebugNode};
 use state::{AppState, StateHandle};
+
+
+/* Directory for saved trees. */
+const SAVED_TREE_DIR : &str = "./saved_trees/";
+
 
 /* Setup Tauri app */
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
@@ -26,6 +32,11 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     /* Clone the app handle for use by Rocket state */
     let handle: tauri::AppHandle = app.handle().clone();
 
+    /* If the folder for saved_trees does not exist, create it. */
+    if !std::path::Path::new(SAVED_TREE_DIR).exists() {
+        std::fs::create_dir(SAVED_TREE_DIR)?;
+    }
+    
     /* Mount the Rocket server to the running instance of Tauri */
     tauri::async_runtime::spawn(async move {
         server::launch(StateHandle::new(handle))

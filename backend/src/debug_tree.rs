@@ -1,3 +1,5 @@
+use crate::saved_tree::{SavedTree, SavedNode};
+
 /* Placeholder ParserInfo structures for state management */
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
 pub struct DebugTree {
@@ -16,6 +18,33 @@ impl DebugTree {
 
     pub fn get_input(&self) -> &String {
         &self.input
+    }
+}
+
+impl From<&SavedTree> for DebugTree {
+    fn from(debug_tree: &SavedTree) -> Self {
+
+      fn convert_node(node: SavedNode) -> DebugNode {
+        /* Recursively convert children into SavedNodes */
+        let children: Vec<DebugNode> = node.children
+            .into_iter()
+            .map(|child| convert_node(child))
+            .collect();
+
+        /* Instantiate SavedNode */
+        DebugNode::new(
+            node.node_id, 
+            node.name,
+            node.internal,
+            node.success,
+            node.child_id,
+            node.input,
+            children,
+        )
+      }
+      let node: DebugNode = convert_node(debug_tree.get_root().clone());
+
+      DebugTree::new(debug_tree.get_input().clone(), node)
     }
 }
 
