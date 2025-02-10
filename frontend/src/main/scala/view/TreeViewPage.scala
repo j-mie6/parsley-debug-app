@@ -34,15 +34,15 @@ object TreeViewPage extends DebugViewPage {
 
     /* Renders a list of buttons which will reload to 
         whatever tree is pressed on */
-    val treeList: Var[HtmlElement] = Var(
-      div(
-        children <-- fileNames.signal.map(names =>
-          names.map(name => button(
-            name,
-            onClick --> {_ => TreeController.loadSavedTree(name, displayTree)}
-            )): Seq[HtmlElement]
+    val treeList = Var(
+        div(
+            children <-- fileNames.signal.map(names =>
+                names.map(name => button(
+                    name,
+                    onClick --> {_ => TreeController.loadSavedTree(name, displayTree)}
+                )): Seq[HtmlElement]
+            )
         )
-      )
     )
 
     /* Button which updates fileNames with json file names. */
@@ -57,14 +57,14 @@ object TreeViewPage extends DebugViewPage {
     val inputName: Var[String] = Var("")
     
     val nameInput = div(
-      input(
-        typ := "text",
-        placeholder := "Enter text...",
-        controlled(
-          value <-- inputName.signal,
-          onInput.mapToValue --> inputName.writer
-        )
-      ),
+        input(
+            typ := "text",
+            placeholder := "Enter text...",
+            controlled(
+                value <-- inputName.signal,
+                onInput.mapToValue --> inputName.writer
+            )
+        ),
     )
 
     private val noTreeFound: HtmlElement = div(
