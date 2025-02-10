@@ -135,17 +135,16 @@ fn save_debug_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result
                 .map_err(|_| SaveTreeError::SerdeError)?
         },
             
-        None => String::from(""),
+        None => return Err(SaveTreeError::NoTreeError),
     };
 
-    if !tree_json.is_empty() {
-        /* Create the json file to store the tree */
-        let file_path: String = format!("saved_trees/{}.json", name);
-        let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateError)?;
 
-        /* Write tree json to the json file */
-        data_file.write(tree_json.as_bytes()).map_err(|_| SaveTreeError::WriteError)?;
-    }
+    /* Create the json file to store the tree */
+    let file_path: String = format!("saved_trees/{}.json", name);
+    let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateError)?;
+
+    /* Write tree json to the json file */
+    data_file.write(tree_json.as_bytes()).map_err(|_| SaveTreeError::WriteError)?;
 
     Ok(())
 }
@@ -153,6 +152,7 @@ fn save_debug_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result
 #[derive(Debug, serde::Serialize)]
 enum SaveTreeError {
     LockFailed,
+    NoTreeError,
     SerdeError,
     CreateError,
     WriteError,
@@ -161,17 +161,16 @@ enum SaveTreeError {
 /* Returns a list of filenames in saved_trees */
 #[tauri::command]
 fn get_saved_trees() -> Result<String, GetTreesError>  {
-    let dir: &str = "./saved_trees/";
-    let ext: &str = ".json";
+    const DIR: &str = "./saved_trees/";
 
     /* Get all path names inside the saved_trees folder */
-    let paths: ReadDir = read_dir(dir).unwrap();
+    let paths: ReadDir = read_dir(DIR).unwrap();
 
     /* Strip off the extension and add only the name to names */
     let mut names: Vec<String> = Vec::new();
     for path in paths {
         let file_name: String = path.map_err(|_| GetTreesError::ReadPathError)?.file_name().into_string().map_err(|_| GetTreesError::IntoStringError)?;
-        let name: &str = file_name.strip_suffix(ext).ok_or(GetTreesError::StripSuffixError)?;
+        let name: &str = file_name.strip_suffix(".json").ok_or(GetTreesError::StripSuffixError)?;
 
         names.push(String::from(name));
     }
@@ -192,11 +191,10 @@ enum GetTreesError {
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
 fn reload_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), ReloadTreeError>  {
-    let dir: &str = "./saved_trees/";
-    let ext: &str = ".json";
+    const DIR: &str = "./saved_trees/";
 
     /* Get the file path of the tree to be reloaded */
-    let file_path: String = format!("{}{}{}", dir, name, ext);
+    let file_path: String = format!("{}{}.json", DIR, name);
 
     /* Read the contents of the file as a string */
     let contents: String = read_to_string(file_path)

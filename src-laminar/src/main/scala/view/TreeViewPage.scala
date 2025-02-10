@@ -30,7 +30,7 @@ object TreeViewPage extends DebugViewPage {
     )
 
     /* List of file names (excluding path and ext) wrapped in Var*/
-    var fileNames: Var[List[String]] = Var(List())
+    var fileNames: Var[List[String]] = Var(Nil)
 
     /* Renders a list of buttons which will reload to 
         whatever tree is pressed on */
