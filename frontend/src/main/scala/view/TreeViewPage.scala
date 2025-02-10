@@ -15,25 +15,17 @@ import controller.Tauri
 
 
 object TreeViewPage extends DebugViewPage {
-    private val displayTree: Var[HtmlElement] = Var(DebugTreeDisplay(DebugTree.Sample))
-    
-    private lazy val reloadIcon: HtmlElement = i(className := "bi bi-arrow-clockwise", fontSize.px := 25, marginRight.px := 10)
-
-    private lazy val reloadButton: Element = button(
-        className := "tree-view-reload",
-        
-        reloadIcon,
-        "Reload tree",
-
-        onClick --> { _ => TreeController.reloadTree(displayTree)}
+    private val noTreeFound: HtmlElement = div(
+        className := "tree-view-error",
+        "No tree found! Start debugging by attaching DillRemoteView to a parser"
     )
+
+    private val displayTree: Var[HtmlElement] = Var(noTreeFound)
 
     def apply(): HtmlElement = {
         Tauri.listen[Unit]("tree-ready", {_ => TreeController.reloadTree(displayTree)})
         super.render(Some(div(
             className := "tree-view-page",
-
-            reloadButton,
             child <-- displayTree
         )))
     }

@@ -11,6 +11,7 @@
   --background-tertiary-20: #96dec433;	/* Parsley green 20% transparency. */
   --font-color-primary: #96DEC4;	/* Parsley green. */
   --font-color-secondary: #242526;	/* Dark grey. */
+  --font-color-error: #d2042d;	/* Red error. */
   --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif;
 }
 
@@ -23,6 +24,7 @@
   --background-tertiary-20: #24252633;	/* Grey 20% transparancy. */
   --font-color-primary: #242526;	/* Black. */
   --font-color-secondary: #96DEC4;	/* Parsley green. */
+  --font-color-error: #fd4659;	/* Red error. */
 }
 
 body {
