@@ -88,7 +88,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     tauri::Builder::default()
         .setup(setup) /* Run app setup */
-        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children, save_debug_tree, get_saved_trees, reload_tree]) /* Expose render_debug_tree() to frontend */
+        .invoke_handler(tauri::generate_handler![fetch_debug_tree, fetch_node_children, save_tree, fetch_saved_tree_names, load_saved_tree]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
 }
@@ -132,7 +132,7 @@ enum FetchChildrenError {
 
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
-fn save_debug_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), SaveTreeError> {
+fn save_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), SaveTreeError> {
     /* Acquire the state mutex to access the parser */
     let guard: MutexGuard<AppState> = state.lock().map_err(|_| SaveTreeError::LockFailed)?; // Use `map_err` to convert the error
     let tree: &Option<DebugTree> = &guard.tree; // Access the `tree` field from the locked state
@@ -144,7 +144,7 @@ fn save_debug_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result
                 .map_err(|_| SaveTreeError::SerdeError)?
         },
             
-        None => return Err(SaveTreeError::NoTreeError),
+        None => Err(SaveTreeError::NoTreeError)?,
     };
 
 
@@ -169,7 +169,7 @@ enum SaveTreeError {
 
 /* Returns a list of filenames in saved_trees */
 #[tauri::command]
-fn get_saved_trees() -> Result<String, TreeSaveError>  {
+fn fetch_saved_tree_names() -> Result<String, TreeSaveError>  {
     /* Get all path names inside the saved_trees folder */
     let paths: ReadDir = read_dir(SAVED_TREE_DIR).unwrap();
 
@@ -197,7 +197,7 @@ enum TreeSaveError {
 
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
-fn reload_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), ReloadTreeError>  {
+fn load_saved_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), ReloadTreeError>  {
     /* Get the file path of the tree to be reloaded */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, name);
 
