@@ -26,8 +26,8 @@ object TreeController {
             )
         }
 
-    def saveTree(): Unit = 
-        Tauri.invoke[String]("save_debug_tree")
+    def saveTree(treeName: String): Unit = 
+        Tauri.invoke[String]("save_debug_tree", Map("name" -> treeName))
     
 
     def getTrees(fileNames: Var[List[String]]): Unit = {
@@ -37,7 +37,7 @@ object TreeController {
         }
     }
 
-    def reloadTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
+    def reloadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
         Tauri.invoke[String]("reload_tree", Map("name" -> treeName)).foreach { _ =>
             TreeController.reloadTree(displayTree)
         }

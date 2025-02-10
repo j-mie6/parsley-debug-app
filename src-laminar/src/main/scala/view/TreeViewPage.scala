@@ -26,7 +26,7 @@ object TreeViewPage extends DebugViewPage {
         saveIcon,
         "Save tree",
 
-        onClick --> { _ => TreeController.saveTree()}
+        onClick --> { _ => TreeController.saveTree(inputName.now())}
     )
 
     /* List of file names (excluding path and ext) wrapped in Var*/
@@ -39,7 +39,7 @@ object TreeViewPage extends DebugViewPage {
         children <-- fileNames.signal.map(names =>
           names.map(name => button(
             name,
-            onClick --> {_ => TreeController.reloadTree(name, displayTree)}
+            onClick --> {_ => TreeController.reloadSavedTree(name, displayTree)}
             )): Seq[HtmlElement]
         )
       )
@@ -54,17 +54,32 @@ object TreeViewPage extends DebugViewPage {
         onClick --> { _ => TreeController.getTrees(fileNames)}
     )
 
+    val inputName: Var[String] = Var("")
+    
+    val nameInput = div(
+      input(
+        typ := "text",
+        placeholder := "Enter text...",
+        controlled(
+          value <-- inputName.signal,
+          onInput.mapToValue --> inputName.writer
+        )
+      ),
+    )
+
     def apply(): HtmlElement = {
         Tauri.listen[Unit]("tree-ready", {_ => TreeController.reloadTree(displayTree)})
         super.render(Some(div(
             className := "tree-view-page",
 
             child <-- displayTree,
-            /* 
-            This will display the name of each json file stored
-            child <-- treeList.signal
+
+            /*
+            saveButton, /* Used for saving a tree using the name given in nameInput */
+            getButton, /* Updates list of saved tree names */
+            child <-- treeList.signal, /* Renders list of tree buttons */
+            nameInput, /* Input for saving tree names */
             */
-            
         )))
     }
 }
