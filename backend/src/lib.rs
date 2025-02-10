@@ -54,6 +54,9 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         )?;
     }
 
+    /* Fix for NVidia graphics cards */
+    std::env::set_var( "WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+
     /* Manage the app state using Tauri */
     app.manage(Mutex::new(AppState::new()));
 
