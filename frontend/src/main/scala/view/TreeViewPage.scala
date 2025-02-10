@@ -13,7 +13,9 @@ import controller.DebugTreeHandler
 import controller.TreeController
 import controller.Tauri
 
-
+/**
+  * Object containing rendering functions for the TreeViewPage.
+  */
 object TreeViewPage extends DebugViewPage {
     private val noTreeFound: HtmlElement = div(
         className := "tree-view-error",
