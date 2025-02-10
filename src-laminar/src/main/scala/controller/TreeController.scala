@@ -26,9 +26,7 @@ object TreeController {
             )
         }
 
-    def saveTree(treeName: String): Unit = 
-        Tauri.invoke[String]("save_debug_tree", Map("name" -> treeName))
-    
+    def saveTree(treeName: String): Unit = Tauri.invoke[String]("save_debug_tree", Map("name" -> treeName))
 
     def getTrees(fileNames: Var[List[String]]): Unit = {
         Tauri.invoke[String]("get_saved_trees").foreach { serializedNames =>
