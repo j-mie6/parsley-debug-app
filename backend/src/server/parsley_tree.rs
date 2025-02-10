@@ -8,8 +8,8 @@ pub struct ParsleyNode {
     internal: String,           /* The internal name of the parser */
     success: bool,              /* Whether the parser was successful */
     child_id: i64,              /* The unique child number of this node */
-    from_offset: i32, /* Offset into the input in which this node's parse attempt starts */
-    to_offset: i32,   /* Offset into the input in which this node's parse attempt finished */
+    from_offset: i32,           /* Offset into the input in which this node's parse attempt starts */
+    to_offset: i32,             /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
 }
 
