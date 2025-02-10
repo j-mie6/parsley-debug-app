@@ -4,10 +4,10 @@ import com.raquo.laminar.api.L.*
 import scala.util.{Try, Success, Failure}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import upickle.default as up
-
 import view.DebugTreeDisplay
 import org.scalablytyped.runtime.StringDictionary
+
+import upickle.default as up
 
 /**
   * TreeController provides interface for updating DebugTree
