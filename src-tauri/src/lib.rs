@@ -16,6 +16,10 @@ pub use debug_tree::{DebugTree, DebugNode};
 pub use saved_tree::SavedTree;
 
 
+/* Directory for saved trees. */
+const SAVED_TREE_DIR : &str = "./saved_trees/";
+
+
 /* Global app state managed by Tauri */
 struct AppState {
     tree: Option<DebugTree>, /* Parser tree that we may have */
@@ -51,8 +55,6 @@ impl AppState {
 
 /* Setup Tauri app */
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    const DIR: &str = "./saved_trees/";
-    
     if cfg!(debug_assertions) {
         app.handle().plugin(
             tauri_plugin_log::Builder::default()
@@ -68,8 +70,8 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let handle: tauri::AppHandle = app.handle().clone();
 
     /* If the folder for saved_trees does not exist, create it. */
-    if !std::path::Path::new(DIR).exists() {
-        std::fs::create_dir(DIR)?;
+    if !std::path::Path::new(SAVED_TREE_DIR).exists() {
+        std::fs::create_dir(SAVED_TREE_DIR)?;
     }
     
     /* Mount the Rocket server to the running instance of Tauri */
@@ -168,10 +170,8 @@ enum SaveTreeError {
 /* Returns a list of filenames in saved_trees */
 #[tauri::command]
 fn get_saved_trees() -> Result<String, TreeSaveError>  {
-    const DIR: &str = "./saved_trees/";
-
     /* Get all path names inside the saved_trees folder */
-    let paths: ReadDir = read_dir(DIR).unwrap();
+    let paths: ReadDir = read_dir(SAVED_TREE_DIR).unwrap();
 
     /* Strip off the extension and add only the name to names */
     let names: Vec<String> = paths.into_iter()
@@ -198,10 +198,8 @@ enum TreeSaveError {
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
 fn reload_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), ReloadTreeError>  {
-    const DIR: &str = "./saved_trees/";
-
     /* Get the file path of the tree to be reloaded */
-    let file_path: String = format!("{}{}.json", DIR, name);
+    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, name);
 
     /* Read the contents of the file as a string */
     let contents: String = read_to_string(file_path)
