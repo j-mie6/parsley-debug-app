@@ -5,7 +5,11 @@ import com.raquo.laminar.api.L.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Try, Success, Failure}
 
+import upickle.default as up
+import org.scalablytyped.runtime.StringDictionary
+
 import view.DebugTreeDisplay
+
 
 /**
   * Object containing methods for manipulating the DebugTree.
@@ -28,4 +32,21 @@ object TreeController {
                     }
             )
         }
+
+    def saveTree(treeName: String): Unit = Tauri.invoke[String]("save_tree", Map("name" -> treeName))
+
+    def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
+        Tauri.invoke[String]("fetch_saved_tree_names").foreach { serializedNames =>
+            // Update fileNames with parsed names
+            fileNames.update(_ => up.read[List[String]](serializedNames))
+        }
+    }
+
+    def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
+        Tauri.invoke[String]("load_saved_tree", Map("name" -> treeName)).foreach { _ =>
+            TreeController.reloadTree(displayTree)
+        }
+    }
+        
+
 }
