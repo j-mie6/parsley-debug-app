@@ -51,6 +51,8 @@ impl AppState {
 
 /* Setup Tauri app */
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    const DIR: &str = "./saved_trees/";
+    
     if cfg!(debug_assertions) {
         app.handle().plugin(
             tauri_plugin_log::Builder::default()
@@ -64,6 +66,11 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     
     /* Clone the app handle for use by Rocket state */
     let handle: tauri::AppHandle = app.handle().clone();
+
+
+    if !std::path::Path::new(DIR).exists() {
+        std::fs::create_dir(DIR)?;
+    }
     
     /* Mount the Rocket server to the running instance of Tauri */
     tauri::async_runtime::spawn(async move {
@@ -160,7 +167,7 @@ enum SaveTreeError {
 
 /* Returns a list of filenames in saved_trees */
 #[tauri::command]
-fn get_saved_trees() -> Result<String, GetTreesError>  {
+fn get_saved_trees() -> Result<String, TreeFilesError>  {
     const DIR: &str = "./saved_trees/";
 
     /* Get all path names inside the saved_trees folder */
@@ -169,19 +176,19 @@ fn get_saved_trees() -> Result<String, GetTreesError>  {
     /* Strip off the extension and add only the name to names */
     let mut names: Vec<String> = Vec::new();
     for path in paths {
-        let file_name: String = path.map_err(|_| GetTreesError::ReadPathError)?.file_name().into_string().map_err(|_| GetTreesError::IntoStringError)?;
-        let name: &str = file_name.strip_suffix(".json").ok_or(GetTreesError::StripSuffixError)?;
+        let file_name: String = path.map_err(|_| TreeFilesError::ReadPathError)?.file_name().into_string().map_err(|_| TreeFilesError::IntoStringError)?;
+        let name: &str = file_name.strip_suffix(".json").ok_or(TreeFilesError::StripSuffixError)?;
 
         names.push(String::from(name));
     }
 
     /* Serialise names */
     serde_json::to_string_pretty(&names)
-        .map_err(|_| GetTreesError::SerdeError)
+        .map_err(|_| TreeFilesError::SerdeError)
 }
 
 #[derive(Debug, serde::Serialize)]
-enum GetTreesError {
+enum TreeFilesError {
     ReadPathError,
     IntoStringError,
     StripSuffixError,
