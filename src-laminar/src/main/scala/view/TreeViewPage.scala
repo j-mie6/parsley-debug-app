@@ -39,7 +39,7 @@ object TreeViewPage extends DebugViewPage {
         children <-- fileNames.signal.map(names =>
           names.map(name => button(
             name,
-            onClick --> {_ => TreeController.reloadSavedTree(name, displayTree)}
+            onClick --> {_ => TreeController.loadSavedTree(name, displayTree)}
             )): Seq[HtmlElement]
         )
       )
@@ -51,7 +51,7 @@ object TreeViewPage extends DebugViewPage {
         
         "Get trees",
 
-        onClick --> { _ => TreeController.getTrees(fileNames)}
+        onClick --> { _ => TreeController.fetchSavedTreeNames(fileNames)}
     )
 
     val inputName: Var[String] = Var("")
