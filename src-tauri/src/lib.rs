@@ -67,7 +67,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     /* Clone the app handle for use by Rocket state */
     let handle: tauri::AppHandle = app.handle().clone();
 
-
+    /* If the folder for saved_trees does not exist, create it. */
     if !std::path::Path::new(DIR).exists() {
         std::fs::create_dir(DIR)?;
     }
