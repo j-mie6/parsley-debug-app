@@ -4,7 +4,7 @@ use std::sync::{Mutex, MutexGuard};
 use std::collections::HashMap;
 
 
-use std::fs::{read_dir, read_to_string, File, ReadDir};
+use std::fs::{read_dir, read_to_string, DirEntry, File, ReadDir};
 use std::io::Write;
 
 mod server;
@@ -176,9 +176,9 @@ fn get_saved_trees() -> Result<String, TreeSaveError>  {
     /* Strip off the extension and add only the name to names */
     let names: Vec<String> = paths.into_iter()
         .map(|path| {
-            let path = path.map_err(|_| TreeSaveError::ReadPathError)?;
-            let file_name = path.file_name().into_string().map_err(|_| TreeSaveError::IntoStringError)?;
-            let name = file_name.strip_suffix(".json").ok_or(TreeSaveError::StripSuffixError)?;
+            let path: DirEntry = path.map_err(|_| TreeSaveError::ReadPathError)?;
+            let file_name: String = path.file_name().into_string().map_err(|_| TreeSaveError::IntoStringError)?;
+            let name: &str = file_name.strip_suffix(".json").ok_or(TreeSaveError::StripSuffixError)?;
             Ok(name.to_string())
         }).collect::<Result<Vec<String>, TreeSaveError>>()?;
 
