@@ -60,7 +60,7 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './src-tauri -> target'
+          workspaces: './backend -> target'
 
       - name: Clean SBT caches and set env (Windows only)
         if: matrix.platform == 'windows-latest'
@@ -107,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dill-${{ matrix.platform }}.exe
-          path: ./src-tauri/target/release/dill.exe
+          path: ./backend/target/release/dill.exe
           if-no-files-found: error
       
       - name: Upload app executable (Linux)
@@ -115,7 +115,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dill-${{ matrix.platform }}
-          path: ./src-tauri/target/release/dill
+          path: ./backend/target/release/dill
           if-no-files-found: error
 
       - name: Upload app executable (MacOS)
@@ -123,7 +123,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dill-${{ matrix.platform }}
-          path: ./src-tauri/target/universal-apple-darwin/release/dill
+          path: ./backend/target/universal-apple-darwin/release/dill
           if-no-files-found: error
 
       - name: Upload app bundles (Linux and Windows)
@@ -131,7 +131,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: dill-bundles-${{ matrix.platform }}
-            path: ./src-tauri/target/release/bundle/
+            path: ./backend/target/release/bundle/
             if-no-files-found: error
       
       - name: Upload app bundles (MacOS)
@@ -139,5 +139,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: dill-bundles-${{ matrix.platform }}
-            path: ./src-tauri/target/universal-apple-darwin/release/bundle/
+            path: ./backend/target/universal-apple-darwin/release/bundle/
             if-no-files-found: error

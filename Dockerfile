@@ -6,8 +6,8 @@ FROM rust:latest
 WORKDIR /home
 COPY ./project ./project
 COPY ./public ./public
-COPY ./src ./src
-COPY ./src-tauri ./src-tauri
+COPY ./frontend ./frontend
+COPY ./backend ./backend
 COPY ./build.sbt ./build.sbt
 COPY ./index.html ./index.html
 COPY ./package-lock.json ./package-lock.json
