@@ -41,6 +41,7 @@ impl From<&DebugTree> for SavedTree {
                 node.is_leaf
             )
         }
+
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
   
         SavedTree::new(debug_tree.get_input().clone(), node)
