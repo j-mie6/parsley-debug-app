@@ -1,4 +1,4 @@
-use std::fs::{read_dir, read_to_string, DirEntry, File, ReadDir};
+use std::fs::{read_dir, read_to_string, remove_file, DirEntry, File, ReadDir};
 use std::io::Write;
 use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
@@ -98,7 +98,8 @@ pub fn run() {
             fetch_node_children, 
             save_tree, 
             fetch_saved_tree_names, 
-            load_saved_tree
+            load_saved_tree,
+            delete_tree
         ]) /* Expose render_debug_tree() to frontend */
         .run(tauri::generate_context!()) /* Start up the app */
         .expect("error while running tauri application");
@@ -183,6 +184,21 @@ enum SaveTreeError {
     SerdeError,
     CreateError,
     WriteError,
+}
+
+#[tauri::command]
+fn delete_tree(name: String) -> Result<(), DeleteTreeError> {
+    /* Path to the json file used to store the tree */
+    let file_path: String = format!("saved_trees/{}.json", name);
+
+    /* Remove the file from the file system */
+    remove_file(file_path).map_err(|_| DeleteTreeError::FileSysError)?;
+    Ok(())
+}
+
+#[derive(Debug, serde::Serialize)]
+enum DeleteTreeError {
+    FileSysError,
 }
 
 /* Returns a list of filenames in saved_trees */
