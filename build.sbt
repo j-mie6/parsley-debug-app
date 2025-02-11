@@ -33,7 +33,7 @@ inThisBuild(List(
         Developer("j-mie6", "Jamie Willis", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("Riley-horrix", "Riley Horrix", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("aniket1101", "Aniket Gupta", "", url("https://github.com/j-mie6/parsley-debug-app")),
-        Developer("PriyanshC", "Priyansh Chung", "", url("https://github.com/j-mie6/parsley-debug-app")),
+        Developer("PriyanshC", "Priyansh Chugh", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("Aito0", "Alejandro Perez Fadon", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("AdamW1087", "Adam Watson", "", url("https://github.com/j-mie6/parsley-debug-app")),
         Developer("josh-ja-walker", "Josh Walker", "", url("https://github.com/j-mie6/parsley-debug-app"))
@@ -58,9 +58,11 @@ lazy val commonSettings = Seq(
     Test / parallelExecution := false,
 )
 
+lazy val isRelease = sys.env.get("RELEASE").contains("true") /* Compile in release mode (not dev) */
+
 /* Setup for Laminar */
 lazy val dillFrontend = project
-    .in(file("src-laminar"))
+    .in(file("frontend"))
     .enablePlugins(ScalaJSPlugin, ScalablyTypedConverterExternalNpmPlugin)
     .settings(
         /* Scala JS/ScalablyTyped settings */
@@ -82,6 +84,7 @@ lazy val dillFrontend = project
         /* Run npm to link with ScalablyTyped */
         externalNpm := {
             convertCmd("npm").!
+            println()
             baseDirectory.value.getParentFile()
         },
 
@@ -93,8 +96,6 @@ lazy val dillFrontend = project
         }
     )
 
-
-lazy val isRelease = sys.env.get("RELEASE").contains("true") /* Compile in release mode (not dev) */
 
 /* Report frontend build setup */
 lazy val reportFrontend = taskKey[(Report, File)]("")
@@ -110,7 +111,7 @@ ThisBuild / reportFrontend := {
 
 
 /* Build Dill frontend */
-lazy val buildFrontend = taskKey[Map[String, File]]("")
+lazy val buildFrontend = taskKey[Map[String, File]]("Build the Scala Laminar frontend.")
 
 buildFrontend := {
     val (report, fm) = reportFrontend.value
@@ -129,24 +130,40 @@ buildFrontend := {
 }
 
 
-/* Build project into an executable */
-val build = taskKey[Unit]("Build the project into packages and executables.")
+/* Build Tauri backend */
+lazy val buildBackend = taskKey[Unit]("Build Tauri app into packages and executables.")
 
-build := {
-    val front = buildFrontend.value
+buildBackend := {
     convertCmd("npm run tauri build").!
 }
 
+/* Run Tauri backend in dev mode */
+lazy val runBackend = taskKey[Unit]("Run Tauri app in development mode.")
 
-/* Run project */
-run := {
-    val front = buildFrontend.value
+runBackend := {    
     convertCmd("npm run tauri dev").!
 }
 
 
+/* Build frontend and backend into executables */
+val build = taskKey[Unit]("Build the project into packages and executables.")
+
+build := {
+    buildFrontend.value
+    buildBackend.value
+}
+
+
+/* Run project - install dependencies, build frontend then run backend */
+run := {
+    setup.value
+    buildFrontend.value
+    runBackend.value
+}
+
+
 /* Setup required dependencies */
-lazy val setup = taskKey[Unit]("Install required dependencies")
+lazy val setup = taskKey[Unit]("Install required dependencies.")
 
 setup := {
     convertCmd("npm install").!
@@ -154,11 +171,11 @@ setup := {
 
 
 /* Build project in Docker */
-val dockerBuild = taskKey[Unit]("Build the project onto a docker machine, running the application")
+val dockerBuild = taskKey[Unit]("Build the project onto a Docker machine, running the application.")
 
 dockerBuild := {
     print("Copying Files... ")
-    "scp -o StrictHostKeyChecking=no -r -P 2222 ./src ./src-tauri root@localhost:/home >> logs".!
+    "scp -o StrictHostKeyChecking=no -r -P 2222 ./src ./backend root@localhost:/home >> logs".!
     println("done")
 
     println("Building frontend... ")
@@ -168,12 +185,7 @@ dockerBuild := {
 
 
 /* Clean all generated files */
-clean := {
-    "rm log.txt".!
-    clean.value
-}
-
-val cleanHard = taskKey[Unit]("Clean")
+val cleanHard = taskKey[Unit]("Remove generated files and dependencies.")
 
 cleanHard := {
     print("Removing npm dependencies... ")
@@ -191,12 +203,12 @@ cleanHard := {
     "rm -rf static/".!
     println("done")
 
-    print("Removing Tauri targets... ")
-    "rm -rf src-tauri/target/".!
+    print("Removing backend targets... ")
+    "rm -rf backend/target/".!
     println("done")
     
-    print("Removing Laminar targets... ")
-    "rm -rf src-laminar/target/".!
+    print("Removing frontend targets... ")
+    "rm -rf frontend/target/".!
     println("done")
 
     /* Apply default clean */
