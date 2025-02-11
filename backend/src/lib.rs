@@ -9,7 +9,6 @@ mod trees;
 
 use state::{AppState, StateHandle};
 
-
 /* Directory for saved trees. */
 const SAVED_TREE_DIR : &str = "./saved_trees/";
 
