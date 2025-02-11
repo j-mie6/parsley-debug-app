@@ -6,11 +6,11 @@ use tauri::Emitter;
 use super::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
-
-
+/* Synchronised global app state */
 pub struct AppState(Mutex<AsyncAppState>);
 
 impl AppState {
+    /* Create a new app state with the app_handle */
     pub fn new(app_handle: tauri::AppHandle) -> AppState {
         let async_app_state: AsyncAppState = AsyncAppState::new(app_handle);
         let sync_app_state: Mutex<AsyncAppState> = Mutex::new(async_app_state);
@@ -26,11 +26,11 @@ impl AppState {
 }
 
 
-/* Global app state managed by Tauri */
+/* Unsynchronised global AppState */
 struct AsyncAppState {
-    app_handle: tauri::AppHandle,
-    tree: Option<DebugTree>, /* Parser tree that we may have */
-    map: HashMap<u32, DebugNode>, /* Map from node_id to the respective node */
+    app_handle: tauri::AppHandle,   /* Handle to instance of Tauri app, used for events */
+    tree: Option<DebugTree>,        /* Parser tree that we may have */
+    map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
 }
 
 impl AsyncAppState {
@@ -62,11 +62,14 @@ impl AsyncAppState {
 
 
 impl StateManager for AppState {
+
+    /* Update StateManager's tree */
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
         self.acquire()?.set_tree(tree);
         Ok(())
     }
     
+    /* Get StateManager's tree */
     fn get_tree(&self) -> Result<DebugTree, StateError> {
         self.acquire()?
             .tree
@@ -75,6 +78,7 @@ impl StateManager for AppState {
             .cloned()
     }
     
+    /* Get node associated with node ID */
     fn get_node(&self, id: u32) -> Result<DebugNode, StateError> {
         self.acquire()?
             .map

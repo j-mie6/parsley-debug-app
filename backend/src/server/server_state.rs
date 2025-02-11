@@ -1,7 +1,7 @@
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
-
+/* Wrapper for StateManager implementation used for Rocket server state management */
 pub struct ServerState(Box<dyn StateManager>);
 
 impl ServerState {
@@ -10,6 +10,7 @@ impl ServerState {
     }
 }
 
+/* Delegate StateManager implementations to wrapped StateManager */
 impl StateManager for ServerState {
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
         self.0.as_ref().set_tree(tree)
