@@ -12,41 +12,45 @@ import view.DebugTreeDisplay
 
 
 /**
-  * Object containing methods for manipulating the DebugTree.
-  */
+* Object containing methods for manipulating the DebugTree.
+*/
 object TreeController {
+    
+    /* Display tree that will be rendered by TreeView */
+    private val displayTree: Var[HtmlElement] = Var(div())
+    
+    /* Gets display tree element*/
+    def getDisplayTree: Var[HtmlElement] = displayTree
+    
+    def renderDisplayTree = displayTree.signal
+    
     /**
-      * Fetch the debug tree root from the tauri backend.
-      *
-      * @param displayTree The var that the display tree HTML element will be written into.
-      */
-    def reloadTree(displayTree: Var[HtmlElement]): Unit = 
+    * Mutably updates the displayTree variable
+    *
+    * @param tree New element to update the displayTree variable
+    */
+    def setDisplayTree(tree: HtmlElement) = {
+        displayTree.set(tree)
+    }
+    
+    /**
+    * Fetch the debug tree root from the tauri backend.
+    *
+    * @param displayTree The var that the display tree HTML element will be written into.
+    */
+    def reloadTree(): Unit = {
         for {
-          treeString <- Tauri.invoke[String]("fetch_debug_tree")
+            treeString <- Tauri.invoke[String]("fetch_debug_tree")
         } do {
-            displayTree.set(
+            setDisplayTree(
                 if treeString.isEmpty then div("No tree found") else 
-                    DebugTreeHandler.decodeDebugTree(treeString) match {
-                        case Failure(exception) => println(s"Error in decoding debug tree : ${exception.getMessage()}"); div()
-                        case Success(debugTree) => DebugTreeDisplay(debugTree)
-                    }
+                DebugTreeHandler.decodeDebugTree(treeString) match {
+                    case Failure(exception) => 
+                        println(s"Error in decoding debug tree : ${exception.getMessage()}");
+                        div()
+                    case Success(debugTree) => DebugTreeDisplay(debugTree)
+                }
             )
-        }
-
-    def saveTree(treeName: String): Unit = Tauri.invoke[String]("save_tree", Map("name" -> treeName))
-
-    def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
-        Tauri.invoke[String]("fetch_saved_tree_names").foreach { serializedNames =>
-            // Update fileNames with parsed names
-            fileNames.update(_ => up.read[List[String]](serializedNames))
-        }
-    }
-
-    def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
-        Tauri.invoke[String]("load_saved_tree", Map("name" -> treeName)).foreach { _ =>
-            TreeController.reloadTree(displayTree)
-        }
-    }
-        
-
+        }   
+    } 
 }

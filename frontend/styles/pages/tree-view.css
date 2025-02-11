@@ -31,11 +31,10 @@
 }
 
 .tree-view-save {
-  padding-block: 10px;
-  padding-inline: 20px;
-  margin: 0;
-  background: none;
   text-align: center;
+  margin-top: 10px;
+  margin-left: 10px;
+  background: transparent;
   color: inherit;
   border: none;
   font: inherit;

@@ -44,6 +44,37 @@
     margin-block: auto;
 }
 
+.scrollable-tab-bar {
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    
+}
+
+/* .reload-saved-trees-button {
+    background-color: rebeccapurple;
+} */
+
+.tab-button {
+    padding-inline: 5px;
+    margin: 0;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background-color: var(--background-tertiary);
+    border-color: var(--background-tertiary);
+}
+
+.close-tab-button {
+    background-color: var(--background-tertiary)
+}
+
+.close-tab-button:hover {
+    background-color: var(--background-tertiary-60);
+}
+
+
 .debug-view-page {
     box-sizing: border-box;
     padding: 30px;
