@@ -7,24 +7,31 @@ use crate::trees::{DebugTree, DebugNode};
 
 #[cfg_attr(test, automock)]
 pub trait StateManager: Send + Sync + 'static {
-    fn set_tree(&self, tree: DebugTree);
+    fn set_tree(&self, tree: DebugTree) -> Result<(), StateError>;
 
-    fn get_tree(&self) -> DebugTree;
+    fn get_tree(&self) -> Result<DebugTree, StateError>;
 
-    fn get_debug_node(&self, node_id: u32) -> DebugNode;
+    fn get_node(&self, id: u32) -> Result<DebugNode, StateError>;
 }
 
 
 impl StateManager for tauri::AppHandle {
-    fn set_tree(&self, tree: DebugTree) {
-        self.state::<AppState>().set_tree(tree);
+    fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
+        self.state::<AppState>().set_tree(tree)
     }
 
-    fn get_tree(&self) -> DebugTree {
+    fn get_tree(&self) -> Result<DebugTree, StateError> {
         self.state::<AppState>().get_tree()
     }
 
-    fn get_debug_node(&self, node_id: u32) -> DebugNode {
-        self.state::<AppState>().get_debug_node(node_id)
+    fn get_node(&self, id: u32) -> Result<DebugNode, StateError> {
+        self.state::<AppState>().get_node(id)
     }
+}
+
+#[derive(Debug)]
+pub enum StateError {
+    LockFailed,
+    TreeNotFound,
+    NodeNotFound(u32),
 }

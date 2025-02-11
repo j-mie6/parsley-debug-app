@@ -32,11 +32,11 @@ pub mod test {
         mock.expect_set_tree()
             .with(predicate::eq(test_tree()))
             .times(NUM_REPEATS)
-            .return_const(());
+            .returning(|_| Ok(()));
 
         mock.expect_get_tree()
             .times(NUM_REPEATS)
-            .returning(|| test_tree());
+            .returning(|| Ok(test_tree()));
 
         let client: blocking::Client = tracked_client(mock);
 

@@ -2,7 +2,7 @@ mod app_state;
 mod state_manager;
 mod state_handle;
 
-pub use state_manager::StateManager;
+pub use state_manager::{StateManager, StateError};
 #[cfg(test)] pub use state_manager::MockStateManager;
 
 pub use app_state::AppState;

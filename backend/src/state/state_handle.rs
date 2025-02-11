@@ -1,4 +1,4 @@
-use super::StateManager;
+use super::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
 
@@ -11,15 +11,15 @@ impl StateHandle {
 }
 
 impl StateManager for StateHandle {
-    fn set_tree(&self, tree: DebugTree) {
-        self.0.as_ref().set_tree(tree);
+    fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
+        self.0.as_ref().set_tree(tree)
     }
 
-    fn get_tree(&self) -> DebugTree {
+    fn get_tree(&self) -> Result<DebugTree, StateError> {
         self.0.as_ref().get_tree()
     }
 
-    fn get_debug_node(&self, node_id: u32) -> DebugNode {
-        self.0.as_ref().get_debug_node(node_id)
+    fn get_node(&self, id: u32) -> Result<DebugNode, StateError> {
+        self.0.as_ref().get_node(id)
     }
 }

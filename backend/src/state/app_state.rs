@@ -1,18 +1,28 @@
-use std::{collections::HashMap, sync::Mutex};
+use std::collections::HashMap;
+use std:: sync::{Mutex, MutexGuard};
 
 use tauri::Emitter;
 
+use super::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
-use super::StateManager;
 
 
 pub struct AppState(Mutex<AsyncAppState>);
 
 impl AppState {
     pub fn new(app_handle: tauri::AppHandle) -> AppState {
-        AppState(Mutex::new(AsyncAppState::new(app_handle)))
+        let async_app_state: AsyncAppState = AsyncAppState::new(app_handle);
+        let sync_app_state: Mutex<AsyncAppState> = Mutex::new(async_app_state);
+
+        AppState(sync_app_state)
     }
+
+    fn acquire(&self) -> Result<MutexGuard<AsyncAppState>, StateError> {
+        self.0.lock()
+            .map_err(|_| StateError::LockFailed)
+    }
+
 }
 
 
@@ -47,30 +57,29 @@ impl AsyncAppState {
         self.app_handle.emit("tree-ready", ()).expect("Could not find ready tree");
 
     }
+
 }
 
 
 impl StateManager for AppState {
-    fn set_tree(&self, tree: DebugTree) {
-        self.0.lock()
-            .expect("Failed to acquire lock")
-            .set_tree(tree);
+    fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
+        self.acquire()?.set_tree(tree);
+        Ok(())
     }
     
-    fn get_tree(&self) -> DebugTree {
-        self.0.lock()
-            .expect("Failed to acquire lock")
+    fn get_tree(&self) -> Result<DebugTree, StateError> {
+        self.acquire()?
             .tree
             .as_ref()
-            .expect("Tree has not been loaded")
-            .clone()
+            .ok_or(StateError::TreeNotFound)
+            .cloned()
     }
     
-    fn get_debug_node(&self, node_id: u32) -> DebugNode {
-        self.0.lock()
-            .expect("Failed to acquire lock")
-            .map.get(&node_id)
-            .expect("Tree has not been loaded")
-            .clone()
+    fn get_node(&self, id: u32) -> Result<DebugNode, StateError> {
+        self.acquire()?
+            .map
+            .get(&id)
+            .ok_or(StateError::NodeNotFound(id))
+            .cloned()
     }
 }

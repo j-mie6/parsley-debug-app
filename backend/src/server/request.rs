@@ -2,7 +2,7 @@ use rocket::{get, http, post, serde::json::Json};
 
 use super::parsley_tree::ParsleyTree;
 use crate::trees::DebugTree;
-use crate::state::{StateHandle, StateManager};
+use crate::state::{StateError, StateHandle, StateManager};
 
 /* Length of input slice returned in post response */
 const RESPONSE_INPUT_LEN: usize = 16;
@@ -41,20 +41,26 @@ fn post_tree(
         },
     );
 
-    /* Update state with new debug_tree */
-    let handle: &StateHandle = state.inner();
-    handle.set_tree(debug_tree);
+    /* Update state with new debug_tree and return response */
+    match state.set_tree(debug_tree) {
+        Ok(()) => (http::Status::Ok, response),
+        
+        Err(StateError::LockFailed) => 
+            (http::Status::InternalServerError, String::from("Locking state mutex failed - try again")), 
+            
+        Err(_) => panic!("Unexpected error on set_tree"),
+    }
 
-    /* Return response */
-    (http::Status::Ok, response)
 }
 
 /* Return posted DebugTree as JSON string */
 #[get("/api/remote/tree")]
 fn get_tree(state: &rocket::State<StateHandle>) -> String {
-    let handle: &StateHandle = state.inner();
-
-    serde_json::to_string_pretty(&handle.get_tree()).expect("Could not serialise State to JSON")
+    match &state.get_tree() {
+        Ok(tree) => serde_json::to_string_pretty(tree)
+            .unwrap_or(String::from("Could not serialise tree to JSON")),
+        Err(err) => format!("{:?}", err),
+    }
 }
 
 #[cfg(test)]
@@ -119,7 +125,7 @@ pub mod test {
         let mut mock = MockStateManager::new();
         mock.expect_set_tree()
             .with(predicate::eq(test_tree()))
-            .return_const(());
+            .returning(|_| Ok(()));
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -169,7 +175,7 @@ pub mod test {
     #[test]
     fn get_returns_tree() {
         let mut mock = MockStateManager::new();
-        mock.expect_get_tree().returning(|| test_tree());
+        mock.expect_get_tree().returning(|| Ok(test_tree()));
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -186,9 +192,9 @@ pub mod test {
         let mut mock = MockStateManager::new();
         mock.expect_set_tree()
             .with(predicate::eq(test_tree()))
-            .return_const(());
+            .returning(|_| Ok(()));
 
-        mock.expect_get_tree().returning(|| test_tree());
+        mock.expect_get_tree().returning(|| Ok(test_tree()));
 
         let client: blocking::Client = tracked_client(mock);
 
