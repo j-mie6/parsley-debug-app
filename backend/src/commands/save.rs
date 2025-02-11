@@ -98,6 +98,7 @@ pub fn load_saved_tree(state: tauri::State<AppState>, name: String) -> Result<()
 }
 
 #[derive(Debug, serde::Serialize)]
+#[allow(clippy::enum_variant_names)]
 pub enum LoadTreeError {
     LockFailed,
     ReadFileFailed,
