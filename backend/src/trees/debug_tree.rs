@@ -85,3 +85,44 @@ impl DebugNode {
         }
     }
 }
+
+
+
+
+#[cfg(test)]
+pub mod test {
+    /* Debug Tree unit testing */
+
+    use super::{DebugNode, DebugTree};
+
+
+    pub const RAW_TREE: &str = r#"{
+        "input": "Test",
+        "root": {
+            "nodeId": 0,
+            "name": "Test",
+            "internal": "Test",
+            "success": true,
+            "childId": 0,
+            "input": "Test",
+            "isLeaf": true
+        }
+    }"#;
+
+    pub fn test_tree() -> DebugTree {
+        DebugTree::new(
+            String::from("Test"),
+            DebugNode::new(
+                0u32,
+                String::from("Test"),
+                String::from("Test"),
+                true,
+                Some(0),
+                String::from("Test"),
+                vec![],
+            ),
+        )
+    }
+
+}
+

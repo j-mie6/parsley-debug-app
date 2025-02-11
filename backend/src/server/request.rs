@@ -1,7 +1,6 @@
-use rocket::{get, http, post, serde::json::Json};
+use rocket::{get, post, http, serde::json::Json};
 
-use super::parsley_tree::ParsleyTree;
-use crate::trees::DebugTree;
+use crate::trees::{DebugTree, ParsleyTree};
 use crate::state::{StateError, StateHandle, StateManager};
 
 /* Length of input slice returned in post response */
@@ -69,25 +68,9 @@ pub mod test {
     use mockall::predicate;
     use rocket::{http, local::blocking};
 
-    use crate::server::test::tracked_client;
-    use crate::server::parsley_tree::test::RAW_TREE_SIMPLE;
+    use crate::server::test::tracked_client; 
     use crate::state::MockStateManager;
-    use crate::trees::{DebugNode, DebugTree};
-
-    pub fn test_tree() -> DebugTree {
-        DebugTree::new(
-            String::from("Test"),
-            DebugNode::new(
-                0u32,
-                String::from("Test"),
-                String::from("Test"),
-                true,
-                Some(0),
-                String::from("Test"),
-                vec![],
-            ),
-        )
-    }
+    use crate::trees::{debug_tree, parsley_tree};
 
     /* Request unit testing */
 
@@ -124,7 +107,7 @@ pub mod test {
     fn post_tree_succeeds() {
         let mut mock = MockStateManager::new();
         mock.expect_set_tree()
-            .with(predicate::eq(test_tree()))
+            .with(predicate::eq(debug_tree::test::test_tree()))
             .returning(|_| Ok(()));
 
         let client: blocking::Client = tracked_client(mock);
@@ -133,7 +116,7 @@ pub mod test {
         let response: blocking::LocalResponse = client
             .post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
-            .body(&RAW_TREE_SIMPLE)
+            .body(&parsley_tree::test::RAW_TREE)
             .dispatch();
 
         /* Assert that POST succeeded */
@@ -175,7 +158,7 @@ pub mod test {
     #[test]
     fn get_returns_tree() {
         let mut mock = MockStateManager::new();
-        mock.expect_get_tree().returning(|| Ok(test_tree()));
+        mock.expect_get_tree().returning(|| Ok(debug_tree::test::test_tree()));
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -191,10 +174,10 @@ pub mod test {
     fn get_returns_posted_tree() {
         let mut mock = MockStateManager::new();
         mock.expect_set_tree()
-            .with(predicate::eq(test_tree()))
+            .with(predicate::eq(debug_tree::test::test_tree()))
             .returning(|_| Ok(()));
 
-        mock.expect_get_tree().returning(|| Ok(test_tree()));
+        mock.expect_get_tree().returning(|| Ok(debug_tree::test::test_tree()));
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -202,7 +185,7 @@ pub mod test {
         let post_response: blocking::LocalResponse = client
             .post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
-            .body(&RAW_TREE_SIMPLE)
+            .body(&parsley_tree::test::RAW_TREE)
             .dispatch();
 
         /* Assert that POST succeeded */
@@ -216,25 +199,12 @@ pub mod test {
         assert_eq!(get_response.status(), http::Status::Ok);
 
         /* Assert that we GET the expected tree */
-        let expected_tree: &str = r#"{
-            "input": "Test",
-            "root": {
-                "nodeId": 0,
-                "name": "Test",
-                "internal": "Test",
-                "success": true,
-                "childId": 0,
-                "input": "Test",
-                "isLeaf": true
-            }
-        }"#;
-
         assert_eq!(
             get_response
                 .into_string()
                 .expect("get_info response is not a String")
                 .replace(" ", ""),
-            expected_tree.replace(" ", "")
+            debug_tree::test::RAW_TREE.replace(" ", "")
         );
     }
 }

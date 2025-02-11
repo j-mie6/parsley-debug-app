@@ -1,5 +1,4 @@
 mod launch;
-mod parsley_tree;
 mod request;
 
 pub use launch::launch;
@@ -10,11 +9,12 @@ pub mod test {
     use mockall::predicate;
     use rocket::{http, local::blocking};
 
-    use super::request::test::test_tree;
-    use super::{launch, parsley_tree::test::RAW_TREE_SIMPLE};
+    use super::launch;
+    use crate::trees::{debug_tree, parsley_tree};
     use crate::state::{MockStateManager, StateHandle};
 
     /* Server integration testing */
+
 
     /* Start a blocking, tracked client for rocket
     The mock should already be set with expectations */
@@ -30,13 +30,13 @@ pub mod test {
         let mut mock = MockStateManager::new();
 
         mock.expect_set_tree()
-            .with(predicate::eq(test_tree()))
+            .with(predicate::eq(debug_tree::test::test_tree()))
             .times(NUM_REPEATS)
             .returning(|_| Ok(()));
 
         mock.expect_get_tree()
             .times(NUM_REPEATS)
-            .returning(|| Ok(test_tree()));
+            .returning(|| Ok(debug_tree::test::test_tree()));
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -47,7 +47,7 @@ pub mod test {
         let post_tree = client
             .post("/api/remote/tree")
             .header(http::ContentType::JSON)
-            .body(RAW_TREE_SIMPLE);
+            .body(parsley_tree::test::RAW_TREE);
 
         let get_tree = client.get("/api/remote/tree");
 
