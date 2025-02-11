@@ -1,7 +1,9 @@
 mod launch;
 mod request;
+mod server_state;
 
 pub use launch::launch;
+pub use server_state::ServerState;
 
 #[cfg(test)]
 pub mod test {
@@ -9,9 +11,9 @@ pub mod test {
     use mockall::predicate;
     use rocket::{http, local::blocking};
 
-    use super::launch;
+    use super::{launch, ServerState};
+    use crate::state::MockStateManager;
     use crate::trees::{debug_tree, parsley_tree};
-    use crate::state::{MockStateManager, StateHandle};
 
     /* Server integration testing */
 
@@ -19,8 +21,8 @@ pub mod test {
     /* Start a blocking, tracked client for rocket
     The mock should already be set with expectations */
     pub fn tracked_client(mock: MockStateManager) -> blocking::Client {
-        let handle = StateHandle::new(mock);
-        blocking::Client::tracked(launch::build(handle)).expect("Could not launch rocket")
+        let state = ServerState::new(mock);
+        blocking::Client::tracked(launch::build(state)).expect("Could not launch rocket")
     }
 
     #[test]

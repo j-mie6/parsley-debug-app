@@ -1,16 +1,16 @@
-use super::{StateError, StateManager};
+use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
 
-pub struct StateHandle(Box<dyn StateManager>);
+pub struct ServerState(Box<dyn StateManager>);
 
-impl StateHandle {
+impl ServerState {
     pub fn new<S: StateManager>(state: S) -> Self {
-        StateHandle(Box::new(state))
+        ServerState(Box::new(state))
     }
 }
 
-impl StateManager for StateHandle {
+impl StateManager for ServerState {
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
         self.0.as_ref().set_tree(tree)
     }

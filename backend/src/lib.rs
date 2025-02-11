@@ -5,7 +5,8 @@ mod state;
 mod commands;
 mod trees;
 
-use state::{AppState, StateHandle};
+use state::AppState;
+use server::ServerState;
 
 /* Directory for saved trees. */
 const SAVED_TREE_DIR : &str = "./saved_trees/";
@@ -30,12 +31,12 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         std::fs::create_dir(SAVED_TREE_DIR)?;
     }
     
-    /* Clone the app handle for use by Rocket state */
-    let rocket_handle: tauri::AppHandle = app.handle().clone();
+    /* Clone the app handle and create a ServerState */
+    let server_state: ServerState = ServerState::new(app.handle().clone());
 
     /* Mount the Rocket server to the running instance of Tauri */
     tauri::async_runtime::spawn(async move {
-        server::launch(StateHandle::new(rocket_handle))
+        server::launch(server_state)
             .await
             .expect("Rocket failed to initialise")
     });

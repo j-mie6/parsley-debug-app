@@ -1,7 +1,8 @@
 use rocket::{get, post, http, serde::json::Json};
 
+use super::ServerState;
 use crate::trees::{DebugTree, ParsleyTree};
-use crate::state::{StateError, StateHandle, StateManager};
+use crate::state::{StateError, StateManager};
 
 /* Length of input slice returned in post response */
 const RESPONSE_INPUT_LEN: usize = 16;
@@ -21,7 +22,7 @@ fn get_index() -> String {
 #[post("/api/remote/tree", format = "application/json", data = "<data>")]
 fn post_tree(
     data: Json<ParsleyTree>,
-    state: &rocket::State<StateHandle>,
+    state: &rocket::State<ServerState>,
 ) -> (http::Status, String) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
@@ -54,7 +55,7 @@ fn post_tree(
 
 /* Return posted DebugTree as JSON string */
 #[get("/api/remote/tree")]
-fn get_tree(state: &rocket::State<StateHandle>) -> String {
+fn get_tree(state: &rocket::State<ServerState>) -> String {
     match &state.get_tree() {
         Ok(tree) => serde_json::to_string_pretty(tree)
             .unwrap_or(String::from("Could not serialise tree to JSON")),
