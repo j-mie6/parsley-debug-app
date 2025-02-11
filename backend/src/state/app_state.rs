@@ -1,43 +1,76 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Mutex};
+
+use tauri::Emitter;
 
 use crate::trees::{DebugTree, DebugNode};
 
+use super::StateManager;
+
+
+pub struct AppState(Mutex<AsyncAppState>);
+
+impl AppState {
+    pub fn new(app_handle: tauri::AppHandle) -> AppState {
+        AppState(Mutex::new(AsyncAppState::new(app_handle)))
+    }
+}
+
 
 /* Global app state managed by Tauri */
-pub struct AppState {
+struct AsyncAppState {
+    app_handle: tauri::AppHandle,
     tree: Option<DebugTree>, /* Parser tree that we may have */
     map: HashMap<u32, DebugNode>, /* Map from node_id to the respective node */
 }
 
-impl AppState {
+impl AsyncAppState {
     /* Create new AppState with no parser */
-    pub fn new() -> Self {
-        AppState {
+    fn new(app_handle: tauri::AppHandle) -> Self {
+        AsyncAppState {
+            app_handle,
             tree: None,
             map: HashMap::new(),
         }
     }
 
-    /* Set the parser tree */
-    pub fn set_tree(&mut self, tree: DebugTree) {
+    fn setup_map(&mut self, node: &DebugNode) {
+        self.map.insert(node.node_id, node.clone());
+        node.children.iter().for_each(|child| self.setup_map(child));
+    }
+
+    fn set_tree(&mut self, tree: DebugTree) {
         self.map.clear();
         self.setup_map(tree.get_root());
-        self.tree = Some(tree);
-    }
+        self.tree = Some(tree);        
+        
+        /* Notify frontend listener */
+        self.app_handle.emit("tree-ready", ()).expect("Could not find ready tree");
 
-    /* Get parser tree */
-    pub fn get_tree(&self) -> Option<&DebugTree> {
-        self.tree.as_ref()
     }
-
-    fn setup_map(&mut self, debug_node: &DebugNode) {
-        self.map.insert(debug_node.node_id, debug_node.clone());
-        debug_node.children.iter().for_each(|child| self.setup_map(child));
-    }
-
-    pub fn get_debug_node(&self, node_id: u32) -> Option<&DebugNode> {
-        self.map.get(&node_id)
-    }
-
 }
 
+
+impl StateManager for AppState {
+    fn set_tree(&self, tree: DebugTree) {
+        self.0.lock()
+            .expect("Failed to acquire lock")
+            .set_tree(tree);
+    }
+    
+    fn get_tree(&self) -> DebugTree {
+        self.0.lock()
+            .expect("Failed to acquire lock")
+            .tree
+            .as_ref()
+            .expect("Tree has not been loaded")
+            .clone()
+    }
+    
+    fn get_debug_node(&self, node_id: u32) -> DebugNode {
+        self.0.lock()
+            .expect("Failed to acquire lock")
+            .map.get(&node_id)
+            .expect("Tree has not been loaded")
+            .clone()
+    }
+}

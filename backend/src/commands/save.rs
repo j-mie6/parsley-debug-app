@@ -1,27 +1,20 @@
 use std::io::Write;
 use std::fs::{self, File};
-use std::sync::{Mutex, MutexGuard};
 
+use crate::state::StateManager;
 use crate::{AppState, SAVED_TREE_DIR};
 use crate::trees::{DebugTree, SavedTree};
 
 
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
-pub fn save_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), SaveTreeError> {
-    /* Acquire the state mutex to access the parser */
-    let guard: MutexGuard<AppState> = state.lock().map_err(|_| SaveTreeError::LockFailed)?; // Use `map_err` to convert the error
-    let tree: Option<&DebugTree> = guard.get_tree(); // Access the `tree` field from the locked state
+pub fn save_tree(state: tauri::State<AppState>, name: String) -> Result<(), SaveTreeError> {
+    /* Access the `tree` field from the locked state */
+    let saved_tree: SavedTree = SavedTree::from(&state.get_tree()); 
     
-    /* If tree exists, get the JSON equivalent */
-    let tree_json: String = match tree {
-        Some(tree) => {
-            serde_json::to_string_pretty(&SavedTree::from(tree))
-                .map_err(|_| SaveTreeError::SerdeError)?
-        },
-            
-        None => Err(SaveTreeError::NoTreeError)?,
-    };
+    /* Get the serialised JSON */
+    let tree_json: String = serde_json::to_string_pretty(&saved_tree)
+        .map_err(|_| SaveTreeError::SerdeError)?;
 
 
     /* Create the json file to store the tree */
@@ -75,7 +68,7 @@ pub enum TreeSaveError {
 
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
-pub fn load_saved_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Result<(), ReloadTreeError>  {
+pub fn load_saved_tree(state: tauri::State<AppState>, name: String) -> Result<(), ReloadTreeError>  {
     /* Get the file path of the tree to be reloaded */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, name);
 
@@ -88,10 +81,7 @@ pub fn load_saved_tree(state: tauri::State<Mutex<AppState>>, name: String) -> Re
     let tree: DebugTree = DebugTree::from(&saved_tree);
 
     /* Update the global tauri state with the reloaded tree */
-    state
-        .lock()
-        .map_err(|_| ReloadTreeError::LockingError)?
-        .set_tree(tree);
+    state.set_tree(tree);
 
     Ok(())
 }
