@@ -5,10 +5,8 @@ use tauri::Manager;
 mod server;
 mod state;
 mod commands;
-mod saved_tree;
-mod debug_tree;
+mod trees;
 
-use debug_tree::{DebugTree, DebugNode};
 use state::{AppState, StateHandle};
 
 

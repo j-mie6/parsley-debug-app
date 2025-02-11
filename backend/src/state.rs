@@ -4,7 +4,7 @@ use std::{collections::HashMap, sync::Mutex};
 use mockall::automock;
 use tauri::{Emitter, Manager};
 
-use crate::{DebugNode, DebugTree};
+use crate::trees::{DebugNode, DebugTree};
 
 
 /* Global app state managed by Tauri */

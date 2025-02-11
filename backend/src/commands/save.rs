@@ -2,8 +2,8 @@ use std::io::Write;
 use std::fs::{self, File};
 use std::sync::{Mutex, MutexGuard};
 
-use crate::SAVED_TREE_DIR;
-use crate::{AppState, DebugTree, saved_tree::SavedTree};
+use crate::{AppState, SAVED_TREE_DIR};
+use crate::trees::{DebugTree, SavedTree};
 
 
 /* Saves current tree to saved_trees/name.json */

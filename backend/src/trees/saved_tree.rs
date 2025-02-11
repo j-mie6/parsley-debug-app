@@ -1,4 +1,4 @@
-use crate::{DebugNode, DebugTree};
+use super::{DebugNode, DebugTree};
 
 /* Struct identical to DebugTree that allows serialized saving */
 #[derive(Debug, serde::Serialize, serde::Deserialize)]

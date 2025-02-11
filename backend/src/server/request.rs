@@ -1,10 +1,8 @@
 use rocket::{get, http, post, serde::json::Json};
 
 use super::parsley_tree::ParsleyTree;
-use crate::{
-    state::{StateHandle, StateManager},
-    DebugTree,
-};
+use crate::trees::DebugTree;
+use crate::state::{StateHandle, StateManager};
 
 /* Length of input slice returned in post response */
 const RESPONSE_INPUT_LEN: usize = 16;
@@ -62,11 +60,13 @@ fn get_tree(state: &rocket::State<StateHandle>) -> String {
 #[cfg(test)]
 pub mod test {
 
-    use crate::server::{parsley_tree::test::RAW_TREE_SIMPLE, test::tracked_client};
-    use crate::state::MockStateManager;
-    use crate::{DebugNode, DebugTree};
     use mockall::predicate;
     use rocket::{http, local::blocking};
+
+    use crate::server::test::tracked_client;
+    use crate::server::parsley_tree::test::RAW_TREE_SIMPLE;
+    use crate::state::MockStateManager;
+    use crate::trees::{DebugNode, DebugTree};
 
     pub fn test_tree() -> DebugTree {
         DebugTree::new(

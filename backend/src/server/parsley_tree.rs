@@ -1,4 +1,4 @@
-use crate::{DebugNode, DebugTree};
+use crate::trees::{DebugNode, DebugTree};
 
 /* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(Debug, Clone, PartialEq, serde::Deserialize)]
@@ -70,7 +70,7 @@ pub mod test {
 
     use super::{ParsleyNode, ParsleyTree};
     use crate::server::request::test::test_tree;
-    use crate::{DebugNode, DebugTree};
+    use crate::trees::{DebugNode, DebugTree};
 
     pub const RAW_TREE_SIMPLE: &str = r#"{
             "input": "Test",

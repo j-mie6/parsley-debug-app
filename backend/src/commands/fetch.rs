@@ -1,6 +1,7 @@
 use std::sync::{Mutex, MutexGuard};
 
-use crate::{debug_tree::DebugNode, AppState, DebugTree};
+use crate::AppState;
+use crate::trees::{DebugTree, DebugNode};
 
 /* Frontend-accessible debug render */
 #[tauri::command]
