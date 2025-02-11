@@ -55,7 +55,7 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-right",
         div(
             child <-- State.isLightMode.signal
-            .map((project: Boolean) => if project then moonIcon else sunIcon),
+                .map((project: Boolean) => if project then moonIcon else sunIcon),
             cursor.pointer,
             alignContent.center,
             marginRight.px := 20,
