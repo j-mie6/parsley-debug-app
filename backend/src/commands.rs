@@ -1,5 +1,3 @@
-use tauri;
-
 mod fetch;
 mod save;
 
