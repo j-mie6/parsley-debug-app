@@ -91,7 +91,7 @@ pub mod test {
     pub const RAW_TREE: &str = ""; //TODO
 
     pub fn test_tree() -> SavedTree {
-        todo!()
+        todo!("SavedTree test example does not exist")
     }
 
 }
