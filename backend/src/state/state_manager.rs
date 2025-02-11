@@ -34,4 +34,5 @@ pub enum StateError {
     LockFailed,
     TreeNotFound,
     NodeNotFound(u32),
+    EventEmitFailed,
 }

@@ -12,12 +12,14 @@ pub struct AppState(Mutex<AsyncAppState>);
 impl AppState {
     /* Create a new app state with the app_handle */
     pub fn new(app_handle: tauri::AppHandle) -> AppState {
-        let async_app_state: AsyncAppState = AsyncAppState::new(app_handle);
-        let sync_app_state: Mutex<AsyncAppState> = Mutex::new(async_app_state);
-
-        AppState(sync_app_state)
+        AppState(
+            Mutex::new(
+                AsyncAppState::new(app_handle)
+            )
+        )
     }
 
+    /* Acquire the lock on the AsyncAppState */
     fn acquire(&self) -> Result<MutexGuard<AsyncAppState>, StateError> {
         self.0.lock()
             .map_err(|_| StateError::LockFailed)
@@ -43,30 +45,29 @@ impl AsyncAppState {
         }
     }
 
-    fn setup_map(&mut self, node: &DebugNode) {
+    /* Recursively insert nodes into map of node ids to nodes */
+    fn insert_node(&mut self, node: &DebugNode) {
         self.map.insert(node.node_id, node.clone());
-        node.children.iter().for_each(|child| self.setup_map(child));
+        node.children.iter().for_each(|child| self.insert_node(child));
     }
-
-    fn set_tree(&mut self, tree: DebugTree) {
-        self.map.clear();
-        self.setup_map(tree.get_root());
-        self.tree = Some(tree);        
-        
-        /* Notify frontend listener */
-        self.app_handle.emit("tree-ready", ()).expect("Could not find ready tree");
-
-    }
-
+    
 }
-
 
 impl StateManager for AppState {
 
     /* Update StateManager's tree */
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
-        self.acquire()?.set_tree(tree);
-        Ok(())
+        let mut state: MutexGuard<AsyncAppState> = self.acquire()?;
+        
+        /* Reset map */
+        state.map.clear();
+        state.insert_node(tree.get_root());
+
+        /* Update tree */
+        state.tree = Some(tree);
+        
+        /* Notify frontend listener */
+        state.app_handle.emit("tree-ready", ()).map_err(|_| StateError::EventEmitFailed)
     }
     
     /* Get StateManager's tree */
