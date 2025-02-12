@@ -68,11 +68,6 @@
     box-shadow: none;
 }
 
-/* .tab-button:active {
-    transform: none;
-    box-shadow: none;
-} */
-
 .tab-button:hover {
     background-color: var(--background-tertiary-60);
 }
