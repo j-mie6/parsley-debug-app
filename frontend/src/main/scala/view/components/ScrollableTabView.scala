@@ -38,20 +38,11 @@ object ScrollableTabView {
                 tabTitle,
                 button(
                     className := "close-tab-button",
-                    borderColor := "transparent",
-                    backgroundColor := "transparent",
-                    transition := "all 0.5s",
-                    i(className := "bi bi-x-circle"),
+                    i(className := "bi bi-x"),
 
                     onClick --> {_ => {
                             /* Deletes the respective tab */
                             TabController.deleteTab(tabTitle)
-
-                            /* Reloads the tree if this was the selected tab */
-                            TabController.isSelectedTab(tabTitle).map(selected => {
-                                if selected then
-                                    TreeController.reloadTree()
-                            })
                         }
                     }
                 ),

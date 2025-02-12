@@ -106,7 +106,7 @@ object TabController {
     * @param treeName User-defined name of tree to be saved
     */
     def saveTree(treeName: String): Unit = {
-        Tauri.invoke[String]("save_tree", Map("tree_name" -> treeName))
+        Tauri.invoke[String]("save_tree", Map("name" -> treeName))
         fetchSavedTreeNames()
         setSelectedTab(treeName)
     }
