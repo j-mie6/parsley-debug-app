@@ -1,37 +1,14 @@
 use std::collections::HashMap;
-use std:: sync::{Mutex, MutexGuard};
+use std::sync::{Mutex, MutexGuard};
 
-use serde::Serialize;
-use tauri::Emitter;
-
-use super::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
-
+use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
 struct AppStateInternal {
     app: AppHandle,                 /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
-}
-
-
-/* Wrapper for Tauri AppHandle */
-pub struct AppHandle(tauri::AppHandle);
-
-impl AppHandle {
-    pub fn new(app_handle: tauri::AppHandle) -> AppHandle {
-        AppHandle(app_handle)
-    }
-
-    /* Delegate emit to wrapped Tauri AppHandle */
-    pub fn emit<S>(&self, event: &str, payload: S) -> Result<(), StateError>
-    where 
-        S: Serialize + Clone
-    {
-        self.0.emit(event, payload)
-            .map_err(|_| StateError::EventEmitFailed)
-    }
 }
 
 
@@ -58,6 +35,7 @@ impl AppState {
             .map_err(|_| StateError::LockFailed)
     }
 }
+
 
 impl StateManager for AppState {
     /* Update StateManager's tree */
