@@ -25,7 +25,6 @@ object ScrollableTabView {
 
     /* Renders a tab button from a saved tree name */
     private def tabButton(tabTitle: String, selectedTab: Var[String]): HtmlElement = {
-        // div(
             button(
                 cls := "tab-button",
                 /* Passing on the signal of the selected tab to each tab*/
@@ -67,9 +66,6 @@ object ScrollableTabView {
                     }
                 }
             )
-            
-        // )
-        
     }
     
     def apply(): HtmlElement = {
