@@ -44,7 +44,7 @@
     margin-block: auto;
 }
 
-.scrollable-tab-bar {
+.tab-bar {
     height: 30px;
     max-width: 100%;
     flex-shrink: 0;

@@ -69,7 +69,7 @@ object ScrollableTabView {
     
     def apply(): HtmlElement = {
         div(
-            className:= "scrollable-tab-bar",
+            className:= "tab-bar",
 
             /* Renders tabs */ 
             children <-- TabController.getFileNames.signal.map(names =>
