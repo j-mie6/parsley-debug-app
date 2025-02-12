@@ -1,4 +1,4 @@
-use crate::saved_tree::{SavedTree, SavedNode};
+use super::{SavedTree, SavedNode};
 
 /* Placeholder ParserInfo structures for state management */
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
@@ -23,28 +23,27 @@ impl DebugTree {
 
 impl From<&SavedTree> for DebugTree {
     fn from(debug_tree: &SavedTree) -> Self {
-
-      fn convert_node(node: SavedNode) -> DebugNode {
         /* Recursively convert children into SavedNodes */
-        let children: Vec<DebugNode> = node.children
-            .into_iter()
-            .map(|child| convert_node(child))
-            .collect();
+        fn convert_node(node: SavedNode) -> DebugNode {
+            let children: Vec<DebugNode> = node.children
+                .into_iter()
+                .map(convert_node)
+                .collect();
 
-        /* Instantiate SavedNode */
-        DebugNode::new(
-            node.node_id, 
-            node.name,
-            node.internal,
-            node.success,
-            node.child_id,
-            node.input,
-            children,
-        )
-      }
-      let node: DebugNode = convert_node(debug_tree.get_root().clone());
+            /* Instantiate SavedNode */
+            DebugNode::new(
+                node.node_id, 
+                node.name,
+                node.internal,
+                node.success,
+                node.child_id,
+                node.input,
+                children,
+            )
+        }
 
-      DebugTree::new(debug_tree.get_input().clone(), node)
+        let node: DebugNode = convert_node(debug_tree.get_root().clone());
+        DebugTree::new(debug_tree.get_input().clone(), node)
     }
 }
 
@@ -85,3 +84,41 @@ impl DebugNode {
         }
     }
 }
+
+
+#[cfg(test)]
+pub mod test {
+    /* Debug Tree unit testing */
+
+    use super::{DebugNode, DebugTree};
+
+    pub const RAW_TREE: &str = r#"{
+        "input": "Test",
+        "root": {
+            "nodeId": 0,
+            "name": "Test",
+            "internal": "Test",
+            "success": true,
+            "childId": 0,
+            "input": "Test",
+            "isLeaf": true
+        }
+    }"#;
+
+    pub fn test_tree() -> DebugTree {
+        DebugTree::new(
+            String::from("Test"),
+            DebugNode::new(
+                0u32,
+                String::from("Test"),
+                String::from("Test"),
+                true,
+                Some(0),
+                String::from("Test"),
+                Vec::new(),
+            ),
+        )
+    }
+
+}
+

@@ -1,4 +1,4 @@
-use crate::{DebugNode, DebugTree};
+use super::{DebugNode, DebugTree};
 
 /* Struct identical to DebugTree that allows serialized saving */
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -26,7 +26,7 @@ impl From<&DebugTree> for SavedTree {
             /* Recursively convert children into SavedNodes */
             let children: Vec<SavedNode> = node.children
                 .into_iter()
-                .map(|child| convert_node(child))
+                .map(convert_node)
                 .collect();
     
             /* Instantiate SavedNode */
@@ -66,16 +66,32 @@ impl SavedTree {
 }
 
 impl SavedNode {
-  pub fn new(node_id: u32, name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<SavedNode>, is_leaf: bool) -> Self {
-      SavedNode {
-          node_id,
-          name,
-          internal,
-          success,
-          child_id,
-          input,
-          children,
-          is_leaf
-      }
-  }
+    pub fn new(node_id: u32, name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<SavedNode>, is_leaf: bool) -> Self {
+        SavedNode {
+            node_id,
+            name,
+            internal,
+            success,
+            child_id,
+            input,
+            children,
+            is_leaf
+        }
+    }
+}
+
+
+
+#[cfg(test)]
+pub mod test {
+    /* Saved Tree unit testing */
+
+    use super::SavedTree;
+
+    pub const RAW_TREE: &str = ""; //TODO
+
+    pub fn test_tree() -> SavedTree {
+        todo!("SavedTree test example does not exist")
+    }
+
 }
