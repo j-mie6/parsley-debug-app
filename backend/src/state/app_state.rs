@@ -20,7 +20,7 @@ impl AppState {
     }
 
     /* Acquire the lock on the AppStateInternal */
-    fn acquire(&self) -> Result<MutexGuard<AppStateInternal>, StateError> {
+    fn inner(&self) -> Result<MutexGuard<AppStateInternal>, StateError> {
         self.0.lock()
             .map_err(|_| StateError::LockFailed)
     }
@@ -58,7 +58,7 @@ impl StateManager for AppState {
 
     /* Update StateManager's tree */
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
-        let mut state: MutexGuard<AppStateInternal> = self.acquire()?;
+        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
         
         /* Reset map */
         state.map.clear();
@@ -73,7 +73,7 @@ impl StateManager for AppState {
     
     /* Get StateManager's tree */
     fn get_tree(&self) -> Result<DebugTree, StateError> {
-        self.acquire()?
+        self.inner()?
             .tree
             .as_ref()
             .ok_or(StateError::TreeNotFound)
@@ -82,7 +82,7 @@ impl StateManager for AppState {
     
     /* Get node associated with node ID */
     fn get_node(&self, id: u32) -> Result<DebugNode, StateError> {
-        self.acquire()?
+        self.inner()?
             .map
             .get(&id)
             .ok_or(StateError::NodeNotFound(id))
