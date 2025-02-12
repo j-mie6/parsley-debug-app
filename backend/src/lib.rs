@@ -31,7 +31,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         std::fs::create_dir(SAVED_TREE_DIR)?;
     }
     
-    /* Clone the app handle and create a ServerState */
+    /* Clone the app handle and use to create a ServerState */
     let server_state: ServerState = ServerState::new(app.handle().clone());
 
     /* Mount the Rocket server to the running instance of Tauri */
