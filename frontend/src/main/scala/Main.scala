@@ -1,14 +1,11 @@
 import scala.util.{Try, Success, Failure}
-
-import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import org.scalajs.dom
 import com.raquo.laminar.api.L.*
 
 import view.TreeViewPage
-
-import controller.State
-import controller.Tauri
+import controller.{State, tauri.Tauri}
 
 
 @main def app = {
