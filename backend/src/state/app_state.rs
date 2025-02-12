@@ -30,16 +30,17 @@ impl AppState {
 
 /* Unsynchronised global AppState */
 struct AsyncAppState {
-    app_handle: tauri::AppHandle,   /* Handle to instance of Tauri app, used for events */
-    tree: Option<DebugTree>,        /* Parser tree that we may have */
+    app: tauri::AppHandle,          /* Handle to instance of Tauri app, used for events */
+    tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
 }
 
 impl AsyncAppState {
+    
     /* Create new AppState with no parser */
     fn new(app_handle: tauri::AppHandle) -> Self {
         AsyncAppState {
-            app_handle,
+            app: app_handle,
             tree: None,
             map: HashMap::new(),
         }
@@ -67,7 +68,7 @@ impl StateManager for AppState {
         state.tree = Some(tree);
         
         /* Notify frontend listener */
-        state.app_handle.emit("tree-ready", ()).map_err(|_| StateError::EventEmitFailed)
+        state.app.emit("tree-ready", ()).map_err(|_| StateError::EventEmitFailed)
     }
     
     /* Get StateManager's tree */
@@ -87,4 +88,5 @@ impl StateManager for AppState {
             .ok_or(StateError::NodeNotFound(id))
             .cloned()
     }
+    
 }
