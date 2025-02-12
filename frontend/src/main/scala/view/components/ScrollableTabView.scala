@@ -75,7 +75,7 @@ object ScrollableTabView {
             children <-- TabController.getFileNames.signal.map(names =>
                 names.map(name => {
                     tabButton(name, TabController.getSelectedTab)
-                }): Seq[HtmlElement]
+                })
             )
         )
     }
