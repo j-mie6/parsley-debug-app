@@ -6,21 +6,21 @@ use tauri::Emitter;
 use super::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
-/* Synchronised global app state */
-pub struct AppState(Mutex<AsyncAppState>);
+/* Synchronised global app state wrapping AppStateInternal */
+pub struct AppState(Mutex<AppStateInternal>);
 
 impl AppState {
     /* Create a new app state with the app_handle */
     pub fn new(app_handle: tauri::AppHandle) -> AppState {
         AppState(
             Mutex::new(
-                AsyncAppState::new(app_handle)
+                AppStateInternal::new(app_handle)
             )
         )
     }
 
-    /* Acquire the lock on the AsyncAppState */
-    fn acquire(&self) -> Result<MutexGuard<AsyncAppState>, StateError> {
+    /* Acquire the lock on the AppStateInternal */
+    fn acquire(&self) -> Result<MutexGuard<AppStateInternal>, StateError> {
         self.0.lock()
             .map_err(|_| StateError::LockFailed)
     }
@@ -29,17 +29,17 @@ impl AppState {
 
 
 /* Unsynchronised global AppState */
-struct AsyncAppState {
+struct AppStateInternal {
     app: tauri::AppHandle,          /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
 }
 
-impl AsyncAppState {
+impl AppStateInternal {
     
-    /* Create new AppState with no parser */
+    /* Create new AppStateInternal with no parser */
     fn new(app_handle: tauri::AppHandle) -> Self {
-        AsyncAppState {
+        AppStateInternal {
             app: app_handle,
             tree: None,
             map: HashMap::new(),
@@ -58,7 +58,7 @@ impl StateManager for AppState {
 
     /* Update StateManager's tree */
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
-        let mut state: MutexGuard<AsyncAppState> = self.acquire()?;
+        let mut state: MutexGuard<AppStateInternal> = self.acquire()?;
         
         /* Reset map */
         state.map.clear();
