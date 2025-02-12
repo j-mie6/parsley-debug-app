@@ -21,17 +21,14 @@ object TreeController {
       * @param displayTree The var that the display tree HTML element will be written into.
       */
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
-        for {
-            treeString <- Tauri.invoke[String]("fetch_debug_tree")
-        } do {
-            displayTree.set(
-                if treeString.isEmpty then div("No tree found") else 
-                    DebugTreeHandler.decodeDebugTree(treeString) match {
-                        case Failure(exception) => println(s"Error in decoding debug tree : ${exception.getMessage()}"); div()
-                        case Success(debugTree) => DebugTreeDisplay(debugTree)
-                    }
-            )
+        Tauri.invoke[String]("fetch_debug_tree").onComplete {
+            case Success(result) => DebugTreeHandler.decodeDebugTree(result) match {
+                case Success(debugTree) => displayTree.set(DebugTreeDisplay(debugTree))
+                case Failure(exception) => throw exception
+            }
+            case Failure(error) => displayTree.set(h1(error.toString()))
         }
+        
 
     def saveTree(treeName: String): Unit = Tauri.invoke[String]("save_tree", Map("name" -> treeName))
 
