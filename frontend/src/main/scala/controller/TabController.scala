@@ -5,6 +5,8 @@ import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import controller.TreeController
+
 import upickle.default as up
 
 
@@ -58,6 +60,7 @@ object TabController {
       */
     def setSelectedTab(tabTitle: String): Unit = {
         selectedTab.set(tabTitle)
+        TreeController.reloadTree()
     } 
 
     /**
@@ -105,6 +108,7 @@ object TabController {
     def saveTree(treeName: String): Unit = {
         Tauri.invoke[String]("save_tree", Map("name" -> treeName))
         fetchSavedTreeNames()
+        setSelectedTab(treeName)
     }
     
     /**
