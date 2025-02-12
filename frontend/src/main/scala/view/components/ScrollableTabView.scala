@@ -26,7 +26,7 @@ object ScrollableTabView {
     /* Renders a tab button from a saved tree name */
     private def tabButton(tabTitle: String, selectedTab: Var[String]): HtmlElement = {
             button(
-                cls := "tab-button",
+                className := "tab-button",
                 /* Passing on the signal of the selected tab to each tab*/
                 className <-- TabController.isSelectedTab(tabTitle).map(selected => {
                         if selected then
