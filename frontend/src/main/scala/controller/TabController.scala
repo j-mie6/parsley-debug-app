@@ -5,9 +5,9 @@ import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import controller.TreeController
-
 import upickle.default as up
+
+import controller.TreeController
 
 
 /**
