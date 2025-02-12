@@ -5,7 +5,8 @@ import org.scalajs.dom
 import com.raquo.laminar.api.L.*
 
 import view.TreeViewPage
-import controller.{State, tauri.Tauri}
+import controller.State
+import controller.tauri.Tauri
 
 
 @main def app = {
