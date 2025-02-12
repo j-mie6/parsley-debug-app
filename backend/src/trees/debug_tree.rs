@@ -23,28 +23,27 @@ impl DebugTree {
 
 impl From<&SavedTree> for DebugTree {
     fn from(debug_tree: &SavedTree) -> Self {
-
-      fn convert_node(node: SavedNode) -> DebugNode {
         /* Recursively convert children into SavedNodes */
-        let children: Vec<DebugNode> = node.children
-            .into_iter()
-            .map(convert_node)
-            .collect();
+        fn convert_node(node: SavedNode) -> DebugNode {
+            let children: Vec<DebugNode> = node.children
+                .into_iter()
+                .map(convert_node)
+                .collect();
 
-        /* Instantiate SavedNode */
-        DebugNode::new(
-            node.node_id, 
-            node.name,
-            node.internal,
-            node.success,
-            node.child_id,
-            node.input,
-            children,
-        )
-      }
-      let node: DebugNode = convert_node(debug_tree.get_root().clone());
+            /* Instantiate SavedNode */
+            DebugNode::new(
+                node.node_id, 
+                node.name,
+                node.internal,
+                node.success,
+                node.child_id,
+                node.input,
+                children,
+            )
+        }
 
-      DebugTree::new(debug_tree.get_input().clone(), node)
+        let node: DebugNode = convert_node(debug_tree.get_root().clone());
+        DebugTree::new(debug_tree.get_input().clone(), node)
     }
 }
 
@@ -87,14 +86,11 @@ impl DebugNode {
 }
 
 
-
-
 #[cfg(test)]
 pub mod test {
     /* Debug Tree unit testing */
 
     use super::{DebugNode, DebugTree};
-
 
     pub const RAW_TREE: &str = r#"{
         "input": "Test",
@@ -119,7 +115,7 @@ pub mod test {
                 true,
                 Some(0),
                 String::from("Test"),
-                vec![],
+                Vec::new(),
             ),
         )
     }

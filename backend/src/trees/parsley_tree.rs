@@ -1,4 +1,4 @@
-use crate::trees::{DebugNode, DebugTree};
+use super::{DebugNode, DebugTree};
 
 /* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(Debug, Clone, PartialEq, serde::Deserialize)]
