@@ -51,7 +51,6 @@ object ScrollableTabView {
                             TabController.isSelectedTab(tabTitle).map(selected => {
                                 if selected then
                                     TreeController.reloadTree()
-
                             })
                         }
                     }
