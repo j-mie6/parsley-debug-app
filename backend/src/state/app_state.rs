@@ -41,11 +41,11 @@ impl AppState {
     }
 
     /* Recursively insert nodes into map of node ids to nodes */
-    fn insert_node(&mut self, node: &DebugNode) -> Result<(), StateError> {
+    fn insert_node(&self, node: &DebugNode) -> Result<(), StateError> {
         self.inner()?.map.insert(node.node_id, node.clone());
 
-        for child in node.children {
-            self.insert_node(&child)?;
+        for child in node.children.iter() {
+            self.insert_node(child)?;
         }
         
         Ok(())
@@ -62,7 +62,7 @@ impl StateManager for AppState {
         
         /* Reset map */
         state.map.clear();
-        state.insert_node(tree.get_root());
+        self.insert_node(tree.get_root())?;
 
         /* Update tree */
         state.tree = Some(tree);
