@@ -57,7 +57,7 @@ pub fn delete_tree(name: String) -> Result<(), DeleteTreeError> {
 
 #[derive(Debug, serde::Serialize)]
 pub enum DeleteTreeError {
-    FileSysError,
+    TreeFileRemoveFail,
 }
 
 
