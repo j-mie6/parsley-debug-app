@@ -96,7 +96,7 @@ object TabController {
       * @param tabTitle
       */
     def deleteTab(tabTitle: String): Unit = {
-        Tauri.invoke("delete_tree", Map("name" -> tabTitle))
+        Tauri.invoke("delete_tree", Map("tree_name" -> tabTitle))
         fetchSavedTreeNames()
     }
     
@@ -106,7 +106,7 @@ object TabController {
     * @param treeName User-defined name of tree to be saved
     */
     def saveTree(treeName: String): Unit = {
-        Tauri.invoke[String]("save_tree", Map("name" -> treeName))
+        Tauri.invoke[String]("save_tree", Map("tree_name" -> treeName))
         fetchSavedTreeNames()
         setSelectedTab(treeName)
     }
@@ -118,7 +118,7 @@ object TabController {
     * @param displayTree Tree element to load and display in a given tree
     */
     def loadSavedTree(treeName: String): Unit = {
-        Tauri.invoke[String]("load_saved_tree", Map("name" -> treeName)).foreach { _ =>
+        Tauri.invoke[String]("load_saved_tree", Map("tree_name" -> treeName)).foreach { _ =>
             TreeController.reloadTree()
         }
     }

@@ -7,7 +7,7 @@ use crate::trees::{DebugTree, SavedTree};
 
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
-pub fn save_tree(state: tauri::State<AppState>, name: String) -> Result<(), SaveTreeError> {
+pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<(), SaveTreeError> {
     /* Access the `tree` field from the locked state */
     let saved_tree: SavedTree = SavedTree::from(&state.get_tree()?); 
     
@@ -17,7 +17,7 @@ pub fn save_tree(state: tauri::State<AppState>, name: String) -> Result<(), Save
 
 
     /* Create the json file to store the tree */
-    let file_path: String = format!("saved_trees/{}.json", name);
+    let file_path: String = format!("saved_trees/{}.json", tree_name);
     let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
 
     /* Write tree json to the json file */
@@ -46,12 +46,12 @@ impl From<StateError> for SaveTreeError {
 }
 
 #[tauri::command]
-pub fn delete_tree(name: String) -> Result<(), DeleteTreeError> {
+pub fn delete_tree(tree_name: String) -> Result<(), DeleteTreeError> {
     /* Path to the json file used to store the tree */
-    let file_path: String = format!("saved_trees/{}.json", name);
+    let file_path: String = format!("saved_trees/{}.json", tree_name);
 
     /* Remove the file from the file system */
-    fs::remove_file(file_path).map_err(|_| DeleteTreeError::FileSysError)?;
+    fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
     Ok(())
 }
 
@@ -93,9 +93,9 @@ pub enum FetchTreeNameError {
 
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
-pub fn load_saved_tree(state: tauri::State<AppState>, name: String) -> Result<(), LoadTreeError>  {
+pub fn load_saved_tree(state: tauri::State<AppState>, tree_name: String) -> Result<(), LoadTreeError>  {
     /* Get the file path of the tree to be reloaded */
-    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, name);
+    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
 
     /* Read the contents of the file as a string */
     let contents: String = fs::read_to_string(file_path)
