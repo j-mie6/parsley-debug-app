@@ -6,53 +6,53 @@ use tauri::Emitter;
 use super::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
-/* Synchronised global app state wrapping AppStateInternal */
-pub struct AppState(Mutex<AppStateInternal>);
 
-impl AppState {
-    /* Create a new app state with the app_handle */
-    pub fn new(app_handle: tauri::AppHandle) -> AppState {
-        AppState(
-            Mutex::new(
-                AppStateInternal::new(app_handle)
-            )
-        )
-    }
-
-    /* Acquire the lock on the AppStateInternal */
-    fn inner(&self) -> Result<MutexGuard<AppStateInternal>, StateError> {
-        self.0.lock()
-            .map_err(|_| StateError::LockFailed)
-    }
-
-}
-
-
-/* Unsynchronised global AppState */
+/* Unsynchronised AppState */
 struct AppStateInternal {
     app: tauri::AppHandle,          /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
 }
 
-impl AppStateInternal {
-    
-    /* Create new AppStateInternal with no parser */
-    fn new(app_handle: tauri::AppHandle) -> Self {
-        AppStateInternal {
-            app: app_handle,
-            tree: None,
-            map: HashMap::new(),
-        }
+
+/* Synchronised global app state wrapping internal AppState */
+pub struct AppState(Mutex<AppStateInternal>);
+
+
+impl AppState {
+
+    /* Create a new app state with the app_handle */
+    pub fn new(app_handle: tauri::AppHandle) -> AppState {
+        AppState(
+            Mutex::new(
+                AppStateInternal {
+                    app: app_handle,
+                    tree: None,
+                    map: HashMap::new(),
+                }
+            )
+        )
+    }
+
+    /* Access wrapped inner AppStateInternal struct */
+    fn inner(&self) -> Result<MutexGuard<AppStateInternal>, StateError> {
+        self.0.lock()
+            .map_err(|_| StateError::LockFailed)
     }
 
     /* Recursively insert nodes into map of node ids to nodes */
-    fn insert_node(&mut self, node: &DebugNode) {
-        self.map.insert(node.node_id, node.clone());
-        node.children.iter().for_each(|child| self.insert_node(child));
+    fn insert_node(&mut self, node: &DebugNode) -> Result<(), StateError> {
+        self.inner()?.map.insert(node.node_id, node.clone());
+
+        for child in node.children {
+            self.insert_node(&child)?;
+        }
+        
+        Ok(())
     }
-    
+
 }
+
 
 impl StateManager for AppState {
 
@@ -68,7 +68,8 @@ impl StateManager for AppState {
         state.tree = Some(tree);
         
         /* Notify frontend listener */
-        state.app.emit("tree-ready", ()).map_err(|_| StateError::EventEmitFailed)
+        state.app.emit("tree-ready", ())
+            .map_err(|_| StateError::EventEmitFailed)
     }
     
     /* Get StateManager's tree */
