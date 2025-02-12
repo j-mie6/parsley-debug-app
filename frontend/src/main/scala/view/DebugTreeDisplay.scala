@@ -3,8 +3,7 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
-
-import controller.Tauri
+import controller.tauri.Tauri
 
 /**
   * Object containing rendering methods for the Debug Tree
