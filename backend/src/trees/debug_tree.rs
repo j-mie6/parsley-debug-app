@@ -28,7 +28,7 @@ impl From<&SavedTree> for DebugTree {
         /* Recursively convert children into SavedNodes */
         let children: Vec<DebugNode> = node.children
             .into_iter()
-            .map(|child| convert_node(child))
+            .map(convert_node)
             .collect();
 
         /* Instantiate SavedNode */
