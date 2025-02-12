@@ -22,7 +22,7 @@ object TreeController {
       */
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         for {
-          treeString <- Tauri.invoke[String]("fetch_debug_tree")
+            treeString <- Tauri.invoke[String]("fetch_debug_tree")
         } do {
             displayTree.set(
                 if treeString.isEmpty then div("No tree found") else 
