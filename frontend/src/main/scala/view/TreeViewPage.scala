@@ -37,7 +37,7 @@ object TreeViewPage extends DebugViewPage {
         saveIcon, /* Floppy disk icon */
 
         onClick --> { _ => {
-            /* DO SAVE POP UP LOGIC HERE */
+            /* TODO: Save popup logic */
 
             TabController.saveTree((rand.nextInt).toString())
         }}
