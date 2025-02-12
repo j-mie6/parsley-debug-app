@@ -1,4 +1,4 @@
-use crate::{DebugNode, DebugTree};
+use super::{DebugNode, DebugTree};
 
 /* Represents tree received from parsley-debug-views' Remote View*/
 #[derive(Debug, Clone, PartialEq, serde::Deserialize)]
@@ -64,28 +64,28 @@ impl From<ParsleyTree> for DebugTree {
     }
 }
 
+
 #[cfg(test)]
 pub mod test {
     /* Data unit testing */
 
     use super::{ParsleyNode, ParsleyTree};
-    use crate::server::request::test::test_tree;
-    use crate::{DebugNode, DebugTree};
+    use crate::trees::{debug_tree, DebugNode, DebugTree};
 
-    pub const RAW_TREE_SIMPLE: &str = r#"{
-            "input": "Test",
-            "root": {
-                "name": "Test",
-                "internal": "Test",
-                "success": true,
-                "childId": 0,
-                "fromOffset": 0,
-                "toOffset": 4,
-                "children": []
-            }
-        }"#;
+    pub const RAW_TREE: &str = r#"{
+        "input": "Test",
+        "root": {
+            "name": "Test",
+            "internal": "Test",
+            "success": true,
+            "childId": 0,
+            "fromOffset": 0,
+            "toOffset": 4,
+            "children": []
+        }
+    }"#;
 
-    fn test_parsley_tree() -> ParsleyTree {
+    pub fn test_tree() -> ParsleyTree {
         ParsleyTree {
             input: String::from("Test"),
             root: ParsleyNode {
@@ -100,10 +100,11 @@ pub mod test {
         }
     }
 
+
     #[test]
     fn parsley_tree_deserialises() {
         let parsley_tree: ParsleyTree =
-            serde_json::from_str(&RAW_TREE_SIMPLE).expect("Could not deserialise ParsleyTree");
+            serde_json::from_str(&RAW_TREE).expect("Could not deserialise ParsleyTree");
 
         assert_eq!(parsley_tree.input, "Test");
         assert_eq!(parsley_tree.root.name, "Test");
@@ -225,8 +226,8 @@ pub mod test {
 
     #[test]
     fn parsley_debug_tree_converts_into_debug_tree() {
-        let parsley_tree: ParsleyTree = test_parsley_tree();
-        let debug_tree: DebugTree = test_tree();
+        let parsley_tree: ParsleyTree = test_tree();
+        let debug_tree: DebugTree = debug_tree::test::test_tree();
 
         assert_eq!(debug_tree, parsley_tree.into());
     }
