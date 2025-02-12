@@ -24,28 +24,51 @@ object ScrollableTabView {
         )
 
     /* Renders a tab button from a saved tree name */
-    private def tabButton(tabTitle: String): HtmlElement = {
-        div(
+    private def tabButton(tabTitle: String, selectedTab: Var[String]): HtmlElement = {
+        // div(
             button(
-            className := "tab-button",
-            
-            transition := "all 0.5s",
-            tabTitle,
-            button(
-                className := "close-tab-button",
-
-                borderColor := "transparent",
-                backgroundColor := "transparent",
+                cls := "tab-button",
+                /* Passing on the signal of the selected tab to each tab*/
+                className <-- TabController.isSelectedTab(tabTitle).map(selected => {
+                        if selected then
+                            "selected"
+                        else
+                            ""
+                }),
                 transition := "all 0.5s",
-                i(className := "bi bi-x-circle"),
+                tabTitle,
+                button(
+                    className := "close-tab-button",
+                    borderColor := "transparent",
+                    backgroundColor := "transparent",
+                    transition := "all 0.5s",
+                    i(className := "bi bi-x-circle"),
 
-                onClick --> {_ => TabController.deleteTab(tabTitle)}
-            ),
+                    onClick --> {_ => {
+                            /* Deletes the respective tab */
+                            TabController.deleteTab(tabTitle)
 
-            onClick --> {_ => TabController.loadSavedTree(tabTitle)}
-            ),
+                            /* Reloads the tree if this was the selected tab */
+                            TabController.isSelectedTab(tabTitle).map(selected => {
+                                if selected then
+                                    TreeController.reloadTree()
+
+                            })
+                        }
+                    }
+                ),
+
+                onClick --> {_ => {
+                        /* Sets selected tab signal to newly selected tab */
+                        TabController.setSelectedTab(tabTitle)
+
+                        /* Loads in the respective tree */
+                        TabController.loadSavedTree(tabTitle)
+                    }
+                }
+            )
             
-        )
+        // )
         
     }
     
@@ -55,7 +78,9 @@ object ScrollableTabView {
 
             /* Renders tabs */ 
             children <-- TabController.getFileNames.signal.map(names =>
-                names.map(name => tabButton(name)): Seq[HtmlElement]
+                names.map(name => {
+                    tabButton(name, TabController.getSelectedTab)
+                }): Seq[HtmlElement]
             )
         )
     }

@@ -19,18 +19,22 @@ object TabController {
     
     /* List of file names (excluding path and ext) wrapped in Var */
     private var fileNames: Var[List[String]] = Var(Nil)
+
+    /* The tab that is currented selected */
+    private val selectedTab: Var[String] = Var("")
+
     
     /**
     * Gets the scrollable tab element
     */
-    def getTab = scrollableTab
+    def getTabBar: Var[HtmlElement] = scrollableTab
     
     /**
       * 
       *
       * @param tab An individual tab comprising of title and delete button
       */
-    def setTab(tab: HtmlElement) = {
+    def setTabBar(tab: HtmlElement): Unit = {
         scrollableTab.set(tab)
     }
     
@@ -41,7 +45,35 @@ object TabController {
         fetchSavedTreeNames()
         fileNames
     }
-    
+
+    /**
+      * Returns the title of the selected tab
+      */
+    def getSelectedTab: Var[String] = selectedTab
+
+    /**
+      * Sets the shared signal for selected tab to a particular tab title
+      *
+      * @param tabTitle The title of the tab that has been selected
+      */
+    def setSelectedTab(tabTitle: String): Unit = {
+        selectedTab.set(tabTitle)
+    } 
+
+    /**
+      * Checks if a tab is the currently selected tab
+      *
+      * @param tabTitle The title of the tab we are checking
+      */
+    def isSelectedTab(tabTitle: String): Signal[Boolean] = {
+        selectedTab.signal.map(selected => selected == tabTitle)
+    }
+
+    /**
+      * Returns true if there are no saved trees
+      */
+    def hasNoTabs: Signal[Boolean] = 
+        getFileNames.signal.map(names => names.isEmpty)
     
     /**
     * 
@@ -63,7 +95,6 @@ object TabController {
     def deleteTab(tabTitle: String): Unit = {
         Tauri.invoke("delete_tree", Map("name" -> tabTitle))
         fetchSavedTreeNames()
-        TreeController.reloadTree()
     }
     
     /**

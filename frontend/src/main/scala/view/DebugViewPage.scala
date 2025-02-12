@@ -76,14 +76,6 @@ abstract class DebugViewPage extends Page {
         headerRight,
     )
 
-    /* Default tab view */
-    private val defaultTab: HtmlElement = div(
-        button(
-            backgroundColor := "red",
-            "Saved tree #1"
-        )
-    )
-
     /**
       * Render the DebugViewPage header and a child element. This allows different views to 
       * be inserted.
@@ -93,7 +85,6 @@ abstract class DebugViewPage extends Page {
       * @return HTML element of the DebugView page.
       */
     override def render(child: Option[HtmlElement]): HtmlElement = {
-        TabController.setTab(defaultTab)
 
         super.render(Some(mainTag(
         className := "debug-view-page",
