@@ -32,7 +32,7 @@ object TabController {
     def getTabBar: Var[HtmlElement] = scrollableTab
     
     /**
-      * 
+      * Sets tab bar element
       *
       * @param tab An individual tab comprising of title and delete button
       */
@@ -91,7 +91,7 @@ object TabController {
     }
     
     /**
-      * 
+      * Deletes a tab within the tab bar and reloads saved tree names
       *
       * @param tabTitle
       */
