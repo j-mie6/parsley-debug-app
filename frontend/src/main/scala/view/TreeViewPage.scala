@@ -18,11 +18,6 @@ import controller.TreeController
   * Object containing rendering functions for the TreeViewPage.
   */
 object TreeViewPage extends DebugViewPage {
-    /* Default tree view when no tree is loaded */
-    private val noTreeFound: HtmlElement = div(
-        className := "tree-view-error",
-        "No tree found! Start debugging by attaching DillRemoteView to a parser"
-    )
 
     /* Visual call to action  for user to save the current tree */
     private lazy val saveIcon: HtmlElement = i(className := "bi bi-floppy-fill",
@@ -38,19 +33,18 @@ object TreeViewPage extends DebugViewPage {
 
         onClick --> { _ => {
             /* TODO: Save popup logic */
-
             TabController.saveTree((rand.nextInt).toString())
         }}
     )
 
     def apply(): HtmlElement = {
-        TreeController.setDisplayTree(noTreeFound)
+        TreeController.setEmptyTree()
 
         Tauri.listen[Unit]("tree-ready", {_ => TreeController.reloadTree()})
         
         super.render(Some(div(
             className := "tree-view-page",
-            saveButton,            
+            saveButton,
             child <-- TreeController.getDisplayTree, /* Renders tree */
         )))
     }

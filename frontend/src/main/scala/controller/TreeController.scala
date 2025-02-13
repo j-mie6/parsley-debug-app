@@ -18,6 +18,12 @@ object TreeController {
     
     /* Display tree that will be rendered by TreeView */
     private val displayTree: Var[HtmlElement] = Var(div())
+
+    /* Default tree view when no tree is loaded */
+    private val noTreeFound: HtmlElement = div(
+        className := "tree-view-error",
+        "No tree found! Start debugging by attaching DillRemoteView to a parser"
+    )
     
     /* Gets display tree element*/
     def getDisplayTree: Var[HtmlElement] = displayTree
@@ -31,6 +37,10 @@ object TreeController {
     */
     def setDisplayTree(tree: HtmlElement) = {
         displayTree.set(tree)
+    }
+
+    def setEmptyTree(): Unit = {
+        setDisplayTree(noTreeFound)
     }
     
     /**
