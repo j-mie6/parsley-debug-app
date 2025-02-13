@@ -52,13 +52,18 @@
     flex-direction: row;
     align-items: flex-end;
     justify-content: flex-start;
+    gap: 5px;
     margin-left: 20px;
     margin-right: 20px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .tab-button {
     height: 20px;
-    padding-inline: 5px;
+    padding: 0 10px;
     margin: 0;
     border: none;
     border-top-left-radius: 5px;
@@ -66,6 +71,12 @@
     background-color: var(--tab); 
     border-color: var(--tab); 
     box-shadow: none;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease-in-out;
+    position: relative;
+    justify-content: space-between;
+    white-space: nowrap;
+    min-width: 80px;
 }
 
 .tab-button:hover {
@@ -82,12 +93,20 @@
 .close-tab-button {
     border-color: transparent;
     background-color: transparent;
-    transition: all 0.5s;
-    border-radius: 10px;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    border-radius: 50%;
+    position: relative;
+    align-self: center;
+    width: 16px; /* Adjust for better fit */
+    height: 16px; /* Ensure a perfect circle */
+    margin-left: 8px;
+    padding: 0;
+
 }
 
 .close-tab-button:hover {
-    background-color: var(--background-tertiary-60);
+    background-color: var(--tab);
+    transform: scale(1.1);
 }
 
 
