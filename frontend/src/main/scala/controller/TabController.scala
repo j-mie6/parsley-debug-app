@@ -75,8 +75,8 @@ object TabController {
     /**
       * Returns true if there are no saved trees
       */
-    def hasSavedTrees: Signal[Boolean] = 
-        getFileNames.signal.map(names => !names.isEmpty)
+    def noSavedTrees: Signal[Boolean] = 
+        getFileNames.signal.map(names => names.isEmpty)
     
     /**
     * 

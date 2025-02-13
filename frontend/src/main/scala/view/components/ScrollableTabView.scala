@@ -28,23 +28,17 @@ object ScrollableTabView {
             button(
                 className := "tab-button",
                 /* Passing on the signal of the selected tab to each tab*/
-                className <-- TabController.isSelectedTab(tabTitle).map(selected => {
-                        if selected then
-                            "selected"
-                        else
-                            ""
-                }),
+                cls("selected") <-- TabController.isSelectedTab(tabTitle),
                 transition := "all 0.5s",
                 tabTitle,
                 button(
                     className := "close-tab-button",
                     i(className := "bi bi-x"),
 
-                    onClick --> {_ => {
-                            /* Deletes the respective tab */
-                            TabController.deleteTab(tabTitle)
-                        }
-                    }
+                    onClick --> {_ => 
+                        /* Deletes the respective tab */
+                        TabController.deleteTab(tabTitle) 
+                    },
                 ),
 
                 onClick --> {_ => {
