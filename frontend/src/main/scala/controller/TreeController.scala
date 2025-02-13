@@ -9,7 +9,7 @@ import upickle.default as up
 import org.scalablytyped.runtime.StringDictionary
 
 import view.DebugTreeDisplay
-
+import view.ErrorHandler
 
 /**
   * Object containing methods for manipulating the DebugTree.
@@ -22,26 +22,35 @@ object TreeController {
       */
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         Tauri.invoke[String]("fetch_debug_tree").onComplete {
-            case Success(result) => DebugTreeHandler.decodeDebugTree(result) match {
+            case Success(result) => DebugTreeHandler.decodeDebugTree("skibidi") match {
                 case Success(debugTree) => displayTree.set(DebugTreeDisplay(debugTree))
-                case Failure(exception) => throw exception
+                case Failure(exception) => displayTree.set(SerialisationError())
             }
-            case Failure(error) => displayTree.set(h1(error.toString()))
+            case Failure(error) => println(s"Error: $error"); ErrorHandler.handleError(error)
         }
         
 
-    def saveTree(treeName: String): Unit = Tauri.invoke[String]("save_tree", Map("name" -> treeName))
+    def saveTree(treeName: String): Unit = 
+        Tauri.invoke[String]("save_tree", Map("name" -> treeName)).onComplete {
+            case Failure(error) => ErrorHandler.handleError(error)
+        }
 
     def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
-        Tauri.invoke[String]("fetch_saved_tree_names").foreach { serializedNames =>
-            // Update fileNames with parsed names
-            fileNames.update(_ => up.read[List[String]](serializedNames))
+        Tauri.invoke[String]("fetch_saved_tree_names").onComplete{
+            case Success(names) => names.foreach { serializedNames =>
+                // Update fileNames with parsed names
+                fileNames.update(_ => up.read[List[String]](serializedNames))
+            }
+            case Failure(error) => ErrorHandler.handleError(error)
         }
     }
 
     def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
-        Tauri.invoke[String]("load_saved_tree", Map("name" -> treeName)).foreach { _ =>
-            TreeController.reloadTree(displayTree)
+        Tauri.invoke[String]("load_saved_tree", Map("name" -> treeName)).onComplete {
+            case Success(trees) => trees.foreach { _ =>
+                TreeController.reloadTree(displayTree)
+            }
+            case Failure(error) => ErrorHandler.handleError(error)
         }
     }
         

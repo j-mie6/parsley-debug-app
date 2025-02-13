@@ -7,6 +7,9 @@ import com.raquo.laminar.api.L.*
 
 import model.DebugNode
 import controller.{Tauri, DebugTreeHandler}
+import org.xml.sax.ErrorHandler
+
+import view.error.ErrorHandler
 
 /**
   * Wrapper for DebugNode to add reactive children.
@@ -34,7 +37,7 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
                     DebugTreeHandler.decodeDebugNodes(nodesString) match {
                         case Success(nodes) => nodes
                         case Failure(exception) => {
-                            println(s"Error in decoding debug tree: ${exception.getMessage()}") 
+                            ErrorHandler.handleError(exception)
                             Nil
                         }
                     }
