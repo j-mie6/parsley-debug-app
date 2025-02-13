@@ -75,8 +75,8 @@ object TabController {
     /**
       * Returns true if there are no saved trees
       */
-    def hasNoTabs: Signal[Boolean] = 
-        getFileNames.signal.map(names => names.isEmpty)
+    def hasSavedTrees: Signal[Boolean] = 
+        getFileNames.signal.map(names => !names.isEmpty)
     
     /**
     * 
@@ -93,10 +93,10 @@ object TabController {
     /**
       * Deletes a tab within the tab bar and reloads saved tree names
       *
-      * @param tabTitle
+      * @param treeName The name of the tree belonging to the tab to be deleted
       */
-    def deleteTab(tabTitle: String): Unit = {
-        Tauri.invoke("delete_tree", Map("tree_name" -> tabTitle))
+    def deleteTab(name: String): Unit = {
+        Tauri.invoke("delete_tree", Map("treeName" -> name))
         fetchSavedTreeNames()
     }
     
@@ -105,10 +105,10 @@ object TabController {
     *
     * @param treeName User-defined name of tree to be saved
     */
-    def saveTree(treeName: String): Unit = {
-        Tauri.invoke[String]("save_tree", Map("name" -> treeName))
+    def saveTree(name: String): Unit = {
+        Tauri.invoke[String]("save_tree", Map("treeName" -> name))
         fetchSavedTreeNames()
-        setSelectedTab(treeName)
+        setSelectedTab(name)
     }
     
     /**
@@ -118,7 +118,7 @@ object TabController {
     * @param displayTree Tree element to load and display in a given tree
     */
     def loadSavedTree(treeName: String): Unit = {
-        Tauri.invoke[String]("load_saved_tree", Map("tree_name" -> treeName)).foreach { _ =>
+        Tauri.invoke[String]("load_saved_tree", Map("treeName" -> treeName)).foreach { _ =>
             TreeController.reloadTree()
         }
     }
