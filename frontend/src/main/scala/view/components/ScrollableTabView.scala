@@ -35,9 +35,6 @@ object ScrollableTabView {
                 onClick --> {_ => {
                         /* Sets selected tab signal to newly selected tab */
                         TabController.setSelectedTab(tabTitle)
-
-                        /* Loads in the respective tree */
-                        TabController.loadSavedTree(tabTitle)
                     }
                 }
             )
@@ -52,7 +49,7 @@ object ScrollableTabView {
 
                     onClick --> {_ => 
                         /* Deletes the respective tab */
-                        TabController.deleteTab(tabTitle) 
+                        TabController.deleteTab(tabTitle)
                     },
                 )
     }

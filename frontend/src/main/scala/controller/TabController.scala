@@ -1,9 +1,9 @@
 package controller
 
-import com.raquo.laminar.api.L.*
-
 import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
+
+import com.raquo.laminar.api.L.*
 
 import upickle.default as up
 
@@ -60,6 +60,11 @@ object TabController {
       */
     def setSelectedTab(tabTitle: String): Unit = {
         selectedTab.set(tabTitle)
+
+        /* Loads in the respective tree */
+        TabController.loadSavedTree(tabTitle) 
+
+        /* Reload the tree */
         TreeController.reloadTree()
     } 
 
