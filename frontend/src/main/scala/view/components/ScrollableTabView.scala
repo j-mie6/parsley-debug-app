@@ -5,7 +5,7 @@ import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 
 import controller.TabController
-import controller.Tauri
+import controller.tauri.Tauri
 import controller.TreeController
 
 

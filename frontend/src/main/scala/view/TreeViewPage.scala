@@ -44,7 +44,7 @@ object TreeViewPage extends DebugViewPage {
     def apply(): HtmlElement = {
         TreeController.setEmptyTree()
 
-        Tauri.listen[Unit](Event.TreeReady, {_ => TreeController.reloadTree(displayTree)})
+        Tauri.listen[Unit](Event.TreeReady, {_ => TreeController.reloadTree()})
         
         super.render(Some(div(
             className := "tree-view-page",

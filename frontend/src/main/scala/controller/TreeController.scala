@@ -76,7 +76,7 @@ object TreeController {
 
     def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
         Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName)).foreach { _ =>
-            TreeController.reloadTree(displayTree)
+            TreeController.reloadTree()
         }
     }
         

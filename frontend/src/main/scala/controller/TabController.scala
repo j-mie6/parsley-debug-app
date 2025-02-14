@@ -7,7 +7,9 @@ import com.raquo.laminar.api.L.*
 
 import upickle.default as up
 
+import controller.tauri.{Tauri, Command}
 import controller.TreeController
+
 
 
 /**
@@ -89,7 +91,7 @@ object TabController {
     * @param fileNames List of all trees saved by the user within a session
     */
     def fetchSavedTreeNames(): Unit = {
-        Tauri.invoke[String]("fetch_saved_tree_names").foreach { serializedNames =>
+        Tauri.invoke[String](Command.FetchSavedTreeNames).foreach { serializedNames =>
             /* Update fileNames with parsed names */
             fileNames.update(_ => up.read[List[String]](serializedNames))
         }
@@ -101,7 +103,7 @@ object TabController {
       * @param treeName The name of the tree belonging to the tab to be deleted
       */
     def deleteTab(name: String): Unit = {
-        Tauri.invoke("delete_tree", Map("treeName" -> name))
+        Tauri.invoke(Command.DeleteTree, Map("treeName" -> name))
         fetchSavedTreeNames()
     }
     
@@ -111,7 +113,7 @@ object TabController {
     * @param treeName User-defined name of tree to be saved
     */
     def saveTree(name: String): Unit = {
-        Tauri.invoke[String]("save_tree", Map("treeName" -> name))
+        Tauri.invoke[String](Command.SaveTree, Map("treeName" -> name))
         fetchSavedTreeNames()
         setSelectedTab(name)
     }
@@ -123,7 +125,7 @@ object TabController {
     * @param displayTree Tree element to load and display in a given tree
     */
     def loadSavedTree(treeName: String): Unit = {
-        Tauri.invoke[String]("load_saved_tree", Map("treeName" -> treeName)).foreach { _ =>
+        Tauri.invoke[String](Command.LoadSavedTree, Map("treeName" -> treeName)).foreach { _ =>
             TreeController.reloadTree()
         }
     }
