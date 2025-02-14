@@ -22,7 +22,7 @@ object TabController {
     private val scrollableTab: Var[HtmlElement] = Var(div())
     
     /* List of file names (excluding path and ext) wrapped in Var */
-    private var fileNames: Var[List[String]] = Var(Nil)
+    private val fileNames: Var[List[String]] = Var(Nil)
 
     /* The tab that is currented selected */
     private val selectedTab: Var[String] = Var("")
@@ -103,7 +103,7 @@ object TabController {
       * @param treeName The name of the tree belonging to the tab to be deleted
       */
     def deleteTab(name: String): Unit = {
-        Tauri.invoke(Command.DeleteTree, Map("treeName" -> name))
+        Tauri.invoke[Unit](Command.DeleteTree, Map("treeName" -> name))
         fetchSavedTreeNames()
     }
     
