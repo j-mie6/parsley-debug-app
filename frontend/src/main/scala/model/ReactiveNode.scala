@@ -7,7 +7,6 @@ import com.raquo.laminar.api.L.*
 
 import model.DebugNode
 import controller.{Tauri, DebugTreeHandler}
-import org.xml.sax.ErrorHandler
 
 import view.error.ErrorHandler
 

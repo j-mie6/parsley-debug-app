@@ -3,24 +3,46 @@ package view.error
 import com.raquo.laminar.api.L.*
 
 import view.error.*
+// import web.syntax.visibilitySwitch
 
 object ErrorHandler {
-    def handleError(error: String): HtmlElement = {
+    
+    private lazy val alertIcon: Element = i(
+        className := "bi bi-exclamation-triangle-fill", 
+        fontSize.px := 30,
+        )
+    val errorVar: Var[Option[Throwable]] = Var(None)
+    
+    val displayError: HtmlElement = 
+      div(
+        className := "popup",
+        h2(
+            child.text <-- errorVar.signal.map(_.getOrElse(Exception("Err")).toString),
+            color := "#ffffff",
+        ),
+        div(
+            className := "popup-text",
+            child <-- errorVar.signal.map(getErrorMessage(_)),//.map(getErrorMessage(_)),
+        ),
+        display <-- errorVar.signal.map(opt => if (opt.isDefined) "block" else "none"),
+        // onClick --> {_ => errorVar.set(None)}
+      )
+    
+    def getErrorMessage(error: Option[Throwable]): String = {
+        if (!error.isDefined) {
+            return "None"
+        }
+
+        val errorName = error.get.toString().split(" ").last
+        
+        return errorName
         // error match {
-        //     case "LockFailed" => BreakingError(error)
-        //     case "SerialiseFailed" => BreakingError(error)
-        //     case "TreeNotFound" => BreakingError(error)
-        //     case "CreateDirFailed" => BreakingError(error)
-        //     case "NodeNotFound" => BreakingError(error)
-	    //     case "WriteTreeFailed" => BreakingError(error)
-	    //     case "ReadDirFailed" => BreakingError(error)
-	    //     case "ReadPathFailed" => BreakingError(error)
-	    //     case "StringContainsInvalidUnicode" => PopupError(error)
-	    //     case "SuffixNotFound" => BreakingError(error)
-	    //     case "ReadFileFailed" => ReadFileFailedError()
-	    //     case "DeserialiseFailed" => DeserialiseFailedError()
-        //     case _ => UnknownError() 
+        //     case 
         // }
-        BreakingError(error)
+    }
+
+    def handleError(error: Throwable): Unit = {
+        println(s"Error was: ${error.toString()}")
+        errorVar.set(Some(error))
     }
 }

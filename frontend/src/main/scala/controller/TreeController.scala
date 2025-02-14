@@ -9,7 +9,7 @@ import upickle.default as up
 import org.scalablytyped.runtime.StringDictionary
 
 import view.DebugTreeDisplay
-import view.ErrorHandler
+import view.error.ErrorHandler
 
 /**
   * Object containing methods for manipulating the DebugTree.
@@ -24,7 +24,7 @@ object TreeController {
         Tauri.invoke[String]("fetch_debug_tree").onComplete {
             case Success(result) => DebugTreeHandler.decodeDebugTree("skibidi") match {
                 case Success(debugTree) => displayTree.set(DebugTreeDisplay(debugTree))
-                case Failure(exception) => displayTree.set(SerialisationError())
+                case Failure(error) => ErrorHandler.handleError(error)
             }
             case Failure(error) => println(s"Error: $error"); ErrorHandler.handleError(error)
         }
@@ -33,14 +33,14 @@ object TreeController {
     def saveTree(treeName: String): Unit = 
         Tauri.invoke[String]("save_tree", Map("name" -> treeName)).onComplete {
             case Failure(error) => ErrorHandler.handleError(error)
+            case Success(_) => ()
         }
 
     def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
-        Tauri.invoke[String]("fetch_saved_tree_names").onComplete{
-            case Success(names) => names.foreach { serializedNames =>
+        Tauri.invoke[String]("fetch_saved_tree_names").onComplete {
+            case Success(names: String) => 
                 // Update fileNames with parsed names
-                fileNames.update(_ => up.read[List[String]](serializedNames))
-            }
+                fileNames.update(_ => up.read[List[String]](names))
             case Failure(error) => ErrorHandler.handleError(error)
         }
     }

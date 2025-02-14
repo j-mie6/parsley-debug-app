@@ -10,11 +10,17 @@ import view.TreeViewPage
 import controller.State
 import controller.Tauri
 
+import view.error.ErrorHandler
 
 @main def app = {
     dom.document.documentElement.setAttribute("data-theme", if State.isLightMode.now() then "light" else "dark")
     renderOnDomContentLoaded(
         dom.document.getElementById("app"),
-        TreeViewPage()
+        root
     )
 }
+
+val root: HtmlElement = div(
+    TreeViewPage(),
+    ErrorHandler.displayError
+)
