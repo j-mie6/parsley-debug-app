@@ -38,7 +38,6 @@ impl From<DebugTree> for SavedTree {
                 node.child_id,
                 node.input,
                 children,
-                node.is_leaf
             )
         }
 
@@ -66,7 +65,16 @@ impl SavedTree {
 }
 
 impl SavedNode {
-    pub fn new(node_id: u32, name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<SavedNode>, is_leaf: bool) -> Self {
+    pub fn new(
+        node_id: u32, 
+        name: String, 
+        internal: String, 
+        success: bool, 
+        child_id: Option<u32>, 
+        input: String, 
+        children: Vec<SavedNode>
+    ) -> Self {
+        let is_leaf: bool = children.is_empty();
         SavedNode {
             node_id,
             name,
@@ -75,7 +83,7 @@ impl SavedNode {
             child_id,
             input,
             children,
-            is_leaf
+            is_leaf,
         }
     }
 }
