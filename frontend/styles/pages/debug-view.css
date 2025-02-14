@@ -55,7 +55,7 @@
     gap: 5px;
     margin-left: 20px;
     margin-right: 20px;
-    overflow-x: scroll;
+    overflow-x: hidden; /* scroll */
     overflow-y: hidden;
     flex-wrap: nowrap;
     white-space: nowrap;
