@@ -19,8 +19,8 @@ pub struct SavedNode {
     pub is_leaf: bool,
 }
 
-impl From<&DebugTree> for SavedTree {
-    fn from(debug_tree: &DebugTree) -> Self {
+impl From<DebugTree> for SavedTree {
+    fn from(debug_tree: DebugTree) -> Self {
 
         fn convert_node(node: DebugNode) -> SavedNode {
             /* Recursively convert children into SavedNodes */
@@ -38,7 +38,6 @@ impl From<&DebugTree> for SavedTree {
                 node.child_id,
                 node.input,
                 children,
-                node.is_leaf
             )
         }
 
@@ -66,7 +65,16 @@ impl SavedTree {
 }
 
 impl SavedNode {
-    pub fn new(node_id: u32, name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<SavedNode>, is_leaf: bool) -> Self {
+    pub fn new(
+        node_id: u32, 
+        name: String, 
+        internal: String, 
+        success: bool, 
+        child_id: Option<u32>, 
+        input: String, 
+        children: Vec<SavedNode>
+    ) -> Self {
+        let is_leaf: bool = children.is_empty();
         SavedNode {
             node_id,
             name,
@@ -75,7 +83,7 @@ impl SavedNode {
             child_id,
             input,
             children,
-            is_leaf
+            is_leaf,
         }
     }
 }
@@ -86,12 +94,21 @@ impl SavedNode {
 pub mod test {
     /* Saved Tree unit testing */
 
-    use super::SavedTree;
+    use super::{SavedTree, SavedNode};
 
-    pub const RAW_TREE: &str = ""; //TODO
 
     pub fn test_tree() -> SavedTree {
-        todo!("SavedTree test example does not exist")
+        SavedTree::new(
+            String::from("Test"),
+            SavedNode::new(
+                0u32,
+                String::from("Test"),
+                String::from("Test"),
+                true,
+                Some(0),
+                String::from("Test"),
+                Vec::new(),
+            ),
+        )
     }
-
 }
