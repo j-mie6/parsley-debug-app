@@ -1,12 +1,13 @@
 package controller
 
-import com.raquo.laminar.api.L.*
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Try, Success, Failure}
+import scala.concurrent.ExecutionContext.Implicits.global
 
-import upickle.default as up
 import org.scalablytyped.runtime.StringDictionary
+import com.raquo.laminar.api.L.*
+import upickle.default as up
+
+import controller.tauri.{Tauri, Command}
 
 import view.DebugTreeDisplay
 
@@ -50,7 +51,7 @@ object TreeController {
     */
     def reloadTree(): Unit = {
         for {
-            treeString <- Tauri.invoke[String]("fetch_debug_tree")
+            treeString <- Tauri.invoke[String](Command.FetchDebugTree)
         } do {
             setDisplayTree(
                 if treeString.isEmpty then div("No tree found") else 
@@ -61,6 +62,22 @@ object TreeController {
                     case Success(debugTree) => DebugTreeDisplay(debugTree)
                 }
             )
-        }   
-    } 
+        }
+    }
+
+    def saveTree(treeName: String): Unit = Tauri.invoke[String](Command.SaveTree, Map("name" -> treeName))
+
+    def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
+        Tauri.invoke[String](Command.FetchSavedTreeNames).foreach { serializedNames =>
+            // Update fileNames with parsed names
+            fileNames.update(_ => up.read[List[String]](serializedNames))
+        }
+    }
+
+    def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
+        Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName)).foreach { _ =>
+            TreeController.reloadTree(displayTree)
+        }
+    }
+        
 }
