@@ -94,12 +94,21 @@ impl SavedNode {
 pub mod test {
     /* Saved Tree unit testing */
 
-    use super::SavedTree;
+    use super::{SavedTree, SavedNode};
 
-    pub const RAW_TREE: &str = ""; //TODO
 
     pub fn test_tree() -> SavedTree {
-        todo!("SavedTree test example does not exist")
+        SavedTree::new(
+            String::from("Test"),
+            SavedNode::new(
+                0u32,
+                String::from("Test"),
+                String::from("Test"),
+                true,
+                Some(0),
+                String::from("Test"),
+                Vec::new(),
+            ),
+        )
     }
-
 }
