@@ -17,9 +17,11 @@ object ErrorHandler {
       div(
         className := "popup",
         h2(
-            child.text <-- errorVar.signal.map(_.getOrElse(Exception("Err")).toString),
+            "Something went wrong",
+            // child.text <-- errorVar.signal.map(_.getOrElse(Exception("Err")).toString),
             color := "#ffffff",
         ),
+        br(),
         div(
             className := "popup-text",
             child <-- errorVar.signal.map(getErrorMessage(_)),//.map(getErrorMessage(_)),
@@ -33,8 +35,20 @@ object ErrorHandler {
             return "None"
         }
 
-        val errorName = error.get.toString().split(" ").last
+        var errorName = error.get.toString().split(" ").last
         
+        errorName = errorName match {
+            case "LockFailed" => ""
+            case "NodeNotFound" => ""
+            case "SerialiseFailed" => ""
+            case "TreeNotFound" => "App server could not retrieve debug tree from Remote View"
+            case "ReadDirFailed" => ""
+            case "ReadPathFailed" => ""
+            case "StringContainsInvalidUnicode" => ""
+            case "SuffixNotFound" => ""
+            case _ => "Something unexpected went wrong"
+        }
+
         return errorName
         // error match {
         //     case 
