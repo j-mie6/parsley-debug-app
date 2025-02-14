@@ -97,8 +97,8 @@
     border-radius: 50%;
     position: relative;
     align-self: center;
-    width: 16px; /* Adjust for better fit */
-    height: 16px; /* Ensure a perfect circle */
+    width: 16px;
+    height: 16px;
     margin-left: 8px;
     padding: 0;
 

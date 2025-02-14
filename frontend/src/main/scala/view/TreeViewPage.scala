@@ -33,7 +33,10 @@ object TreeViewPage extends DebugViewPage {
 
         onClick --> { _ => {
             /* TODO: Save popup logic */
-            TabController.saveTree((rand.nextInt).toString())
+            val treeName: String = (rand.nextInt).toString()
+            TabController.saveTree(treeName)
+            TabController.setSelectedTab(treeName)
+
         }}
     )
 

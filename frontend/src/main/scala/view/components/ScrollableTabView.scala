@@ -31,16 +31,7 @@ object ScrollableTabView {
                 cls("selected") <-- TabController.isSelectedTab(tabTitle),
                 transition := "all 0.5s",
                 tabTitle,
-                button(
-                    className := "close-tab-button",
-                    i(className := "bi bi-x"),
-
-                    onClick --> {_ => 
-                        /* Deletes the respective tab */
-                        TabController.deleteTab(tabTitle) 
-                    },
-                ),
-
+                closeTabButton(tabTitle),
                 onClick --> {_ => {
                         /* Sets selected tab signal to newly selected tab */
                         TabController.setSelectedTab(tabTitle)
@@ -50,6 +41,20 @@ object ScrollableTabView {
                     }
                 }
             )
+    }
+
+    def closeTabButton(tabTitle: String): HtmlElement = {
+        button(
+                    className := "close-tab-button",
+
+                    /* Close 'X' icon */
+                    i(className := "bi bi-x"),
+
+                    onClick --> {_ => 
+                        /* Deletes the respective tab */
+                        TabController.deleteTab(tabTitle) 
+                    },
+                )
     }
     
     def apply(): HtmlElement = {
