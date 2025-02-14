@@ -10,7 +10,7 @@ use crate::trees::{DebugTree, SavedTree};
 #[tauri::command]
 pub fn save_tree(state: tauri::State<AppState>, name: String) -> Result<(), SaveTreeError> {
     /* Access the `tree` field from the locked state */
-    let saved_tree: SavedTree = SavedTree::from(&state.get_tree()?); 
+    let saved_tree: SavedTree = SavedTree::from(state.get_tree()?); 
     
     /* Get the serialised JSON */
     let tree_json: String = serde_json::to_string_pretty(&saved_tree)
@@ -89,7 +89,7 @@ pub fn load_saved_tree(state: tauri::State<AppState>, name: String) -> Result<()
 
     /* Deserialize the tree into SavedTree, then convert to DebugTree */
     let saved_tree: SavedTree = serde_json::from_str(&contents).map_err(|_| LoadTreeError::DeserialiseFailed)?;
-    let tree: DebugTree = DebugTree::from(&saved_tree);
+    let tree: DebugTree = DebugTree::from(saved_tree);
 
     /* Update the global tauri state with the reloaded tree */
     state.set_tree(tree)?;

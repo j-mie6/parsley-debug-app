@@ -19,8 +19,8 @@ pub struct SavedNode {
     pub is_leaf: bool,
 }
 
-impl From<&DebugTree> for SavedTree {
-    fn from(debug_tree: &DebugTree) -> Self {
+impl From<DebugTree> for SavedTree {
+    fn from(debug_tree: DebugTree) -> Self {
 
         fn convert_node(node: DebugNode) -> SavedNode {
             /* Recursively convert children into SavedNodes */
