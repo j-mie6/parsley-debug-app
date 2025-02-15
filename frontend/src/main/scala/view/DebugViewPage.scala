@@ -10,7 +10,10 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
+import view.ScrollableTabView
+
 import controller.State
+import controller.TabController
 import controller.tauri.Tauri
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -81,10 +84,13 @@ abstract class DebugViewPage extends Page {
       * 
       * @return HTML element of the DebugView page.
       */
-    override def render(child: Option[HtmlElement]): HtmlElement = super.render(Some(mainTag(
-        className := "debug-view-page",
+    override def render(child: Option[HtmlElement]): HtmlElement = {
 
+        super.render(Some(mainTag(
+        className := "debug-view-page",
         headerView,
+        ScrollableTabView(),
         child.getOrElse(div())
     )))
+    } 
 }

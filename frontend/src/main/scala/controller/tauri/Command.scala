@@ -9,6 +9,7 @@ enum Command(val name: String):
     case SaveTree extends Command("save_tree")
     case FetchSavedTreeNames extends Command("fetch_saved_tree_names")
     case LoadSavedTree extends Command("load_saved_tree")
+    case DeleteTree extends Command("delete_tree")
 
 
 object Command {
