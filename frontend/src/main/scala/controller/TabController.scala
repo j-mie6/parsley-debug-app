@@ -38,9 +38,8 @@ object TabController {
       *
       * @param tab An individual tab comprising of title and delete button
       */
-    def setTabBar(tab: HtmlElement): Unit = {
-        scrollableTab.set(tab)
-    }
+    def setTabBar(tab: HtmlElement): Unit = scrollableTab.set(tab)
+    
     
     /**
     * Gets filenames of saved trees
@@ -75,9 +74,8 @@ object TabController {
       *
       * @param tabTitle The title of the tab we are checking
       */
-    def isSelectedTab(tabTitle: String): Signal[Boolean] = {
+    def isSelectedTab(tabTitle: String): Signal[Boolean] =
         selectedTab.signal.map(selected => selected == tabTitle)
-    }
 
     /**
       * Returns true if there are no saved trees
@@ -125,7 +123,8 @@ object TabController {
     * @param displayTree Tree element to load and display in a given tree
     */
     def loadSavedTree(treeName: String): Unit = {
-        Tauri.invoke[String](Command.LoadSavedTree, Map("treeName" -> treeName)).foreach { _ =>
+        Tauri.invoke[String](Command.LoadSavedTree, Map("treeName" -> treeName))
+          .foreach { _ =>
             TreeController.reloadTree()
         }
     }
