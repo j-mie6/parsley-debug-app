@@ -122,10 +122,9 @@ object TabController {
     * @param treeName User-defined name of the tree to be loaded
     * @param displayTree Tree element to load and display in a given tree
     */
-    def loadSavedTree(treeName: String): Unit = {
+    def loadSavedTree(treeName: String): Unit = 
         Tauri.invoke[String](Command.LoadSavedTree, Map("treeName" -> treeName))
           .foreach { _ =>
             TreeController.reloadTree()
         }
-    }
 }
