@@ -17,7 +17,7 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<(),
 
 
     /* Create the json file to store the tree */
-    let file_path: String = format!(SAVED_TREE_DIR + "{}.json", tree_name);
+    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
     let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
 
     /* Write tree json to the json file */
@@ -48,7 +48,7 @@ impl From<StateError> for SaveTreeError {
 #[tauri::command]
 pub fn delete_tree(tree_name: String) -> Result<(), DeleteTreeError> {
     /* Path to the json file used to store the tree */
-    let file_path: String = format!(SAVED_TREE_DIR + "{}.json", tree_name);
+    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
 
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
