@@ -16,17 +16,35 @@ object DebugTreeDisplay {
       * 
       * @return HTML element representing the whole tree.
       */
+
+
+    val zoomFactor = Var(1.0)
+
+    // TODO: Fix not being able to move left
+    val wheelHandler = onWheel.map { e =>
+      if (e.ctrlKey) {
+        e.preventDefault()
+
+
+        val zoomChange = 1.0 + (e.deltaY * -0.002) 
+        (zoomFactor.now() * zoomChange).max(0.5).min(3.0)
+      } else {
+        zoomFactor.now()
+      }
+    } --> zoomFactor
+
     def apply(tree: DebugTree): HtmlElement = div(
-        className := "debug-tree-display",
-        h1(
-            className := "debug-tree-title",
-            p("Parser Input : ", margin.px := 0, fontSize.px := 15, fontStyle.italic, fontWeight.lighter),
-            tree.input
-        ),
-        div(
+        className := "debug-tree-display zoom-container",
+            h1(
+                className := "debug-tree-title",
+                p("Parser Input : ", margin.px := 0, fontSize.px := 15, fontStyle.italic, fontWeight.lighter),
+                tree.input
+            ),
+            styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
+            wheelHandler,
+
             ReactiveNodeDisplay(ReactiveNode(tree.root))
         )
-    )
 }
 
 /**

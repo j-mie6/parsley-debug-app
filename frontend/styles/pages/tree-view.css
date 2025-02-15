@@ -45,3 +45,8 @@
     flex-direction: row;
     align-items: center;
 }
+
+.zoom-container {
+    transition: transform 0.1s ease-in-out;
+    transform-origin: initial;
+}
