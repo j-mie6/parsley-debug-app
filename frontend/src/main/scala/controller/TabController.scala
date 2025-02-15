@@ -84,7 +84,7 @@ object TabController {
         getFileNames.signal.map(names => names.isEmpty)
     
     /**
-    * 
+    * Fetches all tree names saved by the user from the backend
     *
     * @param fileNames List of all trees saved by the user within a session
     */
@@ -106,7 +106,7 @@ object TabController {
     }
     
     /**
-    * 
+    * Saves the the curren tree to the backend as a given name
     *
     * @param treeName User-defined name of tree to be saved
     */
@@ -117,7 +117,7 @@ object TabController {
     }
     
     /**
-    * 
+    * Loads a saved tree from the backend into the display tree
     *
     * @param treeName User-defined name of the tree to be loaded
     * @param displayTree Tree element to load and display in a given tree
