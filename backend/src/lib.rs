@@ -9,7 +9,6 @@ mod files;
 
 use state::AppState;
 use server::ServerState;
-use files::{clean_saved_trees, make_saved_trees};
 
 
 /* Setup Tauri app */
@@ -26,7 +25,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let app_state: AppState = AppState::new(app.app_handle().clone());
     app.manage(app_state);
 
-    make_saved_trees().expect("Error occured while making saved_trees folder");
+    files::make_saved_trees().expect("Error occured while making saved_trees folder");
     
     /* Clone the app handle and use to create a ServerState */
     let server_state: ServerState = ServerState::new(app.handle().clone());
@@ -58,7 +57,7 @@ pub fn run() {
     app.run(|_, event| {
         /* On window shutdown, remove saved_trees folder */
         if let RunEvent::ExitRequested { code: None, .. } = event {
-            clean_saved_trees().expect("Error occured cleaning saved trees");
+            files::delete_saved_trees().expect("Error occured cleaning saved trees");
         }
     })
 }
