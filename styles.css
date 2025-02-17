@@ -1,5 +1,6 @@
 @import url('frontend/styles/pages/debug-view.css');
 @import url('frontend/styles/pages/tree-view.css');
+@import url('frontend/styles/pages/tab-bar.css');
 @import url('frontend/styles/displays/debug-tree.css');
 
 :root {
