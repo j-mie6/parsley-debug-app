@@ -23,13 +23,16 @@ object MainViewHandler {
     /**
      * Sets if the current view is the tree view
      * 
+     * @param isTree True if the current view is the tree view element
      */
     def setIsTreeView(isTree: Boolean): Unit = isTreeView.set(isTree)
 
     /**
      * Gets if the view is the tree view 
      * 
-     * @return True if the current view is the tree view element
+     * @param isTree True if the current view is the tree view element
+     * @return True if the comparing view with tree view element,
+     * false for input
      */
     def isTreeView(isTree: Boolean): Signal[Boolean] = {
         isTreeView.signal.map(_ == isTree)
