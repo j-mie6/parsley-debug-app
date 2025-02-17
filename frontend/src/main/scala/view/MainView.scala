@@ -15,13 +15,9 @@ object MainView extends DebugViewPage {
 
         Tauri.listen[Unit](Event.TreeReady, {_ => TreeController.reloadTree()})
 
-        super.render(
-            Some(
-                div(
+        super.render(Some(div(
                     child <-- MainViewHandler.getMainView
-                )
-            )
-
+            ))
         )
     }
 }
