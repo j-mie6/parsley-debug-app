@@ -12,9 +12,9 @@ import model.DebugTree
 import controller.TreeController
 
 /**
-  * Object containing rendering functions for the TreeViewPage.
+  * Object containing rendering functions for the TreeView
   */
-object TreeViewPage {
+object TreeView {
 
     def apply(): HtmlElement = {        
         div(

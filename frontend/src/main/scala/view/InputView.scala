@@ -18,8 +18,6 @@ import controller.TreeController
   * Object containing rendering functions for the input view page.
   */
 
-object InputViewPage {
+object InputView {
     def apply(): HtmlElement = div(InputController.getInput)
-    
-    
 }
