@@ -8,7 +8,7 @@ import com.raquo.laminar.api.L.*
 import upickle.default as up
 
 import controller.tauri.{Tauri, Command}
-
+import model.DebugTree
 import view.DebugTreeDisplay
 
 
@@ -16,38 +16,45 @@ import view.DebugTreeDisplay
   * Object containing methods for manipulating the DebugTree.
   */
 object TreeController {
+    /* Deserialise the JSON string into a DebugTree */
+    private def deserialise(json: String): Option[DebugTree] = DebugTreeHandler.decodeDebugTree(json).toOption
     
+    /* Convert the DebugTree into a HtmlElement */
+    private def display(tree: Option[DebugTree]): Option[HtmlElement] = tree.map(DebugTreeDisplay(_))
+
     /**
-      * Fetch the debug tree root from the tauri backend.
+      * Fetch the debug tree from the tauri backend
       *
-      * @param displayTree The var that the display tree HTML element will be written into.
+      * @return Stream containing an optional HTML Element DebugTreeDisplay to be rendered.
       */
-    def reloadTree(displayTree: Var[HtmlElement]): Unit = 
-        for {
-            treeString <- Tauri.invoke[String](Command.FetchDebugTree.name)
-        } do {
-            displayTree.set(
-                if treeString.isEmpty then div("No tree found") else 
-                    DebugTreeHandler.decodeDebugTree(treeString) match {
-                        case Failure(exception) => println(s"Error in decoding debug tree : ${exception.getMessage()}"); div()
-                        case Success(debugTree) => DebugTreeDisplay(debugTree)
-                    }
-            )
-        }
+    def load: EventStream[Option[HtmlElement]] = Tauri.invoke[String](Command.FetchDebugTree)
+        .map(deserialise)
+        .map(display)
 
-    def saveTree(treeName: String): Unit = Tauri.invoke[String](Command.SaveTree.name, Map("name" -> treeName))
 
-    def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
-        Tauri.invoke[String](Command.FetchSavedTreeNames.name).foreach { serializedNames =>
-            // Update fileNames with parsed names
-            fileNames.update(_ => up.read[List[String]](serializedNames))
-        }
-    }
-
-    def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
-        Tauri.invoke[String](Command.LoadSavedTree.name, Map("name" -> treeName)).foreach { _ =>
-            TreeController.reloadTree(displayTree)
-        }
-    }
+    /** 
+     * Fetch saved trees
+     * 
+     * @return Stream containing saved tree names
+     */
+    def fetchSavedTreeNames(): EventStream[List[String]] = Tauri.invoke[String](Command.FetchSavedTreeNames)
+        .map(up.read[List[String]](_))
         
+    /**
+      * Save tree into JSON file
+      *
+      * @param treeName Name to save the tree with 
+      */
+    def saveTree(treeName: String): Unit = Tauri.invoke[Unit](Command.SaveTree, Map("name" -> treeName))
+
+    /**
+      * Load saved tree into view
+      *
+      * @param treeName Name of tree to load
+      */
+    def loadSavedTree(treeName: String): EventStream[Option[HtmlElement]] = 
+        Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName))
+            .map(deserialise)
+            .map(display)
+
 }

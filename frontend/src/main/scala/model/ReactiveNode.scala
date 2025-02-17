@@ -19,29 +19,16 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
     /**
       * Clear the children from this mode.
       */
-    def resetChildren(): Unit = { 
-        children.set(Nil)
-    }
+    def resetChildren(): Unit = children.set(Nil)
   
     /**
       * Query the Tauri backend to get the children of this node.
       */
     def reloadChildren(): Unit = {
-        for {
-            nodesString: String <- Tauri.invoke[String](Command.FetchNodeChildren.name, Map("nodeId" -> debugNode.nodeId))
-        } do {
-            if (!nodesString.isEmpty) {
-                children.set(
-                    DebugTreeHandler.decodeDebugNodes(nodesString) match {
-                        case Success(nodes) => nodes
-                        case Failure(exception) => {
-                            println(s"Error in decoding debug tree: ${exception.getMessage()}") 
-                            Nil
-                        }
-                    }
-                )
-            }
-        }
+        Tauri.invoke[String](Command.FetchNodeChildren, Map("nodeId" -> debugNode.nodeId))
+            .filterNot(_.isEmpty())
+            .map(DebugTreeHandler.decodeDebugNodes(_).getOrElse(Nil))
+            --> children
     }
 }
 
