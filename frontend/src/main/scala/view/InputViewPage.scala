@@ -18,11 +18,8 @@ import controller.TreeController
   * Object containing rendering functions for the input view page.
   */
 
-object InputViewPage extends DebugViewPage {
-    def apply(): HtmlElement = {        
-        super.render(
-            Some(InputController.getInput)
-        )
-    }
+object InputViewPage {
+    def apply(): HtmlElement = div(InputController.getInput)
+    
     
 }

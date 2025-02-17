@@ -14,11 +14,11 @@ import controller.TreeController
 /**
   * Object containing rendering functions for the TreeViewPage.
   */
-object TreeViewPage extends DebugViewPage {
+object TreeViewPage {
 
     def apply(): HtmlElement = {        
-        super.render(Some(div(
+        div(
             TreeController.getDisplayTree, /* Renders tree */
-        )))
+        )
     }
 }
