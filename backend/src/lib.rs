@@ -1,4 +1,6 @@
 use tauri::Manager;
+use tauri::RunEvent;
+use std::fs::remove_dir_all;
 
 mod server;
 mod state;
@@ -49,12 +51,36 @@ pub fn run() {
     /* Fix for NVidia graphics cards */
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
 
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .setup(setup) /* Run app setup */
         .invoke_handler(commands::handlers()) /* Expose Tauri commands to frontend */
-        .run(tauri::generate_context!()) /* Start up the app */
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error building the app");
+
+    app.run(move |_app_handle, _event| {
+      match &_event {
+        /* On window shutdown, remove saved_trees folder */
+        RunEvent::ExitRequested { api, code, .. } => {
+          if code.is_none() {
+            api.prevent_exit();
+            let _res = clean_saved_trees();
+          }
+        }
+      _ => (),
+    }
+    })
+}
+
+/* Removes all saved_trees wiith the folder */
+pub fn clean_saved_trees() -> Result<(), CleanTreesError> {
+    remove_dir_all(SAVED_TREE_DIR).map_err(|_| CleanTreesError::CleanSavedTreesError)?;
+    Ok(())
+}
+
+#[derive(Debug, serde::Serialize)]
+pub enum CleanTreesError {
+    CleanSavedTreesError,
 }
 
 
