@@ -27,9 +27,8 @@ object TreeController {
     )
     
     /* Gets display tree element*/
-    def getDisplayTree: Var[HtmlElement] = displayTree
+    def getDisplayTree: HtmlElement = div(child <-- displayTree.signal)
     
-    def renderDisplayTree = displayTree.signal
     
     /**
     * Mutably updates the displayTree variable
@@ -59,7 +58,10 @@ object TreeController {
                     case Failure(exception) => 
                         println(s"Error in decoding debug tree : ${exception.getMessage()}");
                         div()
-                    case Success(debugTree) => DebugTreeDisplay(debugTree)
+                    case Success(debugTree) => {
+                        InputController.setInput(debugTree.input)
+                        DebugTreeDisplay(debugTree)
+                    }
                 }
             )
         }
