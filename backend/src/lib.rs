@@ -11,9 +11,6 @@ use state::AppState;
 use server::ServerState;
 use files::{clean_saved_trees, make_saved_trees};
 
-/* Directory for saved trees. */
-const SAVED_TREE_DIR : &str = "./saved_trees/";
-
 
 /* Setup Tauri app */
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {

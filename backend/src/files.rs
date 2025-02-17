@@ -1,6 +1,8 @@
 use std::fs;
 
-use crate::SAVED_TREE_DIR;
+
+/* Directory for saved trees. */
+pub const SAVED_TREE_DIR : &str = "./saved_trees/";
 
 
 /* Removes all saved_trees wiith the folder */
