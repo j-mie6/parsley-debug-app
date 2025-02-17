@@ -10,13 +10,18 @@ import controller.tauri.{Tauri, Event}
 import controller.TreeController
 
 
-object MainView {
+object MainView extends DebugViewPage {
     def apply(): HtmlElement = {
+
         Tauri.listen[Unit](Event.TreeReady, {_ => TreeController.reloadTree()})
 
-        div(
-            className:= "main-view",
-            child <-- MainViewHandler.getMainView
+        super.render(
+            Some(
+                div(
+                    child <-- MainViewHandler.getMainView
+                )
+            )
+
         )
     }
 }
