@@ -56,7 +56,7 @@ pub fn run() {
         .setup(setup)
         .invoke_handler(commands::handlers())
         .build(tauri::generate_context!())
-        .expect("error building the app");
+        .expect("Error building the app");
 
     /* Run app setting it to clean used folders on shutdown */
     app.run(|_, event| {
