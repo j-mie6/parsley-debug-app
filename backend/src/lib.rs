@@ -25,7 +25,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let app_state: AppState = AppState::new(app.app_handle().clone());
     app.manage(app_state);
 
-    files::make_saved_trees().expect("Error occured while making saved_trees folder");
+    files::create_saved_trees_dir().expect("Error occured while making saved_trees folder");
     
     /* Clone the app handle and use to create a ServerState */
     let server_state: ServerState = ServerState::new(app.handle().clone());
@@ -57,7 +57,7 @@ pub fn run() {
     app.run(|_, event| {
         /* On window shutdown, remove saved_trees folder */
         if let RunEvent::ExitRequested { code: None, .. } = event {
-            files::delete_saved_trees().expect("Error occured cleaning saved trees");
+            files::delete_saved_trees_dir().expect("Error occured cleaning saved trees");
         }
     })
 }
