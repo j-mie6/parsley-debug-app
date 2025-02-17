@@ -62,16 +62,21 @@ pub fn run() {
     app.run(|_, event| {
         /* On window shutdown, remove saved_trees folder */
         if let RunEvent::ExitRequested { code: None, .. } = event {
-            clean_saved_trees();
+            clean_saved_trees().expect("Error occured cleaning saved trees");
         }
     })
 }
 
 /* Removes all saved_trees wiith the folder */
-pub fn clean_saved_trees() -> () {
-    remove_dir_all(SAVED_TREE_DIR).expect("Saved trees could not be cleaned");
+fn clean_saved_trees() -> Result<(), CleanTreesError> {
+    remove_dir_all(SAVED_TREE_DIR).map_err(|_| CleanTreesError::CleanTreesError);
+    Ok(())
 }
 
+#[derive (Debug)]
+enum CleanTreesError {
+    CleanTreesError
+}
 
 #[cfg(test)]
 mod test {
