@@ -34,7 +34,7 @@ object MainViewHandler {
      * @return True if the comparing view with tree view element,
      * false for input
      */
-    def isTreeView(isTree: Boolean): Signal[Boolean] = {
+    def isTreeView(isTree: Boolean): Signal[Boolean] = 
         isTreeView.signal.map(_ == isTree)
-    }
+    
 }
