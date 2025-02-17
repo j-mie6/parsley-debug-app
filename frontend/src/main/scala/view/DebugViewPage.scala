@@ -10,8 +10,6 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
-import view.ScrollableTabView
-
 import controller.InputController
 import controller.MainViewHandler
 import controller.State
@@ -87,6 +85,26 @@ abstract class DebugViewPage extends Page {
         headerRight,
     )
 
+    /* Visual call to action  for user to save the current tree */
+    private lazy val saveIcon: HtmlElement = i(className := "bi bi-floppy-fill",
+        fontSize.px := 25, marginRight.px := 10)
+
+    /* Random number generator */
+    private val rand = new scala.util.Random
+
+    /* Adds ability to save and store current tree. */
+    private lazy val saveButton: Element = button(
+        className := "tree-view-save",
+
+        saveIcon, /* Floppy disk icon */
+
+        onClick --> { _ => {
+            val treeName: String = (rand.nextInt).toString()
+            TabController.saveTree(treeName)
+            TabController.setSelectedTab(treeName)
+        }}
+    )
+
     /**
       * Render the DebugViewPage header and a child element. This allows different views to 
       * be inserted.
@@ -101,8 +119,11 @@ abstract class DebugViewPage extends Page {
             className := "debug-view-page",
             headerView,
             ScrollableTabView(),
-            // child <-- MainViewHandler.getDebugView
-            child.getOrElse(div())
+            div(
+                className := "tree-view-page",
+                saveButton,
+                child.getOrElse(div())
+            )
         )))
     } 
 }
