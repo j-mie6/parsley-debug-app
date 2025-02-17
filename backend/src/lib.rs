@@ -1,14 +1,15 @@
 use tauri::Manager;
 use tauri::RunEvent;
-use std::fs::remove_dir_all;
 
 mod server;
 mod state;
 mod commands;
 mod trees;
+mod files;
 
 use state::AppState;
 use server::ServerState;
+use files::clean_saved_trees;
 
 /* Directory for saved trees. */
 const SAVED_TREE_DIR : &str = "./saved_trees/";
@@ -67,16 +68,6 @@ pub fn run() {
     })
 }
 
-/* Removes all saved_trees wiith the folder */
-fn clean_saved_trees() -> Result<(), CleanTreesError> {
-    remove_dir_all(SAVED_TREE_DIR).map_err(|_| CleanTreesError::CleanTreesError);
-    Ok(())
-}
-
-#[derive (Debug)]
-enum CleanTreesError {
-    CleanTreesError
-}
 
 #[cfg(test)]
 mod test {
