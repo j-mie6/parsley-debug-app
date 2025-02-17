@@ -10,7 +10,7 @@ sealed trait DillException(name: String, message: String) {
     def displayElement(): HtmlElement
 }
 
-sealed trait Warning(name: String, message: String) extends DillException(name: String, message: String) {
+sealed trait Warning extends DillException {
     override def displayElement(): HtmlElement = {
         div(
             className := "popup",
@@ -29,9 +29,10 @@ sealed trait Warning(name: String, message: String) extends DillException(name: 
     }
 }
 
-case class PracticeWarning(name: String, message: String) extends Warning(name: String, message: String)
+case class PracticeWarning(name: String, message: String) extends DillException(name, message), Error
+object DefaultWarning extends DillException("bob", "died"), Error
 
-sealed trait Error(name: String, message: String) extends DillException(name: String, message: String) {
+sealed trait Error extends DillException {
     override def displayElement(): HtmlElement = {
         div(
             className := "popup",

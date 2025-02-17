@@ -14,7 +14,7 @@ object ErrorHandler {
 
     val errorVar: Var[Option[DillException]] = Var(None)
     
-    val displayError: HtmlElement = errorVar.now().get.displayElement()
+    val displayError: HtmlElement = errorVar.now().getOrElse(DefaultWarning).displayElement()
 
     def mapError(error: Throwable): DillException = {
         error match {
