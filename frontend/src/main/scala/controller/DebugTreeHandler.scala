@@ -20,7 +20,7 @@ object DebugTreeHandler {
     def decodeDebugTree(jsonString: String): Try[DebugTree] = {
         Try(up.read[DebugTree](jsonString)) match {
             case tree: Success[_] => tree
-            case Failure(err) => Failure(Exception(s"Error while decoding JSON: ${err.getMessage()}", err))
+            case Failure(err) => Failure(MalformedJSONException)
         }
     }
 
@@ -34,7 +34,9 @@ object DebugTreeHandler {
     def decodeDebugNodes(jsonString: String): Try[List[DebugNode]] = {
         Try(up.read[List[DebugNode]](jsonString)) match {
             case nodes: Success[_] => nodes
-            case Failure(err) => Failure(Exception(s"Error while decoding JSON: ${err.getMessage()}", err))
+            case Failure(err) => Failure(MalformedJSONException)
         }
     }
 }
+
+object MalformedJSONException extends Exception

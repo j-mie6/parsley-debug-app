@@ -22,7 +22,7 @@ object TreeController {
       */
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         Tauri.invoke[String]("fetch_debug_tree").onComplete {
-            case Success(result) => DebugTreeHandler.decodeDebugTree("skibidi") match {
+            case Success(result) => DebugTreeHandler.decodeDebugTree(result) match {
                 case Success(debugTree) => displayTree.set(DebugTreeDisplay(debugTree))
                 case Failure(error) => ErrorHandler.handleError(error)
             }
@@ -43,6 +43,7 @@ object TreeController {
                 fileNames.update(_ => up.read[List[String]](names))
             case Failure(error) => ErrorHandler.handleError(error)
         }
+        
     }
 
     def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
