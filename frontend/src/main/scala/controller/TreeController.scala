@@ -24,7 +24,7 @@ object TreeController {
       */
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         for {
-            treeString <- Tauri.invoke[String](Command.FetchDebugTree)
+            treeString <- Tauri.invoke[String](Command.FetchDebugTree.name)
         } do {
             displayTree.set(
                 if treeString.isEmpty then div("No tree found") else 
@@ -35,17 +35,17 @@ object TreeController {
             )
         }
 
-    def saveTree(treeName: String): Unit = Tauri.invoke[String](Command.SaveTree, Map("name" -> treeName))
+    def saveTree(treeName: String): Unit = Tauri.invoke[String](Command.SaveTree.name, Map("name" -> treeName))
 
     def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
-        Tauri.invoke[String](Command.FetchSavedTreeNames).foreach { serializedNames =>
+        Tauri.invoke[String](Command.FetchSavedTreeNames.name).foreach { serializedNames =>
             // Update fileNames with parsed names
             fileNames.update(_ => up.read[List[String]](serializedNames))
         }
     }
 
     def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
-        Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName)).foreach { _ =>
+        Tauri.invoke[String](Command.LoadSavedTree.name, Map("name" -> treeName)).foreach { _ =>
             TreeController.reloadTree(displayTree)
         }
     }

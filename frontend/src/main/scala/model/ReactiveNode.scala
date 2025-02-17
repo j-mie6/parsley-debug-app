@@ -28,7 +28,7 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
       */
     def reloadChildren(): Unit = {
         for {
-            nodesString: String <- Tauri.invoke[String](Command.FetchNodeChildren, Map("nodeId" -> debugNode.nodeId))
+            nodesString: String <- Tauri.invoke[String](Command.FetchNodeChildren.name, Map("nodeId" -> debugNode.nodeId))
         } do {
             if (!nodesString.isEmpty) {
                 children.set(

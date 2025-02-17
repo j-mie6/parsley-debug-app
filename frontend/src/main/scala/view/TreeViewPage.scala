@@ -12,7 +12,6 @@ import model.DebugTree
 import controller.DebugTreeHandler
 import controller.TreeController
 import controller.tauri.{Tauri, Event}
-import controller.tauri.Event.eventToString
 
 /**
   * Object containing rendering functions for the TreeViewPage.
@@ -76,7 +75,7 @@ object TreeViewPage extends DebugViewPage {
     private val displayTree: Var[HtmlElement] = Var(noTreeFound)
 
     def apply(): HtmlElement = {
-        Tauri.listen[Unit](Event.TreeReady, {_ => TreeController.reloadTree(displayTree)})
+        Tauri.listen[Unit](Event.TreeReady.name, {_ => TreeController.reloadTree(displayTree)})
         
         super.render(Some(div(
             className := "tree-view-page",

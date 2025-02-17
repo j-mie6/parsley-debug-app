@@ -9,9 +9,3 @@ enum Command(val name: String):
     case SaveTree extends Command("save_tree")
     case FetchSavedTreeNames extends Command("fetch_saved_tree_names")
     case LoadSavedTree extends Command("load_saved_tree")
-
-
-object Command {
-    given commandToString: Conversion[Command, String] with
-        def apply(command: Command): String = command.name
-}
