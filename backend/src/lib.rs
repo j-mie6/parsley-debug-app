@@ -51,13 +51,14 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     /* Fix for NVidia graphics cards */
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
-    /* Build app with our setup and handlers for frontend calling */
+
+    /* Build app using Tauri builders */
     let app = tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
-        .setup(setup)
-        .invoke_handler(commands::handlers())
-        .build(tauri::generate_context!())
-        .expect("Error building the app");
+        .plugin(tauri_plugin_shell::init())     /* Allow shell access from app */
+        .setup(setup)                           /* Run app setup */
+        .invoke_handler(commands::handlers())   /* Expose Tauri commands to frontend */
+        .build(tauri::generate_context!())      /* Build the app */
+        .expect("Error building Dill");
 
     /* Runs app with handling events */
     app.run(|_, event| {
