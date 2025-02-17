@@ -26,6 +26,6 @@ pub fn make_saved_trees() -> Result<(), FileError> {
 
 #[derive (Debug)]
 pub enum FileError  {
-    CleanDirError,
-    MakeDirError,
+    DeleteDirFailed,
+    CreateDirFailed,
 }
