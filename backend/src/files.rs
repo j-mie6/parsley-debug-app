@@ -13,3 +13,17 @@ pub fn clean_saved_trees() -> Result<(), CleanTreesError> {
 pub enum CleanTreesError {
     CleanTreesError
 }
+
+pub fn make_saved_trees() -> Result<(), MakeSavedTreesError> {
+    /* If the folder for saved_trees does not exist, create it. */
+    if !std::path::Path::new(SAVED_TREE_DIR).exists() {
+        std::fs::create_dir(SAVED_TREE_DIR).map_err(|_| MakeSavedTreesError::MakeSavedTreesError)?;
+    }
+
+    Ok(())
+}
+
+#[derive (Debug)]
+pub enum MakeSavedTreesError {
+    MakeSavedTreesError
+}

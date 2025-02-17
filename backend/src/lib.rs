@@ -9,7 +9,7 @@ mod files;
 
 use state::AppState;
 use server::ServerState;
-use files::clean_saved_trees;
+use files::{clean_saved_trees, make_saved_trees};
 
 /* Directory for saved trees. */
 const SAVED_TREE_DIR : &str = "./saved_trees/";
@@ -29,10 +29,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let app_state: AppState = AppState::new(app.app_handle().clone());
     app.manage(app_state);
 
-    /* If the folder for saved_trees does not exist, create it. */
-    if !std::path::Path::new(SAVED_TREE_DIR).exists() {
-        std::fs::create_dir(SAVED_TREE_DIR)?;
-    }
+    make_saved_trees().expect("Error occured while making saved_trees folder");
     
     /* Clone the app handle and use to create a ServerState */
     let server_state: ServerState = ServerState::new(app.handle().clone());
