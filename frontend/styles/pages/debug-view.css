@@ -71,8 +71,6 @@
 }
 
 .save-button {
-    /* text-align: center; */
-    /* margin-top: 10px; */
     margin-right: 20px;
     background: transparent;
     color: inherit;
@@ -80,7 +78,4 @@
     font: inherit;
     outline: inherit;
     cursor: pointer;
-    /* display: flex; */
-    /* flex-direction: row; */
-    /* align-items: center; */
 }
