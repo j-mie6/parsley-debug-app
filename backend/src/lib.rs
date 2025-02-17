@@ -60,15 +60,10 @@ pub fn run() {
 
     /* Run app setting it to clean used folders on shutdown */
     app.run(|_, event| {
-        match &event {
-            /* On window shutdown, remove saved_trees folder */
-            RunEvent::ExitRequested { code, .. } => {
-            if let None = code  {
-                clean_saved_trees();
-            }
-          }
-        _ => (),
-    }
+        /* On window shutdown, remove saved_trees folder */
+        if let RunEvent::ExitRequested { code: None, .. } = event {
+            clean_saved_trees();
+        }
     })
 }
 
