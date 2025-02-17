@@ -16,9 +16,8 @@ object InputController {
     /**
      * Sets the input string
      * 
-     * @param newInput The new input string
+     * @param input The new input string
      */
-
     def setInput(input: String): Unit = {
         inputElement.set(input)
     }
