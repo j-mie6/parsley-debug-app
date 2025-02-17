@@ -1,9 +1,10 @@
 use std::fs::{self, File};
 use std::io::Write;
 
+use crate::AppState;
 use crate::state::{StateError, StateManager};
-use crate::{AppState, SAVED_TREE_DIR};
 use crate::trees::{DebugTree, SavedTree};
+use crate::files::SAVED_TREE_DIR;
 
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
