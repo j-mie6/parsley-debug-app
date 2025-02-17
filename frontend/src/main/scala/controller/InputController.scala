@@ -13,14 +13,12 @@ object InputController {
      * @return An HTML element displaying the input string
      */
     def toInputElement(input: String): HtmlElement = {
-        div (
             h1(
                 className := "debug-tree-title",
                 p("Parser Input : ", margin.px := 0, fontSize.px := 15,
                     fontStyle.italic, fontWeight.lighter),
                 input
-            ),
-        )
+            )
     }
 
     /**
