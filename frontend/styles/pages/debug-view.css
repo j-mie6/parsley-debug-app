@@ -62,3 +62,18 @@
     height: 100vh;
     overflow: hidden;
 }
+
+.tree-view-save {
+    text-align: center;
+    margin-top: 10px;
+    margin-left: 10px;
+    background: transparent;
+    color: inherit;
+    border: none;
+    font: inherit;
+    outline: inherit;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
