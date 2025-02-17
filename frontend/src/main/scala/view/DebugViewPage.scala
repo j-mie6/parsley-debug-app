@@ -64,6 +64,12 @@ abstract class DebugViewPage extends Page {
     /* Random number generator */
     private val rand = new scala.util.Random
 
+    /* Visual call to action for user to save the current tree */
+     private lazy val saveIcon: HtmlElement = i(
+        className := "bi bi-floppy-fill",
+        fontSize.px := 25, marginRight.px := 10
+    )
+
     /* Adds ability to save and store current tree. */
     private lazy val saveButton: Element = button(
         className := "save-button",
@@ -110,11 +116,7 @@ abstract class DebugViewPage extends Page {
         headerLeft,
         title,
         headerRight,
-    )
-
-    /* Visual call to action  for user to save the current tree */
-    private lazy val saveIcon: HtmlElement = i(className := "bi bi-floppy-fill",
-        fontSize.px := 25, marginRight.px := 10)        
+    )        
 
     /**
       * Render the DebugViewPage header and a child element. This allows different views to 
