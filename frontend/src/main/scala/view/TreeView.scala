@@ -15,10 +15,7 @@ import controller.TreeController
   * Object containing rendering functions for the TreeView
   */
 object TreeView {
-
-    def apply(): HtmlElement = {        
-        div(
+    def apply(): HtmlElement = div(
             TreeController.getDisplayTree, /* Renders tree */
-        )
-    }
+    )
 }
