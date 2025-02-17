@@ -58,7 +58,7 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("Error building the app");
 
-    /* Run app setting it to clean used folders on shutdown */
+    /* Runs app with handling events */
     app.run(|_, event| {
         /* On window shutdown, remove saved_trees folder */
         if let RunEvent::ExitRequested { code: None, .. } = event {
