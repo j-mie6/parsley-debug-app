@@ -65,6 +65,7 @@ abstract class DebugViewPage extends Page {
     // Right section of the page header, containing light mode button & github link.
     private lazy val headerRight: Element = div(
         className := "debug-view-header-right",
+        saveButton,
         div(
             child <-- State.isLightMode.signal
                 .map((project: Boolean) => if project then moonIcon else sunIcon),
@@ -121,7 +122,6 @@ abstract class DebugViewPage extends Page {
             ScrollableTabView(),
             div(
                 className := "tree-view-page",
-                saveButton,
                 child.getOrElse(div())
             )
         )))
