@@ -15,6 +15,13 @@
     justify-content: flex-end;
 }
 
+.debug-view-header-right-buttons {
+    width: 30%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
 .debug-view-header-title {
     display: flex;
     flex-direction: row;
@@ -33,6 +40,17 @@
     flex-direction: row;
     text-wrap: nowrap;
     align-items: center;
+    border-radius: 2px;
+    padding: 5px 10px 5px;
+}
+
+.debug-view-header-left-container:hover {
+    background-color: var(--background-secondary);
+}
+
+.debug-view-header-left-container.selected {
+    background-color: var(--background-tertiary);
+    color: var(--font-color-secondary);
 }
 
 .debug-view-header-left-vbar {
@@ -40,83 +58,8 @@
     height: 40px;
     border: 1px solid var(--font-color-primary);
     background-color: var(--font-color-primary);
-    margin-inline: 20px;
     margin-block: auto;
 }
-
-.tab-bar {
-    min-height: 30px;
-    max-width: 100%;
-    
-    display: flex;
-    flex-direction: row;
-    flex-shrink: 0;
-    align-items: flex-end;
-    justify-content: flex-start;
-    
-    gap: 3px;
-    
-    margin-left: 20px;
-    margin-right: 20px;
-    
-    overflow-x: auto; /* scroll */
-    overflow-y: hidden;
-
-    flex-wrap: nowrap;
-    white-space: nowrap;
-}
-
-.tab-button {
-    position: relative;
-    flex-shrink: 0;
-
-    height: 20px;
-    min-width: 80px;
-
-    padding: 0 10px;
-    margin: 0;
-
-    border: none;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-
-    color: var(--font-color-secondary);
-    background-color: var(--tab); 
-    transition: background-color 0.2s ease-in-out;
-
-    box-shadow: none;
-    white-space: nowrap;
-    justify-content: space-between;
-}
-
-.tab-button:hover {
-    background-color: var(--tab-hover); 
-}
-
-.tab-button.selected {
-    height: 23px;
-    background-color: var(--tab-selected);
-    font-weight: bold;
-}
-
-.close-tab-button {
-    border-color: transparent;
-    background-color: transparent;
-    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
-    border-radius: 50%;
-    position: relative;
-    align-self: center;
-    width: 16px;
-    height: 16px;
-    margin-left: 8px;
-    padding: 0;
-
-}
-
-.close-tab-button:hover {
-    transform: scale(1.25);
-}
-
 
 .debug-view-page {
     box-sizing: border-box;
@@ -125,4 +68,14 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+}
+
+.save-button {
+    margin-right: 20px;
+    background: transparent;
+    color: inherit;
+    border: none;
+    font: inherit;
+    outline: inherit;
+    cursor: pointer;
 }
