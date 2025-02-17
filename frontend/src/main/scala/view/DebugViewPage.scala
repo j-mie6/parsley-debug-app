@@ -62,19 +62,44 @@ abstract class DebugViewPage extends Page {
         h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
+    /* Random number generator */
+    private val rand = new scala.util.Random
+
+    /* Adds ability to save and store current tree. */
+    private lazy val saveButton: Element = button(
+        className := "save-button",
+
+        saveIcon, /* Floppy disk icon */
+
+        onClick --> { _ => {
+            val treeName: String = (rand.nextInt).toString()
+            TabController.saveTree(treeName)
+            TabController.setSelectedTab(treeName)
+        }}
+    )
+
+    private lazy val themeButton: Element = div(
+        child <-- State.isLightMode.signal
+            .map((project: Boolean) => if project then moonIcon else sunIcon),
+        cursor.pointer,
+        alignContent.center,
+        marginRight.px := 20,
+        onClick --> {_ => State.toggleTheme()}
+    )
+
+    private lazy val githubButton: Element = a(
+        href := "https://github.com/j-mie6/parsley-debug-app", target := "_blank", gitIcon
+    )
+
     // Right section of the page header, containing light mode button & github link.
     private lazy val headerRight: Element = div(
         className := "debug-view-header-right",
-        saveButton,
         div(
-            child <-- State.isLightMode.signal
-                .map((project: Boolean) => if project then moonIcon else sunIcon),
-            cursor.pointer,
-            alignContent.center,
-            marginRight.px := 20,
-            onClick --> {_ => State.toggleTheme()}
-        ),
-        a(href := "https://github.com/j-mie6/parsley-debug-app", target := "_blank", gitIcon)
+            className := "debug-view-header-right-buttons",
+            saveButton,
+            themeButton,
+            githubButton
+        )
     )
 
     // The page header.
@@ -88,23 +113,7 @@ abstract class DebugViewPage extends Page {
 
     /* Visual call to action  for user to save the current tree */
     private lazy val saveIcon: HtmlElement = i(className := "bi bi-floppy-fill",
-        fontSize.px := 25, marginRight.px := 10)
-
-    /* Random number generator */
-    private val rand = new scala.util.Random
-
-    /* Adds ability to save and store current tree. */
-    private lazy val saveButton: Element = button(
-        className := "tree-view-save",
-
-        saveIcon, /* Floppy disk icon */
-
-        onClick --> { _ => {
-            val treeName: String = (rand.nextInt).toString()
-            TabController.saveTree(treeName)
-            TabController.setSelectedTab(treeName)
-        }}
-    )
+        fontSize.px := 25, marginRight.px := 10)        
 
     /**
       * Render the DebugViewPage header and a child element. This allows different views to 
