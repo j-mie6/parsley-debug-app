@@ -9,9 +9,7 @@ pub const SAVED_TREE_DIR : &str = "./saved_trees/";
 /* Removes all saved_trees wiith the folder */
 pub fn delete_saved_trees_dir() -> Result<(), FileError> {
     fs::remove_dir_all(SAVED_TREE_DIR)
-        .map_err(|_| FileError::DeleteDirFailed)?;
-
-    Ok(())
+        .map_err(|_| FileError::DeleteDirFailed)
 }
 
 
