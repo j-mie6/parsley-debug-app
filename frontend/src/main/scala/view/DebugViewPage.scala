@@ -25,14 +25,14 @@ val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
   * light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {
-    // Bootstrap icons used on the page (https://icons.getbootstrap.com/).
+    /* Bootstrap icons used on the page (https://icons.getbootstrap.com/) */
     private lazy val treeIcon: Element = i(className := "bi bi-tree-fill", fontSize.px := 30)
     private lazy val fileIcon: Element = i(className := "bi bi-file-earmark-text-fill", fontSize.px := 25)
     private lazy val gitIcon: Element = i(className := "bi bi-github", fontSize.px := 40)
     private lazy val sunIcon: Element = i(className := "bi bi-brightness-high-fill", fontSize.px := 33)
     private lazy val moonIcon: Element = i(className := "bi bi-moon-fill", fontSize.px := 33)
 
-    // Left section of the page header, containing tree and source view tabs.
+    /* Left section of the page header, containing tree and source view tabs */
     private lazy val headerLeft: Element = div(
         className := "debug-view-header-left",
         div(
@@ -44,7 +44,6 @@ abstract class DebugViewPage extends Page {
                 MainViewHandler.setIsTreeView(true) 
             }
         ),
-        // div(className := "debug-view-header-left-vbar"),
         div(
             className := "debug-view-header-left-container",
             cls("selected") <-- MainViewHandler.isTreeView(false),
@@ -56,7 +55,7 @@ abstract class DebugViewPage extends Page {
         )
     )
 
-    // Title element.
+    /* Title element */
     private lazy val title: Element = div(
         className := "debug-view-header-title",
         h1("Dill", fontSize.px := 40, margin.px := 0)
@@ -78,6 +77,7 @@ abstract class DebugViewPage extends Page {
         }}
     )
 
+    /* Button used to toggle the theme */
     private lazy val themeButton: Element = div(
         child <-- State.isLightMode.signal
             .map((project: Boolean) => if project then moonIcon else sunIcon),
@@ -87,11 +87,12 @@ abstract class DebugViewPage extends Page {
         onClick --> {_ => State.toggleTheme()}
     )
 
+    /* Button that links to the 'parsley-debug-app' Github repo */
     private lazy val githubButton: Element = a(
         href := "https://github.com/j-mie6/parsley-debug-app", target := "_blank", gitIcon
     )
 
-    // Right section of the page header, containing light mode button & github link.
+    /* Right section of the page header, containing various buttons */
     private lazy val headerRight: Element = div(
         className := "debug-view-header-right",
         div(
@@ -102,7 +103,7 @@ abstract class DebugViewPage extends Page {
         )
     )
 
-    // The page header.
+    /* The page header */
     private lazy val headerView: Element = headerTag(
         className := "debug-view-header",
 
