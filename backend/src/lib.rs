@@ -50,37 +50,31 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 pub fn run() {
     /* Fix for NVidia graphics cards */
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
-
+    /* Build app with our setup and handlers for frontend calling */
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .setup(setup) /* Run app setup */
-        .invoke_handler(commands::handlers()) /* Expose Tauri commands to frontend */
+        .setup(setup)
+        .invoke_handler(commands::handlers())
         .build(tauri::generate_context!())
         .expect("error building the app");
 
-    app.run(move |_app_handle, _event| {
-      match &_event {
-        /* On window shutdown, remove saved_trees folder */
-        RunEvent::ExitRequested { api, code, .. } => {
-          if code.is_none() {
-            api.prevent_exit();
-            let _res = clean_saved_trees();
+    /* Run app setting it to clean used folders on shutdown */
+    app.run(|_, event| {
+        match &event {
+            /* On window shutdown, remove saved_trees folder */
+            RunEvent::ExitRequested { code, .. } => {
+            if let None = code  {
+                clean_saved_trees();
+            }
           }
-        }
-      _ => (),
+        _ => (),
     }
     })
 }
 
 /* Removes all saved_trees wiith the folder */
-pub fn clean_saved_trees() -> Result<(), CleanTreesError> {
-    remove_dir_all(SAVED_TREE_DIR).map_err(|_| CleanTreesError::CleanSavedTreesError)?;
-    Ok(())
-}
-
-#[derive(Debug, serde::Serialize)]
-pub enum CleanTreesError {
-    CleanSavedTreesError,
+pub fn clean_saved_trees() -> () {
+    remove_dir_all(SAVED_TREE_DIR).expect("Saved trees could not be cleaned");
 }
 
 
