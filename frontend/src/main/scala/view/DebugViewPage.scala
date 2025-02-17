@@ -12,9 +12,12 @@ import model.Page
 
 import view.ScrollableTabView
 
+import controller.InputController
+import controller.MainViewHandler
 import controller.State
 import controller.TabController
 import controller.tauri.Tauri
+import controller.TreeController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -36,14 +39,22 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-left",
         div(
             className := "debug-view-header-left-container",
+            cls("selected") <-- MainViewHandler.isTreeView(true),
             treeIcon,
-            h2("Tree View", marginLeft.px := 7)
+            h2("Tree View", marginLeft.px := 7),
+            onClick --> { _ => 
+                MainViewHandler.setIsTreeView(true) 
+            }
         ),
-        div(className := "debug-view-header-left-vbar"),
+        // div(className := "debug-view-header-left-vbar"),
         div(
             className := "debug-view-header-left-container",
+            cls("selected") <-- MainViewHandler.isTreeView(false),
             fileIcon,
-            h2("Input View", marginLeft.px := 12)
+            h2("Input View", marginLeft.px := 12),
+            onClick --> { _ => 
+                MainViewHandler.setIsTreeView(false) 
+            }
         )
     )
 
@@ -87,10 +98,11 @@ abstract class DebugViewPage extends Page {
     override def render(child: Option[HtmlElement]): HtmlElement = {
 
         super.render(Some(mainTag(
-        className := "debug-view-page",
-        headerView,
-        ScrollableTabView(),
-        child.getOrElse(div())
-    )))
+            className := "debug-view-page",
+            headerView,
+            ScrollableTabView(),
+            // child <-- MainViewHandler.getDebugView
+            child.getOrElse(div())
+        )))
     } 
 }
