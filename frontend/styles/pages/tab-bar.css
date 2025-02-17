@@ -13,7 +13,7 @@
     margin-left: 20px;
     margin-right: 20px;
     
-    overflow-x: auto; /* scroll */
+    overflow-x: auto;
     overflow-y: hidden;
 
     flex-wrap: nowrap;
