@@ -11,9 +11,9 @@ import scala.util.{Try, Success, Failure}
 import model.Page
 
 import controller.StateController
-import controller.TabController
 import controller.tauri.Tauri
 import controller.viewControllers.MainViewController
+import controller.viewControllers.TabController
 import controller.viewControllers.TreeViewController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
