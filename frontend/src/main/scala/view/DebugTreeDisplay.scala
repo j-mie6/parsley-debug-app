@@ -60,9 +60,10 @@ private object ReactiveNodeDisplay {
                                 button(
                                     className := "debug-tree-node-button debug-tree-node-button-expand", 
                                     "Expand", 
-                                    onClick
-                                        .flatMapTo(Tauri.invoke(Command.FetchNodeChildren, Map("nodeId" -> node.debugNode.nodeId)))
-                                         --> node.children
+                                    onClick.flatMapTo(
+                                        Tauri.invoke(Command.FetchNodeChildren, Map("nodeId" -> node.debugNode.nodeId))
+                                            .map(_.getOrElse(Nil))
+                                        ) --> node.children
                                 )
                             else 
                                 button(

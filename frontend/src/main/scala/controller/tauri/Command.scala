@@ -1,5 +1,6 @@
 package controller.tauri
 
+import scala.util.Try
 import scala.scalajs.js
 
 import com.raquo.laminar.api.L.*
@@ -19,16 +20,16 @@ sealed trait Command(val name: String) {
     
 
     /* Helper function for no-arg invoke */
-    protected[tauri] def invoke(): EventStream[this.Response] = this.invoke(Map())
+    protected[tauri] def invoke(): EventStream[Try[this.Response]] = this.invoke(Map())
 
     /* Invoke backend command using Tauri JS interface */
-    protected[tauri] def invoke(args: Map[String, Any]): EventStream[this.Response] = {
+    protected[tauri] def invoke(args: Map[String, Any]): EventStream[Try[this.Response]] = {
         /* Invoke command with arguments passed as JS string dictionary */
         val invoke: js.Promise[String] = tauriInvoke[String](this.name, StringDictionary(args.toSeq*));
         
         /* Start EventStream from promise with value parsed to Response type */
         EventStream.fromJsPromise(invoke, emitOnce = true)
-            .map((json: String) => up.read[this.Response](json))
+            .map((json: String) => Try(up.read[this.Response](json)))
     }
 
 }

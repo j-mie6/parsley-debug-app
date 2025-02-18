@@ -1,5 +1,6 @@
 package controller.tauri
 
+import scala.util.Try
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -18,11 +19,11 @@ sealed trait Event(private val name: String) {
 
     
     /* Listen to backend event using Tauri JS interface */
-    protected[tauri] def listen(): (EventStream[this.Response], Future[() => Unit]) = {
-        val (stream, callback) = EventStream.withCallback[this.Response]
+    protected[tauri] def listen(): (EventStream[Try[this.Response]], Future[() => Unit]) = {
+        val (stream, callback) = EventStream.withCallback[Try[this.Response]]
         
         /* Send deserialised event to the EventStream when Tauri notified */
-        val fireEvent = (e: TauriEvent[?]) => callback(up.read[this.Response](e.payload.toString));
+        val fireEvent = (e: TauriEvent[?]) => callback(Try(up.read[this.Response](e.payload.toString)));
         
         /* Call Tauri function and get future of unlisten function */
         val unlisten = tauriListen(this.name, fireEvent)

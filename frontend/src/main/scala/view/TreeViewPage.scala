@@ -10,6 +10,7 @@ import com.raquo.laminar.api.L.*
 import model.DebugTree
 import controller.TreeController
 import controller.tauri.{Command, Event, Tauri}
+import scala.util.Try
 
 /**
   * Object containing rendering functions for the TreeViewPage.
@@ -32,8 +33,9 @@ object TreeViewPage extends DebugViewPage {
     /* Renders a list of buttons which will reload to whatever tree is pressed on */
     val treeList = div(
         children <-- fileNames.signal.map(_.map(name => 
-            button(name, onClick
-                .flatMapTo(Tauri.invoke(Command.LoadSavedTree, Map("name" -> name))) 
+            button(name, 
+            onClick
+                .flatMapTo(Tauri.invoke(Command.LoadSavedTree, Map("name" -> name)))
                 --> TreeController.tree
             )
         ))
@@ -43,7 +45,7 @@ object TreeViewPage extends DebugViewPage {
     private lazy val getButton: Element = button(
         className := "tree-view-save",
         "Get trees",
-        onClick.flatMapTo(Tauri.invoke(Command.FetchSavedTreeNames)) --> fileNames
+        onClick.flatMapTo(Tauri.invoke(Command.FetchSavedTreeNames).map(_.get)) --> fileNames
     )
 
     val inputName: Var[String] = Var("")
