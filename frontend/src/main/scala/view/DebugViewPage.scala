@@ -130,7 +130,7 @@ abstract class DebugViewPage extends Page {
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,
-            ScrollableTabView(),
+            TabView(),
             div(
                 className := "tree-view-page",
                 child.getOrElse(div())

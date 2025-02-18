@@ -9,7 +9,7 @@ import controller.viewControllers.TabController
 import controller.viewControllers.TreeViewController
 
 
-object ScrollableTabView {
+object TabView {
     val inputName: Var[String] = Var("")
 
     /* Input for the name of the tree to be saved */
