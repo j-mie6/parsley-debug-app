@@ -67,11 +67,12 @@ object TreeViewPage extends DebugViewPage {
 
         super.render(Some(div(
             className := "tree-view-page",
-
+            
+            stream.filter(Event.TreeReady.equals)
+                .flatMapTo(TreeController.load) --> TreeController.tree,
+                
             // TODO: move to TreeController
-            child <-- stream.filter(Event.TreeReady.equals)
-                .flatMapTo(TreeController.load)
-                .map(_.getOrElse(noTreeFound)),
+            child <-- TreeController.treeElem.map(_.getOrElse(noTreeFound)),
 
             /*
             saveButton, /* Used for saving a tree using the name given in nameInput */

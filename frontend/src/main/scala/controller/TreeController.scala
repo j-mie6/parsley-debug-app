@@ -16,20 +16,23 @@ import view.DebugTreeDisplay
   * Object containing methods for manipulating the DebugTree.
   */
 object TreeController {
+    /* Reactive DebugTree */
+    private val treeVar: Var[Option[DebugTree]] = Var(None)
+    val tree: Observer[Option[DebugTree]] = treeVar.writer
+
+    /* Convert the DebugTree into a HtmlElement */
+    val treeElem: Signal[Option[HtmlElement]] = treeVar.signal.map(_.map(DebugTreeDisplay(_)))
+
     /* Deserialise the JSON string into a DebugTree */
     private def deserialise(json: String): Option[DebugTree] = DebugTreeHandler.decodeDebugTree(json).toOption
-    
-    /* Convert the DebugTree into a HtmlElement */
-    private def display(tree: Option[DebugTree]): Option[HtmlElement] = tree.map(DebugTreeDisplay(_))
 
     /**
       * Fetch the debug tree from the tauri backend
       *
       * @return Stream containing an optional HTML Element DebugTreeDisplay to be rendered.
       */
-    def load: EventStream[Option[HtmlElement]] = Tauri.invoke[String](Command.FetchDebugTree)
+    def load: EventStream[Option[DebugTree]] = Tauri.invoke[String](Command.FetchDebugTree)
         .map(deserialise)
-        .map(display)
 
 
     /** 
@@ -52,9 +55,8 @@ object TreeController {
       *
       * @param treeName Name of tree to load
       */
-    def loadSavedTree(treeName: String): EventStream[Option[HtmlElement]] = 
+    def loadSavedTree(treeName: String): EventStream[Option[DebugTree]] = 
         Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName))
             .map(deserialise)
-            .map(display)
 
 }
