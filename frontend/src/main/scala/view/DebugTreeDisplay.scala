@@ -3,6 +3,8 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
+
+import controller.MainViewHandler
 import controller.tauri.Tauri
 
 /**

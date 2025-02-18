@@ -13,27 +13,59 @@ import view.DebugTreeDisplay
 
 
 /**
-  * Object containing methods for manipulating the DebugTree.
-  */
+* Object containing methods for manipulating the DebugTree.
+*/
 object TreeController {
     
+    /* Display tree that will be rendered by TreeView */
+    private val displayTree: Var[HtmlElement] = Var(div())
+
+    /* Default tree view when no tree is loaded */
+    private val noTreeFound: HtmlElement = div(
+        className := "tree-view-error",
+        "No tree found! Start debugging by attaching DillRemoteView to a parser"
+    )
+    
+    /* Gets display tree element*/
+    def getDisplayTree: HtmlElement = div(child <-- displayTree.signal)
+    
+    
     /**
-      * Fetch the debug tree root from the tauri backend.
-      *
-      * @param displayTree The var that the display tree HTML element will be written into.
-      */
-    def reloadTree(displayTree: Var[HtmlElement]): Unit = 
+    * Mutably updates the displayTree variable
+    *
+    * @param tree New element to update the displayTree variable
+    */
+    def setDisplayTree(tree: HtmlElement) = {
+        displayTree.set(tree)
+    }
+
+    def setEmptyTree(): Unit = {
+        setDisplayTree(noTreeFound)
+    }
+    
+    /**
+    * Fetch the debug tree root from the tauri backend.
+    *
+    * @param displayTree The var that the display tree HTML element will be written into.
+    */
+    def reloadTree(): Unit = {
         for {
             treeString <- Tauri.invoke[String](Command.FetchDebugTree)
         } do {
-            displayTree.set(
+            setDisplayTree(
                 if treeString.isEmpty then div("No tree found") else 
-                    DebugTreeHandler.decodeDebugTree(treeString) match {
-                        case Failure(exception) => println(s"Error in decoding debug tree : ${exception.getMessage()}"); div()
-                        case Success(debugTree) => DebugTreeDisplay(debugTree)
+                DebugTreeHandler.decodeDebugTree(treeString) match {
+                    case Failure(exception) => 
+                        println(s"Error in decoding debug tree : ${exception.getMessage()}");
+                        div()
+                    case Success(debugTree) => {
+                        InputController.setInput(debugTree.input)
+                        DebugTreeDisplay(debugTree)
                     }
+                }
             )
         }
+    }
 
     def saveTree(treeName: String): Unit = Tauri.invoke[String](Command.SaveTree, Map("name" -> treeName))
 
@@ -46,7 +78,7 @@ object TreeController {
 
     def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
         Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName)).foreach { _ =>
-            TreeController.reloadTree(displayTree)
+            TreeController.reloadTree()
         }
     }
         

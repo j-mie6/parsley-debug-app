@@ -4,7 +4,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalajs.dom
 import com.raquo.laminar.api.L.*
 
-import view.TreeViewPage
+import view.MainView
+
 import controller.State
 import controller.tauri.Tauri
 
@@ -13,6 +14,7 @@ import controller.tauri.Tauri
     dom.document.documentElement.setAttribute("data-theme", if State.isLightMode.now() then "light" else "dark")
     renderOnDomContentLoaded(
         dom.document.getElementById("app"),
-        TreeViewPage()
+        MainView()
+
     )
 }
