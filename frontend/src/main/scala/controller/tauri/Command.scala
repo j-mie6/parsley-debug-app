@@ -49,7 +49,7 @@ object Command {
     /* Save commands */
 
     case object SaveTree extends Command("save_tree"):
-        type Response = Unit
+        type Response = None.type
 
     case object FetchSavedTreeNames extends Command("fetch_saved_tree_names"):
         type Response = List[String]
