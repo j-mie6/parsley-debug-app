@@ -62,8 +62,9 @@ impl StateManager for AppState {
         state.tree = Some(tree);
         
         /* Notify frontend listener */
-        state.app.emit("tree-ready", ())
+        serde_json::to_string(&state.tree)
             .map_err(|_| StateError::EventEmitFailed)
+            .and_then(|tree| state.app.emit("tree-ready", tree))
     }
     
     /* Get StateManager's tree */
