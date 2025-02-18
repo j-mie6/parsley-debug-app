@@ -1,4 +1,4 @@
-package controller
+package controller.viewControllers
 
 import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
