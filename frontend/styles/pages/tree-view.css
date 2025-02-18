@@ -47,6 +47,12 @@
 }
 
 .zoom-container {
-    transition: transform 0.1s ease-in-out;
-    transform-origin: initial;
+    /* transition: transform 0.1s ease-in-out; */
+    /* transform-origin: initial; */
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex-basis: auto;
+    justify-content: flex-start;
+    align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
 }
