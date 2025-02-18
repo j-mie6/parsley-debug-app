@@ -1,7 +1,7 @@
 use super::{DebugNode, DebugTree};
 
 /* Struct identical to DebugTree that allows serialized saving */
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SavedTree {
     input: String,
     root: SavedNode,
@@ -87,11 +87,30 @@ impl SavedNode {
 
 
 
+/* Saved Tree testing */
 #[cfg(test)]
 pub mod test {
-    /* Saved Tree unit testing */
+
+    use std::{fs::{self, File}, io::Write, path};
+
+    use crate::trees::{debug_tree, DebugTree};
 
     use super::{SavedTree, SavedNode};
+
+    const TEST_TREE_DIR: &str = "./test_trees/";
+
+    const TREE_JSON: &str = r#"{
+  "input": "Test",
+  "root": {
+    "node_id": 0,
+    "name": "Test",
+    "internal": "Test",
+    "success": true,
+    "child_id": 0,
+    "input": "Test",
+    "children": []
+  }
+}"#;
 
 
     pub fn test_tree() -> SavedTree {
@@ -107,5 +126,91 @@ pub mod test {
                 Vec::new(),
             ),
         )
+    }
+
+
+    #[test]
+    fn converts_from_debug_to_saved() {
+        let d_tree: DebugTree = debug_tree::test::test_tree();
+        let s_tree: SavedTree = test_tree();
+
+        assert_eq!(SavedTree::from(d_tree), s_tree);
+    }
+
+    #[test]
+    fn converts_from_saved_to_debug() {
+        let d_tree: DebugTree = debug_tree::test::test_tree();
+        let s_tree: SavedTree = test_tree();
+
+        assert_eq!(DebugTree::from(s_tree), d_tree);
+    }
+
+    #[test]
+    fn saved_tree_serializes() {
+        let s_tree: SavedTree = test_tree();
+        let tree_str: String = serde_json::to_string_pretty(&s_tree).expect("Tree should be able to serialize");
+
+        assert_eq!(tree_str, String::from(TREE_JSON));
+    }
+
+
+    #[test]
+    fn saved_tree_deserializes() {
+        let s_tree: SavedTree = test_tree();
+        let saved_tree: SavedTree =
+            serde_json::from_str(TREE_JSON).expect("Could not deserialise SavedTree");
+
+        assert_eq!(s_tree, saved_tree);
+    }
+
+    fn create_dir() {
+        if !path::Path::new(TEST_TREE_DIR).exists() {
+            fs::create_dir(TEST_TREE_DIR).expect("Folder should be made");
+        }
+    }
+
+    #[test]
+    fn can_save_and_retrieve_json_from_file() {
+        create_dir();
+        let tree_name: &str = "Test_json";
+
+
+        let file_path: String = format!("{}{}.json", TEST_TREE_DIR, tree_name);
+        let mut data_file: File = File::create(&file_path).expect("File should have been made");
+    
+        data_file.write(TREE_JSON.as_bytes()).expect("File should have been written to");
+
+        let contents: String = fs::read_to_string(&file_path).expect("File contents should have been read");
+        assert_eq!(contents, String::from(TREE_JSON));
+
+
+        /* Clear test file */
+        fs::remove_file(file_path).expect("File should have been deleted");
+    }
+
+    #[test]
+    fn can_save_and_retrieve_tree_from_file() {
+        create_dir();
+
+        let tree_name: &str = "Test_tree";
+        let tree_str: String = serde_json::to_string_pretty(&test_tree()).expect("Tree should be able to serialize");
+
+
+        let file_path: String = format!("{}{}.json", TEST_TREE_DIR, tree_name);
+        let mut data_file: File = File::create(&file_path).expect("File should have been made");
+    
+        data_file.write(tree_str.as_bytes()).expect("File should have been written to");
+
+
+
+        let contents: String = fs::read_to_string(&file_path).expect("File contents should have been read");
+
+        let saved_tree: SavedTree =
+        serde_json::from_str(&contents).expect("Could not deserialise SavedTree");
+
+        assert_eq!(test_tree(), saved_tree);
+
+        /* Clear test file */
+        fs::remove_file(file_path).expect("File should have been deleted");
     }
 }
