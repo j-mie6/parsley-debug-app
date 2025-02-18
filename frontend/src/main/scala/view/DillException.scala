@@ -2,61 +2,95 @@ package view.error
 
 import com.raquo.laminar.api.L.*
 
-sealed trait DillException(name: String, message: String) {
-    def getMessage: String = message
-    def getName: String = name
+sealed trait DillException {
+    def name: String
+    def message: String
+    def canDelete: Boolean
+    def colour: String
 
-
-    def displayElement(): HtmlElement
-}
-
-sealed trait Warning extends DillException {
-    override def displayElement(): HtmlElement = {
+    def displayElement: HtmlElement = {
         div(
             className := "popup",
             h2(
-                child.text <-- ErrorHandler.errorVar.signal.map(_.get.getName),
-                color := "#ffffff",
+                child.text <-- ErrorHandler.errorVar.signal.map(_.get.name),
+                color := this.colour,
             ),
             br(),
             div(
                 className := "popup-text",
-                child.text <-- ErrorHandler.errorVar.signal.map(_.get.getMessage),
+                child.text <-- ErrorHandler.errorVar.signal.map(_.get.message),
             ),
             display <-- ErrorHandler.errorVar.signal.map(opt => if (opt.isDefined) "block" else "none"),
-            onClick --> {_ => ErrorHandler.errorVar.set(None)}
+            if canDelete then onClick --> {_ => ErrorHandler.errorVar.set(None)}
         )
     }
 }
 
-case class PracticeWarning(name: String, message: String) extends DillException(name, message), Error
-object DefaultWarning extends DillException("bob", "died"), Error
-
-sealed trait Error extends DillException {
-    override def displayElement(): HtmlElement = {
-        div(
-            className := "popup",
-            h2(
-                child.text <-- ErrorHandler.errorVar.signal.map(_.get.getName),
-                color := "#ffffff",
-            ),
-            br(),
-            div(
-                className := "popup-text",
-                child.text <-- ErrorHandler.errorVar.signal.map(_.get.getMessage),
-            ),
-            display <-- ErrorHandler.errorVar.signal.map(opt => if (opt.isDefined) "block" else "none"),
-      )
-    }
+sealed trait Warning extends DillException {
+    override def colour: String = "ffff00"
+    override def canDelete: Boolean = true
 }
 
-// case class TreeNotFound("Tree Not Found", "App server could not retrieve debug tree from Remote View") extends Error
-// case class LockFailed("Lock Failed", "App thread could not get a hold of the app lock. Please re-start the app") extends Error
-// case class NodeNotFound("Node Not Found", "Child does not exist", 62) extends Error
+sealed trait Error extends DillException {
+    override def colour: String = "ff0000"
+    override def canDelete: Boolean = false
+}
 
-// case class SerialiseFailed("Serialise Failed", "Could not serialise display tree. Please contact Jamie about this") extends Error
-// case class ReadDirFailed("Read Directory Failed", "Failed to read directory") extends Error
-// case class ReadPathFailed("Read Path Failed", "Failed to read path") extends Error
-// case class StringContainsInvalidUnicode("String Contains Invalid Unicode", "Remove invalid character") extends Error
-// case class SuffixNotFound("Suffix Not Found", "Could not find suffix") extends Error
-// case class MalformedJSON("Malformed JSON", "Frontend received malformed JSON") extends Error
+/* 
+    DILL ERRORS
+*/
+
+case object TreeNotFound extends Error {
+    override def name: String = "Tree Not Found"
+    override def message: String = "App server could not retrieve debug tree from Remote View"
+}
+
+case object LockFailed extends Error {
+    override def name: String = "Lock Failed"
+    override def message: String = "App thread could not get a hold of the app lock. Please re-start the app"
+}
+
+case class NodeNotFound(nodeId: Int) extends Error {
+    override def name: String = "Node Not Found"
+    override def message: String = s"Child node with ID $nodeId does not exist."
+}
+
+case object SerialiseFailed extends Error {
+    override def name: String = "Serialise Failed"
+    override def message: String = "Could not serialise display tree. Please contact Jamie about this"
+}
+
+case object ReadDirFailed extends Error {
+    override def name: String = "Read Directory Failed"
+    override def message: String = "Failed to read directory"
+}
+
+case object ReadPathFailed extends Error {
+    override def name: String = "Read Path Failed"
+    override def message: String = "Failed to read path"
+}
+
+case object StringContainsInvalidUnicode extends Error {
+    override def name: String = "String Contains Invalid Unicode"
+    override def message: String = "Remove invalid character"
+}
+
+case object SuffixNotFound extends Error {
+    override def name: String = "Suffix Not Found"
+    override def message: String = "Could not find suffix"
+}
+
+case object MalformedJSON extends Error {
+    override def name: String = "Malformed JSON"
+    override def message: String = "Frontend received malformed JSON"
+}
+
+case class UnknownError(message: String) extends Error {
+    override def name: String = "Unknown Error"
+    override def message: String = s"Something went wrong: $message"
+}
+
+case object PracticeWarning extends Warning {
+    override def name: String = "Practice Warning"
+    override def message: String = "This is a practice warning, this should not be on release"
+}
