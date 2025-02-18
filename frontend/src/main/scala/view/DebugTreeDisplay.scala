@@ -8,60 +8,58 @@ import controller.MainViewHandler
 import controller.tauri.Tauri
 
 /**
-  * Object containing rendering methods for the Debug Tree
-  */
+* Object containing rendering methods for the Debug Tree
+*/
 object DebugTreeDisplay {
-    /**
-      * Render the entire tree from the root node downwards.
-      *
-      * @param tree The debug tree to render.
-      * 
-      * @return HTML element representing the whole tree.
-      */
-
-
     val zoomFactor = Var(1.0)
-
+    
     // TODO: Fix not being able to move left
     val wheelHandler = onWheel.map { e =>
-      if (e.ctrlKey) {
-        e.preventDefault()
-
-
-        val zoomChange = 1.0 + (e.deltaY * -0.002) 
-        (zoomFactor.now() * zoomChange).max(0.5).min(3.0)
-      } else {
-        zoomFactor.now()
-      }
+        if (e.ctrlKey) {
+            e.preventDefault()
+            
+            val zoomChange = 1.0 + (e.deltaY * -0.002) 
+            (zoomFactor.now() * zoomChange).max(0.5).min(3.0)
+        } else {
+            zoomFactor.now()
+        }
     } --> zoomFactor
-
+    
+    /**
+    * Render the entire tree from the root node downwards.
+    *
+    * @param tree The debug tree to render.
+    * 
+    * @return HTML element representing the whole tree.
+    */
     def apply(tree: DebugTree): HtmlElement = div(
         className := "debug-tree-display zoom-container",
             h1(
                 className := "debug-tree-title",
-                p("Parser Input : ", margin.px := 0, fontSize.px := 15, fontStyle.italic, fontWeight.lighter),
+                p("Parser Input : ", margin.px := 0, fontSize.px := 15,
+                    fontStyle.italic, fontWeight.lighter),
                 tree.input
             ),
-            styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
-            wheelHandler,
-
-            ReactiveNodeDisplay(ReactiveNode(tree.root))
-        )
+        styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
+        wheelHandler,
+        
+        ReactiveNodeDisplay(ReactiveNode(tree.root))
+    )
 }
 
 /**
-  * Object containing rendering methods for a reactive node (and children).
-  */
+* Object containing rendering methods for a reactive node (and children).
+*/
 private object ReactiveNodeDisplay {
     /**
-      * Render a reactive node display. This display enables optional rendering
-      * of children nodes, toggled by ReactiveNode.reloadChildren() and 
-      * ReactiveNode.resetChildren().
-      *
-      * @param node The reactive node structure.
-      * 
-      * @return HTML element representing a reactive node with optional children.
-      */
+    * Render a reactive node display. This display enables optional rendering
+    * of children nodes, toggled by ReactiveNode.reloadChildren() and 
+    * ReactiveNode.resetChildren().
+    *
+    * @param node The reactive node structure.
+    * 
+    * @return HTML element representing a reactive node with optional children.
+    */
     def apply(node: ReactiveNode): HtmlElement = {
         val newType =  node.debugNode.internal != node.debugNode.name
         div(
@@ -69,52 +67,59 @@ private object ReactiveNodeDisplay {
             when (newType) {
                 p(className := "debug-tree-node-type-name", node.debugNode.name)
             },
-    
             DebugNodeDisplay(node.debugNode, 
-                div(when (! node.debugNode.isLeaf) {
-                    div(
-                        child <-- node.children.signal.map(_.isEmpty).map(
-                            if (_) 
-                                button("Expand", className := "debug-tree-node-button debug-tree-node-button-expand", onClick --> { _ => node.reloadChildren() }) 
-                            else 
-                                button("Compress", className := "debug-tree-node-button debug-tree-node-button-compress", onClick --> { _ => node.resetChildren() })
-                        )
+            div(when (! node.debugNode.isLeaf) {
+                div(
+                    child <-- node.children.signal.map(_.isEmpty).map(
+                    if (_) 
+                        button("Expand",
+                            className := "debug-tree-node-button debug-tree-node-button-expand",
+                            onClick --> { _ => node.reloadChildren() }) 
+                    else 
+                        button("Compress",
+                            className := "debug-tree-node-button debug-tree-node-button-compress",
+                            onClick --> { _ => node.resetChildren() })
                     )
-                })
+                )
+            })
             ),
             div(
                 className := "debug-tree-node-container",
-                children <-- node.children.signal.map(_.map((child) => ReactiveNodeDisplay(ReactiveNode(child))))
-             ),
+                children <-- node.children.signal
+                    .map(_.map((child) => ReactiveNodeDisplay(ReactiveNode(child))))
+            ),
         )
     }
 }
 
 /**
-  * Object containing render methods for a single debug node.
-  */
+* Object containing render methods for a single debug node.
+*/
 private object DebugNodeDisplay {
     /**
-      * Render a debug node. This function returns an HTML element representing
-      * a single node of the tree.
-      *
-      * @param debugNode Representation of the debug node structure.
-      * @param buttons Collapse / expand buttons. They are passed in here so
-      * that the onClick functions can affect the reactive node (parent) object.
-      * 
-      * @return HTML Element representing a debug node.
-      */
+    * Render a debug node. This function returns an HTML element representing
+    * a single node of the tree.
+    *
+    * @param debugNode Representation of the debug node structure.
+    * @param buttons Collapse / expand buttons. They are passed in here so
+    * that the onClick functions can affect the reactive node (parent) object.
+    * 
+    * @return HTML Element representing a debug node.
+    */
     def apply(debugNode: DebugNode, buttons: HtmlElement): HtmlElement = {
         val showButtons: Var[Boolean] = Var(false)
         div(
-            className := s"debug-tree-node debug-tree-node-${if debugNode.success then "success" else "fail"}",
+            className := s"debug-tree-node debug-tree-node-${
+                if debugNode.success then "success" else "fail"
+            }",
             onMouseEnter --> { _ => showButtons.set(true)},
             onMouseLeave --> { _ => showButtons.set(false)},
             div(
                 p(className := "debug-tree-node-name", debugNode.internal),
                 p(fontStyle := "italic", debugNode.input)
             ),
-            buttons.amend(display <-- showButtons.signal.map(if (_) "block" else "none"))
+            buttons.amend(display <-- showButtons.signal
+                .map(if (_) "block" else "none"))
         )
     }
 }
