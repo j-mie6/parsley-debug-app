@@ -39,20 +39,5 @@ object Tauri {
             true
         )
 
-    /**
-      * Listen to a backend Tauri event.
-      *
-      * @param event Name of Tauri Event to listen for.
-      * @return Tuple of EventStream and Future holding a function to un-listen
-      */
-    def listen[T](event: Event): (EventStream[Event], Future[() => Unit]) = {
-        val (stream, callback) = EventStream.withCallback[Event]
-
-        val unlisten = listenInternal(event.name, _ => callback(event))
-            .toFuture
-            .mapTo[() => Unit]
-        
-        (stream, unlisten)
-    }
-
+    def listen(event: Event): (EventStream[event.Response], Future[() => Unit]) = event.listen()
 }

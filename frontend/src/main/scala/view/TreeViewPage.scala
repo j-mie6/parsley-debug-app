@@ -63,16 +63,13 @@ object TreeViewPage extends DebugViewPage {
     )
 
     def apply(): HtmlElement = {
-        val (stream, unlisten) = Tauri.listen(Event.TreeReady)
+        val (treeStream, unlisten) = Tauri.listen(Event.TreeReady)
 
         super.render(Some(div(
             className := "tree-view-page",
             
-            stream.filter(Event.TreeReady.equals)
-                .flatMapTo(TreeController.load) --> TreeController.tree,
-                
-            // TODO: move to TreeController
-            child <-- TreeController.treeElem.map(_.getOrElse(noTreeFound)),
+            treeStream --> TreeController.tree,
+            child.maybe <-- TreeController.treeElem,
 
             /*
             saveButton, /* Used for saving a tree using the name given in nameInput */
