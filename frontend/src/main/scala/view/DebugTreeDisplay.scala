@@ -3,7 +3,9 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
+import controller.tauri
 import controller.tauri.Tauri
+import controller.tauri.Command
 
 /**
   * Object containing rendering methods for the Debug Tree
@@ -43,7 +45,7 @@ private object ReactiveNodeDisplay {
       * @return HTML element representing a reactive node with optional children.
       */
     def apply(node: ReactiveNode): HtmlElement = {
-        val newType =  node.debugNode.internal != node.debugNode.name
+        val newType = node.debugNode.internal != node.debugNode.name
         div(
             cls("debug-tree-node-type-box") := newType,
             when (newType) {
@@ -51,13 +53,23 @@ private object ReactiveNodeDisplay {
             },
     
             DebugNodeDisplay(node.debugNode, 
-                div(when (! node.debugNode.isLeaf) {
+                div(when(!node.debugNode.isLeaf) {
                     div(
                         child <-- node.children.signal.map(_.isEmpty).map(
                             if (_) 
-                                button("Expand", className := "debug-tree-node-button debug-tree-node-button-expand", onClick --> { _ => node.reloadChildren() }) 
+                                button(
+                                    className := "debug-tree-node-button debug-tree-node-button-expand", 
+                                    "Expand", 
+                                    onClick
+                                        .flatMapTo(Tauri.invoke(Command.FetchNodeChildren, Map("nodeId" -> node.debugNode.nodeId)))
+                                         --> node.children
+                                )
                             else 
-                                button("Compress", className := "debug-tree-node-button debug-tree-node-button-compress", onClick --> { _ => node.resetChildren() })
+                                button(
+                                    className := "debug-tree-node-button debug-tree-node-button-compress", 
+                                    "Compress", 
+                                    onClick.mapTo(Nil) --> node.children
+                                )
                         )
                     )
                 })

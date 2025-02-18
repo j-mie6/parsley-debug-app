@@ -7,7 +7,7 @@ import com.raquo.laminar.api.L.*
 
 import model.DebugNode
 import controller.DebugTreeHandler
-import controller.tauri.{Tauri, Command}
+import controller.tauri.{Command, Tauri}
 
 /**
   * Wrapper for DebugNode to add reactive children.
@@ -15,22 +15,7 @@ import controller.tauri.{Tauri, Command}
   * @param debugNode holds information about debug node
   * @param children reactive children updated at runtime
   */
-case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
-    /**
-      * Clear the children from this mode.
-      */
-    def resetChildren(): Unit = children.set(Nil)
-  
-    /**
-      * Query the Tauri backend to get the children of this node.
-      */
-    def reloadChildren(): Unit = {
-        Tauri.invoke[String](Command.FetchNodeChildren, Map("nodeId" -> debugNode.nodeId))
-            .filterNot(_.isEmpty())
-            .map(DebugTreeHandler.decodeDebugNodes(_).getOrElse(Nil))
-            --> children
-    }
-}
+case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {}
 
 /**
   * Companion object for a ReactiveNode.
