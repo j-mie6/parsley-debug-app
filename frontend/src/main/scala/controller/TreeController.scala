@@ -22,7 +22,7 @@ object TreeController {
       */
     def reloadTree(displayTree: Var[HtmlElement]): Unit = 
         Tauri.invoke[String]("fetch_debug_tree").onComplete {
-            case Success(result) => DebugTreeHandler.decodeDebugTree(result) match {
+            case Success(result) => DebugTreeHandler.decodeDebugTree("skibiddi") match {
                 case Success(debugTree) => println(s"This worked!: result = $result"); displayTree.set(DebugTreeDisplay(debugTree))
                 case Failure(error) => println(s"Failed, but couldn't deserialise $error"); ErrorHandler.handleError(error)
             }
