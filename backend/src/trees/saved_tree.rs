@@ -166,7 +166,7 @@ pub mod test {
     fn create_dir() {
         if !path::Path::new(TEST_TREE_DIR).exists() {
             /* Will fail if dir is already there */
-            let _res = fs::create_dir(TEST_TREE_DIR);
+            let _res: std::io::Result<()> = fs::create_dir(TEST_TREE_DIR);
         }
     }
 
