@@ -7,7 +7,7 @@ import org.scalajs.dom
 /**
   * Object containing functions and variables defining page state.
   */
-object State {
+object StateContoller {
     // Boolean representing the current page theme.
     val isLightMode: Var[Boolean] = Var(!dom.window.matchMedia("(prefers-color-scheme: dark)").matches)
 

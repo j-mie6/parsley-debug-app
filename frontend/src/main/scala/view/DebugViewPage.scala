@@ -11,7 +11,7 @@ import scala.util.{Try, Success, Failure}
 import model.Page
 
 import controller.MainViewController
-import controller.State
+import controller.StateController
 import controller.TabController
 import controller.tauri.Tauri
 import controller.TreeController
@@ -84,12 +84,12 @@ abstract class DebugViewPage extends Page {
 
     /* Button used to toggle the theme */
     private lazy val themeButton: Element = div(
-        child <-- State.isLightMode.signal
+        child <-- StateController.isLightMode.signal
             .map((project: Boolean) => if project then moonIcon else sunIcon),
         cursor.pointer,
         alignContent.center,
         marginRight.px := 20,
-        onClick --> {_ => State.toggleTheme()}
+        onClick --> {_ => StateController.toggleTheme()}
     )
 
     /* Button that links to the 'parsley-debug-app' Github repo */
