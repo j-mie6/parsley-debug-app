@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
+use crate::events::Event;
 use crate::trees::{DebugTree, DebugNode};
 use super::{StateError, StateManager, AppHandle};
 
@@ -58,13 +59,13 @@ impl StateManager for AppState {
 
         insert_node(&mut state, tree.get_root())?;
 
+        
         /* Update tree */
         state.tree = Some(tree);
-        
-        /* Notify frontend listener */
-        serde_json::to_string(&state.tree)
+    
+        /* Notify frontend listener - call inline to avoid deadlock */        
+        state.app.emit(Event::TreeReady(&state.tree.as_ref().unwrap()))
             .map_err(|_| StateError::EventEmitFailed)
-            .and_then(|tree| state.app.emit("tree-ready", tree))
     }
     
     /* Get StateManager's tree */
@@ -83,5 +84,10 @@ impl StateManager for AppState {
             .get(&id)
             .ok_or(StateError::NodeNotFound(id))
             .cloned()
+    }
+
+    /* Notify frontend listeners of an event */        
+    fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError> {
+        self.inner()?.app.emit(event)
     }
 }

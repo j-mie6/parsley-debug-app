@@ -1,9 +1,10 @@
 use tauri::Manager;
 
-mod server;
 mod state;
 mod commands;
+mod events;
 mod trees;
+mod server;
 
 use state::AppState;
 use server::ServerState;
