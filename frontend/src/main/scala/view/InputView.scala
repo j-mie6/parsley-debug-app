@@ -12,7 +12,7 @@ import model.Page
 
 import controller.InputViewController
 import controller.tauri.{Tauri, Event}
-import controller.TreeController
+import controller.TreeViewController
 
 /**
   * Object containing rendering functions for the input view page.

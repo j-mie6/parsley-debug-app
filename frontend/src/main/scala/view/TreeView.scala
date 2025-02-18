@@ -9,13 +9,13 @@ import scala.util.Success
 
 import model.DebugTree
 
-import controller.TreeController
+import controller.TreeViewController
 
 /**
   * Object containing rendering functions for the TreeView
   */
 object TreeView {
     def apply(): HtmlElement = div(
-            TreeController.getDisplayTree, /* Renders tree */
+            TreeViewController.getDisplayTree, /* Renders tree */
     )
 }

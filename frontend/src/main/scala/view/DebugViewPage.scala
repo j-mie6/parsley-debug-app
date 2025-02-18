@@ -14,7 +14,7 @@ import controller.MainViewController
 import controller.StateController
 import controller.TabController
 import controller.tauri.Tauri
-import controller.TreeController
+import controller.TreeViewController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 

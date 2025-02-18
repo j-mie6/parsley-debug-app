@@ -16,7 +16,7 @@ import view.DebugTreeDisplay
 /**
 * Object containing methods for manipulating the DebugTree.
 */
-object TreeController {
+object TreeViewController {
     
     /* Display tree that will be rendered by TreeView */
     private val displayTree: Var[HtmlElement] = Var(div())
@@ -79,7 +79,7 @@ object TreeController {
 
     def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
         Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName)).foreach { _ =>
-            TreeController.reloadTree()
+            TreeViewController.reloadTree()
         }
     }
         

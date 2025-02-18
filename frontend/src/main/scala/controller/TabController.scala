@@ -8,7 +8,7 @@ import com.raquo.laminar.api.L.*
 import upickle.default as up
 
 import controller.tauri.{Tauri, Command}
-import controller.TreeController
+import controller.TreeViewController
 
 
 
@@ -66,7 +66,7 @@ object TabController {
         TabController.loadSavedTree(tabTitle) 
 
         /* Reload the tree */
-        TreeController.reloadTree()
+        TreeViewController.reloadTree()
     } 
 
     /**
@@ -125,6 +125,6 @@ object TabController {
     def loadSavedTree(treeName: String): Unit = 
         Tauri.invoke[String](Command.LoadSavedTree, Map("treeName" -> treeName))
           .foreach { _ =>
-            TreeController.reloadTree()
+            TreeViewController.reloadTree()
         }
 }
