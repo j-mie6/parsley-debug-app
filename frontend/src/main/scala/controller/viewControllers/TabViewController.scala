@@ -13,11 +13,11 @@ import controller.viewControllers.TreeViewController
 
 
 /**
-* TabController object contains functions that modify the state of 
+* TabViewController object contains functions that modify the state of 
 * saved/loaded trees
 */
 
-object TabController {
+object TabViewController {
     /* Scrollable tab that holds all saved trees */
     private val scrollableTab: Var[HtmlElement] = Var(div())
     
@@ -63,7 +63,7 @@ object TabController {
         selectedTab.set(tabTitle)
 
         /* Loads in the respective tree */
-        TabController.loadSavedTree(tabTitle) 
+        TabViewController.loadSavedTree(tabTitle) 
 
         /* Reload the tree */
         TreeViewController.reloadTree()

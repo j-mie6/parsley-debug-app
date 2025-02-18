@@ -5,7 +5,7 @@ import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 
 import controller.tauri.Tauri
-import controller.viewControllers.TabController
+import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 
 
@@ -28,13 +28,13 @@ object TabView {
             button(
                 className := "tab-button",
                 /* Passing on the signal of the selected tab to each tab*/
-                cls("selected") <-- TabController.isSelectedTab(tabTitle),
+                cls("selected") <-- TabViewController.isSelectedTab(tabTitle),
                 transition := "all 0.5s",
                 tabTitle,
                 closeTabButton(tabTitle),
                 onClick --> {_ => {
                         /* Sets selected tab signal to newly selected tab */
-                        TabController.setSelectedTab(tabTitle)
+                        TabViewController.setSelectedTab(tabTitle)
                     }
                 }
             )
@@ -49,7 +49,7 @@ object TabView {
 
                     onClick --> {_ => 
                         /* Deletes the respective tab */
-                        TabController.deleteTab(tabTitle)
+                        TabViewController.deleteTab(tabTitle)
                     },
                 )
     }
@@ -59,9 +59,9 @@ object TabView {
             className:= "tab-bar",
 
             /* Renders tabs */ 
-            children <-- TabController.getFileNames.signal.map(names =>
+            children <-- TabViewController.getFileNames.signal.map(names =>
                 names.map(name => {
-                    tabButton(name, TabController.getSelectedTab)
+                    tabButton(name, TabViewController.getSelectedTab)
                 })
             )
         )

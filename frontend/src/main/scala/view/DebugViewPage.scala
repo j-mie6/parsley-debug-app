@@ -13,7 +13,7 @@ import model.Page
 import controller.StateController
 import controller.tauri.Tauri
 import controller.viewControllers.MainViewController
-import controller.viewControllers.TabController
+import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -77,8 +77,8 @@ abstract class DebugViewPage extends Page {
 
         onClick --> { _ => {
             val treeName: String = (rand.nextInt).toString()
-            TabController.saveTree(treeName)
-            TabController.setSelectedTab(treeName)
+            TabViewController.saveTree(treeName)
+            TabViewController.setSelectedTab(treeName)
         }}
     )
 
