@@ -16,7 +16,6 @@ pub struct SavedNode {
     pub child_id: Option<u32>,
     pub input: String,
     pub children: Vec<SavedNode>,
-    pub is_leaf: bool,
 }
 
 impl From<DebugTree> for SavedTree {
@@ -74,7 +73,6 @@ impl SavedNode {
         input: String, 
         children: Vec<SavedNode>
     ) -> Self {
-        let is_leaf: bool = children.is_empty();
         SavedNode {
             node_id,
             name,
@@ -83,7 +81,6 @@ impl SavedNode {
             child_id,
             input,
             children,
-            is_leaf,
         }
     }
 }
