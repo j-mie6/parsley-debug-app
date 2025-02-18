@@ -3,7 +3,6 @@ package view.error
 import com.raquo.laminar.api.L.*
 
 import view.error.*
-// import web.syntax.visibilitySwitch
 
 object ErrorHandler {
     
@@ -14,7 +13,9 @@ object ErrorHandler {
 
     val errorVar: Var[Option[DillException]] = Var(None)
     
-    val displayError: HtmlElement = errorVar.now().getOrElse(DefaultWarning).displayElement()
+    val displayError: HtmlElement = div(
+        child <-- errorVar.signal.map(_.map(_.displayElement()).getOrElse(emptyNode)),
+    )
 
     def mapError(error: Throwable): DillException = {
         error match {
@@ -25,6 +26,10 @@ object ErrorHandler {
     def handleError(error: Throwable): Unit = {
         println(s"Error was: ${error.toString()}")
         errorVar.set(Some(mapError(error)))
+    }
+
+    def clearError(): Unit = {
+        errorVar.set(None)
     }
 
 }

@@ -12,16 +12,15 @@ sealed trait DillException {
         div(
             className := "popup",
             h2(
-                child.text <-- ErrorHandler.errorVar.signal.map(_.get.name),
+                this.name,
                 color := this.colour,
             ),
             br(),
             div(
                 className := "popup-text",
-                child.text <-- ErrorHandler.errorVar.signal.map(_.get.message),
+                this.message,
             ),
-            display <-- ErrorHandler.errorVar.signal.map(opt => if (opt.isDefined) "block" else "none"),
-            if canDelete then onClick --> {_ => ErrorHandler.errorVar.set(None)}
+            if canDelete then onClick --> {_ => ErrorHandler.clearError()}
         )
     }
 }
@@ -93,4 +92,9 @@ case class UnknownError(message: String) extends Error {
 case object PracticeWarning extends Warning {
     override def name: String = "Practice Warning"
     override def message: String = "This is a practice warning, this should not be on release"
+}
+
+case object EmptyWarning extends Warning {
+    override def name: String = "Empty Warning"
+    override def message: String = "You should never be seeing this warning"
 }
