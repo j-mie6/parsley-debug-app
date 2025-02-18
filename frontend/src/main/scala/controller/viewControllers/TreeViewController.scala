@@ -1,4 +1,4 @@
-package controller
+package controller.viewControllers
 
 import scala.util.{Try, Success, Failure}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -7,8 +7,9 @@ import org.scalablytyped.runtime.StringDictionary
 import com.raquo.laminar.api.L.*
 import upickle.default as up
 
-import controller.InputViewController
+import controller.DebugTreeController
 import controller.tauri.{Tauri, Command}
+import controller.viewControllers.InputViewController
 
 import view.DebugTreeDisplay
 
@@ -55,7 +56,7 @@ object TreeViewController {
         } do {
             setDisplayTree(
                 if treeString.isEmpty then div("No tree found") else 
-                DebugTreeHandler.decodeDebugTree(treeString) match {
+                DebugTreeController.decodeDebugTree(treeString) match {
                     case Failure(exception) => 
                         println(s"Error in decoding debug tree : ${exception.getMessage()}");
                         div()

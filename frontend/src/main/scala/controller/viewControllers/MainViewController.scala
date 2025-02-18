@@ -1,4 +1,4 @@
-package controller
+package controller.viewControllers
 
 import com.raquo.laminar.api.L.*
 
