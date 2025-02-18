@@ -2,7 +2,11 @@ package view.error
 
 import com.raquo.laminar.api.L.*
 
+import scala.scalajs.js
+
 import view.error.*
+
+import controller.MalformedJSONException
 
 /** 
   * ErrorHandler keeps track of the error state of the app and the code to display error 
@@ -20,25 +24,28 @@ object ErrorHandler {
     
     /* EmptyNode will not be rendered (if there is no error) */
     val displayError: HtmlElement = div(
-        child <-- errorVar.signal.map(_.map(_.displayElement()).getOrElse(emptyNode)),
+        child <-- errorVar.signal.map(_.map(err => err.displayElement).getOrElse(emptyNode)),
     )
 
     /* Maps an error passed by the backend to a frontend DillException object */
-    /* I think the problem is errors are scala.js errors, so they are all js.JavaScriptException: 
-       https://www.scala-js.org/doc/interoperability/exceptions.html
-       https://javadoc.io/doc/org.scala-js/scalajs-library_2.12/latest/scala/scalajs/js/JavaScriptException.html
-    */
     def mapError(error: Throwable): DillException = {
         error match {
             /* Backend errors */
-            case jsErr:js.JavaScriptException => jsErr match {
-                case err if err.getMessage().contains("TreeNotFound") => TreeNotFound
+            case js.JavaScriptException(jsErr) => jsErr match {
+                case err if err.toString.contains("TreeNotFound") => TreeNotFound
+                case err if err.toString.contains("LockFailed") => LockFailed
+                case err if err.toString.contains("NodeNotFound") => NodeNotFound(0)
+                case err if err.toString.contains("SerialiseFailed") => SerialiseFailed
+                case err if err.toString.contains("ReadDirFailed") => ReadDirFailed
+                case err if err.toString.contains("ReadPathFailed") => ReadPathFailed
+                case err if err.toString.contains("StringContainsInvalidUnicode") => StringContainsInvalidUnicode
+                case err if err.toString.contains("SuffixNotFound") => SuffixNotFound
 
                 case _ => new UnknownError(s"Unknown backend error: ${jsErr.toString()}")
             }
 
             /* Frontend errors */
-            case err:MalformedJSON => MalformedJSON
+            case MalformedJSONException => MalformedJSON
             
             /* Unknown error if not from backend or frontend */
             case _ => new UnknownError(s"Unknown error: ${error.toString()}")

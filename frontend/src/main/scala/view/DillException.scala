@@ -13,7 +13,7 @@ import com.raquo.laminar.api.L.*
 sealed trait DillException {
     def name: String
     def message: String
-    def canDelete: Boolean
+    def closable: Boolean
     def colour: String
 
     def displayElement: HtmlElement = {
@@ -21,14 +21,14 @@ sealed trait DillException {
             className := "popup",
             h2(
                 this.name,
-                color := this.colour,
+                color := "#ffffff",
             ),
             br(),
             div(
                 className := "popup-text",
                 this.message,
             ),
-            if canDelete then onClick --> {_ => ErrorHandler.clearError()}
+            if closable then onClick --> {_ => ErrorHandler.clearError()} else onClick --> {_ => ()}
         )
     }
 }
@@ -38,7 +38,7 @@ sealed trait DillException {
   */
 sealed trait Warning extends DillException {
     override def colour: String = "ffff00"
-    override def canDelete: Boolean = true
+    override def closable: Boolean = true
 }
 
 /**
@@ -46,7 +46,7 @@ sealed trait Warning extends DillException {
   */
 sealed trait Error extends DillException {
     override def colour: String = "ff0000"
-    override def canDelete: Boolean = false
+    override def closable: Boolean = false
 }
 
 /* 
@@ -93,23 +93,13 @@ case object SuffixNotFound extends Error {
     override def message: String = "Could not find suffix"
 }
 
-case object MalformedJSON extends Error {
+case object MalformedJSON extends Warning {
     override def name: String = "Malformed JSON"
     override def message: String = "Frontend received malformed JSON"
 }
 
 /* Used when an unexpected error occurs */
-case class UnknownError(message: String) extends Error {
+case class UnknownError(mes: String) extends Error {
     override def name: String = "Unknown Error"
-    override def message: String = s"Something went wrong: $message"
-}
-
-case object PracticeWarning extends Warning {
-    override def name: String = "Practice Warning"
-    override def message: String = "This is a practice warning, this should not be on release"
-}
-
-case object EmptyWarning extends Warning {
-    override def name: String = "Empty Warning"
-    override def message: String = "You should never be seeing this warning"
+    override def message: String = s"Something went wrong: $mes"
 }

@@ -6,9 +6,8 @@ use crate::trees::DebugNode;
 /* Frontend-accessible debug render */
 #[tauri::command]
 pub fn fetch_debug_tree(state: tauri::State<AppState>) -> Result<String, FetchTreeError> {
-    // serde_json::to_string_pretty(&state.get_tree()?)
-    //     .map_err(|_| FetchTreeError::SerialiseFailed)
-    Err(FetchTreeError::TreeNotFound)
+    serde_json::to_string_pretty(&state.get_tree()?)
+        .map_err(|_| FetchTreeError::SerialiseFailed)
 }
 
 #[derive(Debug, serde::Serialize)]
