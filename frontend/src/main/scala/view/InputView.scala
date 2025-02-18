@@ -10,9 +10,9 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
-import controller.InputViewController
 import controller.tauri.{Tauri, Event}
-import controller.TreeViewController
+import controller.viewControllers.InputViewController
+import controller.viewControllers.TreeViewController
 
 /**
   * Object containing rendering functions for the input view page.

@@ -5,9 +5,9 @@ import com.raquo.laminar.api.L.*
 
 import org.scalajs.dom
 
-import controller.MainViewController
 import controller.tauri.{Tauri, Event}
-import controller.TreeViewController
+import controller.viewControllers.MainViewController
+import controller.viewControllers.TreeViewController
 
 
 object MainView extends DebugViewPage {

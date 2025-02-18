@@ -6,7 +6,7 @@ import org.scalajs.dom
 
 import controller.TabController
 import controller.tauri.Tauri
-import controller.TreeViewController
+import controller.viewControllers.TreeViewController
 
 
 object ScrollableTabView {

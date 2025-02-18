@@ -10,11 +10,11 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
-import controller.MainViewController
 import controller.StateController
 import controller.TabController
 import controller.tauri.Tauri
-import controller.TreeViewController
+import controller.viewControllers.MainViewController
+import controller.viewControllers.TreeViewController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 

@@ -8,7 +8,7 @@ import com.raquo.laminar.api.L.*
 import upickle.default as up
 
 import controller.tauri.{Tauri, Command}
-import controller.TreeViewController
+import controller.viewControllers.TreeViewController
 
 
 

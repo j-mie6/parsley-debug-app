@@ -9,7 +9,7 @@ import scala.util.Success
 
 import model.DebugTree
 
-import controller.TreeViewController
+import controller.viewControllers.TreeViewController
 
 /**
   * Object containing rendering functions for the TreeView
