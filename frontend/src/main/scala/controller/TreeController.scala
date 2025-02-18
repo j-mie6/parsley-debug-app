@@ -7,6 +7,7 @@ import org.scalablytyped.runtime.StringDictionary
 import com.raquo.laminar.api.L.*
 import upickle.default as up
 
+import controller.InputViewController
 import controller.tauri.{Tauri, Command}
 
 import view.DebugTreeDisplay
@@ -59,7 +60,7 @@ object TreeController {
                         println(s"Error in decoding debug tree : ${exception.getMessage()}");
                         div()
                     case Success(debugTree) => {
-                        InputController.setInput(debugTree.input)
+                        InputViewController.setInput(debugTree.input)
                         DebugTreeDisplay(debugTree)
                     }
                 }

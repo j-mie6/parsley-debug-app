@@ -2,7 +2,7 @@ package controller
 
 import com.raquo.laminar.api.L.*
 
-object InputController {
+object InputViewController {
     /* The input element to be render by InputView */
     private val inputElement: Var[String] = Var("Please attach a parser to DillRemoteView")
 

@@ -10,7 +10,7 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
-import controller.InputController
+import controller.InputViewController
 import controller.tauri.{Tauri, Event}
 import controller.TreeController
 
@@ -34,5 +34,5 @@ object InputView {
     )
     
 
-    def apply(): HtmlElement = div(toInputElement(InputController.getInput.signal))
+    def apply(): HtmlElement = div(toInputElement(InputViewController.getInput.signal))
 }
