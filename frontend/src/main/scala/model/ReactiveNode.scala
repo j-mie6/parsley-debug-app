@@ -6,7 +6,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import com.raquo.laminar.api.L.*
 
 import model.DebugNode
-import controller.DebugTreeHandler
+import controller.DebugTreeController
 import controller.tauri.{Tauri, Command}
 
 /**
@@ -32,7 +32,7 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
         } do {
             if (!nodesString.isEmpty) {
                 children.set(
-                    DebugTreeHandler.decodeDebugNodes(nodesString) match {
+                    DebugTreeController.decodeDebugNodes(nodesString) match {
                         case Success(nodes) => nodes
                         case Failure(exception) => {
                             println(s"Error in decoding debug tree: ${exception.getMessage()}") 
