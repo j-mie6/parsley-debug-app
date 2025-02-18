@@ -11,18 +11,20 @@ import model.DebugTree
 
 
 sealed trait Event(private val name: String) {
-    type Response
 
-    //TODO: handle errors - i.e., what to do when up.Read fails
+    /* Response type associated with Event */
+    type Response
     given up.Reader[Response] = scala.compiletime.deferred
 
     
+    /* Listen to backend event using Tauri JS interface */
     protected[tauri] def listen(): (EventStream[this.Response], Future[() => Unit]) = {
         val (stream, callback) = EventStream.withCallback[this.Response]
         
-        //TODO: handle errors - i.e., what to do when up.Read fails
+        /* Send deserialised event to the EventStream when Tauri notified */
         val fireEvent = (e: TauriEvent[?]) => callback(up.read[this.Response](e.payload.toString));
         
+        /* Call Tauri function and get future of unlisten function */
         val unlisten = tauriListen(this.name, fireEvent)
             .toFuture
             .mapTo[() => Unit]
