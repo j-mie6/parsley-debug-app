@@ -165,7 +165,8 @@ pub mod test {
 
     fn create_dir() {
         if !path::Path::new(TEST_TREE_DIR).exists() {
-            fs::create_dir(TEST_TREE_DIR).expect("Folder should be made");
+            /* Will fail if dir is already there */
+            let _res = fs::create_dir(TEST_TREE_DIR);
         }
     }
 
