@@ -5,7 +5,7 @@ import com.raquo.laminar.api.L.*
 
 import org.scalajs.dom
 
-import controller.MainViewHandler
+import controller.MainViewController
 import controller.tauri.{Tauri, Event}
 import controller.TreeController
 
@@ -16,7 +16,7 @@ object MainView extends DebugViewPage {
         Tauri.listen[Unit](Event.TreeReady, {_ => TreeController.reloadTree()})
 
         super.render(Some(div(
-                    child <-- MainViewHandler.getMainView
+                    child <-- MainViewController.getMainView
             ))
         )
     }

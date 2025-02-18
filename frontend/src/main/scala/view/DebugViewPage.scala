@@ -10,8 +10,7 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
-import controller.InputController
-import controller.MainViewHandler
+import controller.MainViewController
 import controller.State
 import controller.TabController
 import controller.tauri.Tauri
@@ -37,20 +36,20 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-left",
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewHandler.isTreeView(true),
+            cls("selected") <-- MainViewController.isTreeView(true),
             treeIcon,
             h2("Tree View", marginLeft.px := 7),
             onClick --> { _ => 
-                MainViewHandler.setIsTreeView(true) 
+                MainViewController.setIsTreeView(true) 
             }
         ),
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewHandler.isTreeView(false),
+            cls("selected") <-- MainViewController.isTreeView(false),
             fileIcon,
             h2("Input View", marginLeft.px := 12),
             onClick --> { _ => 
-                MainViewHandler.setIsTreeView(false) 
+                MainViewController.setIsTreeView(false) 
             }
         )
     )

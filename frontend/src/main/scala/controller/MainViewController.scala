@@ -8,7 +8,7 @@ import view.DebugViewPage
 import view.InputView
 import view.TreeView
 
-object MainViewHandler {
+object MainViewController {
     /* If the current view is the tree view element */
     private val isTreeView: Var[Boolean] = Var(true)
 
