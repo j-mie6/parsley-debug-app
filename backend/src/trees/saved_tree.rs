@@ -91,7 +91,7 @@ impl SavedNode {
 #[cfg(test)]
 pub mod test {
 
-    use std::{fs::{self, File}, io::Write, path};
+    use std::{fs::{self, File}, io::{ErrorKind, Write}, path};
 
     use crate::trees::{debug_tree, DebugTree};
 
@@ -165,8 +165,14 @@ pub mod test {
 
     fn create_dir() {
         if !path::Path::new(TEST_TREE_DIR).exists() {
-            /* Will fail if dir is already there */
-            let _res: std::io::Result<()> = fs::create_dir(TEST_TREE_DIR);
+            let res: std::io::Result<()> = fs::create_dir(TEST_TREE_DIR);
+
+            if let Err(e) = res {
+                /* Already exists means the dir is there, we dont need to do anything */
+                if e.kind() != ErrorKind::AlreadyExists {
+                    panic!("Error creating test_trees folder");
+                }
+            }
         }
     }
 
