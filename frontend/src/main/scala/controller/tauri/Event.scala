@@ -17,12 +17,6 @@ sealed trait Event(private val name: String) {
     given up.Reader[Response] = scala.compiletime.deferred
 
     
-    /**
-     * Listen to a backend Tauri event.
-     *
-     * @param event Name of Tauri Event to listen for.
-     * @return Tuple of EventStream and Future holding a function to un-listen
-     */
     protected[tauri] def listen(): (EventStream[this.Response], Future[() => Unit]) = {
         val (stream, callback) = EventStream.withCallback[this.Response]
         
