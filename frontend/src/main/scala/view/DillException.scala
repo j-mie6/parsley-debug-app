@@ -2,6 +2,14 @@ package view.error
 
 import com.raquo.laminar.api.L.*
 
+/**
+  * DillException is the generic frontend representation of an Exception
+  * 
+  * @param name Name of Exception
+  * @param message More detailed error message displayed to the user
+  * @param canDelete Whether the popup can be cleared by clicking on it (only for non-breaking warnings)
+  * @param colour Outline colour for popup, red for errors and yellow for warnings
+  */
 sealed trait DillException {
     def name: String
     def message: String
@@ -25,18 +33,24 @@ sealed trait DillException {
     }
 }
 
+/**
+  * Represents a non-breaking Exception in Dill. Overrides colour to yellow and canDelete to true
+  */
 sealed trait Warning extends DillException {
     override def colour: String = "ffff00"
     override def canDelete: Boolean = true
 }
 
+/**
+  * Represents a breaking Exception in Dill. Overrides colour to red and canDelete to false
+  */
 sealed trait Error extends DillException {
     override def colour: String = "ff0000"
     override def canDelete: Boolean = false
 }
 
 /* 
-    DILL ERRORS
+    List of DILL Exceptions
 */
 
 case object TreeNotFound extends Error {
@@ -84,6 +98,7 @@ case object MalformedJSON extends Error {
     override def message: String = "Frontend received malformed JSON"
 }
 
+/* Used when an unexpected error occurs */
 case class UnknownError(message: String) extends Error {
     override def name: String = "Unknown Error"
     override def message: String = s"Something went wrong: $message"
