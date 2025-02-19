@@ -13,18 +13,18 @@ import controller.tauri.Tauri
 */
 object DebugTreeDisplay {
     /* Variable that keeps track of how much the tree has been zoomed into */
-    val zoomFactor = Var(1.0)
+    val zoomFactor: Var[Double] = Var(1.0)
     
+    val zoomSpeed: Float = -0.002 /* Speed of zooming in and out */
+    val maxZoomFactor: Double = 0.5 /* Maximum zoom factor */
+    val minZoomFactor: Double = 3.0 /* Minimum zoom factor */
+
     /* Event handler for zooming in and out of the tree */
-    val wheelHandler = onWheel.map { e =>
-        if (e.ctrlKey) {
-            e.preventDefault()
+    val wheelHandler = onWheel.filter(_.ctrlKey).map { e =>
+            e.preventDefault() /* Prevent default zooming */
             
-            val zoomChange = 1.0 + (e.deltaY * -0.002) 
-            (zoomFactor.now() * zoomChange).max(0.5).min(3.0)
-        } else {
-            zoomFactor.now()
-        }
+            val zoomChange = 1.0 + (e.deltaY * zoomSpeed)
+            (zoomFactor.now() * zoomChange).max(maxZoomFactor).min(minZoomFactor) 
     } --> zoomFactor
     
     /**
@@ -38,7 +38,7 @@ object DebugTreeDisplay {
         className := "debug-tree-display zoom-container",
         ReactiveNodeDisplay(ReactiveNode(tree.root)),
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
-        wheelHandler,
+        wheelHandler
     )
 }
 
