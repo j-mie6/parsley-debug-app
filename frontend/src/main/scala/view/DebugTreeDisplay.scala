@@ -4,7 +4,8 @@ import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
 
-import controller.Tauri
+import controller.viewControllers.MainViewController
+import controller.tauri.Tauri
 
 /**
   * Object containing rendering methods for the Debug Tree
@@ -19,11 +20,6 @@ object DebugTreeDisplay {
       */
     def apply(tree: DebugTree): HtmlElement = div(
         className := "debug-tree-display",
-        h1(
-            className := "debug-tree-title",
-            p("Parser Input : ", margin.px := 0, fontSize.px := 15, fontStyle.italic, fontWeight.lighter),
-            tree.input
-        ),
         div(
             ReactiveNodeDisplay(ReactiveNode(tree.root))
         )

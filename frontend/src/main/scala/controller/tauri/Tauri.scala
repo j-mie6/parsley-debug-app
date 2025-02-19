@@ -1,10 +1,10 @@
-package controller
+package controller.tauri
 
 import scala.concurrent.Future
+
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.*
-
 import org.scalablytyped.runtime.StringDictionary
 
 import typings.tauriAppsApi.coreMod.{invoke => invokeInternal, InvokeArgs}

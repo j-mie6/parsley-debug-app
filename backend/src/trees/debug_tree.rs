@@ -21,8 +21,8 @@ impl DebugTree {
     }
 }
 
-impl From<&SavedTree> for DebugTree {
-    fn from(debug_tree: &SavedTree) -> Self {
+impl From<SavedTree> for DebugTree {
+    fn from(debug_tree: SavedTree) -> Self {
         /* Recursively convert children into SavedNodes */
         fn convert_node(node: SavedNode) -> DebugNode {
             let children: Vec<DebugNode> = node.children

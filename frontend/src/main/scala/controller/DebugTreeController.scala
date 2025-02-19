@@ -6,10 +6,10 @@ import scala.util.{Try, Success, Failure}
 import model.{DebugTree, DebugNode}
 
 /**
-  * DebugTreeHandler object contains methods on decoding JSON into debug tree
+  * DebugTreeController object contains methods on decoding JSON into debug tree
   * data structures.
   */
-object DebugTreeHandler {
+object DebugTreeController {
     /**
       * Decode a JSON string into a DebugTree class.
       *

@@ -1,6 +1,8 @@
-package view.error
+package model.errors
 
 import com.raquo.laminar.api.L.*
+
+import controller.errors.ErrorController
 
 /**
   * DillException is the generic frontend representation of an Exception
@@ -30,7 +32,7 @@ sealed trait DillException {
                 className := "popup-text",
                 this.message,
             ),
-            if closable then onClick --> {_ => ErrorHandler.clearError()} else onClick --> {_ => ()}
+            if closable then onClick --> {_ => ErrorController.clearError()} else onClick --> {_ => ()}
         )
     }
 }

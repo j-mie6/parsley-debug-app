@@ -1,26 +1,26 @@
 import scala.util.{Try, Success, Failure}
-
-import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import org.scalajs.dom
 import com.raquo.laminar.api.L.*
 
-import view.TreeViewPage
+import view.MainView
 
-import controller.State
-import controller.Tauri
+import controller.AppStateController
+import controller.tauri.Tauri
 
-import view.error.ErrorHandler
+import controller.errors.ErrorController
 
 @main def app = {
-    dom.document.documentElement.setAttribute("data-theme", if State.isLightMode.now() then "light" else "dark")
+    dom.document.documentElement.setAttribute("data-theme", if AppStateController.isLightMode.now() then "light" else "dark")
     renderOnDomContentLoaded(
         dom.document.getElementById("app"),
         root
+
     )
 }
 
 val root: HtmlElement = div(
-    TreeViewPage(),
-    ErrorHandler.displayError
+    MainView(),
+    ErrorController.displayError
 )

@@ -1,18 +1,18 @@
-package view.error
+package controller.errors
 
 import com.raquo.laminar.api.L.*
 
 import scala.scalajs.js
 
-import view.error.*
+import model.errors.*
 
 import controller.MalformedJSONException
 
 /** 
-  * ErrorHandler keeps track of the error state of the app and the code to display error 
+  * ErrorController keeps track of the error state of the app and the code to display error 
   * popups in the app 
   */
-object ErrorHandler {
+object ErrorController {
     
     private lazy val alertIcon: Element = i (
         className := "bi bi-exclamation-triangle-fill", 

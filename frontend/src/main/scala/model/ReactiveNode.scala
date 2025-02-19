@@ -6,9 +6,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import com.raquo.laminar.api.L.*
 
 import model.DebugNode
-import controller.{Tauri, DebugTreeHandler}
+import controller.DebugTreeController
+import controller.tauri.{Tauri, Command}
 
-import view.error.ErrorHandler
+import controller.errors.ErrorController
 
 /**
   * Wrapper for DebugNode to add reactive children.
@@ -29,14 +30,14 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
       */
     def reloadChildren(): Unit = {
         for {
-            nodesString: String <- Tauri.invoke[String]("fetch_node_children", Map("nodeId" -> debugNode.nodeId))
+            nodesString: String <- Tauri.invoke[String](Command.FetchNodeChildren, Map("nodeId" -> debugNode.nodeId))
         } do {
             if (!nodesString.isEmpty) {
                 children.set(
-                    DebugTreeHandler.decodeDebugNodes(nodesString) match {
+                    DebugTreeController.decodeDebugNodes(nodesString) match {
                         case Success(nodes) => nodes
                         case Failure(exception) => {
-                            ErrorHandler.handleError(exception)
+                            ErrorController.handleError(exception)
                             Nil
                         }
                     }
