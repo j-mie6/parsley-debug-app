@@ -47,6 +47,7 @@ impl From<SavedTree> for DebugTree {
     }
 }
 
+
 /* Defines tree structure used in backend that will be passed to frontend */
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -62,16 +63,9 @@ pub struct DebugNode {
 }
 
 impl DebugNode {
-    pub fn new(
-        node_id: u32,
-        name: String,
-        internal: String,
-        success: bool,
-        child_id: Option<u32>,
-        input: String,
-        children: Vec<DebugNode>,
-    ) -> Self {
+    pub fn new(node_id: u32, name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
         let is_leaf: bool = children.is_empty();
+
         DebugNode {
             node_id,
             name,
@@ -88,35 +82,109 @@ impl DebugNode {
 
 #[cfg(test)]
 pub mod test {
+
     /* Debug Tree unit testing */
 
     use super::{DebugNode, DebugTree};
 
-    pub const RAW_TREE: &str = r#"{
-        "input": "Test",
-        "root": {
-            "nodeId": 0,
-            "name": "Test",
-            "internal": "Test",
-            "success": true,
-            "childId": 0,
+    pub fn test_json() -> String {
+        r#"{
             "input": "Test",
-            "isLeaf": true
-        }
-    }"#;
+            "root": {
+                "nodeId": 0,
+                "name": "Test",
+                "internal": "Test",
+                "success": true,
+                "childId": 0,
+                "input": "Test",
+                "isLeaf": true
+            }
+        }"#
+        .split_whitespace()
+        .collect::<String>()
+    }
+
+    pub fn test_nested_json() -> String {
+        r#"{
+            "input": "0",
+            "root": {
+                "name": "0",
+                "internal": "0",
+                "success": true,
+                "childId": 0,
+                "input": "0",
+                "children": []
+        }"#
+        .split_whitespace()
+        .collect()
+    }
 
     pub fn test_tree() -> DebugTree {
         DebugTree::new(
             String::from("Test"),
             DebugNode::new(
-                0u32,
+                0,
                 String::from("Test"),
                 String::from("Test"),
                 true,
                 Some(0),
                 String::from("Test"),
-                Vec::new(),
-            ),
+                Vec::new()
+            )
+        )
+    }
+
+    pub fn test_nested_tree() -> DebugTree {
+        DebugTree::new(
+            String::from("01234"),
+            DebugNode::new(
+                0,
+                String::from("0"),
+                String::from("0"),
+                true,
+                Some(0),
+                String::from("0"),
+                vec![
+                    DebugNode::new(
+                        1,
+                        String::from("1"),
+                        String::from("1"),
+                        true,
+                        Some(1),
+                        String::from("1"),
+                        vec![
+                            DebugNode::new(
+                                2,
+                                String::from("2"),
+                                String::from("2"),
+                                true,
+                                Some(2),
+                                String::from("2"),
+                                vec![],
+                            )
+                        ]
+                    ),
+                    DebugNode::new(
+                        3,
+                        String::from("3"),
+                        String::from("3"),
+                        true,
+                        Some(3),
+                        String::from("3"),
+                        vec![
+                            DebugNode::new(
+                                4,
+                                String::from("4"),
+                                String::from("4"),
+                                true,
+                                Some(4),
+                                String::from("4"),
+                                vec![],
+                            )
+                        ]
+                    )
+                ]
+            )
         )
     }
 
