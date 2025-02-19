@@ -67,7 +67,7 @@ private object ReactiveNodeDisplay {
                 p(className := "debug-tree-node-type-name", node.debugNode.name)
             },
             DebugNodeDisplay(node.debugNode, 
-            div(when (! node.debugNode.isLeaf) {
+            div(when (!node.debugNode.isLeaf) {
                 div(
                     child <-- node.children.signal.map(_.isEmpty).map(
                     if (_) 
@@ -108,9 +108,7 @@ private object DebugNodeDisplay {
     def apply(debugNode: DebugNode, buttons: HtmlElement): HtmlElement = {
         val showButtons: Var[Boolean] = Var(false)
         div(
-            className := s"debug-tree-node debug-tree-node-${
-                if debugNode.success then "success" else "fail"
-            }",
+            className := s"debug-tree-node debug-tree-node-${if debugNode.success then "success" else "fail"}",
             onMouseEnter --> { _ => showButtons.set(true)},
             onMouseLeave --> { _ => showButtons.set(false)},
             div(
