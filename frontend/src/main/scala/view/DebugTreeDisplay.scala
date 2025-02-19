@@ -15,17 +15,21 @@ object DebugTreeDisplay {
     /* Variable that keeps track of how much the tree has been zoomed into */
     val zoomFactor: Var[Double] = Var(1.0)
     
-    val zoomSpeed: Float = -0.002 /* Speed of zooming in and out */
+    val zoomSpeed: Float = -0.002   /* Speed of zooming in and out */
     val maxZoomFactor: Double = 0.5 /* Maximum zoom factor */
     val minZoomFactor: Double = 3.0 /* Minimum zoom factor */
-
+    
+    /* Updater for the zoom factor */
+    val zoomUpdate = zoomFactor.updater[Double]((prev, delta) => 
+            val zoomChange = 1.0 + (delta * zoomSpeed)
+            (prev * zoomChange).min(minZoomFactor).max(maxZoomFactor)
+    )
+    
     /* Event handler for zooming in and out of the tree */
     val wheelHandler = onWheel.filter(_.ctrlKey).map { e =>
-            e.preventDefault() /* Prevent default zooming */
-            
-            val zoomChange = 1.0 + (e.deltaY * zoomSpeed)
-            (zoomFactor.now() * zoomChange).max(maxZoomFactor).min(minZoomFactor) 
-    } --> zoomFactor
+        e.preventDefault() /* Prevent default zooming */
+        e.deltaY           /* Get the vertical delta of the wheel */
+    } --> zoomUpdate
     
     /**
     * Render the entire tree from the root node downwards.
