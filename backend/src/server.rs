@@ -49,7 +49,7 @@ pub mod test {
         let post_tree = client
             .post("/api/remote/tree")
             .header(http::ContentType::JSON)
-            .body(parsley_tree::test::RAW_TREE);
+            .body(parsley_tree::test::test_json());
 
         let get_tree = client.get("/api/remote/tree");
 

@@ -20,10 +20,7 @@ fn get_index() -> String {
 
 /* Post request handler to accept debug tree */
 #[post("/api/remote/tree", format = "application/json", data = "<data>")]
-fn post_tree(
-    data: Json<ParsleyTree>,
-    state: &rocket::State<ServerState>,
-) -> (http::Status, String) {
+fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, String) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
     let debug_tree: DebugTree = parsley_tree.into();
@@ -117,7 +114,7 @@ pub mod test {
         let response: blocking::LocalResponse = client
             .post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
-            .body(&parsley_tree::test::RAW_TREE)
+            .body(&parsley_tree::test::test_json())
             .dispatch();
 
         /* Assert that POST succeeded */
@@ -186,7 +183,7 @@ pub mod test {
         let post_response: blocking::LocalResponse = client
             .post(rocket::uri!(super::post_tree))
             .header(http::ContentType::JSON)
-            .body(&parsley_tree::test::RAW_TREE)
+            .body(&parsley_tree::test::test_json())
             .dispatch();
 
         /* Assert that POST succeeded */
@@ -204,8 +201,9 @@ pub mod test {
             get_response
                 .into_string()
                 .expect("get_info response is not a String")
-                .replace(" ", ""),
-            debug_tree::test::RAW_TREE.replace(" ", "")
+                .split_whitespace()
+                .collect::<String>(),
+            debug_tree::test::test_json()
         );
     }
 }
