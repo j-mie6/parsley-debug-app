@@ -53,54 +53,68 @@ sealed trait Error extends DillException {
 /* 
     List of DILL Exceptions
 */
-
 case object TreeNotFound extends Error {
     override def name: String = "Tree Not Found"
-    override def message: String = "App server could not retrieve debug tree from Remote View"
+    override def message: String = 
+        "The application server failed to retrieve the debug tree from Remote View. " +
+        "Ensure that the debug session is active and reachable. If the problem persists, please" + 
+        "contact Jamie Willis."
 }
 
 case object LockFailed extends Error {
-    override def name: String = "Lock Failed"
-    override def message: String = "App thread could not get a hold of the app lock. Please re-start the app"
+    override def name: String = "Lock Acquisition Failed"
+    override def message: String = 
+        "The application thread was unable to acquire the required lock. Try restarting the application"
 }
 
 case class NodeNotFound(nodeId: Int) extends Error {
     override def name: String = "Node Not Found"
-    override def message: String = s"Child node with ID $nodeId does not exist."
+    override def message: String = 
+        s"Could not locate child node with ID $nodeId."
 }
 
 case object SerialiseFailed extends Error {
-    override def name: String = "Serialise Failed"
-    override def message: String = "Could not serialise display tree. Please contact Jamie about this"
+    override def name: String = "Serialization Failed"
+    override def message: String = 
+        "Failed to serialize the display tree. " +
+        "This may indicate an issue with the serialization process. " +
+        "Please report this issue to Jamie Willis"
 }
 
 case object ReadDirFailed extends Error {
-    override def name: String = "Read Directory Failed"
-    override def message: String = "Failed to read directory"
+    override def name: String = "Directory Read Failure"
+    override def message: String = 
+        "The system encountered an error while attempting to read a directory. Ensure the directory exists."
 }
 
 case object ReadPathFailed extends Error {
-    override def name: String = "Read Path Failed"
-    override def message: String = "Failed to read path"
+    override def name: String = "Path Read Failure"
+    override def message: String = 
+        "Failed to access the specified file path. Ensure the path is correct and not blocked by another process."
 }
 
 case object StringContainsInvalidUnicode extends Error {
-    override def name: String = "String Contains Invalid Unicode"
-    override def message: String = "Remove invalid character"
+    override def name: String = "Invalid Unicode Character"
+    override def message: String = 
+        "The input string contains invalid Unicode characters. Ensure that all characters are properly encoded and remove any unsupported symbols."
 }
 
 case object SuffixNotFound extends Error {
     override def name: String = "Suffix Not Found"
-    override def message: String = "Could not find suffix"
+    override def message: String = 
+        "The expected suffix was not found in the input. Verify that the correct format is being used."
 }
 
 case object MalformedJSON extends Warning {
-    override def name: String = "Malformed JSON"
-    override def message: String = "Frontend received malformed JSON"
+    override def name: String = "Malformed JSON Received"
+    override def message: String = 
+        "Failed to serialize the display tree. " +
+        "This may indicate an issue with the serialization process. " +
+        "Please report this issue to Jamie Willis"
 }
 
 /* Used when an unexpected error occurs */
 case class UnknownError(mes: String) extends Error {
     override def name: String = "Unknown Error"
-    override def message: String = s"Something went wrong: $mes"
+    override def message: String = s"Something unexpected went wrong: $mes"
 }
