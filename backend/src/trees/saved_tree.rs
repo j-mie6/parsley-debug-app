@@ -91,127 +91,260 @@ impl SavedNode {
 #[cfg(test)]
 pub mod test {
 
-    use std::{fs::{self, File}, io::Write, path};
+    /* Saved Tree unit testing */
 
-    use crate::trees::{debug_tree, DebugTree};
+    use std::io::Write;
+    use std::fs::{self, File};
 
     use super::{SavedTree, SavedNode};
+    use crate::trees::{debug_tree, DebugTree};
 
-    const TEST_TREE_DIR: &str = "./test_trees/";
+    const FILE_PATH: &str = "test.json";
 
-    const TREE_JSON: &str = r#"{
-  "input": "Test",
-  "root": {
-    "node_id": 0,
-    "name": "Test",
-    "internal": "Test",
-    "success": true,
-    "child_id": 0,
-    "input": "Test",
-    "children": []
-  }
-}"#;
+    pub fn test_json() -> String {
+        r#"{
+            "input": "Test",
+            "root": {
+                "node_id": 0,
+                "name": "Test",
+                "internal": "Test",
+                "success": true,
+                "child_id": 0,
+                "input": "Test",
+                "children": []
+            }
+        }"#
+        .split_whitespace()
+        .collect::<String>()
+    }
 
+    pub fn test_nested_json() -> String {
+        r#"{
+            "input": "01234",
+            "root": {
+                "node_id": 0,
+                "name": "0",
+                "internal": "0",
+                "success": true,
+                "child_id": 0,
+                "input": "0",
+                "children": [
+                    {
+                        "node_id": 1,
+                        "name": "1",
+                        "internal": "1",
+                        "success": true,
+                        "child_id": 1,
+                        "input": "1",
+                        "children": [
+                            {
+                                "node_id": 2,
+                                "name": "2",
+                                "internal": "2",
+                                "success": true,
+                                "child_id": 2,
+                                "input": "2",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "node_id": 3,
+                        "name": "3",
+                        "internal": "3",
+                        "success": true,
+                        "child_id": 3,
+                        "input": "3",
+                        "children": [
+                            {
+                                "node_id": 4,
+                                "name": "4",
+                                "internal": "4",
+                                "success": true,
+                                "child_id": 4,
+                                "input": "4",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        }"#
+        .split_whitespace()
+        .collect()
+    }
 
     pub fn test_tree() -> SavedTree {
         SavedTree::new(
             String::from("Test"),
             SavedNode::new(
-                0u32,
+                0,
                 String::from("Test"),
                 String::from("Test"),
                 true,
                 Some(0),
                 String::from("Test"),
-                Vec::new(),
-            ),
+                Vec::new()
+            )
+        )
+    }
+    
+    pub fn test_nested_tree() -> SavedTree {
+        SavedTree::new(
+            String::from("01234"),
+            SavedNode::new(
+                0,
+                String::from("0"),
+                String::from("0"),
+                true,
+                Some(0),
+                String::from("0"),
+                vec![
+                    SavedNode::new(
+                        1,
+                        String::from("1"),
+                        String::from("1"),
+                        true,
+                        Some(1),
+                        String::from("1"),
+                        vec![
+                            SavedNode::new(
+                                2,
+                                String::from("2"),
+                                String::from("2"),
+                                true,
+                                Some(2),
+                                String::from("2"),
+                                vec![],
+                            )
+                        ]
+                    ),
+                    SavedNode::new(
+                        3,
+                        String::from("3"),
+                        String::from("3"),
+                        true,
+                        Some(3),
+                        String::from("3"),
+                        vec![
+                            SavedNode::new(
+                                4,
+                                String::from("4"),
+                                String::from("4"),
+                                true,
+                                Some(4),
+                                String::from("4"),
+                                vec![],
+                            )
+                        ]
+                    )
+                ]
+            )
         )
     }
 
 
     #[test]
-    fn converts_from_debug_to_saved() {
-        let d_tree: DebugTree = debug_tree::test::test_tree();
-        let s_tree: SavedTree = test_tree();
-
-        assert_eq!(SavedTree::from(d_tree), s_tree);
-    }
-
-    #[test]
-    fn converts_from_saved_to_debug() {
-        let d_tree: DebugTree = debug_tree::test::test_tree();
-        let s_tree: SavedTree = test_tree();
-
-        assert_eq!(DebugTree::from(s_tree), d_tree);
-    }
-
-    #[test]
     fn saved_tree_serializes() {
-        let s_tree: SavedTree = test_tree();
-        let tree_str: String = serde_json::to_string_pretty(&s_tree).expect("Tree should be able to serialize");
+        let json: String = serde_json::to_string(&test_tree())
+            .expect("Tree should be able to serialize");
 
-        assert_eq!(tree_str, String::from(TREE_JSON));
+        assert_eq!(json, test_json());
     }
-
 
     #[test]
     fn saved_tree_deserializes() {
-        let s_tree: SavedTree = test_tree();
-        let saved_tree: SavedTree =
-            serde_json::from_str(TREE_JSON).expect("Could not deserialise SavedTree");
+        let saved_tree: SavedTree = serde_json::from_str(&test_json())
+            .expect("Could not deserialise SavedTree");
 
-        assert_eq!(s_tree, saved_tree);
-    }
-
-    fn create_dir() {
-        if !path::Path::new(TEST_TREE_DIR).exists() {
-            /* Will fail if dir is already there */
-            let _res: std::io::Result<()> = fs::create_dir(TEST_TREE_DIR);
-        }
+        assert_eq!(saved_tree, test_tree());
     }
 
     #[test]
-    fn can_save_and_retrieve_json_from_file() {
-        create_dir();
-        let tree_name: &str = "Test_json";
+    fn nested_saved_tree_serializes() {
+        let json: String = serde_json::to_string(&test_nested_tree())
+            .expect("Tree should be able to serialize");
 
-
-        let file_path: String = format!("{}{}.json", TEST_TREE_DIR, tree_name);
-        let mut data_file: File = File::create(&file_path).expect("File should have been made");
-    
-        data_file.write(TREE_JSON.as_bytes()).expect("File should have been written to");
-
-        let contents: String = fs::read_to_string(&file_path).expect("File contents should have been read");
-        assert_eq!(contents, String::from(TREE_JSON));
-
-
-        /* Clear test file */
-        fs::remove_file(file_path).expect("File should have been deleted");
+        assert_eq!(json, test_nested_json());
     }
 
     #[test]
-    fn can_save_and_retrieve_tree_from_file() {
-        create_dir();
+    fn nested_saved_tree_deserializes() {
+        let saved_tree: SavedTree = serde_json::from_str(&test_nested_json())
+            .expect("Could not deserialise SavedTree");
 
-        let tree_name: &str = "Test_tree";
-        let tree_str: String = serde_json::to_string_pretty(&test_tree()).expect("Tree should be able to serialize");
-
-
-        let file_path: String = format!("{}{}.json", TEST_TREE_DIR, tree_name);
-        let mut data_file: File = File::create(&file_path).expect("File should have been made");
-    
-        data_file.write(tree_str.as_bytes()).expect("File should have been written to");
-
-
-
-        let contents: String = fs::read_to_string(&file_path).expect("File contents should have been read");
-
-        let saved_tree: SavedTree =
-        serde_json::from_str(&contents).expect("Could not deserialise SavedTree");
-
-        assert_eq!(test_tree(), saved_tree);
-
-        /* Clear test file */
-        fs::remove_file(file_path).expect("File should have been deleted");
+        assert_eq!(saved_tree, test_nested_tree());
     }
+
+
+    #[test]
+    fn saved_tree_converts_into_debug_tree() {
+        let saved_tree: SavedTree = test_tree();
+        let debug_tree: DebugTree = debug_tree::test::test_tree();
+        
+        assert_eq!(debug_tree, saved_tree.into());
+    }
+    
+    #[test]
+    fn debug_tree_converts_into_saved_tree() {
+        let saved_tree: SavedTree = test_tree();
+        let debug_tree: DebugTree = debug_tree::test::test_tree();
+
+        assert_eq!(saved_tree, debug_tree.into());
+    }
+
+    #[test]
+    fn nested_saved_tree_converts_into_nested_debug_tree() {
+        let saved_tree: SavedTree = test_nested_tree();
+        let debug_tree: DebugTree = debug_tree::test::test_nested_tree();
+        
+        assert_eq!(debug_tree, saved_tree.into());
+    }
+    
+    #[test]
+    fn nested_debug_tree_converts_into_nested_saved_tree() {
+        let saved_tree: SavedTree = test_nested_tree();
+        let debug_tree: DebugTree = debug_tree::test::test_nested_tree();
+
+        assert_eq!(saved_tree, debug_tree.into());
+    }
+
+    
+    #[test]
+    fn saved_tree_saved_to_json() {
+        let mut data_file: File = File::create(FILE_PATH)
+            .expect("File creation failed");
+
+        write!(data_file, "{}", test_json())
+            .expect("JSON could not be written to file");
+
+        let contents: String = fs::read_to_string("test.json")
+            .expect("File contents could not be read");
+    
+        assert_eq!(contents, test_json());
+
+        fs::remove_file(FILE_PATH)
+            .expect("File could not be deleted");
+    }
+
+    #[test]
+    fn saved_tree_loaded_from_json() {
+        let mut data_file: File = File::create(FILE_PATH)
+            .expect("File creation failed");
+    
+        write!(data_file, "{}", test_json())
+            .expect("JSON could not be written to file");
+
+        let contents: String = fs::read_to_string(FILE_PATH)
+            .expect("File contents could not be read");
+
+        let saved_tree: SavedTree = serde_json::from_str(&contents)
+            .expect("Saved Tree could not be deserialised");
+
+        assert_eq!(saved_tree, test_tree());
+
+        fs::remove_file(FILE_PATH)
+            .expect("File could not be deleted");
+    }
+
 }
