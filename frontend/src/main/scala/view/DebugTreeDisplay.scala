@@ -45,7 +45,8 @@ private object ReactiveNodeDisplay {
       * @return HTML element representing a reactive node with optional children.
       */
     def apply(node: ReactiveNode): HtmlElement = {
-        val newType = node.debugNode.internal != node.debugNode.name
+        val newType: Boolean = node.debugNode.internal != node.debugNode.name
+        val expanded: Boolean = node.children.now().isEmpty;
         
         div(
             cls("debug-tree-node-type-box") := newType,
@@ -54,7 +55,12 @@ private object ReactiveNodeDisplay {
             },
 
             div(
-                className := s"debug-tree-node debug-tree-node-${if node.debugNode.success then "success" else "fail"}",
+                className := s"debug-tree-node",
+                cls("compress") <-- node.children.signal.map(_.isEmpty),
+                cls("fail") := !node.debugNode.success,
+
+                cls("leaf") := node.debugNode.isLeaf,
+
                 div(
                     p(className := "debug-tree-node-name", node.debugNode.internal),
                     p(fontStyle := "italic", node.debugNode.input)
@@ -63,7 +69,7 @@ private object ReactiveNodeDisplay {
                 //TODO: on double click, expand all
 
                 onClick.flatMapTo(
-                    if (!node.children.now().isEmpty) {
+                    if (!expanded) {
                         EventStream.fromValue(Nil)
                     } else {
                         Tauri.invoke(Command.FetchNodeChildren, Map("nodeId" -> node.debugNode.nodeId))
