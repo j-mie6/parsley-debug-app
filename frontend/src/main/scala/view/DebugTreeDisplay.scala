@@ -4,7 +4,7 @@ import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
 
-import controller.MainViewHandler
+import controller.viewControllers.MainViewController
 import controller.tauri.Tauri
 
 /**

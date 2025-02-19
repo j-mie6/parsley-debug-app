@@ -1,4 +1,4 @@
-package controller
+package controller.viewControllers
 
 import org.scalajs.dom
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -8,16 +8,16 @@ import com.raquo.laminar.api.L.*
 import upickle.default as up
 
 import controller.tauri.{Tauri, Command}
-import controller.TreeController
+import controller.viewControllers.TreeViewController
 
 
 
 /**
-* TabController object contains functions that modify the state of 
+* TabViewController object contains functions that modify the state of 
 * saved/loaded trees
 */
 
-object TabController {
+object TabViewController {
     /* Scrollable tab that holds all saved trees */
     private val scrollableTab: Var[HtmlElement] = Var(div())
     
@@ -63,10 +63,10 @@ object TabController {
         selectedTab.set(tabTitle)
 
         /* Loads in the respective tree */
-        TabController.loadSavedTree(tabTitle) 
+        TabViewController.loadSavedTree(tabTitle) 
 
         /* Reload the tree */
-        TreeController.reloadTree()
+        TreeViewController.reloadTree()
     } 
 
     /**
@@ -125,6 +125,6 @@ object TabController {
     def loadSavedTree(treeName: String): Unit = 
         Tauri.invoke[String](Command.LoadSavedTree, Map("treeName" -> treeName))
           .foreach { _ =>
-            TreeController.reloadTree()
+            TreeViewController.reloadTree()
         }
 }

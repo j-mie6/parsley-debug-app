@@ -10,12 +10,11 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
-import controller.InputController
-import controller.MainViewHandler
-import controller.State
-import controller.TabController
+import controller.AppStateController
 import controller.tauri.Tauri
-import controller.TreeController
+import controller.viewControllers.MainViewController
+import controller.viewControllers.TabViewController
+import controller.viewControllers.TreeViewController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -37,20 +36,20 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-left",
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewHandler.isTreeView(true),
+            cls("selected") <-- MainViewController.isTreeView(true),
             treeIcon,
             h2("Tree View", marginLeft.px := 7),
             onClick --> { _ => 
-                MainViewHandler.setIsTreeView(true) 
+                MainViewController.setIsTreeView(true) 
             }
         ),
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewHandler.isTreeView(false),
+            cls("selected") <-- MainViewController.isTreeView(false),
             fileIcon,
             h2("Input View", marginLeft.px := 12),
             onClick --> { _ => 
-                MainViewHandler.setIsTreeView(false) 
+                MainViewController.setIsTreeView(false) 
             }
         )
     )
@@ -78,19 +77,19 @@ abstract class DebugViewPage extends Page {
 
         onClick --> { _ => {
             val treeName: String = (rand.nextInt).toString()
-            TabController.saveTree(treeName)
-            TabController.setSelectedTab(treeName)
+            TabViewController.saveTree(treeName)
+            TabViewController.setSelectedTab(treeName)
         }}
     )
 
     /* Button used to toggle the theme */
     private lazy val themeButton: Element = div(
-        child <-- State.isLightMode.signal
+        child <-- AppStateController.isLightMode.signal
             .map((project: Boolean) => if project then moonIcon else sunIcon),
         cursor.pointer,
         alignContent.center,
         marginRight.px := 20,
-        onClick --> {_ => State.toggleTheme()}
+        onClick --> {_ => AppStateController.toggleTheme()}
     )
 
     /* Button that links to the 'parsley-debug-app' Github repo */
@@ -131,7 +130,7 @@ abstract class DebugViewPage extends Page {
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,
-            ScrollableTabView(),
+            TabView(),
             div(
                 className := "tree-view-page",
                 child.getOrElse(div())

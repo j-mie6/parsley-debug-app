@@ -1,4 +1,4 @@
-package controller
+package controller.viewControllers
 
 import scala.util.{Try, Success, Failure}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -7,7 +7,9 @@ import org.scalablytyped.runtime.StringDictionary
 import com.raquo.laminar.api.L.*
 import upickle.default as up
 
+import controller.DebugTreeController
 import controller.tauri.{Tauri, Command}
+import controller.viewControllers.InputViewController
 
 import view.DebugTreeDisplay
 
@@ -15,7 +17,7 @@ import view.DebugTreeDisplay
 /**
 * Object containing methods for manipulating the DebugTree.
 */
-object TreeController {
+object TreeViewController {
     
     /* Display tree that will be rendered by TreeView */
     private val displayTree: Var[HtmlElement] = Var(div())
@@ -54,12 +56,12 @@ object TreeController {
         } do {
             setDisplayTree(
                 if treeString.isEmpty then div("No tree found") else 
-                DebugTreeHandler.decodeDebugTree(treeString) match {
+                DebugTreeController.decodeDebugTree(treeString) match {
                     case Failure(exception) => 
                         println(s"Error in decoding debug tree : ${exception.getMessage()}");
                         div()
                     case Success(debugTree) => {
-                        InputController.setInput(debugTree.input)
+                        InputViewController.setInput(debugTree.input)
                         DebugTreeDisplay(debugTree)
                     }
                 }
@@ -78,7 +80,7 @@ object TreeController {
 
     def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
         Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName)).foreach { _ =>
-            TreeController.reloadTree()
+            TreeViewController.reloadTree()
         }
     }
         
