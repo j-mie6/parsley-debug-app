@@ -12,7 +12,7 @@ import model.DebugTree
 import model.DebugNode
 
 
-sealed trait Command(val name: String) {
+sealed trait Command(private val name: String) {
 
     /* Response type associated with Command */
     type Out
