@@ -87,7 +87,7 @@ pub mod test {
 
     use super::{DebugNode, DebugTree};
 
-    pub fn test_json() -> String {
+    pub fn json() -> String {
         r#"{
             "input": "Test",
             "root": {
@@ -104,7 +104,7 @@ pub mod test {
         .collect::<String>()
     }
 
-    pub fn test_nested_json() -> String {
+    pub fn nested_json() -> String {
         r#"{
             "input": "01234",
             "root": {
@@ -121,7 +121,7 @@ pub mod test {
         .collect()
     }
 
-    pub fn test_tree() -> DebugTree {
+    pub fn tree() -> DebugTree {
         DebugTree::new(
             String::from("Test"),
             DebugNode::new(
@@ -136,7 +136,7 @@ pub mod test {
         )
     }
 
-    pub fn test_nested_tree() -> DebugTree {
+    pub fn nested_tree() -> DebugTree {
         DebugTree::new(
             String::from("01234"),
             DebugNode::new(
@@ -193,22 +193,22 @@ pub mod test {
 
     #[test]
     fn debug_tree_serialises() {
-        let json: String = serde_json::to_string(&test_tree())
+        let json: String = serde_json::to_string(&tree())
             .expect("Could not serialize DebugTree")
             .split_whitespace()
             .collect();
 
-        assert_eq!(json, test_json());
+        assert_eq!(json, self::json());
     }
 
     #[test]
     fn nested_debug_tree_serialises() {
-        let json: String = serde_json::to_string(&test_nested_tree())
+        let json: String = serde_json::to_string(&nested_tree())
             .expect("Could not serialize DebugTree")
             .split_whitespace()
             .collect();
 
-        assert_eq!(json, test_nested_json());
+        assert_eq!(json, nested_json());
     }
 
 }

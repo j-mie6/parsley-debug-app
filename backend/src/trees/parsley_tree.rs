@@ -73,7 +73,7 @@ pub mod test {
     use super::{ParsleyNode, ParsleyTree};
     use crate::trees::{debug_tree, DebugTree};
 
-    pub fn test_json() -> String {
+    pub fn json() -> String {
         r#"{
             "input": "Test",
             "root": {
@@ -90,7 +90,7 @@ pub mod test {
         .collect()
     }
 
-    pub fn test_nested_json() -> String {
+    pub fn nested_json() -> String {
         r#"{
             "input": "01234",
             "root": {
@@ -146,7 +146,7 @@ pub mod test {
         .collect()
     }
 
-    pub fn test_tree() -> ParsleyTree {
+    pub fn tree() -> ParsleyTree {
         ParsleyTree {
             input: String::from("Test"),
             root: ParsleyNode {
@@ -161,7 +161,7 @@ pub mod test {
         }
     }
 
-    pub fn test_nested_tree() -> ParsleyTree {
+    pub fn nested_tree() -> ParsleyTree {
         ParsleyTree {
             input: String::from("01234"),
             root: ParsleyNode {
@@ -218,32 +218,32 @@ pub mod test {
 
     #[test]
     fn parsley_tree_deserialises() {
-        let tree: ParsleyTree = serde_json::from_str(&test_json())
+        let tree: ParsleyTree = serde_json::from_str(&json())
             .expect("Could not deserialise ParsleyTree");
         
-        assert_eq!(tree, test_tree());
+        assert_eq!(tree, self::tree());
     }
 
     #[test]
     fn nested_parsley_tree_deserialises() {
-        let tree: ParsleyTree = serde_json::from_str(&test_nested_json())
+        let tree: ParsleyTree = serde_json::from_str(&nested_json())
             .expect("Could not deserialise nested ParsleyTree");
 
-        assert_eq!(tree, test_nested_tree());
+        assert_eq!(tree, nested_tree());
     }
 
     #[test]
     fn parsley_debug_tree_converts_into_debug_tree() {
-        let parsley_tree: ParsleyTree = test_tree();
-        let debug_tree: DebugTree = debug_tree::test::test_tree();
+        let parsley_tree: ParsleyTree = tree();
+        let debug_tree: DebugTree = debug_tree::test::tree();
         
         assert_eq!(debug_tree, parsley_tree.into());
     }
     
     #[test]
     fn nested_parsley_debug_tree_converts_into_debug_tree() {
-        let parsley_tree: ParsleyTree = test_nested_tree();
-        let debug_tree: DebugTree = debug_tree::test::test_nested_tree();
+        let parsley_tree: ParsleyTree = nested_tree();
+        let debug_tree: DebugTree = debug_tree::test::nested_tree();
         
         assert_eq!(debug_tree, parsley_tree.into());
     }

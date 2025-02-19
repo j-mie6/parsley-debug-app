@@ -32,13 +32,13 @@ pub mod test {
         let mut mock = MockStateManager::new();
 
         mock.expect_set_tree()
-            .with(predicate::eq(debug_tree::test::test_tree()))
+            .with(predicate::eq(debug_tree::test::tree()))
             .times(NUM_REPEATS)
             .returning(|_| Ok(()));
 
         mock.expect_get_tree()
             .times(NUM_REPEATS)
-            .returning(|| Ok(debug_tree::test::test_tree()));
+            .returning(|| Ok(debug_tree::test::tree()));
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -49,7 +49,7 @@ pub mod test {
         let post_tree = client
             .post("/api/remote/tree")
             .header(http::ContentType::JSON)
-            .body(parsley_tree::test::test_json());
+            .body(parsley_tree::test::json());
 
         let get_tree = client.get("/api/remote/tree");
 

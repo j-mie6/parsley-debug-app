@@ -66,7 +66,7 @@ impl SavedTree {
 impl SavedNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
             child_id: Option<u32>, input: String, children: Vec<SavedNode>) -> Self {
-                
+
         SavedNode {
             node_id,
             name,
@@ -94,7 +94,7 @@ pub mod test {
     use crate::trees::{debug_tree, DebugTree};
 
     
-    pub fn test_json() -> String {
+    pub fn json() -> String {
         r#"{
             "input": "Test",
             "root": {
@@ -108,10 +108,10 @@ pub mod test {
             }
         }"#
         .split_whitespace()
-        .collect::<String>()
+        .collect()
     }
 
-    pub fn test_nested_json() -> String {
+    pub fn nested_json() -> String {
         r#"{
             "input": "01234",
             "root": {
@@ -167,7 +167,7 @@ pub mod test {
         .collect()
     }
 
-    pub fn test_tree() -> SavedTree {
+    pub fn tree() -> SavedTree {
         SavedTree::new(
             String::from("Test"),
             SavedNode::new(
@@ -182,7 +182,7 @@ pub mod test {
         )
     }
     
-    pub fn test_nested_tree() -> SavedTree {
+    pub fn nested_tree() -> SavedTree {
         SavedTree::new(
             String::from("01234"),
             SavedNode::new(
@@ -239,65 +239,65 @@ pub mod test {
 
     #[test]
     fn saved_tree_serializes() {
-        let json: String = serde_json::to_string(&test_tree())
+        let json: String = serde_json::to_string(&tree())
             .expect("Tree should be able to serialize");
 
-        assert_eq!(json, test_json());
+        assert_eq!(json, self::json());
     }
 
     #[test]
     fn saved_tree_deserializes() {
-        let saved_tree: SavedTree = serde_json::from_str(&test_json())
+        let tree: SavedTree = serde_json::from_str(&json())
             .expect("Could not deserialise SavedTree");
 
-        assert_eq!(saved_tree, test_tree());
+        assert_eq!(tree, self::tree());
     }
 
     #[test]
     fn nested_saved_tree_serializes() {
-        let json: String = serde_json::to_string(&test_nested_tree())
+        let json: String = serde_json::to_string(&nested_tree())
             .expect("Tree should be able to serialize");
 
-        assert_eq!(json, test_nested_json());
+        assert_eq!(json, nested_json());
     }
 
     #[test]
     fn nested_saved_tree_deserializes() {
-        let saved_tree: SavedTree = serde_json::from_str(&test_nested_json())
+        let tree: SavedTree = serde_json::from_str(&nested_json())
             .expect("Could not deserialise SavedTree");
 
-        assert_eq!(saved_tree, test_nested_tree());
+        assert_eq!(tree, nested_tree());
     }
 
 
     #[test]
     fn saved_tree_converts_into_debug_tree() {
-        let saved_tree: SavedTree = test_tree();
-        let debug_tree: DebugTree = debug_tree::test::test_tree();
+        let saved_tree: SavedTree = tree();
+        let debug_tree: DebugTree = debug_tree::test::tree();
         
         assert_eq!(debug_tree, saved_tree.into());
     }
     
     #[test]
     fn debug_tree_converts_into_saved_tree() {
-        let saved_tree: SavedTree = test_tree();
-        let debug_tree: DebugTree = debug_tree::test::test_tree();
+        let saved_tree: SavedTree = tree();
+        let debug_tree: DebugTree = debug_tree::test::tree();
 
         assert_eq!(saved_tree, debug_tree.into());
     }
 
     #[test]
     fn nested_saved_tree_converts_into_nested_debug_tree() {
-        let saved_tree: SavedTree = test_nested_tree();
-        let debug_tree: DebugTree = debug_tree::test::test_nested_tree();
+        let saved_tree: SavedTree = nested_tree();
+        let debug_tree: DebugTree = debug_tree::test::nested_tree();
         
         assert_eq!(debug_tree, saved_tree.into());
     }
     
     #[test]
     fn nested_debug_tree_converts_into_nested_saved_tree() {
-        let saved_tree: SavedTree = test_nested_tree();
-        let debug_tree: DebugTree = debug_tree::test::test_nested_tree();
+        let saved_tree: SavedTree = nested_tree();
+        let debug_tree: DebugTree = debug_tree::test::nested_tree();
 
         assert_eq!(saved_tree, debug_tree.into());
     }
@@ -310,13 +310,13 @@ pub mod test {
         let mut data_file: File = File::create(FILE_PATH)
             .expect("File creation failed");
 
-        write!(data_file, "{}", test_json())
+        write!(data_file, "{}", json())
             .expect("JSON could not be written to file");
 
         let contents: String = fs::read_to_string("test.json")
             .expect("File contents could not be read");
     
-        assert_eq!(contents, test_json());
+        assert_eq!(contents, json());
 
         fs::remove_file(FILE_PATH)
             .expect("File could not be deleted");
@@ -329,7 +329,7 @@ pub mod test {
         let mut data_file: File = File::create(FILE_PATH)
             .expect("File creation failed");
     
-        write!(data_file, "{}", test_json())
+        write!(data_file, "{}", json())
             .expect("JSON could not be written to file");
 
         let contents: String = fs::read_to_string(FILE_PATH)
@@ -338,7 +338,7 @@ pub mod test {
         let saved_tree: SavedTree = serde_json::from_str(&contents)
             .expect("Saved Tree could not be deserialised");
 
-        assert_eq!(saved_tree, test_tree());
+        assert_eq!(saved_tree, tree());
 
         fs::remove_file(FILE_PATH)
             .expect("File could not be deleted");
