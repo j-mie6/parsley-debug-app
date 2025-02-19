@@ -11,12 +11,10 @@ import controller.tauri.{Tauri, Command}
 import controller.viewControllers.TreeViewController
 
 
-
 /**
 * TabViewController object contains functions that modify the state of 
 * saved/loaded trees
 */
-
 object TabViewController {
     /* Scrollable tab that holds all saved trees */
     private val scrollableTab: Var[HtmlElement] = Var(div())
@@ -27,7 +25,6 @@ object TabViewController {
     /* The tab that is currented selected */
     private val selectedTab: Var[String] = Var("")
 
-    
     /**
     * Gets the scrollable tab element
     */
@@ -39,7 +36,6 @@ object TabViewController {
       * @param tab An individual tab comprising of title and delete button
       */
     def setTabBar(tab: HtmlElement): Unit = scrollableTab.set(tab)
-    
     
     /**
     * Gets filenames of saved trees
