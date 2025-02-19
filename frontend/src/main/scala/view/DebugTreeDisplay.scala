@@ -46,68 +46,37 @@ private object ReactiveNodeDisplay {
       */
     def apply(node: ReactiveNode): HtmlElement = {
         val newType = node.debugNode.internal != node.debugNode.name
+        
         div(
             cls("debug-tree-node-type-box") := newType,
             when (newType) {
                 p(className := "debug-tree-node-type-name", node.debugNode.name)
             },
-    
-            DebugNodeDisplay(node.debugNode, 
-                div(when(!node.debugNode.isLeaf) {
-                    div(
-                        child <-- node.children.signal.map(_.isEmpty).map(
-                            if (_) 
-                                button(
-                                    className := "debug-tree-node-button debug-tree-node-button-expand", 
-                                    "Expand", 
-                                    onClick.flatMapTo(
-                                        Tauri.invoke(Command.FetchNodeChildren, Map("nodeId" -> node.debugNode.nodeId))
-                                            .map(_.getOrElse(Nil))
-                                        ) --> node.children
-                                )
-                            else 
-                                button(
-                                    className := "debug-tree-node-button debug-tree-node-button-compress", 
-                                    "Compress", 
-                                    onClick.mapTo(Nil) --> node.children
-                                )
-                        )
-                    )
-                })
+
+            div(
+                className := s"debug-tree-node debug-tree-node-${if node.debugNode.success then "success" else "fail"}",
+                div(
+                    p(className := "debug-tree-node-name", node.debugNode.internal),
+                    p(fontStyle := "italic", node.debugNode.input)
+                ),
+
+                //TODO: on double click, expand all
+
+                onClick.flatMapTo(
+                    if (!node.children.now().isEmpty) {
+                        EventStream.fromValue(Nil)
+                    } else {
+                        Tauri.invoke(Command.FetchNodeChildren, Map("nodeId" -> node.debugNode.nodeId))
+                            .map(_.getOrElse(Nil))
+                    }
+                ) --> node.children
+
             ),
+
             div(
                 className := "debug-tree-node-container",
                 children <-- node.children.signal.map(_.map((child) => ReactiveNodeDisplay(ReactiveNode(child))))
              ),
-        )
-    }
-}
-
-/**
-  * Object containing render methods for a single debug node.
-  */
-private object DebugNodeDisplay {
-    /**
-      * Render a debug node. This function returns an HTML element representing
-      * a single node of the tree.
-      *
-      * @param debugNode Representation of the debug node structure.
-      * @param buttons Collapse / expand buttons. They are passed in here so
-      * that the onClick functions can affect the reactive node (parent) object.
-      * 
-      * @return HTML Element representing a debug node.
-      */
-    def apply(debugNode: DebugNode, buttons: HtmlElement): HtmlElement = {
-        val showButtons: Var[Boolean] = Var(false)
-        div(
-            className := s"debug-tree-node debug-tree-node-${if debugNode.success then "success" else "fail"}",
-            onMouseEnter --> { _ => showButtons.set(true)},
-            onMouseLeave --> { _ => showButtons.set(false)},
-            div(
-                p(className := "debug-tree-node-name", debugNode.internal),
-                p(fontStyle := "italic", debugNode.input)
-            ),
-            buttons.amend(display <-- showButtons.signal.map(if (_) "block" else "none"))
         )
     }
 }

@@ -34,9 +34,7 @@ object TreeViewPage extends DebugViewPage {
     val treeList = div(
         children <-- fileNames.signal.map(_.map(name => 
             button(name, 
-            onClick
-                .flatMapTo(Tauri.invoke(Command.LoadSavedTree, Map("name" -> name)))
-                --> TreeController.tree
+            onClick.flatMapTo(Tauri.invoke(Command.LoadSavedTree, Map("name" -> name))) --> TreeController.tree
             )
         ))
     )
@@ -45,7 +43,7 @@ object TreeViewPage extends DebugViewPage {
     private lazy val getButton: Element = button(
         className := "tree-view-save",
         "Get trees",
-        onClick.flatMapTo(Tauri.invoke(Command.FetchSavedTreeNames).map(_.get)) --> fileNames
+        onClick(_.flatMapTo(Tauri.invoke(Command.FetchSavedTreeNames)).map(_.get)) --> fileNames
     )
 
     val inputName: Var[String] = Var("")
