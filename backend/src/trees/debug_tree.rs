@@ -63,8 +63,8 @@ pub struct DebugNode {
 }
 
 impl DebugNode {
-    pub fn new(node_id: u32, name: String, internal: String, success: bool, child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
-        let is_leaf: bool = children.is_empty();
+    pub fn new(node_id: u32, name: String, internal: String, success: bool, 
+            child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
 
         DebugNode {
             node_id,
@@ -73,8 +73,8 @@ impl DebugNode {
             success,
             child_id,
             input,
+            is_leaf: children.is_empty(),
             children,
-            is_leaf,
         }
     }
 }
