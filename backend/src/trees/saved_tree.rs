@@ -313,7 +313,7 @@ pub mod test {
         write!(data_file, "{}", json())
             .expect("JSON could not be written to file");
 
-        let contents: String = fs::read_to_string("test.json")
+        let contents: String = fs::read_to_string(FILE_PATH)
             .expect("File contents could not be read");
     
         assert_eq!(contents, json());
