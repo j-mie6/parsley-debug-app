@@ -64,15 +64,9 @@ impl SavedTree {
 }
 
 impl SavedNode {
-    pub fn new(
-        node_id: u32, 
-        name: String, 
-        internal: String, 
-        success: bool, 
-        child_id: Option<u32>, 
-        input: String, 
-        children: Vec<SavedNode>
-    ) -> Self {
+    pub fn new(node_id: u32, name: String, internal: String, success: bool, 
+            child_id: Option<u32>, input: String, children: Vec<SavedNode>) -> Self {
+                
         SavedNode {
             node_id,
             name,
