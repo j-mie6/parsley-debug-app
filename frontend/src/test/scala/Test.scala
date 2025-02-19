@@ -7,7 +7,7 @@ import scala.util.{Try, Success, Failure}
 import model.DebugTree
 import model.DebugNode
 
-import controller.DebugTreeHandler
+import controller.DebugTreeController
 
 class Test extends AnyFlatSpec with should.Matchers {
 
@@ -24,7 +24,7 @@ class Test extends AnyFlatSpec with should.Matchers {
         }
     }"""
 
-    val tree: DebugTree = DebugTreeHandler.decodeDebugTree(jsonTree).get
+    val tree: DebugTree = DebugTreeController.decodeDebugTree(jsonTree).get
     
     "The tree" should "be deserialised" in {
         /* Check that the root tree has been deserialised correctly */
@@ -40,6 +40,6 @@ class Test extends AnyFlatSpec with should.Matchers {
 
     it should "not be deserialised if the JSON is not properly formatted" in {
         val wrongJson: String = "Testing..."
-        DebugTreeHandler.decodeDebugTree(wrongJson) shouldBe a [Failure[_]]
+        DebugTreeController.decodeDebugTree(wrongJson) shouldBe a [Failure[_]]
     }
 }
