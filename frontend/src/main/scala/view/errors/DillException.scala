@@ -15,11 +15,12 @@ sealed trait DillException {
     def message: String
     def closable: Boolean
     def colour: String
+    def style: String
 
     def displayElement: HtmlElement = {
         div(
             className := "popup",
-            style := s"border-color: ${this.colour}"
+            cls := style,
             h2(
                 this.name,
                 color := "#ffffff",
@@ -40,6 +41,7 @@ sealed trait DillException {
 sealed trait Warning extends DillException {
     override def colour: String = "ffff00"
     override def closable: Boolean = true
+    override def style: String = "warning"
 }
 
 /**
@@ -48,11 +50,11 @@ sealed trait Warning extends DillException {
 sealed trait Error extends DillException {
     override def colour: String = "ff0000"
     override def closable: Boolean = false
+    override def style: String = "error"
 }
 
-/* 
-    List of DILL Exceptions
-*/
+/* List of DILL Exceptions */
+
 case object TreeNotFound extends Error {
     override def name: String = "Tree Not Found"
     override def message: String = 
@@ -105,7 +107,7 @@ case object SuffixNotFound extends Error {
         "The expected suffix was not found in the input. Verify that the correct format is being used."
 }
 
-case object MalformedJSON extends Warning {
+case object MalformedJSON extends Error {
     override def name: String = "Malformed JSON Received"
     override def message: String = 
         "Failed to serialize the display tree. " +

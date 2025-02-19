@@ -20,7 +20,15 @@
     padding: 5vh 5vw;
     border-style: solid;
     border-radius: 10px;
-  }
+}
+
+.popup.warning {
+    border-color: var(--font-color-warning);
+}
+
+.popup.error {
+    border-color: var(--font-color-error);
+}
 
 .popup-text {
     color: white;
