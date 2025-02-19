@@ -9,35 +9,41 @@ import upickle.default as up
 import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent}
 
 import model.DebugTree
-
+import Tauri.Response
 
 sealed trait Event(private val name: String) {
+    
+    /* Output type associated with Event */
+    type Out
+    given up.Reader[Out] = scala.compiletime.deferred
 
-    /* Response type associated with Event */
-    type Response
-    given up.Reader[Response] = scala.compiletime.deferred
+    type UnlistenFn = () => Unit
 
     
     /* Listen to backend event using Tauri JS interface */
-    protected[tauri] def listen(): (EventStream[Try[this.Response]], Future[() => Unit]) = {
-        val (stream, callback) = EventStream.withCallback[Try[this.Response]]
-        
-        /* Send deserialised event to the EventStream when Tauri notified */
-        val fireEvent = (e: TauriEvent[?]) => callback(Try(up.read[this.Response](e.payload.toString)));
+    protected[tauri] def listen(): (EventStream[Response[Out]], Future[UnlistenFn]) = {
+        val (stream, callback) = EventStream.withCallback[String]
         
         /* Call Tauri function and get future of unlisten function */
-        val unlisten = tauriListen(this.name, fireEvent)
+        val unlisten = tauriListen(this.name, e => callback(e.payload.toString()))
             .toFuture
             .mapTo[() => Unit]
-            
-        (stream, unlisten)
+
+
+        /* Deserialise event response and map stream to a Tauri.Response stream */
+        val responseStream: EventStream[Response[Out]] = stream
+            .map(up.read[Out](_).nn)
+            .recoverToEither
+            .mapLeft(error => new Tauri.Error("Parsing event payload failed! " + error.toString()))
+
+        (responseStream, unlisten)
     }
 }
 
 
 object Event {
     case object TreeReady extends Event("tree-ready"):
-        type Response = DebugTree
+        type Out = DebugTree
 }
 
 

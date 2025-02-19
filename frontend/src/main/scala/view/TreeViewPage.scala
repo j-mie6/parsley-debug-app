@@ -11,6 +11,7 @@ import model.DebugTree
 import controller.TreeController
 import controller.tauri.{Command, Event, Tauri}
 import scala.util.Try
+import controller.tauri.Tauri.Response
 
 /**
   * Object containing rendering functions for the TreeViewPage.
@@ -23,7 +24,7 @@ object TreeViewPage extends DebugViewPage {
         className := "tree-view-save",
         saveIcon,
         "Save tree",
-        onClick.flatMapTo(inputName.signal) 
+        onClick(_ => inputName.signal) 
             --> ((name) => Tauri.invoke(Command.SaveTree, Map("name" -> name)))
     )
 
@@ -33,8 +34,11 @@ object TreeViewPage extends DebugViewPage {
     /* Renders a list of buttons which will reload to whatever tree is pressed on */
     val treeList = div(
         children <-- fileNames.signal.map(_.map(name => 
-            button(name, 
-            onClick.flatMapTo(Tauri.invoke(Command.LoadSavedTree, Map("name" -> name))) --> TreeController.tree
+            button(
+                name,
+                onClick(_ =>  Tauri.invoke(Command.LoadSavedTree, Map("name" -> name))
+                    .collect { case Right(r) => r }
+                ) --> TreeController.tree
             )
         ))
     )
@@ -43,7 +47,9 @@ object TreeViewPage extends DebugViewPage {
     private lazy val getButton: Element = button(
         className := "tree-view-save",
         "Get trees",
-        onClick(_.flatMapTo(Tauri.invoke(Command.FetchSavedTreeNames)).map(_.get)) --> fileNames
+        onClick(_ => Tauri.invoke(Command.FetchSavedTreeNames)
+            .collect { case Right(r) => r }
+        ) --> fileNames
     )
 
     val inputName: Var[String] = Var("")
@@ -70,9 +76,16 @@ object TreeViewPage extends DebugViewPage {
         super.render(Some(div(
             className := "tree-view-page",
             
-            treeStream --> TreeController.tree,
+            child.maybe <-- treeStream.map((res: Response[?]) => res.swap.toOption
+                .map((error: Tauri.Error) => div(
+                    className:= "tree-view-error", 
+                    p(error.toString())
+                )
+            )),
+            
+            treeStream.collect { case Right(r) => r } --> TreeController.tree,
             child.maybe <-- TreeController.treeElem,
-
+            
             /*
             saveButton, /* Used for saving a tree using the name given in nameInput */
             getButton, /* Updates list of saved tree names */

@@ -15,21 +15,24 @@ import model.DebugNode
 sealed trait Command(val name: String) {
 
     /* Response type associated with Command */
-    type Response
-    given up.Reader[Response] = scala.compiletime.deferred 
+    type Out
+    given up.Reader[Out] = scala.compiletime.deferred 
     
 
     /* Helper function for no-arg invoke */
-    protected[tauri] def invoke(): EventStream[Try[this.Response]] = this.invoke(Map())
+    protected[tauri] def invoke(): EventStream[Tauri.Response[Out]] = this.invoke(Map())
 
     /* Invoke backend command using Tauri JS interface */
-    protected[tauri] def invoke(args: Map[String, Any]): EventStream[Try[this.Response]] = {
-        /* Invoke command with arguments passed as JS string dictionary */
-        val invoke: js.Promise[String] = tauriInvoke[String](this.name, StringDictionary(args.toSeq*));
+    protected[tauri] def invoke(args: Map[String, Any]): EventStream[Tauri.Response[Out]] = {
         
-        /* Start EventStream from promise with value parsed to Response type */
+        /* Invoke command with arguments passed as JS string dictionary */
+        val invoke: js.Promise[String] = tauriInvoke[String](name, StringDictionary(args.toSeq*));
+        
+        /* Start EventStream from promise with value parsed to Output type */
         EventStream.fromJsPromise(invoke, emitOnce = true)
-            .map((json: String) => Try(up.read[this.Response](json)))
+            .map(up.read[Out](_).nn)
+            .recoverToEither
+            .mapLeft(error => new Tauri.Error("Parsing command response failed! " + error.toString()))
     }
 
 }
@@ -40,22 +43,22 @@ object Command {
     /* Fetch commands */
 
     case object FetchDebugTree extends Command("fetch_debug_tree"):
-        type Response = DebugTree
+        type Out = DebugTree
     
     case object FetchNodeChildren extends Command("fetch_node_children"):
-        type Response = List[DebugNode]
+        type Out = List[DebugNode]
 
 
     /* Save commands */
 
     case object SaveTree extends Command("save_tree"):
-        type Response = Unit
+        type Out = Unit
 
     case object FetchSavedTreeNames extends Command("fetch_saved_tree_names"):
-        type Response = List[String]
+        type Out = List[String]
 
     case object LoadSavedTree extends Command("load_saved_tree"): 
-        type Response = DebugTree
+        type Out = DebugTree
 }
 
 
