@@ -22,13 +22,14 @@ sealed trait Command(private val name: String) {
     /* Helper function for no-arg invoke */
     protected[tauri] def invoke(): EventStream[Tauri.Response[Out]] = this.invoke(Map())
 
+    
     /* Invoke backend command using Tauri JS interface */
     protected[tauri] def invoke(args: Map[String, Any]): EventStream[Tauri.Response[Out]] = {
         
         /* Invoke command with arguments passed as JS string dictionary */
         val invoke: js.Promise[String] = tauriInvoke[String](name, StringDictionary(args.toSeq*));
         
-        /* Start EventStream from promise with value parsed to Output type */
+        /* Start EventStream from invoke and deserialise invoke response */
         EventStream.fromJsPromise(invoke, emitOnce = true)
             .map(up.read[Out](_).nn)
             .recoverToEither

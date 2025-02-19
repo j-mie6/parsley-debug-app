@@ -6,7 +6,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import com.raquo.laminar.api.L.*
 
 import model.DebugNode
-import controller.DebugTreeHandler
 import controller.tauri.{Command, Tauri}
 
 /**

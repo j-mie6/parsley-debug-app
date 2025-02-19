@@ -11,6 +11,7 @@ import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent
 import model.DebugTree
 import Tauri.Response
 
+
 sealed trait Event(private val name: String) {
     
     /* Output type associated with Event */
@@ -28,7 +29,6 @@ sealed trait Event(private val name: String) {
         val unlisten = tauriListen(this.name, e => callback(e.payload.toString()))
             .toFuture
             .mapTo[() => Unit]
-
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
         val responseStream: EventStream[Response[Out]] = stream
