@@ -8,12 +8,14 @@ import controller.MainViewHandler
 import controller.tauri.Tauri
 
 /**
-* Object containing rendering methods for the Debug Tree
+* Object containing rendering methods for the Debug Tree Display, which is
+* used to display the debug tree in the UI.
 */
 object DebugTreeDisplay {
+    /* Variable that keeps track of how much the tree has been zoomed into */
     val zoomFactor = Var(1.0)
     
-    // TODO: Fix not being able to move left
+    /* Event handler for zooming in and out of the tree */
     val wheelHandler = onWheel.map { e =>
         if (e.ctrlKey) {
             e.preventDefault()
@@ -34,16 +36,9 @@ object DebugTreeDisplay {
     */
     def apply(tree: DebugTree): HtmlElement = div(
         className := "debug-tree-display zoom-container",
-            h1(
-                className := "debug-tree-title",
-                p("Parser Input : ", margin.px := 0, fontSize.px := 15,
-                    fontStyle.italic, fontWeight.lighter),
-                tree.input
-            ),
+        ReactiveNodeDisplay(ReactiveNode(tree.root)),
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
         wheelHandler,
-        
-        ReactiveNodeDisplay(ReactiveNode(tree.root))
     )
 }
 
