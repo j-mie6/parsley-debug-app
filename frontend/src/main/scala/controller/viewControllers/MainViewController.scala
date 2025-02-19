@@ -1,4 +1,4 @@
-package controller
+package controller.viewControllers
 
 import com.raquo.laminar.api.L.*
 
@@ -8,7 +8,11 @@ import view.DebugViewPage
 import view.InputView
 import view.TreeView
 
-object MainViewHandler {
+/**
+ * Object containing functions and variables for the main view,cconditionally
+ * rendering the tree or input view depending on the user's selection
+ */
+object MainViewController {
     /* If the current view is the tree view element */
     private val isTreeView: Var[Boolean] = Var(true)
 
