@@ -25,7 +25,7 @@ object TreeViewPage extends DebugViewPage {
         saveIcon,
         "Save tree",
         onClick(_ => inputName.signal) 
-            --> ((name) => Tauri.invoke(Command.SaveTree, Map("name" -> name)))
+            --> ((name) => Tauri.invoke(Command.SaveTree, name))
     )
 
     /* List of file names (excluding path and ext) wrapped in Var*/
@@ -36,7 +36,7 @@ object TreeViewPage extends DebugViewPage {
         children <-- fileNames.signal.map(_.map(name => 
             button(
                 name,
-                onClick(_ =>  Tauri.invoke(Command.LoadSavedTree, Map("name" -> name))
+                onClick(_ =>  Tauri.invoke(Command.LoadSavedTree, name)
                     .collect { case Right(r) => r }
                 ) --> TreeController.tree
             )
