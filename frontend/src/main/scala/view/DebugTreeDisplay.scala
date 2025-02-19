@@ -46,7 +46,7 @@ private object ReactiveNodeDisplay {
       */
     def apply(node: ReactiveNode): HtmlElement = {
         val newType: Boolean = node.debugNode.internal != node.debugNode.name
-        val expanded: Boolean = node.children.now().isEmpty;
+        def expanded: Boolean = node.children.now().isEmpty;
         
         div(
             cls("debug-tree-node-type-box") := newType,
