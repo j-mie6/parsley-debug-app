@@ -84,8 +84,8 @@ private object ReactiveNodeDisplay {
             ),
             div(
                 className := "debug-tree-node-container",
-                children <-- node.children.signal
-                    .map(_.map((child) => ReactiveNodeDisplay(ReactiveNode(child))))
+                children <-- node.children.signal.map(_.map((child) => 
+                    ReactiveNodeDisplay(ReactiveNode(child))))
             ),
         )
     }
@@ -117,8 +117,7 @@ private object DebugNodeDisplay {
                 p(className := "debug-tree-node-name", debugNode.internal),
                 p(fontStyle := "italic", debugNode.input)
             ),
-            buttons.amend(display <-- showButtons.signal
-                .map(if (_) "block" else "none"))
+            buttons.amend(display <-- showButtons.signal.map(if (_) "block" else "none"))
         )
     }
 }
