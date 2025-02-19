@@ -99,8 +99,7 @@ pub mod test {
     use super::{SavedTree, SavedNode};
     use crate::trees::{debug_tree, DebugTree};
 
-    const FILE_PATH: &str = "test.json";
-
+    
     pub fn test_json() -> String {
         r#"{
             "input": "Test",
@@ -312,6 +311,8 @@ pub mod test {
     
     #[test]
     fn saved_tree_saved_to_json() {
+        const FILE_PATH: &str = "test_save.json";
+
         let mut data_file: File = File::create(FILE_PATH)
             .expect("File creation failed");
 
@@ -329,6 +330,8 @@ pub mod test {
 
     #[test]
     fn saved_tree_loaded_from_json() {
+        const FILE_PATH: &str = "test_load.json";
+
         let mut data_file: File = File::create(FILE_PATH)
             .expect("File creation failed");
     
