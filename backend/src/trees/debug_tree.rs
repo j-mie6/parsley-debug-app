@@ -106,14 +106,16 @@ pub mod test {
 
     pub fn test_nested_json() -> String {
         r#"{
-            "input": "0",
+            "input": "01234",
             "root": {
+                "nodeId": 0,
                 "name": "0",
                 "internal": "0",
                 "success": true,
                 "childId": 0,
                 "input": "0",
-                "children": []
+                "isLeaf": false
+            }
         }"#
         .split_whitespace()
         .collect()
@@ -186,6 +188,27 @@ pub mod test {
                 ]
             )
         )
+    }
+ 
+
+    #[test]
+    fn debug_tree_serialises() {
+        let json: String = serde_json::to_string(&test_tree())
+            .expect("Could not serialize DebugTree")
+            .split_whitespace()
+            .collect();
+
+        assert_eq!(json, test_json());
+    }
+
+    #[test]
+    fn nested_debug_tree_serialises() {
+        let json: String = serde_json::to_string(&test_nested_tree())
+            .expect("Could not serialize DebugTree")
+            .split_whitespace()
+            .collect();
+
+        assert_eq!(json, test_nested_json());
     }
 
 }
