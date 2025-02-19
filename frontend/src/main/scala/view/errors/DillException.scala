@@ -19,6 +19,7 @@ sealed trait DillException {
     def displayElement: HtmlElement = {
         div(
             className := "popup",
+            style := s"border-color: ${this.colour}"
             h2(
                 this.name,
                 color := "#ffffff",
