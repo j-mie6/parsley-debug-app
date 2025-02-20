@@ -47,7 +47,7 @@ object TreeViewPage extends DebugViewPage {
     private lazy val getButton: Element = button(
         className := "tree-view-save",
         "Get trees",
-        onClick(_ => Tauri.invoke(Command.FetchSavedTreeNames)
+        onClick(_ => Tauri.invoke(Command.FetchSavedTreeNames, ())
             .collect { case Right(r) => r }
         ) --> fileNames
     )

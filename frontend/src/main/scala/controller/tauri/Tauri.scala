@@ -20,7 +20,7 @@ object Tauri {
      * @param args Map of argument name to argument value. Argument names should be CamelCase.
      * @return EventStream holding the result of the command call
      */
-    def invoke(cmd: Command, args: cmd.In = ()): EventStream[Response[cmd.Out]] = cmd.invoke(args)
+    def invoke(cmd: Command, args: cmd.In): EventStream[Response[cmd.Out]] = cmd.invoke(args)
 
 
     /**
