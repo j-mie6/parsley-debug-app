@@ -21,7 +21,8 @@ object TreeView {
       *
       * @return An HTML element displaying the tree
       */
-    def apply(): HtmlElement = div(
-        TreeViewController.getDisplayTree, /* Renders the tree */
-    )
+    def apply(): HtmlElement = 
+        div(
+            TreeViewController.getDisplayTree   /* Renders the tree */
+        )
 }

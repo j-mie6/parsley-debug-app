@@ -28,7 +28,7 @@ object DebugTreeController {
       * Decode a JSON string into a list of DebugNodes.
       *
       * @param jsonString The JSON string to convert.
-      * 
+      *  
       * @return A Try containing a list of debug DebugNodes or an error message.
       */
     def decodeDebugNodes(jsonString: String): Try[List[DebugNode]] = {
