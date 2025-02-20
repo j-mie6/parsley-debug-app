@@ -19,15 +19,9 @@ import view.DebugTreeDisplay
 * Object containing methods for manipulating the DebugTree.
 */
 object TreeViewController {
-    
-    /* Display tree that will be rendered by TreeView */
-    private val displayTree: Var[HtmlElement] = Var(div())
 
-    /* Default tree view when no tree is loaded */
-    private val noTreeFound: HtmlElement = div(
-        className := "tree-view-error",
-        "No tree found! Start debugging by attaching DillRemoteView to a parser"
-    )
+    /* Display tree that will be rendered by TreeView */
+    private val displayTree: Var[HtmlElement] = Var(MainViewController.getNoTreeFound)
     
     /**
     * Gets display tree element
@@ -44,7 +38,7 @@ object TreeViewController {
     /**
     * Sets the display tree to the default noTreeFound element
     */
-    def setEmptyTree(): Unit = setDisplayTree(noTreeFound)
+    def setEmptyTree(): Unit = setDisplayTree(MainViewController.getNoTreeFound)
     
     /**
     * Fetch the debug tree root from the tauri backend.
@@ -54,7 +48,12 @@ object TreeViewController {
     def reloadTree(): Unit = {
         Tauri.invoke[String](Command.FetchDebugTree).onComplete {
             case Success(result) => DebugTreeController.decodeDebugTree(result) match {
-                case Success(debugTree) => println(s"This worked!: result = $result"); setDisplayTree(DebugTreeDisplay(debugTree))
+                case Success(debugTree) => {
+                    println(s"This worked!: result = $result")
+                    InputViewController.toInputElement(debugTree.input)
+                    setDisplayTree(DebugTreeDisplay(debugTree))
+                } 
+                
                 case Failure(error) => println(s"Failed, but couldn't deserialise $error"); ErrorController.handleError(error)
             }
             case Failure(error) => println(s"Error: $error"); ErrorController.handleError(error)
