@@ -9,7 +9,7 @@ const RESPONSE_INPUT_LEN: usize = 16;
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_index, get_tree, post_tree]
+    rocket::routes![get_index, get_tree, post_tree, post_hit_break]
 }
 
 /* Placeholder GET request handler to print 'Hello world!' */
@@ -59,6 +59,14 @@ fn get_tree(state: &rocket::State<ServerState>) -> String {
         Err(err) => format!("{:?}", err),
     }
 }
+
+
+/* Post request handler to accept debug tree */
+#[post("/api/remote/break", format = "application/json", data = "<data>")]
+async fn post_hit_break(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) {
+    let r = state.receive_breakpoint_skips().await;
+}
+
 
 #[cfg(test)]
 pub mod test {

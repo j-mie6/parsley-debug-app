@@ -10,6 +10,8 @@ pub trait StateManager: Send + Sync + 'static {
     fn get_tree(&self) -> Result<DebugTree, StateError>;
     
     fn get_node(&self, id: u32) -> Result<DebugNode, StateError>;
+
+    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(), StateError>;
 }
 
 
