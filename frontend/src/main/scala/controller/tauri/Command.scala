@@ -16,7 +16,8 @@ import controller.tauri.Command.Args
 sealed trait Command(private val name: String) {
 
     /* Argument type associated with Command */
-    type In: Args
+    type In
+    given args: Args[In]  
 
     /* Response type associated with Command */
     type Out
@@ -53,9 +54,10 @@ object Command {
         type In = Unit
         
         /* Default conversion from Unit to empty Arg Map */
-        override given Args[In] with 
+        given args: Args[Unit] {
             extension (noArg: Unit) 
                 def stringArgs: Map[String, Any] = Map()
+        }
 
         type Out = DebugTree
     }
@@ -64,9 +66,10 @@ object Command {
         type In = Unit
 
         /* Default conversion from Unit to empty Arg Map */
-        override given Args[In] with 
+        given args: Args[Unit] {
             extension (noArg: Unit) 
                 def stringArgs: Map[String, Any] = Map()
+        }
 
         type Out = List[DebugNode]
     }
@@ -77,9 +80,10 @@ object Command {
     case object SaveTree extends Command("save_tree") {
         type In = String
         
-        override given Args[In] with 
+        given args: Args[String] {
             extension (name: String) 
                 def stringArgs: Map[String, Any] = Map("name" -> name)
+        }
         
 
         type Out = Unit
@@ -89,9 +93,10 @@ object Command {
         type In = Unit
 
         /* Default conversion from Unit to empty Arg Map */
-        override given Args[In] with 
+        given args: Args[Unit] {
             extension (noArg: Unit) 
                 def stringArgs: Map[String, Any] = Map()
+        } 
 
         type Out = List[String]
     }
@@ -99,9 +104,10 @@ object Command {
     case object LoadSavedTree extends Command("load_saved_tree") {
         type In = String
 
-        override given Args[In] with 
+        given args: Args[String] {
             extension (name: String) 
                 def stringArgs: Map[String, Any] = Map("name" -> name)
+        }
         
         
 
