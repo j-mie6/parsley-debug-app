@@ -10,9 +10,25 @@ import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.DebugTree
 import model.DebugNode
-import controller.tauri.Command.Args
+import controller.tauri.Args
 
-    
+
+/* Argument trait implemented for types passed to Command invoke call */ 
+private[tauri] sealed trait Args[A] {
+    extension (a: A) 
+        def namedArgs: Map[String, Any]
+}
+
+private[tauri] object Args {
+    /* Default conversion from Unit to empty Arg Map */
+    given noArgs: Args[Unit] {
+        extension (unit: Unit) 
+            def namedArgs: Map[String, Any] = Map()
+    }
+}
+
+
+/* Command trait implemented for each invokable Tauri command */ 
 sealed trait Command(private val name: String) {
 
     /* Argument type associated with Command */
@@ -26,7 +42,7 @@ sealed trait Command(private val name: String) {
     
     /* Invoke backend command using Tauri JS interface */
     protected[tauri] def invoke(args: In): EventStream[Tauri.Response[Out]] = {
-        val strArgs: StringDictionary[Any] = StringDictionary(args.stringArgs.toSeq*)
+        val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
         val invoke: js.Promise[String] = tauriInvoke[String](name, strArgs);
@@ -43,21 +59,7 @@ sealed trait Command(private val name: String) {
 
 object Command {
 
-    sealed trait Args[A] {
-        extension (a: A) def stringArgs: Map[String, Any]
-    }
-
-    object Args {
-        /* Default conversion from Unit to empty Arg Map */
-        given noArgs: Args[Unit] {
-            extension (unit: Unit) 
-                def stringArgs: Map[String, Any] = Map()
-        }
-    }
-
-        
     /* Fetch commands */
-
     case object FetchDebugTree extends Command("fetch_debug_tree") {
         type In = Unit
         given args: Args[In] = Args.noArgs 
@@ -74,12 +76,11 @@ object Command {
 
 
     /* Save commands */
-
     case object SaveTree extends Command("save_tree") {
         type In = String
         given args: Args[String] {
             extension (name: String) 
-                def stringArgs: Map[String, Any] = Map("name" -> name)
+                def namedArgs: Map[String, Any] = Map("name" -> name)
         }
 
         type Out = Unit
@@ -95,8 +96,8 @@ object Command {
     case object LoadSavedTree extends Command("load_saved_tree") {
         type In = String
         given args: Args[String] {
-            extension (name: String) 
-                def stringArgs: Map[String, Any] = Map("name" -> name)
+            extension (name: String)
+                def namedArgs: Map[String, Any] = Map("name" -> name)
         }
 
         type Out = DebugTree
