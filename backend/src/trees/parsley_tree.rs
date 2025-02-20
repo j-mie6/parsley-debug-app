@@ -17,6 +17,13 @@ pub struct ParsleyNode {
 pub struct ParsleyTree {
     input: String,     /* The input string being parsed */
     root: ParsleyNode, /* Root node of the debug tree */
+    is_debugging: bool, /* TODO */
+}
+
+impl ParsleyTree {
+    pub fn is_debugging(&self) -> bool {
+        self.is_debugging
+    }
 }
 
 /* Convert from ParsleyTree to DebugTree */
@@ -157,7 +164,8 @@ pub mod test {
                 from_offset: 0,
                 to_offset: 4,
                 children: vec![]
-            }
+            },
+            is_debugging: false,
         }
     }
 
@@ -211,7 +219,8 @@ pub mod test {
                         ]
                     }
                 ]
-            }
+            },
+            is_debugging: false,
         }
     }
 
