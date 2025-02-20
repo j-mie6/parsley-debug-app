@@ -109,7 +109,7 @@ case object SuffixNotFound extends Error {
         "The expected suffix was not found in the input. Verify that the correct format is being used."
 }
 
-case object MalformedJSON extends Warning {
+case object MalformedJSON extends Error {
     override def name: String = "Malformed JSON Received"
     override def message: String = 
         "Failed to serialize the display tree. " +
