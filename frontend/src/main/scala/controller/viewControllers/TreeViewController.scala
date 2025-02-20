@@ -29,7 +29,9 @@ object TreeViewController {
         "No tree found! Start debugging by attaching DillRemoteView to a parser"
     )
     
-    /* Gets display tree element*/
+    /**
+    * Gets display tree element
+    */
     def getDisplayTree: HtmlElement = div(child <-- displayTree.signal)
     
     /**
@@ -37,13 +39,12 @@ object TreeViewController {
     *
     * @param tree New element to update the displayTree variable
     */
-    def setDisplayTree(tree: HtmlElement) = {
-        displayTree.set(tree)
-    }
+    def setDisplayTree(tree: HtmlElement) = displayTree.set(tree)
 
-    def setEmptyTree(): Unit = {
-        setDisplayTree(noTreeFound)
-    }
+    /**
+    * Sets the display tree to the default noTreeFound element
+    */
+    def setEmptyTree(): Unit = setDisplayTree(noTreeFound)
     
     /**
     * Fetch the debug tree root from the tauri backend.
@@ -60,13 +61,23 @@ object TreeViewController {
         }
     }
 
+    /**
+    * Saves the current tree to a file
+    *
+    * @param treeName The name of the tree to save
+    */
     def saveTree(treeName: String): Unit = {
         Tauri.invoke[String](Command.SaveTree, Map("name" -> treeName)).onComplete {
-            case Failure(error) => ErrorController.handleError(error)
             case Success(_) => ()
+            case Failure(error) => ErrorController.handleError(error)
         }
     }
 
+    /**
+      * Fetches all tree names saved by the user from the backend
+      *
+      * @param fileNames List of all trees saved by the user
+      */
     def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
         Tauri.invoke[String](Command.FetchSavedTreeNames).onComplete {
             case Success(names: String) => 
@@ -76,6 +87,12 @@ object TreeViewController {
         }
     }
 
+    /**
+      * Loads a saved tree from the backend into the display tree
+      *
+      * @param treeName User-defined name of the tree to be loaded
+      * @param displayTree Tree element to load and display in a given tree
+      */
     def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
         Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName)).onComplete {
             case Success(trees) => trees.foreach { _ =>
