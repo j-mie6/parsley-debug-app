@@ -62,9 +62,10 @@ fn get_tree(state: &rocket::State<ServerState>) -> String {
 
 
 /* Post request handler to accept debug tree */
-#[post("/api/remote/break", format = "application/json", data = "<data>")]
-async fn post_hit_break(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) {
-    let r = state.receive_breakpoint_skips().await;
+#[allow(unused)]
+#[post("/api/remote/hit-break", format = "application/json", data = "<data>")]
+async fn post_hit_break(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> Result<Json<i32>, ()> {
+    state.receive_breakpoint_skips().await.map(Json)
 }
 
 
