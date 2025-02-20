@@ -21,4 +21,5 @@ pub enum StateError {
     TreeNotFound,
     NodeNotFound(u32),
     EventEmitFailed,
+    ChannelError,
 }

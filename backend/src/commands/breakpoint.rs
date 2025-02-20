@@ -2,13 +2,13 @@ use crate::{state::{StateError, StateManager}, AppState};
 
 #[derive(Debug, serde::Serialize)]
 pub enum SkipBreakpointError {
-    EventEmitFailed,
+    ChannelError,
 }
 
 impl From<StateError> for SkipBreakpointError {
     fn from(err: StateError) -> Self {
         match err {
-            StateError::EventEmitFailed => Self::EventEmitFailed,
+            StateError::ChannelError => Self::ChannelError,
             _ => panic!("Unexpected error on skip_breakpoints"),
         }
     }

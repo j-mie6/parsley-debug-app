@@ -89,7 +89,7 @@ impl StateManager for AppState {
     }
 
     fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(), StateError> {
-        self.inner()?.break_tx.blocking_lock().blocking_send(skips);
+        self.inner()?.break_tx.blocking_lock().blocking_send(skips).map_err(|_| StateError::ChannelError)?;
         Ok(())
     }
 }

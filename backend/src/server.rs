@@ -9,7 +9,7 @@ pub use server_state::ServerState;
 pub mod test {
 
     use mockall::predicate;
-    use rocket::{http, local::blocking};
+    use rocket::{http, local::blocking, tokio::{self, sync::mpsc}};
 
     use super::{launch, ServerState};
     use crate::state::MockStateManager;
@@ -21,9 +21,14 @@ pub mod test {
     /* Start a blocking, tracked client for rocket
     The mock should already be set with expectations */
     pub fn tracked_client(mock: MockStateManager) -> blocking::Client {
-        let (_, rx) = rocket::tokio::sync::mpsc::channel::<i32>(0);
-        let state = ServerState::new(mock, rocket::tokio::sync::Mutex::new(rx));
+        let rx = empty_channel::<i32>();
+        let state = ServerState::new(mock, tokio::sync::Mutex::new(rx));
         blocking::Client::tracked(launch::build(state)).expect("Could not launch rocket")
+    }
+
+    pub fn empty_channel<T>() -> mpsc::Receiver<T> {
+        let (_, rx) = mpsc::channel::<T>(1);
+        rx
     }
 
     #[test]

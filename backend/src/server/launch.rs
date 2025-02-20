@@ -42,7 +42,7 @@ mod test {
     #[test]
     fn rocket_client_launches_successfully() {
         let mock = MockStateManager::new();
-        let (_, rx) = rocket::tokio::sync::mpsc::channel::<i32>(0);
+        let rx = server::test::empty_channel::<i32>();
         let state = ServerState::new(mock, rocket::tokio::sync::Mutex::new(rx));
 
         let rocket: Rocket<Build> = super::build(state);
