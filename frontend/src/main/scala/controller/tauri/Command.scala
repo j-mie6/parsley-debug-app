@@ -51,7 +51,7 @@ sealed trait Command(private val name: String) {
         EventStream.fromJsPromise(invoke, emitOnce = true)
             .map(up.read[Out](_).nn)
             .recoverToEither
-            .mapLeft(error => new Tauri.Error("Parsing command response failed! " + error.toString()))
+            .mapLeft(error => new Tauri.Error("Parsing command response failed! " + error.toString))
     }
 
 }

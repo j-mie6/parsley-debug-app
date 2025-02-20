@@ -26,7 +26,7 @@ sealed trait Event(private val name: String) {
         val (stream, callback) = EventStream.withCallback[String]
         
         /* Call Tauri function and get future of unlisten function */
-        val unlisten = tauriListen(this.name, e => callback(e.payload.toString()))
+        val unlisten = tauriListen(this.name, e => callback(e.payload.toString))
             .toFuture
             .mapTo[() => Unit]
 
@@ -34,7 +34,7 @@ sealed trait Event(private val name: String) {
         val responseStream: EventStream[Response[Out]] = stream
             .map(up.read[Out](_).nn)
             .recoverToEither
-            .mapLeft(error => new Tauri.Error("Parsing event payload failed! " + error.toString()))
+            .mapLeft(error => new Tauri.Error("Parsing event payload failed! " + error.toString))
 
         (responseStream, unlisten)
     }

@@ -79,7 +79,7 @@ object TreeViewPage extends DebugViewPage {
             child.maybe <-- treeStream.map((res: Response[?]) => res.swap.toOption
                 .map((error: Tauri.Error) => div(
                     className:= "tree-view-error", 
-                    p(error.toString())
+                    p(error.toString)
                 )
             )),
             
