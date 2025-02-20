@@ -47,29 +47,27 @@ object Command {
         extension (a: A) def stringArgs: Map[String, Any]
     }
 
+    object Args {
+        /* Default conversion from Unit to empty Arg Map */
+        given noArgs: Args[Unit] {
+            extension (unit: Unit) 
+                def stringArgs: Map[String, Any] = Map()
+        }
+    }
+
         
     /* Fetch commands */
 
     case object FetchDebugTree extends Command("fetch_debug_tree") {
         type In = Unit
-        
-        /* Default conversion from Unit to empty Arg Map */
-        given args: Args[Unit] {
-            extension (noArg: Unit) 
-                def stringArgs: Map[String, Any] = Map()
-        }
+        given args: Args[In] = Args.noArgs 
 
         type Out = DebugTree
     }
 
     case object FetchNodeChildren extends Command("fetch_node_children") {
         type In = Unit
-
-        /* Default conversion from Unit to empty Arg Map */
-        given args: Args[Unit] {
-            extension (noArg: Unit) 
-                def stringArgs: Map[String, Any] = Map()
-        }
+        given args: Args[In] = Args.noArgs 
 
         type Out = List[DebugNode]
     }
@@ -79,37 +77,27 @@ object Command {
 
     case object SaveTree extends Command("save_tree") {
         type In = String
-        
         given args: Args[String] {
             extension (name: String) 
                 def stringArgs: Map[String, Any] = Map("name" -> name)
         }
-        
 
         type Out = Unit
     }
 
     case object FetchSavedTreeNames extends Command("fetch_saved_tree_names") {
         type In = Unit
-
-        /* Default conversion from Unit to empty Arg Map */
-        given args: Args[Unit] {
-            extension (noArg: Unit) 
-                def stringArgs: Map[String, Any] = Map()
-        } 
+        given args: Args[In] = Args.noArgs 
 
         type Out = List[String]
     }
 
     case object LoadSavedTree extends Command("load_saved_tree") {
         type In = String
-
         given args: Args[String] {
             extension (name: String) 
                 def stringArgs: Map[String, Any] = Map("name" -> name)
         }
-        
-        
 
         type Out = DebugTree
     }
