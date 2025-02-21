@@ -17,7 +17,7 @@ object MainView extends DebugViewPage {
 
         super.render(Some(
             div(
-                stream.collectRight --> TreeViewController.tree,
+                stream.collectRight --> TreeViewController.setTree,
                 child <-- MainViewController.getMainView,
                 onUnmountCallback(_ => unlisten.get)
             )

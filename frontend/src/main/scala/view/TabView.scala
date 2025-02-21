@@ -30,15 +30,13 @@ object TabView {
 
             /* Passing on the signal of the selected tab to each tab*/
             cls("selected") <-- TabViewController.isSelectedTab(tabTitle),
-            
-            transition := "all 0.5s",
+            transition := "all 0.5s", //TODO: move to css
+
             tabTitle,
             closeTabButton(tabTitle),
-            // onClick --> {_ => {
-            //         /* Sets selected tab signal to newly selected tab */
-            //         TabViewController.setSelectedTab(tabTitle)
-            //     }
-            // }
+
+            /* Sets selected tab signal to newly selected tab */
+            onClick(_ => TabViewController.setSelectedTab(tabTitle)) --> TreeViewController.setTree 
         )
     }
 
@@ -49,10 +47,8 @@ object TabView {
             /* Close 'X' icon */
             i(className := "bi bi-x"),
 
-            onClick --> {_ => 
-                /* Deletes the respective tab */
-                // TabViewController.deleteTab(tabTitle)
-            },
+            /* Deletes the respective tab */
+            onClick(_ => TabViewController.deleteTab(tabTitle)) --> TabViewController.setFileNames,
         )
     }
     
@@ -61,10 +57,8 @@ object TabView {
             className:= "tab-bar",
 
             /* Renders tabs */ 
-            children <-- TabViewController.getFileNames.signal.map(names =>
-                names.map(name => {
-                    tabButton(name, TabViewController.getSelectedTab)
-                })
+            children <-- TabViewController.getFileNames.signal
+                .map(_.map(name => tabButton(name, TabViewController.getSelectedTab))
             )
         )
     }

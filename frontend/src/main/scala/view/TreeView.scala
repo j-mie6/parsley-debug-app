@@ -20,7 +20,7 @@ object TreeView {
       * @return An HTML element displaying the tree
       */
     def apply(): HtmlElement = div(
-        child <-- TreeViewController.displayTree, /* Renders the tree */
+        child <-- TreeViewController.getDisplayTree, /* Renders the tree */
     )
             
 }

@@ -89,7 +89,7 @@ abstract class DebugViewPage extends Page {
         cursor.pointer,
         alignContent.center,
         marginRight.px := 20,
-        onClick --> {_ => AppStateController.toggleTheme()}
+        onClick.mapToUnit --> AppStateController.toggleTheme()
     )
 
     /* Button that links to the 'parsley-debug-app' Github repo */

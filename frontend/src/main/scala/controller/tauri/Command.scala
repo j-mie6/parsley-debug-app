@@ -82,8 +82,8 @@ object Command {
     case object SaveTree extends Command("save_tree") {
         type In = String
         given args: Args[String] {
-            extension (name: String) 
-                def namedArgs: Map[String, Any] = Map("name" -> name)
+            extension (treeName: String) 
+                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
         type Out = Unit
@@ -99,11 +99,21 @@ object Command {
     case object LoadSavedTree extends Command("load_saved_tree") {
         type In = String
         given args: Args[String] {
-            extension (name: String)
-                def namedArgs: Map[String, Any] = Map("name" -> name)
+            extension (treeName: String)
+                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
         type Out = DebugTree
+    }
+
+    case object DeleteTree extends Command("delete_tree") {
+        type In = String
+        given args: Args[String] {
+            extension (treeName: String)
+                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
+        }
+
+        type Out = Unit
     }
 
 }

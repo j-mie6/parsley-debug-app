@@ -10,10 +10,11 @@ import org.scalajs.dom
 object AppStateController {
     /* Boolean representing the current page theme */
     val isLightMode: Var[Boolean] = Var(!dom.window.matchMedia("(prefers-color-scheme: dark)").matches)
-
+    def toggleTheme(): Observer[Unit] = isLightMode.updater((old, unit) => !old)
+    
     /* Toggle the current page theme */
-    def toggleTheme() = {
-        dom.document.documentElement.setAttribute("data-theme", if isLightMode.now() then "dark" else "light");
-        isLightMode.set(!isLightMode.now())
+    //TODO: check this is subscribed - think it must be bound?
+    def updateDomTheme(theme: Signal[Boolean]) = {
+        theme --> (theme => dom.document.documentElement.setAttribute("data-theme", if theme then "dark" else "light"))
     }
 }

@@ -21,8 +21,9 @@ object MainViewController {
      * 
      * @return The selected view element
      */
-    def getMainView: Signal[HtmlElement] = 
+    def getMainView: Signal[HtmlElement] = {
         isTreeView.signal.map(if (_) then TreeView() else InputView())
+    }
 
     /**
      * Sets if the current view is the tree view
@@ -38,7 +39,8 @@ object MainViewController {
      * @return True if the comparing view with tree view element,
      * false for input
      */
-    def isTreeView(isTree: Boolean): Signal[Boolean] = 
+    def isTreeView(isTree: Boolean): Signal[Boolean] = {
         isTreeView.signal.map(_ == isTree)
+    }
     
 }

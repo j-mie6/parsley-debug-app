@@ -19,20 +19,20 @@ import controller.viewControllers.TreeViewController
   */
 
 object InputView {
-
-   /**
-     * Converts an input string to an HTML element
-     * 
-     * @param input The input string
-     * @return An HTML element displaying the input string
-     */
-    def toInputElement(input: Signal[String]): HtmlElement = h1(
-                className := "debug-tree-title",
-                p("Parser Input : ", margin.px := 0, fontSize.px := 15,
-                    fontStyle.italic, fontWeight.lighter),
-                text <-- input
+    def apply(): HtmlElement = div(
+        h1(
+            className := "debug-tree-title",
+            
+            //TODO: move to css
+            p(
+                "Parser Input : ", 
+                margin.px := 0, 
+                fontSize.px := 15, 
+                fontStyle.italic, 
+                fontWeight.lighter
+            ),
+            
+            text <-- InputViewController.getInput
+        )
     )
-    
-
-    def apply(): HtmlElement = div(toInputElement(InputViewController.getInput.signal))
 }
