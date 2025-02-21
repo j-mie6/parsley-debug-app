@@ -68,8 +68,11 @@ object Command {
     }
 
     case object FetchNodeChildren extends Command("fetch_node_children") {
-        type In = Unit
-        given args: Args[In] = Args.noArgs 
+        type In = Int
+        given args: Args[Int] {
+            extension (id: Int) 
+                def namedArgs: Map[String, Any] = Map("nodeId" -> id)
+        }
 
         type Out = List[DebugNode]
     }

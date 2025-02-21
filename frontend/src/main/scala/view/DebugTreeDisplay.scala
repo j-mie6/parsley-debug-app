@@ -13,6 +13,7 @@ import controller.tauri.Command
 * used to display the debug tree in the UI.
 */
 object DebugTreeDisplay {
+    
     /* Variable that keeps track of how much the tree has been zoomed into */
     val zoomFactor: Var[Double] = Var(1.0)
     
@@ -22,8 +23,8 @@ object DebugTreeDisplay {
     
     /* Updater for the zoom factor */
     val zoomUpdate = zoomFactor.updater[Double]((prev, delta) => 
-            val zoomChange = 1.0 + (delta * zoomSpeed)
-            (prev * zoomChange).min(minZoomFactor).max(maxZoomFactor)
+        val zoomChange = 1.0 + (delta * zoomSpeed)
+        (prev * zoomChange).min(minZoomFactor).max(maxZoomFactor)
     )
     
     /* Event handler for zooming in and out of the tree */
@@ -62,7 +63,6 @@ private object ReactiveNodeDisplay {
     */
     def apply(node: ReactiveNode): HtmlElement = {
         val newType: Boolean = node.debugNode.internal != node.debugNode.name
-        def expanded: Boolean = node.children.now().isEmpty;
         
         div(
             cls("debug-tree-node-type-box") := newType,
@@ -84,14 +84,12 @@ private object ReactiveNodeDisplay {
 
                 //TODO: on double click, expand all
 
-                onClick.flatMapTo(
-                    if (!expanded) {
-                        EventStream.fromValue(Nil)
-                    } else {
-                        Tauri.invoke(Command.FetchNodeChildren, Map("nodeId" -> node.debugNode.nodeId))
-                            .map(_.getOrElse(Nil))
-                    }
-                ) --> node.children
+                onClick(_
+                    .sample(node.children.signal) 
+                    .filter(_.isEmpty)
+                    .flatMapTo(Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId))
+                    .collectRight
+                ) --> node.children.writer
 
             ),
 
