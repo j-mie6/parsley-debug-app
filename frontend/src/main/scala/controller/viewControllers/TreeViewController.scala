@@ -101,5 +101,14 @@ object TreeViewController {
                 TreeViewController.reloadTree()
         }
     }
+
+    /**
+    * Skips the current breakpoint 'skips' times
+    *
+    * @param skips The amount of times to skip a breakpoint
+    */
+    def skipBreakpoints(skips: Int): Unit =
+        Tauri.invoke[String](Command.SkipBreakpoints , Map("skips" -> skips))
+
         
 }

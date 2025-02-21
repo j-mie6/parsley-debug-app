@@ -30,6 +30,7 @@ abstract class DebugViewPage extends Page {
     private lazy val gitIcon: Element = i(className := "bi bi-github", fontSize.px := 40)
     private lazy val sunIcon: Element = i(className := "bi bi-brightness-high-fill", fontSize.px := 33)
     private lazy val moonIcon: Element = i(className := "bi bi-moon-fill", fontSize.px := 33)
+    private lazy val skipIcon: Element = i(className := "bi bi-fast-forward-fill", fontSize.px := 33)
 
     /* Left section of the page header, containing tree and source view tabs */
     private lazy val headerLeft: Element = div(
@@ -115,7 +116,18 @@ abstract class DebugViewPage extends Page {
         headerLeft,
         title,
         headerRight,
-    )        
+    )
+
+    /* Adds ability to skip the current breakpoint. */
+    private lazy val skipButton: Element = button(
+        className := "skip-button",
+
+        skipIcon, /* Fast forward icon */
+
+        onClick --> { _ => {
+            TreeViewController.skipBreakpoints(1)
+        }}
+    )
 
     /**
       * Render the DebugViewPage header and a child element. This allows different views to 
@@ -133,6 +145,8 @@ abstract class DebugViewPage extends Page {
             TabView(),
             div(
                 className := "tree-view-page",
+
+                skipButton,
                 child.getOrElse(div())
             )
         )))
