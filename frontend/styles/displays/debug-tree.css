@@ -12,6 +12,13 @@
     margin-bottom: 10px;
 }
 
+.debug-tree-title.parser-input {
+    margin: 0px;
+    font-size: 15px;
+    font-style: italic;
+    font-weight: lighter;
+}
+
 .debug-tree-node {
     padding: 10px;
     margin: 5px;
