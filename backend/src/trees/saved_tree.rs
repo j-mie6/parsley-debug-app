@@ -9,15 +9,15 @@ pub struct SavedTree {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SavedNode {
-    pub node_id: u32,
-    pub name: String,
-    pub internal: String,
-    pub success: bool,
-    pub child_id: Option<u32>,
-    pub input: String,
-    pub children: Vec<SavedNode>,
-    pub does_need_bubbling: bool,
-}
+    pub node_id: u32,               /* The user-defined name */
+    pub name: String,               /* The internal name of the parser */
+    pub internal: String,           /* Whether the parser was successful */
+    pub success: bool,              /* The unique child number of this node */
+    pub child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
+    pub input: String,              /* Offset into the input in which this node's parse attempt finished */
+    pub children: Vec<SavedNode>,   /* The children of this node */
+    pub does_need_bubbling: bool,   /* Whether this node needs bubbling (iterative and transparent) */
+} 
 
 impl From<DebugTree> for SavedTree {
     fn from(debug_tree: DebugTree) -> Self {
