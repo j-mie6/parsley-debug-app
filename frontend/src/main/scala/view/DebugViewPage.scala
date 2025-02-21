@@ -75,11 +75,9 @@ abstract class DebugViewPage extends Page {
 
         saveIcon, /* Floppy disk icon */
 
-        onClick --> { _ => {
-            // val treeName: String = (rand.nextInt).toString()
-            // TabViewController.saveTree(treeName)
-            // TabViewController.setSelectedTab(treeName)
-        }}
+        onClick.mapTo(rand.nextInt(100).toString)
+            .compose(TabViewController.saveTree) 
+            --> TreeViewController.setTree()
     )
 
     /* Button used to toggle the theme */
