@@ -36,8 +36,10 @@ object InputViewController {
     def toInputElement(input: String): Unit = {
         setInput (
             h1(
-                className := "parser-input",
-                s"Parser Input: ${input}"
+                className := "debug-tree-title",
+                p("Parser Input : ", margin.px := 0, fontSize.px := 15, 
+                    fontStyle.italic, fontWeight.lighter),
+                input
             )
         )
     }
