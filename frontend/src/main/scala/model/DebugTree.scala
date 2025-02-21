@@ -1,6 +1,7 @@
 package model
 
-import upickle.default.ReadWriter
+// import upickle.default.ReadWriter
+
 
 /**
   * Case class used to represent tauri's debug tree automatically using upickle.
@@ -8,7 +9,9 @@ import upickle.default.ReadWriter
   * @param input the input string the tree node has to parse
   * @param root the debug tree root node
   */
-case class DebugTree(input: String, root: DebugNode) derives ReadWriter
+case class DebugTree(input: String, root: DebugNode)
+given Deserialize[DillError, DebugTree] = Deserialize.upReader[DillError, DebugTree]
+
 
 /**
   * Case class used to represent tauri's debug tree automatically using upickle.
@@ -23,4 +26,6 @@ case class DebugTree(input: String, root: DebugNode) derives ReadWriter
   * @param isLeaf if a node is a leaf
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean) derives ReadWriter
+    childId: Int, input: String, isLeaf: Boolean)
+given Deserialize[DillError, DebugNode] = Deserialize.upReader[DillError, DebugNode]
+
