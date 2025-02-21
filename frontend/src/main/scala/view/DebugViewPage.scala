@@ -84,11 +84,15 @@ abstract class DebugViewPage extends Page {
 
     /* Button used to toggle the theme */
     private lazy val themeButton: Element = div(
-        child <-- AppStateController.isLightMode.signal
-            .map((project: Boolean) => if project then moonIcon else sunIcon),
         cursor.pointer,
         alignContent.center,
-        marginRight.px := 20,
+
+        marginRight.px := 20, //TODO: move to css
+        
+        /* Render moonIcon in light mode; sunIcon in dark mode */
+        child <-- AppStateController.isLightMode.signal
+            .map(if (_) then moonIcon else sunIcon),
+
         onClick.mapToUnit --> AppStateController.toggleTheme()
     )
 
