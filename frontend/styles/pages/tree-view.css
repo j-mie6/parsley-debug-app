@@ -6,6 +6,7 @@
     border: 2px solid var(--font-color-primary);
     border-radius: 20px;
     box-sizing: border-box;
+    justify-items: center;
 }
 
 .tree-view-error {

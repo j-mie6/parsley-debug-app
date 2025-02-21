@@ -125,7 +125,7 @@ abstract class DebugViewPage extends Page {
         skipIcon, /* Fast forward icon */
 
         onClick --> { _ => {
-            TreeViewController.skipBreakpoints(1)
+            TreeViewController.skipBreakpoints(0)
         }}
     )
 
