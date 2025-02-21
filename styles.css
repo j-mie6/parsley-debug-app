@@ -1,5 +1,6 @@
 @import url('frontend/styles/pages/debug-view.css');
 @import url('frontend/styles/pages/tree-view.css');
+@import url('frontend/styles/pages/tab-bar.css');
 @import url('frontend/styles/displays/debug-tree.css');
 
 :root {
@@ -9,6 +10,9 @@
     --background-tertiary-60: #96dec499;	/* Parsley green 60% transparency. */
     --background-tertiary-40: #96dec466;	/* Parsley green 20% transparency. */
     --background-tertiary-20: #96dec433;	/* Parsley green 20% transparency. */
+    --tab: #8fe4c5;                        /* Tab green */
+    --tab-hover: #6DAD96;                  /* 5% lighter tab */
+    --tab-selected: #64E3B4;               /* 10% lighter tab */
     --font-color-primary: #96DEC4;	        /* Parsley green. */
     --font-color-secondary: #242526;	    /* Dark grey. */
     --font-color-error: #d2042d;	        /* Red error. */
@@ -22,6 +26,9 @@
     --background-tertiary-60: #24252699;	/* Grey 60% transparency. */
     --background-tertiary-40: #24252666;	/* Grey 60% transparency. */
     --background-tertiary-20: #24252633;	/* Grey 20% transparancy. */
+    --tab: #3e4041;                        /* Tab green */
+    --tab-hover: #5a5e60;                  /* 5% lighter tab */
+    --tab-selected: #242526;               /* 10% lighter tab */
     --font-color-primary: #242526;	        /* Black. */
     --font-color-secondary: #96DEC4;	    /* Parsley green. */
     --font-color-error: #fd4659;	        /* Red error. */

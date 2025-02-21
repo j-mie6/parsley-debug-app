@@ -14,7 +14,7 @@ import controller.tauri.{Command, Tauri}
   * @param debugNode holds information about debug node
   * @param children reactive children updated at runtime
   */
-case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {}
+case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]])
 
 /**
   * Companion object for a ReactiveNode.

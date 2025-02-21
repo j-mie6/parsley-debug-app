@@ -1,16 +1,15 @@
 use tauri::Manager;
+use tauri::RunEvent;
 
 mod state;
 mod commands;
 mod events;
 mod trees;
 mod server;
+mod files;
 
 use state::AppState;
 use server::ServerState;
-
-/* Directory for saved trees. */
-const SAVED_TREE_DIR : &str = "./saved_trees/";
 
 
 /* Setup Tauri app */
@@ -27,10 +26,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let app_state: AppState = AppState::new(app.app_handle().clone());
     app.manage(app_state);
 
-    /* If the folder for saved_trees does not exist, create it. */
-    if !std::path::Path::new(SAVED_TREE_DIR).exists() {
-        std::fs::create_dir(SAVED_TREE_DIR)?;
-    }
+    files::create_saved_trees_dir().expect("Error occured while making saved_trees folder");
     
     /* Clone the app handle and use to create a ServerState */
     let server_state: ServerState = ServerState::new(app.handle().clone());
@@ -50,12 +46,21 @@ pub fn run() {
     /* Fix for NVidia graphics cards */
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
 
-    tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
-        .setup(setup) /* Run app setup */
-        .invoke_handler(commands::handlers()) /* Expose Tauri commands to frontend */
-        .run(tauri::generate_context!()) /* Start up the app */
-        .expect("error while running tauri application");
+    /* Build app using Tauri builders */
+    let app = tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())     /* Allow shell access from app */
+        .setup(setup)                           /* Run app setup */
+        .invoke_handler(commands::handlers())   /* Expose Tauri commands to frontend */
+        .build(tauri::generate_context!())      /* Build the app */
+        .expect("Error building Dill");
+
+    /* Runs app with handling events */
+    app.run(|_, event| {
+        /* On window shutdown, remove saved_trees folder */
+        if let RunEvent::ExitRequested { code: None, .. } = event {
+            files::delete_saved_trees_dir().expect("Error occured cleaning saved trees");
+        }
+    })
 }
 
 

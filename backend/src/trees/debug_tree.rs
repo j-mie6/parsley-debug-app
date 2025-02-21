@@ -21,8 +21,8 @@ impl DebugTree {
     }
 }
 
-impl From<&SavedTree> for DebugTree {
-    fn from(debug_tree: &SavedTree) -> Self {
+impl From<SavedTree> for DebugTree {
+    fn from(debug_tree: SavedTree) -> Self {
         /* Recursively convert children into SavedNodes */
         fn convert_node(node: SavedNode) -> DebugNode {
             let children: Vec<DebugNode> = node.children
@@ -47,6 +47,7 @@ impl From<&SavedTree> for DebugTree {
     }
 }
 
+
 /* Defines tree structure used in backend that will be passed to frontend */
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -62,16 +63,9 @@ pub struct DebugNode {
 }
 
 impl DebugNode {
-    pub fn new(
-        node_id: u32,
-        name: String,
-        internal: String,
-        success: bool,
-        child_id: Option<u32>,
-        input: String,
-        children: Vec<DebugNode>,
-    ) -> Self {
-        let is_leaf: bool = children.is_empty();
+    pub fn new(node_id: u32, name: String, internal: String, success: bool, 
+            child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
+
         DebugNode {
             node_id,
             name,
@@ -79,8 +73,8 @@ impl DebugNode {
             success,
             child_id,
             input,
+            is_leaf: children.is_empty(),
             children,
-            is_leaf,
         }
     }
 }
@@ -88,36 +82,133 @@ impl DebugNode {
 
 #[cfg(test)]
 pub mod test {
+
     /* Debug Tree unit testing */
 
     use super::{DebugNode, DebugTree};
 
-    pub const RAW_TREE: &str = r#"{
-        "input": "Test",
-        "root": {
-            "nodeId": 0,
-            "name": "Test",
-            "internal": "Test",
-            "success": true,
-            "childId": 0,
+    pub fn json() -> String {
+        r#"{
             "input": "Test",
-            "isLeaf": true
-        }
-    }"#;
+            "root": {
+                "nodeId": 0,
+                "name": "Test",
+                "internal": "Test",
+                "success": true,
+                "childId": 0,
+                "input": "Test",
+                "isLeaf": true
+            }
+        }"#
+        .split_whitespace()
+        .collect::<String>()
+    }
 
-    pub fn test_tree() -> DebugTree {
+    pub fn nested_json() -> String {
+        r#"{
+            "input": "01234",
+            "root": {
+                "nodeId": 0,
+                "name": "0",
+                "internal": "0",
+                "success": true,
+                "childId": 0,
+                "input": "0",
+                "isLeaf": false
+            }
+        }"#
+        .split_whitespace()
+        .collect()
+    }
+
+    pub fn tree() -> DebugTree {
         DebugTree::new(
             String::from("Test"),
             DebugNode::new(
-                0u32,
+                0,
                 String::from("Test"),
                 String::from("Test"),
                 true,
                 Some(0),
                 String::from("Test"),
-                Vec::new(),
-            ),
+                Vec::new()
+            )
         )
+    }
+
+    pub fn nested_tree() -> DebugTree {
+        DebugTree::new(
+            String::from("01234"),
+            DebugNode::new(
+                0,
+                String::from("0"),
+                String::from("0"),
+                true,
+                Some(0),
+                String::from("0"),
+                vec![
+                    DebugNode::new(
+                        1,
+                        String::from("1"),
+                        String::from("1"),
+                        true,
+                        Some(1),
+                        String::from("1"),
+                        vec![
+                            DebugNode::new(
+                                2,
+                                String::from("2"),
+                                String::from("2"),
+                                true,
+                                Some(2),
+                                String::from("2"),
+                                vec![],
+                            )
+                        ]
+                    ),
+                    DebugNode::new(
+                        3,
+                        String::from("3"),
+                        String::from("3"),
+                        true,
+                        Some(3),
+                        String::from("3"),
+                        vec![
+                            DebugNode::new(
+                                4,
+                                String::from("4"),
+                                String::from("4"),
+                                true,
+                                Some(4),
+                                String::from("4"),
+                                vec![],
+                            )
+                        ]
+                    )
+                ]
+            )
+        )
+    }
+ 
+
+    #[test]
+    fn debug_tree_serialises() {
+        let json: String = serde_json::to_string(&tree())
+            .expect("Could not serialize DebugTree")
+            .split_whitespace()
+            .collect();
+
+        assert_eq!(json, self::json());
+    }
+
+    #[test]
+    fn nested_debug_tree_serialises() {
+        let json: String = serde_json::to_string(&nested_tree())
+            .expect("Could not serialize DebugTree")
+            .split_whitespace()
+            .collect();
+
+        assert_eq!(json, nested_json());
     }
 
 }

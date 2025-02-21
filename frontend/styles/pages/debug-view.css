@@ -15,6 +15,13 @@
     justify-content: flex-end;
 }
 
+.debug-view-header-right-buttons {
+    width: 30%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
 .debug-view-header-title {
     display: flex;
     flex-direction: row;
@@ -33,6 +40,17 @@
     flex-direction: row;
     text-wrap: nowrap;
     align-items: center;
+    border-radius: 2px;
+    padding: 5px 10px 5px;
+}
+
+.debug-view-header-left-container:hover {
+    background-color: var(--background-secondary);
+}
+
+.debug-view-header-left-container.selected {
+    background-color: var(--background-tertiary);
+    color: var(--font-color-secondary);
 }
 
 .debug-view-header-left-vbar {
@@ -40,7 +58,6 @@
     height: 40px;
     border: 1px solid var(--font-color-primary);
     background-color: var(--font-color-primary);
-    margin-inline: 20px;
     margin-block: auto;
 }
 
@@ -51,4 +68,14 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+}
+
+.save-button {
+    margin-right: 20px;
+    background: transparent;
+    color: inherit;
+    border: none;
+    font: inherit;
+    outline: inherit;
+    cursor: pointer;
 }
