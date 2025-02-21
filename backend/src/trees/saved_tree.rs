@@ -16,6 +16,7 @@ pub struct SavedNode {
     pub child_id: Option<u32>,
     pub input: String,
     pub children: Vec<SavedNode>,
+    pub does_need_bubbling: bool,
 }
 
 impl From<DebugTree> for SavedTree {
@@ -37,6 +38,7 @@ impl From<DebugTree> for SavedTree {
                 node.child_id,
                 node.input,
                 children,
+                node.does_need_bubbling
             )
         }
 
@@ -65,7 +67,8 @@ impl SavedTree {
 
 impl SavedNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
-            child_id: Option<u32>, input: String, children: Vec<SavedNode>) -> Self {
+            child_id: Option<u32>, input: String, children: Vec<SavedNode>,
+            does_need_bubbling: bool) -> Self {
 
         SavedNode {
             node_id,
@@ -75,6 +78,7 @@ impl SavedNode {
             child_id,
             input,
             children,
+            does_need_bubbling
         }
     }
 }
@@ -104,7 +108,8 @@ pub mod test {
                 "success": true,
                 "child_id": 0,
                 "input": "Test",
-                "children": []
+                "children": [],
+                "does_need_bubbling": false
             }
         }"#
         .split_whitespace()
@@ -137,9 +142,11 @@ pub mod test {
                                 "success": true,
                                 "child_id": 2,
                                 "input": "2",
-                                "children": []
+                                "children": [],
+                                "does_need_bubbling": false
                             }
-                        ]
+                        ],
+                        "does_need_bubbling": false
                     },
                     {
                         "node_id": 3,
@@ -156,11 +163,14 @@ pub mod test {
                                 "success": true,
                                 "child_id": 4,
                                 "input": "4",
-                                "children": []
+                                "children": [],
+                                "does_need_bubbling": false
                             }
-                        ]
+                        ],
+                        "does_need_bubbling": false
                     }
-                ]
+                ],
+                "does_need_bubbling": false
             }
         }"#
         .split_whitespace()
@@ -177,7 +187,8 @@ pub mod test {
                 true,
                 Some(0),
                 String::from("Test"),
-                Vec::new()
+                Vec::new(),
+                false
             )
         )
     }
@@ -209,8 +220,10 @@ pub mod test {
                                 Some(2),
                                 String::from("2"),
                                 vec![],
+                                false
                             )
-                        ]
+                        ],
+                        false
                     ),
                     SavedNode::new(
                         3,
@@ -228,10 +241,13 @@ pub mod test {
                                 Some(4),
                                 String::from("4"),
                                 vec![],
+                                false
                             )
-                        ]
+                        ],
+                        false
                     )
-                ]
+                ],
+                false
             )
         )
     }
