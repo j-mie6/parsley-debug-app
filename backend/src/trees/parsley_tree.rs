@@ -14,15 +14,16 @@ pub struct ParsleyNode {
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ParsleyTree {
     input: String,     /* The input string being parsed */
     root: ParsleyNode, /* Root node of the debug tree */
-    is_debugging: bool, /* TODO */
+    is_debuggable: bool, /* TODO */
 }
 
 impl ParsleyTree {
     pub fn is_debugging(&self) -> bool {
-        self.is_debugging
+        self.is_debuggable
     }
 }
 
@@ -165,7 +166,7 @@ pub mod test {
                 to_offset: 4,
                 children: vec![]
             },
-            is_debugging: false,
+            is_debuggable: false,
         }
     }
 
@@ -220,7 +221,7 @@ pub mod test {
                     }
                 ]
             },
-            is_debugging: false,
+            is_debuggable: false,
         }
     }
 
