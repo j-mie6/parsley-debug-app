@@ -86,10 +86,17 @@ private object ReactiveNodeDisplay {
 
                 onClick(_
                     .sample(node.children.signal) 
-                    .filter(_.isEmpty && !node.debugNode.isLeaf)
-                    .flatMapTo(Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId))
-                    .collectRight
-                ) --> node.children.writer
+                    .filter(_ => !node.debugNode.isLeaf)
+                    .map(_.isEmpty)
+                    .flatMapMerge(
+                        if (_) {
+                            Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId)
+                                .collectRight
+                        } else {
+                            EventStream.fromValue(Nil)
+                        }
+                    )
+                ) --> node.children.writer,
 
             ),
 
