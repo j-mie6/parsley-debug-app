@@ -13,7 +13,7 @@ object TabView {
     val inputName: Var[String] = Var("")
 
     /* Input for the name of the tree to be saved */
-    val nameInput =
+    val nameInput: HtmlElement = {
         input(
             typ := "text",
             placeholder := "Enter text...",
@@ -22,9 +22,10 @@ object TabView {
                 onInput.mapToValue --> inputName.writer
             )
         )
+    }
 
     /* Renders a tab button from a saved tree name */
-    private def tabButton(tabTitle: String, selectedTab: Signal[String]): HtmlElement = {
+    private def tabButton(tabTitle: String): HtmlElement = {
         button(
             className := "tab-button",
 
@@ -57,8 +58,8 @@ object TabView {
             className:= "tab-bar",
 
             /* Renders tabs */ 
-            children <-- TabViewController.getFileNames.signal
-                .map(_.map(name => tabButton(name, TabViewController.getSelectedTab))
+            children <-- TabViewController.getFileNames.signal.map(
+                (names: List[String]) => names.map(tabButton(_))
             )
         )
     }
