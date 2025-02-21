@@ -86,7 +86,7 @@ private object ReactiveNodeDisplay {
 
                 onClick(_
                     .sample(node.children.signal) 
-                    .filter(_.isEmpty)
+                    .filter(_.isEmpty && !node.debugNode.isLeaf)
                     .flatMapTo(Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId))
                     .collectRight
                 ) --> node.children.writer
