@@ -11,7 +11,7 @@ pub struct ParsleyNode {
     from_offset: i32,           /* Offset into the input in which this node's parse attempt starts */
     to_offset: i32,             /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
-    does_need_bubbling: bool,   /* Whether this node needs bubbling (iterative and transparent) */
+    is_iterative: bool,   /* Whether this node needs bubbling (iterative and transparent) */
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
@@ -53,7 +53,7 @@ impl From<ParsleyTree> for DebugTree {
                 child_id,
                 input_slice,
                 children,
-                node.does_need_bubbling
+                node.is_iterative
             )
         }
 
@@ -86,7 +86,7 @@ pub mod test {
                 "fromOffset": 0,
                 "toOffset": 4,
                 "children": [],
-                "doesNeedBubbling": false
+                "isIterative": false
             }
         }"#
         .split_whitespace()
@@ -120,10 +120,10 @@ pub mod test {
                                 "fromOffset": 2,
                                 "toOffset": 3,
                                 "children": [],
-                                "doesNeedBubbling": false
+                                "isIterative": false
                             }
                         ],
-                        "doesNeedBubbling": false
+                        "isIterative": false
                     },
                     {
                         "name": "3",
@@ -141,13 +141,13 @@ pub mod test {
                                 "fromOffset": 4,
                                 "toOffset": 5,
                                 "children": [],
-                                "doesNeedBubbling": false
+                                "isIterative": false
                             }
                         ],
-                        "doesNeedBubbling": false
+                        "isIterative": false
                     }
                 ],
-                "doesNeedBubbling": false
+                "isIterative": false
             }
         }"#
         .split_whitespace()
@@ -165,7 +165,7 @@ pub mod test {
                 from_offset: 0,
                 to_offset: 4,
                 children: vec![],
-                does_need_bubbling: false
+                is_iterative: false
             }
         }
     }
@@ -197,10 +197,10 @@ pub mod test {
                                 from_offset: 2,
                                 to_offset: 3,
                                 children: vec![],
-                                does_need_bubbling: false
+                                is_iterative: false
                             }
                         ],
-                        does_need_bubbling: false
+                        is_iterative: false
                     },
                     ParsleyNode {
                         name: String::from("3"),
@@ -218,13 +218,13 @@ pub mod test {
                                 from_offset: 4,
                                 to_offset: 5,
                                 children: vec![],
-                                does_need_bubbling: false
+                                is_iterative: false
                             }
                         ],
-                        does_need_bubbling: false
+                        is_iterative: false
                     }
                 ],
-                does_need_bubbling: false,
+                is_iterative: false,
             }
         }
     }

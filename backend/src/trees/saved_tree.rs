@@ -16,7 +16,7 @@ pub struct SavedNode {
     pub child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
     pub input: String,              /* Offset into the input in which this node's parse attempt finished */
     pub children: Vec<SavedNode>,   /* The children of this node */
-    pub does_need_bubbling: bool,   /* Whether this node needs bubbling (iterative and transparent) */
+    pub is_iterative: bool,   /* Whether this node needs bubbling (iterative and transparent) */
 } 
 
 impl From<DebugTree> for SavedTree {
@@ -38,7 +38,7 @@ impl From<DebugTree> for SavedTree {
                 node.child_id,
                 node.input,
                 children,
-                node.does_need_bubbling
+                node.is_iterative
             )
         }
 
@@ -68,7 +68,7 @@ impl SavedTree {
 impl SavedNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
             child_id: Option<u32>, input: String, children: Vec<SavedNode>,
-            does_need_bubbling: bool) -> Self {
+            is_iterative: bool) -> Self {
 
         SavedNode {
             node_id,
@@ -78,7 +78,7 @@ impl SavedNode {
             child_id,
             input,
             children,
-            does_need_bubbling
+            is_iterative
         }
     }
 }
@@ -109,7 +109,7 @@ pub mod test {
                 "child_id": 0,
                 "input": "Test",
                 "children": [],
-                "does_need_bubbling": false
+                "is_iterative": false
             }
         }"#
         .split_whitespace()
@@ -143,10 +143,10 @@ pub mod test {
                                 "child_id": 2,
                                 "input": "2",
                                 "children": [],
-                                "does_need_bubbling": false
+                                "is_iterative": false
                             }
                         ],
-                        "does_need_bubbling": false
+                        "is_iterative": false
                     },
                     {
                         "node_id": 3,
@@ -164,13 +164,13 @@ pub mod test {
                                 "child_id": 4,
                                 "input": "4",
                                 "children": [],
-                                "does_need_bubbling": false
+                                "is_iterative": false
                             }
                         ],
-                        "does_need_bubbling": false
+                        "is_iterative": false
                     }
                 ],
-                "does_need_bubbling": false
+                "is_iterative": false
             }
         }"#
         .split_whitespace()

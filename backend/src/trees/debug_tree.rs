@@ -39,7 +39,7 @@ impl From<SavedTree> for DebugTree {
                 node.child_id,
                 node.input,
                 children,
-                node.does_need_bubbling
+                node.is_iterative
             )
         }
 
@@ -61,13 +61,13 @@ pub struct DebugNode {
     pub input: String,         /* The input string passed to the parser */
     #[serde(skip_serializing)] pub children: Vec<DebugNode>, /* The children of this node */
     pub is_leaf: bool,         /* Whether this node is a leaf node */
-    pub does_need_bubbling: bool, /* Whether this node needs bubbling (iterative and transparent) */
+    pub is_iterative: bool, /* Whether this node needs bubbling (iterative and transparent) */
 }
 
 impl DebugNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
             child_id: Option<u32>, input: String, children: Vec<DebugNode>,
-            does_need_bubbling: bool) -> Self {
+            is_iterative: bool) -> Self {
 
         DebugNode {
             node_id,
@@ -78,7 +78,7 @@ impl DebugNode {
             input,
             is_leaf: children.is_empty(),
             children,
-            does_need_bubbling
+            is_iterative
         }
     }
 }
@@ -102,7 +102,7 @@ pub mod test {
                 "childId": 0,
                 "input": "Test",
                 "isLeaf": true,
-                "doesNeedBubbling": false
+                "isIterative": false
             }
         }"#
         .split_whitespace()
@@ -120,7 +120,7 @@ pub mod test {
                 "childId": 0,
                 "input": "0",
                 "isLeaf": false,
-                "doesNeedBubbling": false
+                "isIterative": false
             }
         }"#
         .split_whitespace()
