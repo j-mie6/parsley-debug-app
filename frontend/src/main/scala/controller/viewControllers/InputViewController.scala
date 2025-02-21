@@ -24,6 +24,6 @@ object InputViewController {
      * 
      * @param input The new input string
      */
-    val setInput = inputElement.writer
+    def setInput() = inputElement.writer
 
 }

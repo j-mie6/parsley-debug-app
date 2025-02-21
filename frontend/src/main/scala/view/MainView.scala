@@ -21,7 +21,7 @@ object MainView extends DebugViewPage {
                 AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
 
                 /* Update tree with TreeReady response */
-                stream.collectRight --> TreeViewController.setTree,
+                stream.collectRight --> TreeViewController.setTree(),
 
                 /* Load main page */
                 child <-- MainViewController.getMainView,

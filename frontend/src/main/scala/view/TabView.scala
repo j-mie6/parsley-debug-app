@@ -36,7 +36,7 @@ object TabView {
             closeTabButton(tabTitle),
 
             /* Sets selected tab signal to newly selected tab */
-            onClick(_ => TabViewController.setSelectedTab(tabTitle)) --> TreeViewController.setTree 
+            onClick(_ => TabViewController.setSelectedTab(tabTitle)) --> TreeViewController.setTree()
         )
     }
 
