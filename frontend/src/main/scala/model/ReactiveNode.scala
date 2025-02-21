@@ -9,6 +9,8 @@ import model.DebugNode
 import controller.DebugTreeController
 import controller.tauri.{Tauri, Command}
 
+import controller.errors.ErrorController
+
 /**
   * Wrapper for DebugNode to add reactive children.
   *
@@ -35,7 +37,7 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
                     DebugTreeController.decodeDebugNodes(nodesString) match {
                         case Success(nodes) => nodes
                         case Failure(exception) => {
-                            println(s"Error in decoding debug tree: ${exception.getMessage()}") 
+                            ErrorController.handleError(exception)
                             Nil
                         }
                     }
