@@ -46,7 +46,7 @@ object TabViewController {
             
     /* Get selected tab name */
     def getSelectedTab: Signal[String] = {
-        fileNames.signal.combineWithFn(selectedTab.signal)((names, i) => names(i))
+        fileNames.signal.withCurrentValueOf(selectedTab.signal).map((names, i) => names(i))
     }
 
     /* Checks if tab is currently selected */
