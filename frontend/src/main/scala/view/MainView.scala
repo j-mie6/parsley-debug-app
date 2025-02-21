@@ -11,8 +11,13 @@ import controller.viewControllers.TreeViewController
 
 
 object MainView extends DebugViewPage {
-    def apply(): HtmlElement = {
 
+    val root: HtmlElement = div(
+        MainView(),
+        ErrorController.displayError,
+    )
+
+    def apply(): HtmlElement = {
         Tauri.listen[Unit](Event.TreeReady, {_ => TreeViewController.reloadTree()})
 
         super.render(Some(div(

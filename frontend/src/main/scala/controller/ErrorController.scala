@@ -9,11 +9,14 @@ import model.errors.*
 import controller.MalformedJSONException
 
 /** 
-  * ErrorController keeps track of the error state of the app and the code to display error 
-  * popups in the app 
+  * ErrorController keeps track of the error state of the app 
+  * and the code to display error popups in the app 
   */
 object ErrorController {
     
+    /**
+      * Icon to show a popup is a warning
+      */
     private lazy val alertIcon: Element = i (
         className := "bi bi-exclamation-triangle-fill", 
         fontSize.px := 30,
@@ -22,7 +25,7 @@ object ErrorController {
     /* Holds current error information */
     val errorVar: Var[Option[DillException]] = Var(None)
     
-    /* EmptyNode will not be rendered (if there is no error) */
+    /* EmptyNode will not be rendered when there isn't an error */
     val displayError: HtmlElement = div(
         child <-- errorVar.signal.map(_.map(err => err.displayElement).getOrElse(emptyNode)),
     )
@@ -62,5 +65,4 @@ object ErrorController {
     def clearError(): Unit = {
         errorVar.set(None)
     }
-
 }

@@ -15,12 +15,6 @@ import controller.errors.ErrorController
     dom.document.documentElement.setAttribute("data-theme", if AppStateController.isLightMode.now() then "light" else "dark")
     renderOnDomContentLoaded(
         dom.document.getElementById("app"),
-        root
-
+        MainView.root,
     )
 }
-
-val root: HtmlElement = div(
-    MainView(),
-    ErrorController.displayError
-)

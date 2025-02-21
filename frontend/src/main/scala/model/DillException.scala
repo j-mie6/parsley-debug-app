@@ -16,7 +16,6 @@ sealed trait DillException {
     def name: String
     def message: String
     def closable: Boolean
-    def colour: String
     def style: String
 
     def displayElement: HtmlElement = {
@@ -41,7 +40,6 @@ sealed trait DillException {
   * Represents a non-breaking Exception in Dill. Overrides colour to yellow and canDelete to true
   */
 sealed trait Warning extends DillException {
-    override def colour: String = "ffff00"
     override def closable: Boolean = true
     override def style: String = "warning"
 }
@@ -50,7 +48,6 @@ sealed trait Warning extends DillException {
   * Represents a breaking Exception in Dill. Overrides colour to red and canDelete to false
   */
 sealed trait Error extends DillException {
-    override def colour: String = "ff0000"
     override def closable: Boolean = false
     override def style: String = "error"
 }

@@ -6,6 +6,11 @@ import scala.util.{Try, Success, Failure}
 import model.{DebugTree, DebugNode}
 
 /**
+  * Represents frontend JSON deserialisation going wrong
+  */
+object MalformedJSONException extends Exception
+
+/**
   * DebugTreeController object contains methods on decoding JSON into debug tree
   * data structures.
   */
@@ -14,7 +19,6 @@ object DebugTreeController {
       * Decode a JSON string into a DebugTree class.
       *
       * @param jsonString The JSON string to convert.
-      * 
       * @return A Try containing DebugTree class or an error message.
       */
     def decodeDebugTree(jsonString: String): Try[DebugTree] = {
@@ -38,5 +42,3 @@ object DebugTreeController {
         }
     }
 }
-
-object MalformedJSONException extends Exception

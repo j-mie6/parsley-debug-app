@@ -26,22 +26,21 @@ object InputViewController {
      * 
      * @param input The new input string
      */
-    private def setInput(input: HtmlElement): Unit = {
-        inputElement.set(input)
-    }
+    private def setInput(input: HtmlElement): Unit = inputElement.set(input)
 
     /**
      * Converts an input string to an HTML element
      * 
      * @param input The input string
      */
-    def toInputElement(input: String): Unit =
-         setInput (
+    def toInputElement(input: String): Unit = {
+        setInput (
             h1(
                 className := "debug-tree-title",
                 p("Parser Input : ", margin.px := 0, fontSize.px := 15,
                     fontStyle.italic, fontWeight.lighter),
                 input
             )
-    )
+        )
+    }
 }

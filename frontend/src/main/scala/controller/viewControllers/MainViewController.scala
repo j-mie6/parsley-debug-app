@@ -30,6 +30,10 @@ object MainViewController {
     def getMainView: Signal[HtmlElement] = 
         isTreeView.signal.map(if (_) then TreeView() else InputView())
 
+    /**
+      * Returns a div showing that no tree has been fed
+      * to Remote View yet
+      */
     def getNoTreeFound: HtmlElement = noTreeFound
 
     /**
