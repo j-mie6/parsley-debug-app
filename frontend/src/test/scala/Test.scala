@@ -20,7 +20,8 @@ class Test extends AnyFlatSpec with should.Matchers {
             "success": true,
             "childId": 0,
             "input": "Test",
-            "isLeaf": false
+            "isLeaf": false,
+            "doesNeedBubbling": false
         }
     }"""
 
@@ -36,6 +37,7 @@ class Test extends AnyFlatSpec with should.Matchers {
         tree.root.childId should be (0)
         tree.root.input should be ("Test")
         tree.root.isLeaf should be (false)
+        tree.root.doesNeedBubbling should be (false)
     }
 
     it should "not be deserialised if the JSON is not properly formatted" in {
