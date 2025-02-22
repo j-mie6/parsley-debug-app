@@ -10,8 +10,7 @@ import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 import model.Deserialize
 import model.DebugTree
 import model.DebugNode
-import model.DillError
-
+import model.JsonError
 
 
 /* Trait for specifying named arguments to pass in invoke */
@@ -38,11 +37,11 @@ sealed trait Command(private val name: String) {
 
     /* Response type associated with Command */
     type Out
-    given Deserialize[DillError, Out] = scala.compiletime.deferred 
+    given Deserialize[Out] = scala.compiletime.deferred 
 
 
     /* Invoke backend command using Tauri JS interface */
-    protected[tauri] def invoke(args: In): EventStream[Either[DillError, Out]] = {
+    protected[tauri] def invoke(args: In): EventStream[Either[JsonError, Out]] = {
         val stringDict: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
@@ -50,10 +49,7 @@ sealed trait Command(private val name: String) {
         
         /* Start EventStream from invoke and deserialise invoke response */
         EventStream.fromJsPromise(invoke, emitOnce = true)
-            .map((json: String) => {
-                Deserialize[DillError, Out]
-                    .read(json, err => DillError(err))
-            })
+            .map((json: String) => Deserialize[Out].read(json))
     }
 
 }

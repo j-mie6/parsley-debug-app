@@ -8,7 +8,7 @@ package model
   * @param root the debug tree root node
   */
 case class DebugTree(input: String, root: DebugNode) derives Deserialize.upickle
-given Deserialize[DillError, DebugTree] = Deserialize.upReader[DillError, DebugTree]
+given Deserialize[DebugTree] = Deserialize.upReader[DebugTree]
 
 
 /**
@@ -25,5 +25,5 @@ given Deserialize[DillError, DebugTree] = Deserialize.upReader[DillError, DebugT
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
     childId: Int, input: String, isLeaf: Boolean) derives Deserialize.upickle
-given Deserialize[DillError, DebugNode] = Deserialize.upReader[DillError, DebugNode]
+given Deserialize[DebugNode] = Deserialize.upReader[DebugNode]
 

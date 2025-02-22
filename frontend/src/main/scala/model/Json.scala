@@ -1,27 +1,33 @@
 package model
 
 import scala.util.Try
+import scala.util.Failure
+import scala.util.Success
 
 import upickle.default as up
 
 
+/* Error returned by Serializer/Deserializer */
+case class JsonError(private val msg: String)
+
+
 /* Defines JSON parsing interface */
-trait Deserialize[E <: DillError, O] {
-    def read(s: String, handleError: (Throwable => E)): Either[E, O]
+trait Deserialize[O] {
+    def read(s: String): Either[JsonError, O]
 }
 
 object Deserialize {
     /* Expose deserialize object for calling read function */
-    def apply[E <: DillError, O](using deserialize: Deserialize[E, O]) = deserialize 
+    def apply[O](using deserialize: Deserialize[O]) = deserialize 
     
     type upickle[T] = up.Reader[T]
 
     /* Delegate to upickle for JSON reading */
-    given upReader: [E <: DillError, O: up.Reader] => Deserialize[E, O] {
-        def read(s: String, handleError: (Throwable => E)) = {
-            Try(up.read[O](s).nn)
-                .toEither
-                .swap.map(handleError).swap
+    given upReader: [O: up.Reader] => Deserialize[O] {
+        def read(s: String) = {
+            Try(up.read[O](s).nn) match 
+                case Failure(err) => Left(JsonError(err.getMessage))
+                case Success(value) => Right(value)
         }
     }
     
@@ -29,26 +35,23 @@ object Deserialize {
 
 
 /* Defines JSON writing interface */
-trait Serialize[E <: DillError, I] {
-    def write(input: I, handleError: (Throwable => E)): Either[E, String]
+trait Serialize[JsonError, I] {
+    def write(input: I): Either[JsonError, String]
 }
 
 object Serialize {
     /* Expose serialize object for calling write function */
-    def apply[E <: DillError, I](using serialize: Serialize[E, I]) = serialize 
+    def apply[I](using serialize: Serialize[JsonError, I]) = serialize 
     
     type upickle[T] = up.Writer[T]
 
     /* Delegate to upickle for JSON writing */
-    given upWriter: [E <: DillError, I: up.Writer] => Serialize[E, I] {
-        def write(input: I, handleError: (Throwable => E)) = {
-            Try(up.write[I](input).nn)
-                .toEither 
-                .swap.map(handleError).swap
+    given upWriter: [I: up.Writer] => Serialize[JsonError, I] {
+        def write(input: I) = {
+            Try(up.write[I](input).nn) match
+                case Failure(err) => Left(JsonError(err.getMessage))
+                case Success(value) => Right(value)
         }
     }
 
 }
-
-
-
