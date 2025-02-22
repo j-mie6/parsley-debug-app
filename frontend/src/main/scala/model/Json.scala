@@ -12,18 +12,18 @@ case class JsonError(private val msg: String)
 
 
 /* Defines JSON parsing interface */
-trait Deserialize[O] {
+trait Reader[O] {
     def read(s: String): Either[JsonError, O]
 }
 
-object Deserialize {
+object Reader {
     /* Expose deserialize object for calling read function */
-    def apply[O](using deserialize: Deserialize[O]) = deserialize 
+    def apply[O](using deserialize: Reader[O]) = deserialize 
     
     type upickle[T] = up.Reader[T]
 
     /* Delegate to upickle for JSON reading */
-    given upReader: [O: up.Reader] => Deserialize[O] {
+    given upickleReader: [O: upickle] => Reader[O] {
         def read(s: String) = {
             Try(up.read[O](s).nn) match 
                 case Failure(err) => Left(JsonError(err.getMessage))
@@ -35,18 +35,18 @@ object Deserialize {
 
 
 /* Defines JSON writing interface */
-trait Serialize[JsonError, I] {
+trait Writer[JsonError, I] {
     def write(input: I): Either[JsonError, String]
 }
 
-object Serialize {
+object Writer {
     /* Expose serialize object for calling write function */
-    def apply[I](using serialize: Serialize[JsonError, I]) = serialize 
+    def apply[I](using serialize: Writer[JsonError, I]) = serialize 
     
     type upickle[T] = up.Writer[T]
 
     /* Delegate to upickle for JSON writing */
-    given upWriter: [I: up.Writer] => Serialize[JsonError, I] {
+    given upickleWriter: [I: upickle] => Writer[JsonError, I] {
         def write(input: I) = {
             Try(up.write[I](input).nn) match
                 case Failure(err) => Left(JsonError(err.getMessage))

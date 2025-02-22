@@ -8,7 +8,7 @@ import com.raquo.laminar.api.L.*
 import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent}
 
 import model.DebugTree
-import model.Deserialize
+import model.Reader
 import model.JsonError
 
 
@@ -16,7 +16,7 @@ sealed trait Event(private val name: String) {
     
     /* Output type associated with Event */
     type Out
-    given Deserialize[Out] = scala.compiletime.deferred
+    given Reader[Out] = scala.compiletime.deferred
 
     type UnlistenFn = () => Unit
 
@@ -32,7 +32,7 @@ sealed trait Event(private val name: String) {
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
         val responseStream: EventStream[Either[JsonError, Out]] = stream
-            .map((json: String) => Deserialize[Out].read(json))
+            .map((json: String) => Reader[Out].read(json))
 
         (responseStream, unlisten)
     }

@@ -7,9 +7,9 @@ import com.raquo.laminar.api.L.*
 import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
-import model.Deserialize
 import model.DebugTree
 import model.DebugNode
+import model.Reader
 import model.JsonError
 
 
@@ -37,7 +37,7 @@ sealed trait Command(private val name: String) {
 
     /* Response type associated with Command */
     type Out
-    given Deserialize[Out] = scala.compiletime.deferred 
+    given Reader[Out] = scala.compiletime.deferred 
 
 
     /* Invoke backend command using Tauri JS interface */
@@ -49,7 +49,7 @@ sealed trait Command(private val name: String) {
         
         /* Start EventStream from invoke and deserialise invoke response */
         EventStream.fromJsPromise(invoke, emitOnce = true)
-            .map((json: String) => Deserialize[Out].read(json))
+            .map((json: String) => Reader[Out].read(json))
     }
 
 }

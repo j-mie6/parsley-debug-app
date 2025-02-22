@@ -7,8 +7,8 @@ package model
   * @param input the input string the tree node has to parse
   * @param root the debug tree root node
   */
-case class DebugTree(input: String, root: DebugNode) derives Deserialize.upickle
-given Deserialize[DebugTree] = Deserialize.upReader[DebugTree]
+case class DebugTree(input: String, root: DebugNode) derives Reader.upickle
+given Reader[DebugTree] = Reader.upickleReader[DebugTree]
 
 
 /**
@@ -24,6 +24,6 @@ given Deserialize[DebugTree] = Deserialize.upReader[DebugTree]
   * @param isLeaf if a node is a leaf
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean) derives Deserialize.upickle
-given Deserialize[DebugNode] = Deserialize.upReader[DebugNode]
+    childId: Int, input: String, isLeaf: Boolean) derives Reader.upickle
+given Reader[DebugNode] = Reader.upickleReader[DebugNode]
 
