@@ -4,7 +4,6 @@ import scala.util.Try
 import scala.scalajs.js
 
 import com.raquo.laminar.api.L.*
-import upickle.default as up
 import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
