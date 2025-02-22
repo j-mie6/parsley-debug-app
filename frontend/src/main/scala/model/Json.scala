@@ -14,7 +14,7 @@ object Deserialize {
     /* Expose deserialize object for calling read function */
     def apply[E <: DillError, O](using deserialize: Deserialize[E, O]) = deserialize 
     
-    type upickle[T] = up.Reader[T];
+    type upickle[T] = up.Reader[T]
 
     /* Delegate to upickle for JSON reading */
     given upReader: [E <: DillError, O: up.Reader] => Deserialize[E, O] {
@@ -37,7 +37,7 @@ object Serialize {
     /* Expose serialize object for calling write function */
     def apply[E <: DillError, I](using serialize: Serialize[E, I]) = serialize 
     
-    type upickle[T] = up.Writer[T];
+    type upickle[T] = up.Writer[T]
 
     /* Delegate to upickle for JSON writing */
     given upWriter: [E <: DillError, I: up.Writer] => Serialize[E, I] {
