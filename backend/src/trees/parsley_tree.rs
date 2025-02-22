@@ -92,7 +92,8 @@ pub mod test {
                 "fromOffset": 0,
                 "toOffset": 4,
                 "children": []
-            }
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -148,7 +149,8 @@ pub mod test {
                         ]
                     }
                 ]
-            }
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
