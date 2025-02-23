@@ -1,8 +1,8 @@
 package model
 
-import scala.util.Try
-import scala.util.Failure
-import scala.util.Success
+import scala.util.{Try, Failure, Success}
+import scala.deriving.Mirror
+import scala.reflect.ClassTag
 
 import upickle.default as up
 
@@ -20,7 +20,11 @@ object Reader {
     /* Expose deserialize object for calling read function */
     def apply[O](using deserialize: Reader[O]) = deserialize 
     
-    type upickle[T] = up.Reader[T]
+    /* Define upickle reader */
+    type upickle[O] = up.Reader[O]
+    object upickle {
+        inline def derived[O](using Mirror.Of[O]) = up.Reader.derived[O]
+    }
 
     /* Delegate to upickle for JSON reading */
     given upickleReader: [O: upickle] => Reader[O] {
@@ -35,18 +39,22 @@ object Reader {
 
 
 /* Defines JSON writing interface */
-trait Writer[JsonError, I] {
+trait Writer[I] {
     def write(input: I): Either[JsonError, String]
 }
 
 object Writer {
     /* Expose serialize object for calling write function */
-    def apply[I](using serialize: Writer[JsonError, I]) = serialize 
-    
-    type upickle[T] = up.Writer[T]
+    def apply[I](using serialize: Writer[I]) = serialize 
 
+    /* Define upickle writer */
+    type upickle[T] = up.Writer[T] 
+    object upickle {
+        inline def derived[T](using Mirror.Of[T], ClassTag[T]) = up.Writer.derived[T]
+    }
+    
     /* Delegate to upickle for JSON writing */
-    given upickleWriter: [I: upickle] => Writer[JsonError, I] {
+    given upickleWriter: [I: upickle] => Writer[I] {
         def write(input: I) = {
             Try(up.write[I](input).nn) match
                 case Failure(err) => Left(JsonError(err.getMessage))

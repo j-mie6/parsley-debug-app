@@ -8,7 +8,6 @@ package model
   * @param root the debug tree root node
   */
 case class DebugTree(input: String, root: DebugNode) derives Reader.upickle
-given Reader[DebugTree] = Reader.upickleReader[DebugTree]
 
 
 /**
@@ -25,5 +24,4 @@ given Reader[DebugTree] = Reader.upickleReader[DebugTree]
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
     childId: Int, input: String, isLeaf: Boolean) derives Reader.upickle
-given Reader[DebugNode] = Reader.upickleReader[DebugNode]
 
