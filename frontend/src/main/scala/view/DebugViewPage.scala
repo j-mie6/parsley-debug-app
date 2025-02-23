@@ -66,15 +66,17 @@ abstract class DebugViewPage extends Page {
         fontSize.px := 25, marginRight.px := 10
     )
 
+    def genName: String = s"tree${rand.nextInt(100)}";
+
     /* Adds ability to save and store current tree. */
     private lazy val saveButton: Element = button(
         className := "save-button",
 
         saveIcon, /* Floppy disk icon */
 
-        onClick.mapTo(rand.nextInt(100).toString)
-            .compose(TabViewController.saveTree) 
-            --> TreeViewController.setTree
+        onClick.mapTo(genName).compose(TabViewController.saveTree) --> Observer.empty,
+        onClick.mapTo(genName) --> TabViewController.addFileName,
+        onClick(_ => TabViewController.getTab(genName).changes) --> TabViewController.setSelectedTab,
     )
 
     /* Button used to toggle the theme */
