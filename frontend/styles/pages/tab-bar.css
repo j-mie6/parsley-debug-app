@@ -7,8 +7,8 @@
     flex-shrink: 0;
     align-items: flex-end;
     justify-content: flex-start;
-    
-    gap: 3px;
+
+    gap: 2px;
     
     margin-left: 20px;
     margin-right: 20px;
@@ -22,17 +22,16 @@
 
 .tab-button {
     position: relative;
-    flex-shrink: 0;
-
-    height: 20px;
+    
+    height: 21px;
     min-width: 80px;
 
-    padding: 0 10px;
+    padding: 0 20px;
     margin: 0;
 
     border: none;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 
     color: var(--font-color-secondary);
     background-color: var(--tab); 
@@ -48,14 +47,15 @@
 }
 
 .tab-button.selected {
-    height: 23px;
     background-color: var(--tab-selected);
     font-weight: bold;
+    margin: 0 1px; /* Small extra margin if selected */
 }
 
 .close-tab-button {
     border-color: transparent;
     background-color: transparent;
+    color: var(--font-color-secondary);
     transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
     border-radius: 50%;
     position: relative;
@@ -64,7 +64,6 @@
     height: 16px;
     margin-left: 8px;
     padding: 0;
-
 }
 
 .close-tab-button:hover {
