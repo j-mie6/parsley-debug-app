@@ -52,7 +52,7 @@ object TabView {
 
             /* Deletes the respective tab */
             onClick(event => event.sample(TabViewController.getFileName(index))
-                .compose(TabViewController.deleteSavedTree)
+                .flatMapMerge(TabViewController.deleteSavedTree)
             ) --> TabViewController.setFileNames,
         )
     }
@@ -62,7 +62,7 @@ object TabView {
             className:= "tab-bar",
 
             TabViewController.getSelectedFileName.changes
-                .compose(TabViewController.loadSavedTree)
+                .flatMapMerge(TabViewController.loadSavedTree)
                 --> TreeViewController.setTree,
 
             /* Renders tabs */ 

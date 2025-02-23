@@ -34,11 +34,7 @@ object TabViewController {
     def addFileName: Observer[String] = fileNames.updater((names, name) => names :+ name)
     
     /* Fetches all tree names saved by the user from the backend */
-    def loadFileNames: Signal[List[String]] = {
-        Tauri.invoke(Command.FetchSavedTreeNames, ())
-            .collectRight
-            .toSignal(Nil)
-    }
+    def loadFileNames: EventStream[List[String]] = Tauri.invoke(Command.FetchSavedTreeNames, ()).collectRight
 
     /* Returns true if there are no saved trees */
     def noSavedTrees: Signal[Boolean] = getFileNames.signal.map(_.isEmpty)
@@ -67,16 +63,12 @@ object TabViewController {
     def saveTree(name: String): EventStream[Unit] = Tauri.invoke(Command.SaveTree, name).collectRight
 
     /* Loads a saved tree from the backend as DebugTree */
-    def loadSavedTree(name: EventStream[String]): EventStream[DebugTree] = {
-        name.flatMapMerge(Tauri.invoke(Command.LoadSavedTree, _))
-            .collectRight
-    }
+    def loadSavedTree(name: String): EventStream[DebugTree] = Tauri.invoke(Command.LoadSavedTree, name).collectRight
 
     /* Delete tree loaded within tab, returning updated list of names */
-    def deleteSavedTree(name: EventStream[String]): EventStream[List[String]] = {
-        name.flatMapMerge(Tauri.invoke(Command.DeleteTree, _))
-            .collectRight
-            .sample(loadFileNames)
+    def deleteSavedTree(name: String): EventStream[List[String]] = {
+        Tauri.invoke(Command.DeleteTree, name).collectRight
+            .compose(_ => loadFileNames)
     }
 
 }
