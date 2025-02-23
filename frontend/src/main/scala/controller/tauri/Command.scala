@@ -8,8 +8,7 @@ import upickle.default as up
 import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
-import model.DebugTree
-import model.DebugNode
+import model.{DebugTree, DebugNode}
 import controller.tauri.Args
 
 

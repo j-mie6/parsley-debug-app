@@ -22,7 +22,6 @@ object MainView extends DebugViewPage {
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
     }
 
-    
 
     /* Listen for posted tree */
     val (treeStream, unlistenTree) = Tauri.listen(Event.TreeReady)

@@ -34,7 +34,6 @@ pub enum EventError {
 }
 
 /* Event error conversions */
-
 impl From<serde_json::Error> for EventError {
     fn from(_: serde_json::Error) -> Self {
         EventError::SerializeFailed
