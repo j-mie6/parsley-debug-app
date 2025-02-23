@@ -52,7 +52,7 @@ object TabView {
 
             /* Deletes the respective tab */
             onClick(event => event.sample(TabViewController.getFileName(index))
-                .compose(TabViewController.deleteTab)
+                .compose(TabViewController.deleteSavedTree)
             ) --> TabViewController.setFileNames,
         )
     }

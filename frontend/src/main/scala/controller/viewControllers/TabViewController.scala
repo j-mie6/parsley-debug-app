@@ -70,7 +70,7 @@ object TabViewController {
     }
 
     /* Delete tree loaded within tab, returning updated list of names */
-    def deleteTab(name: EventStream[String]): EventStream[List[String]] = {
+    def deleteSavedTree(name: EventStream[String]): EventStream[List[String]] = {
         name.flatMapMerge(Tauri.invoke(Command.DeleteTree, _))
             .collectRight
             .sample(loadFileNames)
