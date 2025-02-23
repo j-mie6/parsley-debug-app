@@ -14,6 +14,7 @@ object TabView {
     val inputName: Var[String] = Var("")
 
     /* Input for the name of the tree to be saved */
+    //TODO: use for naming saved trees
     val nameInput: HtmlElement = {
         input(
             typ := "text",
@@ -31,7 +32,7 @@ object TabView {
             className := "tab-button",
 
             /* Passing on the signal of the selected tab to each tab*/
-            cls("selected") <-- TabViewController.isSelectedTab(tabName),
+            cls("selected") <-- TabViewController.tabSelected(tabName),
             transition := "all 0.5s", //TODO: move to css
 
             tabName,
@@ -39,7 +40,7 @@ object TabView {
 
             /* Sets selected tab signal to newly selected tab */
             onClick(_ => TabViewController.getTab(tabName)) 
-                --> TabViewController.setSelectedTab
+                --> TabViewController.setSelectedTab //FIXME
         )
     }
 
@@ -51,8 +52,8 @@ object TabView {
             i(className := "bi bi-x"),
 
             /* Deletes the respective tab */
-            onClick(_ => TabViewController.deleteTab(tabTitle)) 
-                --> TabViewController.setFileNames,
+            onClick.mapTo(tabTitle)(TabViewController.deleteTab(_)) 
+                --> TabViewController.setFileNames, //FIXME
         )
     }
     

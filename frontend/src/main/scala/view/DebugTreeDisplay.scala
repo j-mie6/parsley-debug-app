@@ -5,8 +5,7 @@ import com.raquo.laminar.api.L.*
 import model.{DebugTree, DebugNode, ReactiveNode}
 
 import controller.viewControllers.MainViewController
-import controller.tauri.Tauri
-import controller.tauri.Command
+import controller.tauri.{Tauri, Command}
 
 /**
 * Object containing rendering methods for the Debug Tree Display, which is
@@ -42,9 +41,11 @@ object DebugTreeDisplay {
     */
     def apply(tree: DebugTree): HtmlElement = div(
         className := "debug-tree-display zoom-container",
-        ReactiveNodeDisplay(ReactiveNode(tree.root)),
+        
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
-        wheelHandler
+        wheelHandler,
+        
+        ReactiveNodeDisplay(ReactiveNode(tree.root)),
     )
 }
 

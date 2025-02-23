@@ -15,6 +15,6 @@ object InputViewController {
     def getInput: Signal[String] = input.signal
 
     /* Set input string */
-    def setInput = input.writer
+    def setInput: Observer[String] = input.writer
 
 }
