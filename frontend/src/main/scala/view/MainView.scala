@@ -13,11 +13,16 @@ import controller.viewControllers.{MainViewController, TreeViewController, Input
 
 object MainView extends DebugViewPage {
     
-    /* Random number generator */
-    private val rand = new Random
+    /* File counter */
+    object Counter {
+        private val num: Var[Int] = Var(0)
+        val increment: Observer[Unit] = num.updater((x, unit) => x + 1)
+
+        /* Generate random name for file */
+        def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
+    }
+
     
-    /* Generate random name for file */
-    def genName: String = s"tree-${rand.nextInt(100)}"
 
     /* Listen for posted tree */
     val (treeStream, unlistenTree) = Tauri.listen(Event.TreeReady)
@@ -35,9 +40,10 @@ object MainView extends DebugViewPage {
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
 
                 /* Save any new trees when received */
-                newTreeStream.collectRight.mapTo(genName)
+                newTreeStream.collectRight.sample(Counter.genName)
                     .tapEach(TabViewController.saveTree)
                     .tapEach(TabViewController.addFileName.onNext)
+                    .tapEach(_ => Counter.increment.onNext(()))
                     .flatMapSwitch(TabViewController.getFileNameIndex)
                     --> TabViewController.setSelectedTab,
 
