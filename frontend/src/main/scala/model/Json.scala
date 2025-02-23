@@ -10,6 +10,13 @@ import upickle.default as up
 /* Error returned by Serializer/Deserializer */
 case class JsonError(private val msg: String)
 
+/* Convert Try to Either containing JsonError or Output */
+private def tryToEither[O](tryError: Try[O]): Either[JsonError, O] = {
+    tryError match 
+        case Failure(err) => Left(JsonError(err.getMessage))
+        case Success(value) => Right(value)
+}
+
 
 /* Defines JSON parsing interface */
 trait Reader[O] {
@@ -28,11 +35,7 @@ object Reader {
 
     /* Delegate to upickle for JSON reading */
     given upickleReader: [O: upickle] => Reader[O] {
-        def read(s: String) = {
-            Try(up.read[O](s).nn) match 
-                case Failure(err) => Left(JsonError(err.getMessage))
-                case Success(value) => Right(value)
-        }
+        def read(s: String) = tryToEither(Try(up.read[O](s).nn))
     }
     
 }
@@ -55,11 +58,7 @@ object Writer {
     
     /* Delegate to upickle for JSON writing */
     given upickleWriter: [I: upickle] => Writer[I] {
-        def write(input: I) = {
-            Try(up.write[I](input).nn) match
-                case Failure(err) => Left(JsonError(err.getMessage))
-                case Success(value) => Right(value)
-        }
+        def write(input: I) = tryToEither(Try(up.write[I](input).nn))
     }
 
 }
