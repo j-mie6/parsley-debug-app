@@ -63,7 +63,7 @@ object TabViewController {
     def saveTree(name: String): EventStream[Unit] = Tauri.invoke(Command.SaveTree, name).collectRight
 
     /* Loads a saved tree from the backend as DebugTree */
-    def loadSavedTree(name: String): EventStream[DebugTree] = Tauri.invoke(Command.LoadSavedTree, name).collectRight
+    def loadSavedTree(name: String): EventStream[Unit] = Tauri.invoke(Command.LoadSavedTree, name).collectRight
 
     /* Delete tree loaded within tab, returning updated list of names */
     def deleteSavedTree(name: String): EventStream[List[String]] = {

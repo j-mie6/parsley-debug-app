@@ -103,7 +103,7 @@ object Command {
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
-        type Out = DebugTree
+        type Out = Unit
     }
 
     case object DeleteTree extends Command("delete_tree") {
