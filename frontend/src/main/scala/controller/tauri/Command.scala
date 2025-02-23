@@ -41,7 +41,7 @@ sealed trait Command(private val name: String) {
 
     
     /* Invoke backend command using Tauri JS interface */
-    protected[tauri] def invoke(args: In): EventStream[Tauri.Response[Out]] = {
+    private[tauri] def invoke(args: In): EventStream[Tauri.Response[Out]] = {
         val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */

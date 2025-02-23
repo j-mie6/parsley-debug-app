@@ -22,7 +22,7 @@ sealed trait Event(private val name: String) {
 
     
     /* Listen to backend event using Tauri JS interface */
-    protected[tauri] def listen(): (EventStream[Response[Out]], Future[UnlistenFn]) = {
+    private[tauri] def listen(): (EventStream[Response[Out]], Future[UnlistenFn]) = {
         val (stream, callback) = EventStream.withCallback[String]
         
         /* Call Tauri function and get future of unlisten function */
