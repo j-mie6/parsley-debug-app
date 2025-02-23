@@ -39,7 +39,7 @@ object TabView {
             closeTabButton(index),
 
             /* Sets selected tab signal to newly selected tab */
-            onClick.mapTo(index) --> TabViewController.setSelectedTab //FIXME
+            onClick.mapTo(index) --> TabViewController.setSelectedTab
         )
     }
 
@@ -61,9 +61,7 @@ object TabView {
         div(
             className:= "tab-bar",
 
-            //TODO: neaten and move to TreeViewController
-            TabViewController.getSelectedTab.changes
-                .flatMapSwitch(TabViewController.getFileName)
+            TabViewController.getSelectedFileName.changes
                 .compose(TabViewController.loadSavedTree)
                 --> TreeViewController.setTree,
 

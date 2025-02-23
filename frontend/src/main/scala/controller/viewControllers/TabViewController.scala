@@ -55,6 +55,9 @@ object TabViewController {
             
     /* Get selected tab index */
     def getSelectedTab: Signal[Int] = selectedTab.signal
+    
+    /* Get name of tree associated with selected tab */
+    def getSelectedFileName: Signal[String] = selectedTab.signal.flatMapSwitch(getFileName)
 
     /* Checks if tab is currently selected */
     def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)
