@@ -8,6 +8,8 @@ import controller.tauri.Tauri
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.tauri.Command
+import model.DebugTree
+import controller.viewControllers.InputViewController
 
 
 object TabView {
@@ -57,13 +59,17 @@ object TabView {
         )
     }
     
+    /* Loaded tree from selected tab */
+    val treeStream: EventStream[DebugTree] = TabViewController.getSelectedFileName.changes
+        .flatMapMerge(TabViewController.loadSavedTree)
+
+
     def apply(): HtmlElement = {
         div(
             className:= "tab-bar",
-
-            TabViewController.getSelectedFileName.changes
-                .flatMapMerge(TabViewController.loadSavedTree)
-                --> TreeViewController.setTree,
+            
+            treeStream --> TreeViewController.setTree,
+            treeStream.map(_.input) --> InputViewController.setInput,
 
             /* Renders tabs */ 
             children <-- TabViewController.getFileNames.signal.map(
