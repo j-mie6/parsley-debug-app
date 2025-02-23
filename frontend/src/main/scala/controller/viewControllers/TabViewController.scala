@@ -62,12 +62,8 @@ object TabViewController {
     def tabSelected(name: String): Signal[Boolean] = getSelectedTab.map(_ == name)
 
 
-    //FIXME
     /* Saves current tree to the backend with given name, returning assigned tab index  */
-    def saveTree(name: EventStream[String]): EventStream[Unit] = {
-        name.flatMapMerge(Tauri.invoke(Command.SaveTree, _))
-            .collectRight
-    } 
+    def saveTree(name: String): EventStream[Unit] = Tauri.invoke(Command.SaveTree, name).collectRight
 
     /* Loads a saved tree from the backend as DebugTree */
     def loadSavedTree(name: EventStream[String]): EventStream[DebugTree] = {

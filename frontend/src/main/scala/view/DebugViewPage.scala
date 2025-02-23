@@ -16,6 +16,7 @@ import controller.viewControllers.MainViewController.View
 import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
+import controller.viewControllers.InputViewController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -66,17 +67,17 @@ abstract class DebugViewPage extends Page {
         fontSize.px := 25, marginRight.px := 10
     )
 
-    def genName: String = s"tree${rand.nextInt(100)}";
-
+    def getName: Signal[String] = InputViewController.getInput
+        .map((input: String) => s"${input.slice(0, 6)}-tree")
+        
     /* Adds ability to save and store current tree. */
     private lazy val saveButton: Element = button(
         className := "save-button",
 
         saveIcon, /* Floppy disk icon */
 
-        onClick.mapTo(genName).compose(TabViewController.saveTree) --> Observer.empty,
-        onClick.mapTo(genName) --> TabViewController.addFileName,
-        onClick(_ => TabViewController.getTab(genName).changes) --> TabViewController.setSelectedTab,
+        onClick(event => event.sample(getName).tapEach(TabViewController.saveTree)) --> TabViewController.addFileName,
+        onClick(event => event.sample(getName).flatMapSwitch(TabViewController.getTab)) --> TabViewController.setSelectedTab,
     )
 
     /* Button used to toggle the theme */
@@ -88,7 +89,7 @@ abstract class DebugViewPage extends Page {
         
         /* Render moonIcon in light mode; sunIcon in dark mode */
         child <-- AppStateController.isLightMode.signal
-            .map(if (_) then moonIcon else sunIcon),
+            .map(if (_) then moonIcon else sunIcon), 
 
         onClick.mapToUnit --> AppStateController.toggleTheme()
     )
