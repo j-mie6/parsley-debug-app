@@ -3,10 +3,11 @@ import org.scalatest
 import org.scalatest.flatspec.AnyFlatSpec   
 import org.scalatest.matchers.*
 
-import upickle.default as up
-
 import model.DebugTree
 import model.DebugNode
+import model.JsonError
+import model.Reader
+import model.Writer
 
 
 class Test extends AnyFlatSpec with should.Matchers {
@@ -24,9 +25,11 @@ class Test extends AnyFlatSpec with should.Matchers {
         }
     }"""
 
-    val tree: DebugTree = up.read[DebugTree](jsonTree)
     
     "The tree" should "be deserialised" in {
+        val parsed: Either[JsonError, DebugTree] = Reader[DebugTree].read(jsonTree)
+        val tree: DebugTree = parsed.toOption.get /* Throws exception if JsonError is returned */
+
         /* Check that the root tree has been deserialised correctly */
         tree.input should be ("Test")
         tree.root.nodeId should be (0)
@@ -40,6 +43,6 @@ class Test extends AnyFlatSpec with should.Matchers {
 
     it should "not be deserialised if the JSON is not properly formatted" in {
         val wrongJson: String = "Testing..."
-        Try(up.read[DebugTree](wrongJson)) shouldBe a [Failure[?]]
+        assert(Reader[DebugTree].read(wrongJson).isLeft)
     }
 }
