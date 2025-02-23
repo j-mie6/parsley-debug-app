@@ -18,11 +18,10 @@ object AppStateController {
     
     /* Toggle the current page theme */
     def updateDomTheme(): Observer[Boolean] = {
-        Observer(
-            (isLightTheme: Boolean) => 
-                dom.document
-                .documentElement
-                .setAttribute("data-theme", if isLightTheme then "dark" else "light")
+        Observer((isLightTheme: Boolean) => 
+            dom.document
+            .documentElement
+            .setAttribute("data-theme", if isLightTheme then "dark" else "light")
         )
     }
 
