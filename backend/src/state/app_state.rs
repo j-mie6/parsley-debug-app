@@ -63,8 +63,9 @@ impl StateManager for AppState {
         /* Update tree */
         state.tree = Some(tree);
     
-        /* Notify frontend listener - call inline to avoid deadlock */        
-        state.app.emit(Event::TreeReady(&state.tree.as_ref().unwrap()))
+        /* Unwrap cannot fail as tree has just been set */
+        let event: Event = Event::TreeReady(&state.tree.as_ref().unwrap());
+        state.app.emit(event) /* Notify frontend listener - call inline to avoid deadlock */ 
             .map_err(|_| StateError::EventEmitFailed)
     }
     
