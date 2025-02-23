@@ -51,9 +51,9 @@ object Writer {
     def apply[I](using serialize: Writer[I]) = serialize 
 
     /* Define upickle writer */
-    type upickle[T] = up.Writer[T] 
+    type upickle[I] = up.Writer[I] 
     object upickle {
-        inline def derived[T](using Mirror.Of[T], ClassTag[T]) = up.Writer.derived[T]
+        inline def derived[I](using Mirror.Of[I], ClassTag[I]) = up.Writer.derived[I]
     }
     
     /* Delegate to upickle for JSON writing */
