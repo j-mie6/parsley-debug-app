@@ -55,6 +55,7 @@ object TabView {
             /* Deletes the respective tab */
             onClick(event => event.sample(TabViewController.getFileName(index))
                 .flatMapMerge(TabViewController.deleteSavedTree)
+                .tapEach(_ => EventStream.fromValue(0) --> TabViewController.setSelectedTab)
             ) --> TabViewController.setFileNames,
         )
     }
