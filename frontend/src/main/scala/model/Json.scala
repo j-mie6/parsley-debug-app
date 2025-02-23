@@ -19,7 +19,7 @@ private def tryToEither[O](tryError: Try[O]): Either[JsonError, O] = {
 
 
 /* Defines JSON parsing interface */
-trait Reader[O] {
+trait Reader[+O] {
     def read(s: String): Either[JsonError, O]
 }
 
@@ -42,7 +42,7 @@ object Reader {
 
 
 /* Defines JSON writing interface */
-trait Writer[I] {
+trait Writer[-I] {
     def write(input: I): Either[JsonError, String]
 }
 
