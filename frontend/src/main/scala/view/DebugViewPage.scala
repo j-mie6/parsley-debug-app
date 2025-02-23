@@ -67,20 +67,20 @@ abstract class DebugViewPage extends Page {
         fontSize.px := 25, marginRight.px := 10
     )
 
-    def getName: Signal[String] = InputViewController.getInput
-        .map((input: String) => s"${input.slice(0, 6)}-tree")
-        
+    /* Generate random name for file */
+    def getName: String = s"tree-${rand.nextInt(100)}"
+
     /* Adds ability to save and store current tree. */
     private lazy val saveButton: Element = button(
         className := "save-button",
 
         saveIcon, /* Floppy disk icon */
 
-        onClick(event => event.sample(getName)
+        onClick.mapTo(getName)
             .tapEach(TabViewController.saveTree)
             .tapEach(TabViewController.addFileName.onNext)
-            .flatMapSwitch(TabViewController.getFileNameIndex)
-        ) --> TabViewController.setSelectedTab
+            .flatMapSignal(TabViewController.getFileNameIndex)
+            --> TabViewController.setSelectedTab
     )
 
     /* Button used to toggle the theme */
