@@ -22,8 +22,8 @@ object TabViewController {
     private val fileNames: Var[List[String]] = Var(Nil)
 
     /* Expose writing facilities */
-    def setFileNames(): Observer[List[String]] = fileNames.writer
-    def addFileName(): Observer[String] = fileNames.updater((names, name) => names :+ name)
+    def setFileNames: Observer[List[String]] = fileNames.writer
+    def addFileName: Observer[String] = fileNames.updater((names, name) => names :+ name)
     
     /* Fetches all tree names saved by the user from the backend */
     def getFileNames: Signal[List[String]] = {
@@ -37,28 +37,24 @@ object TabViewController {
     private lazy val selectedTab: Var[Int] = Var(0)
 
     //TODO: see if this can be moved into setSelectedTab()
-    def getTab(tabName: String): Signal[Int] = {
-        getFileNames.map((names: List[String]) => names.indexOf(tabName))
-    } 
+    def getTab(tabName: String): Signal[Int] = getFileNames.map(_.indexOf(tabName))
 
     /* Set current selected tab index */
-    def setSelectedTab(): Observer[Int] = selectedTab.writer
+    def setSelectedTab: Observer[Int] = selectedTab.writer
             
     /* Get selected tab name */
     def getSelectedTab: Signal[String] = {
-        fileNames.signal.withCurrentValueOf(selectedTab.signal).map((names, i) => names(i))
+        fileNames.signal
+            .withCurrentValueOf(selectedTab.signal)
+            .map((names, i) => names(i))
     }
 
     /* Checks if tab is currently selected */
     def isSelectedTab(tabTitle: String): Signal[Boolean] = getSelectedTab.map(_ == tabTitle)
 
 
-    /**
-      * Returns true if there are no saved trees
-      */
-    def noSavedTrees: Signal[Boolean] = {
-        getFileNames.signal.map(names => names.isEmpty)
-    }
+    /* Returns true if there are no saved trees */
+    def noSavedTrees: Signal[Boolean] = getFileNames.signal.map(_.isEmpty)
 
 
     /**

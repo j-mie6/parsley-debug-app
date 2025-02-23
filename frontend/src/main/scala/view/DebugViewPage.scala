@@ -12,6 +12,7 @@ import model.Page
 
 import controller.AppStateController
 import controller.tauri.Tauri
+import controller.viewControllers.MainViewController.View
 import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
@@ -36,21 +37,17 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-left",
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewController.isTreeView(true),
+            cls("selected") <-- MainViewController.getView.map(_ == View.Tree),
             treeIcon,
             h2("Tree View", marginLeft.px := 7),
-            onClick --> { _ => 
-                MainViewController.setIsTreeView(true) 
-            }
+            onClick.mapTo(View.Tree) --> MainViewController.setView,
         ),
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewController.isTreeView(false),
+            cls("selected") <-- MainViewController.getView.map(_ == View.Input),
             fileIcon,
             h2("Input View", marginLeft.px := 12),
-            onClick --> { _ => 
-                MainViewController.setIsTreeView(false) 
-            }
+            onClick.mapTo(View.Tree) --> MainViewController.setView,
         )
     )
 
@@ -77,7 +74,7 @@ abstract class DebugViewPage extends Page {
 
         onClick.mapTo(rand.nextInt(100).toString)
             .compose(TabViewController.saveTree) 
-            --> TreeViewController.setTree()
+            --> TreeViewController.setTree
     )
 
     /* Button used to toggle the theme */
@@ -128,7 +125,6 @@ abstract class DebugViewPage extends Page {
       * @return HTML element of the DebugView page.
       */
     override def render(child: Option[HtmlElement]): HtmlElement = {
-
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,

@@ -38,7 +38,8 @@ object TabView {
             closeTabButton(tabName),
 
             /* Sets selected tab signal to newly selected tab */
-            onClick(_ => TabViewController.getTab(tabName)) --> TabViewController.setSelectedTab()
+            onClick(_ => TabViewController.getTab(tabName)) 
+                --> TabViewController.setSelectedTab
         )
     }
 
@@ -50,7 +51,8 @@ object TabView {
             i(className := "bi bi-x"),
 
             /* Deletes the respective tab */
-            onClick(_ => TabViewController.deleteTab(tabTitle)) --> TabViewController.setFileNames(),
+            onClick(_ => TabViewController.deleteTab(tabTitle)) 
+                --> TabViewController.setFileNames,
         )
     }
     
@@ -61,7 +63,7 @@ object TabView {
             //TODO: neaten and move to TreeViewController
             TabViewController.getSelectedTab.changes
                 .compose(TabViewController.loadSavedTree) 
-                --> TreeViewController.setTree(),
+                --> TreeViewController.setTree,
 
             /* Renders tabs */ 
             children <-- TabViewController.getFileNames.signal.map(

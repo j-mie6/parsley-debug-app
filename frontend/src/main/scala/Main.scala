@@ -14,6 +14,5 @@ import controller.tauri.Tauri
     renderOnDomContentLoaded(
         dom.document.getElementById("app"),
         MainView()
-
     )
 }

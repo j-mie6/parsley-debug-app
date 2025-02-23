@@ -6,9 +6,8 @@ import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 
 import controller.tauri.{Tauri, Event}
-import controller.viewControllers.MainViewController
-import controller.viewControllers.TreeViewController
 import controller.AppStateController
+import controller.viewControllers.{MainViewController, TreeViewController}
 
 
 object MainView extends DebugViewPage {
@@ -21,10 +20,10 @@ object MainView extends DebugViewPage {
                 AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
 
                 /* Update tree with TreeReady response */
-                stream.collectRight --> TreeViewController.setTree(),
+                stream.collectRight --> TreeViewController.setTree,
 
                 /* Load main page */
-                child <-- MainViewController.getMainView,
+                child <-- MainViewController.getViewElem,
 
                 /* Unlisten to TreeReady event */
                 onUnmountCallback(_ => unlisten.get)

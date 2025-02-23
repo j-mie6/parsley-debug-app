@@ -19,7 +19,7 @@ import controller.viewControllers.TreeViewController
   */
 
 object InputView {
-    def apply(): HtmlElement = div(
+    def apply(): HtmlElement = {
         h1(
             className := "debug-tree-title",
             
@@ -34,5 +34,5 @@ object InputView {
             
             text <-- InputViewController.getInput
         )
-    )
+    }
 }

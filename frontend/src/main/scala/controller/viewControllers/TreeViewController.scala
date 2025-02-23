@@ -17,9 +17,19 @@ object TreeViewController {
     private val tree: Var[Option[DebugTree]] = Var(None) 
 
     /* Helpers for writing the tree */
-    def setTree(): Observer[DebugTree] = tree.someWriter
-    def setTreeOpt(): Observer[Option[DebugTree]] = tree.writer
+    def setTree: Observer[DebugTree] = tree.someWriter
+    def setTreeOpt: Observer[Option[DebugTree]] = tree.writer
     
+    /* Gets display tree element */
+    def getDisplayTree: Signal[HtmlElement] = tree.signal.map(_ match 
+        /* Default tree view when no tree is loaded */
+        case None => div(
+            className := "tree-view-error",
+            "No tree found! Start debugging by attaching DillRemoteView to a parser"
+        )
+        case Some(tree) => DebugTreeDisplay(tree)
+    )
+
     
     /**
     * Fetch the debug tree root from the tauri backend.
@@ -27,20 +37,5 @@ object TreeViewController {
     * @param displayTree The var that the display tree HTML element will be written into.
     */
     def reloadTree(): EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
-    
-    
-    /* Default tree view when no tree is loaded */
-    private val noTreeFound: HtmlElement = div(
-        className := "tree-view-error",
-        "No tree found! Start debugging by attaching DillRemoteView to a parser"
-    )
-
-    /**
-     * Gets display tree element
-     */
-    def getDisplayTree: Signal[HtmlElement] = tree.signal.map(_ match 
-        case None => noTreeFound
-        case Some(tree) => DebugTreeDisplay(tree)
-    ) 
     
 }
