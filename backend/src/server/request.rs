@@ -113,7 +113,7 @@ pub mod test {
             .with(predicate::eq(debug_tree::test::tree()))
             .returning(|_| Ok(()));
         
-        mock.expect_emit().withf(|other| &Event::NewTree == other)
+        mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
         
         let client: blocking::Client = tracked_client(mock);
@@ -185,7 +185,7 @@ pub mod test {
 
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
         
-        mock.expect_emit().withf(|other| &Event::NewTree == other)
+        mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
 
         let client: blocking::Client = tracked_client(mock);

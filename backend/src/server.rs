@@ -37,7 +37,7 @@ pub mod test {
             .times(NUM_REPEATS)
             .returning(|_| Ok(()));
 
-        mock.expect_emit().withf(|other| &Event::NewTree == other)
+        mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
 
         mock.expect_get_tree()
