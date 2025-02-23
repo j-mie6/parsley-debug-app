@@ -47,7 +47,7 @@ abstract class DebugViewPage extends Page {
             cls("selected") <-- MainViewController.getView.map(_ == View.Input),
             fileIcon,
             h2("Input View", marginLeft.px := 12),
-            onClick.mapTo(View.Tree) --> MainViewController.setView,
+            onClick.mapTo(View.Input) --> MainViewController.setView,
         )
     )
 
