@@ -8,6 +8,7 @@ import org.scalajs.dom
 import controller.tauri.{Tauri, Event}
 import controller.AppStateController
 import controller.viewControllers.{MainViewController, TreeViewController}
+import controller.viewControllers.InputViewController
 
 
 object MainView extends DebugViewPage {
@@ -19,8 +20,9 @@ object MainView extends DebugViewPage {
                 /* Update DOM theme with theme value */
                 AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
 
-                /* Update tree with TreeReady response */
+                /* Update tree and input with TreeReady response */
                 stream.collectRight --> TreeViewController.setTree,
+                stream.collectRight.map(_.input) --> InputViewController.setInput,
 
                 /* Load main page */
                 child <-- MainViewController.getViewElem,
