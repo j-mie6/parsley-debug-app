@@ -22,6 +22,8 @@ object TreeViewController {
     /* Set debug tree (can be None) */
     def setTreeOpt: Observer[Option[DebugTree]] = tree.writer
     
+    def treeExists: Signal[Boolean] = tree.signal.map(_.isDefined)
+
     /* Get debug tree element */
     def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
         /* Default tree view when no tree is loaded */

@@ -101,9 +101,9 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-right",
         div(
             className := "debug-view-header-right-buttons",
-            saveButton,
+            child <-- TreeViewController.treeExists.map(if (_) then saveButton else div()),
             themeButton,
-            githubButton
+            githubButton,
         )
     )
 
