@@ -59,18 +59,15 @@ object TabView {
             ) --> TabViewController.setFileNames,
         )
     }
-    
-    /* Loaded tree from selected tab */
-    val treeStream: EventStream[Unit] = TabViewController.getSelectedFileName.changes
-        .flatMapMerge(TabViewController.loadSavedTree)
-
 
     def apply(): HtmlElement = {
         div(
             className:= "tab-bar",
 
-            /* Ensure tree stream fires */  
-            treeStream --> Observer.empty,
+            /* Update tree on new tab selected */  
+            TabViewController.getSelectedFileName.changes
+                .flatMapMerge(TabViewController.loadSavedTree) 
+                --> Observer.empty,
 
             /* Renders tabs */ 
             children <-- TabViewController.getFileNames.signal.map(
