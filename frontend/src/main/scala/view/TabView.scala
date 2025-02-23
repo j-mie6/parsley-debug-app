@@ -1,15 +1,13 @@
 package view
 
-import com.raquo.laminar.api.L.*
+import scala.util.Try
 
+import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 
-import controller.tauri.Tauri
-import controller.viewControllers.TabViewController
-import controller.viewControllers.TreeViewController
-import controller.tauri.Command
 import model.DebugTree
-import controller.viewControllers.InputViewController
+import controller.tauri.{Tauri, Command}
+import controller.viewControllers.{TabViewController, TreeViewController, InputViewController}
 
 
 object TabView {
@@ -35,7 +33,6 @@ object TabView {
 
             /* Passing on the signal of the selected tab to each tab*/
             cls("selected") <-- TabViewController.tabSelected(index),
-            transition := "all 0.5s", //TODO: move to css
 
             text <-- TabViewController.getFileName(index),
             closeTabButton(index),
@@ -60,14 +57,20 @@ object TabView {
         )
     }
 
+    /* Get selected file name as possible error */
+    val selectedTab: EventStream[Try[String]] = TabViewController.getSelectedFileName.changes.recoverToTry
+    
     def apply(): HtmlElement = {
         div(
             className:= "tab-bar",
-
+            
             /* Update tree on new tab selected */  
-            TabViewController.getSelectedFileName.changes
+            selectedTab.collectSuccess
                 .flatMapMerge(TabViewController.loadSavedTree) 
                 --> Observer.empty,
+
+            /* If no tab can be found, unload tree from frontend */  
+            selectedTab.collectFailure.mapToUnit --> TreeViewController.unloadTree,
 
             /* Renders tabs */ 
             children <-- TabViewController.getFileNames.signal.map(
