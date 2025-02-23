@@ -35,7 +35,7 @@
 
     color: var(--font-color-secondary);
     background-color: var(--tab); 
-    transition: background-color 0.2s ease-in-out;
+    transition: all 0.2s;
 
     box-shadow: none;
     white-space: nowrap;
