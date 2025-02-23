@@ -12,11 +12,13 @@ object AppStateController {
     /* Reactive variable representing the current page theme */
     private val theme: Var[Boolean] = Var(!dom.window.matchMedia("(prefers-color-scheme: dark)").matches)
     
+    /** Get boolean signal indicating whether light theme is active */
     val isLightMode: Signal[Boolean] = theme.signal
-    def toggleTheme(): Observer[Unit] = theme.updater((old: Boolean, unit: Unit) => !old)
 
+    /** Toggle theme between light and dark */
+    def toggleTheme(): Observer[Unit] = theme.updater((old: Boolean, unit: Unit) => !old)
     
-    /* Toggle the current page theme */
+    /** Set theme as DOM CSS page attribute */
     def updateDomTheme(): Observer[Boolean] = {
         Observer(
             (isLightTheme: Boolean) => dom.document

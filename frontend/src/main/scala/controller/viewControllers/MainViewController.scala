@@ -23,13 +23,13 @@ object MainViewController {
     /* Current view selected */
     private val view: Var[View] = Var(View.Tree)
 
-    /* Get view */
+    /** Get current selected view */
     def getView: Signal[View] = view.signal
 
-    /* Set selected view */
+    /** Set selected view */
     def setView: Observer[View] = view.writer
 
-    /* Gets selected view element */
+    /** Get selected view element */
     def getViewElem: Signal[HtmlElement] = view.signal.map(_.elem)
 
 }

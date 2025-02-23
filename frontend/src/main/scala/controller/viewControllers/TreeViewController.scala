@@ -16,19 +16,19 @@ object TreeViewController {
     /* Reactive DebugTree */
     private val tree: Var[Option[DebugTree]] = Var(None) 
 
-    /* Set debug tree */
+    /** Set debug tree */
     def setTree: Observer[DebugTree] = tree.someWriter
 
-    /* Set debug tree (can be None) */
+    /** Set optional debug tree (can be None) */
     def setTreeOpt: Observer[Option[DebugTree]] = tree.writer
 
-    /* Set debug tree to None to stop rendering */
+    /** Set debug tree to None to stop rendering */
     def unloadTree: Observer[Unit] = Observer(_ => tree.set(None))
     
-    /* Return true signal if tree is loaded into frontend */
+    /** Return true signal if tree is loaded into frontend */
     def treeExists: Signal[Boolean] = tree.signal.map(_.isDefined)
 
-    /* Get debug tree element */
+    /** Get debug tree element or warning if no tree found */
     def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
         /* Default tree view when no tree is loaded */
         case None => div(
@@ -40,7 +40,7 @@ object TreeViewController {
         case Some(tree) => DebugTreeDisplay(tree)
     )
 
-    /* Fetch the debug tree root from the backend, return in EventStream */
+    /** Fetch the debug tree root from the backend, return in EventStream */
     def reloadTree: EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
     
 }
