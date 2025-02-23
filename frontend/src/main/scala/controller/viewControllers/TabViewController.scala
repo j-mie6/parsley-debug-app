@@ -21,6 +21,9 @@ object TabViewController {
     /* List of file names (excluding path and ext) wrapped in Var */
     private val fileNames: Var[List[String]] = Var(Nil)
 
+    /* Get file name associated with tab at index */
+    def getFileName(index: Int): Signal[String] = fileNames.signal.map(_(index))
+
     /* Get list of file names */
     def getFileNames: Signal[List[String]] = fileNames.signal
 
@@ -47,19 +50,14 @@ object TabViewController {
     /* Set current selected tab index */
     def setSelectedTab: Observer[Int] = selectedTab.writer
 
-    //TODO: see if this can be moved into setSelectedTab()
     /* Get index of tab with associated name */
-    def getTab(name: String): Signal[Int] = getFileNames.map(_.indexOf(name))
+    def getFileNameIndex(name: String): Signal[Int] = getFileNames.map(_.indexOf(name))
             
-    /* Get selected tab name */
-    def getSelectedTab: Signal[String] = {
-        getFileNames
-            .combineWith(selectedTab.signal)
-            .map((names, i) => names(i))
-    }
+    /* Get selected tab index */
+    def getSelectedTab: Signal[Int] = selectedTab.signal
 
     /* Checks if tab is currently selected */
-    def tabSelected(name: String): Signal[Boolean] = getSelectedTab.map(_ == name)
+    def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)
 
 
     /* Saves current tree to the backend with given name, returning assigned tab index  */

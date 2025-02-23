@@ -76,8 +76,11 @@ abstract class DebugViewPage extends Page {
 
         saveIcon, /* Floppy disk icon */
 
-        onClick(event => event.sample(getName).tapEach(TabViewController.saveTree)) --> TabViewController.addFileName,
-        onClick(event => event.sample(getName).flatMapSwitch(TabViewController.getTab)) --> TabViewController.setSelectedTab,
+        onClick(event => event.sample(getName)
+            .tapEach(TabViewController.saveTree)
+            .tapEach(TabViewController.addFileName.onNext)
+            .flatMapSwitch(TabViewController.getFileNameIndex)
+        ) --> TabViewController.setSelectedTab
     )
 
     /* Button used to toggle the theme */

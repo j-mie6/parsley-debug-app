@@ -27,24 +27,23 @@ object TabView {
     }
 
     /* Renders a tab button from a saved tree name */
-    private def tabButton(tabName: String): HtmlElement = {
+    private def tabButton(index: Int): HtmlElement = {
         button(
             className := "tab-button",
 
             /* Passing on the signal of the selected tab to each tab*/
-            cls("selected") <-- TabViewController.tabSelected(tabName),
+            cls("selected") <-- TabViewController.tabSelected(index),
             transition := "all 0.5s", //TODO: move to css
 
-            tabName,
-            closeTabButton(tabName),
+            text <-- TabViewController.getFileName(index),
+            closeTabButton(index),
 
             /* Sets selected tab signal to newly selected tab */
-            onClick(_ => TabViewController.getTab(tabName)) 
-                --> TabViewController.setSelectedTab //FIXME
+            onClick.mapTo(index) --> TabViewController.setSelectedTab //FIXME
         )
     }
 
-    def closeTabButton(tabTitle: String): HtmlElement = {
+    def closeTabButton(index: Int): HtmlElement = {
         button(
             className := "close-tab-button",
 
@@ -52,8 +51,9 @@ object TabView {
             i(className := "bi bi-x"),
 
             /* Deletes the respective tab */
-            onClick.mapTo(tabTitle)(TabViewController.deleteTab(_)) 
-                --> TabViewController.setFileNames, //FIXME
+            onClick(event => event.sample(TabViewController.getFileName(index))
+                .compose(TabViewController.deleteTab)
+            ) --> TabViewController.setFileNames,
         )
     }
     
@@ -63,12 +63,13 @@ object TabView {
 
             //TODO: neaten and move to TreeViewController
             TabViewController.getSelectedTab.changes
-                .compose(TabViewController.loadSavedTree) 
+                .flatMapSwitch(TabViewController.getFileName)
+                .compose(TabViewController.loadSavedTree)
                 --> TreeViewController.setTree,
 
             /* Renders tabs */ 
             children <-- TabViewController.getFileNames.signal.map(
-                (names: List[String]) => names.map(tabButton(_))
+                _.indices.map(tabButton(_))
             )
         )
     }
