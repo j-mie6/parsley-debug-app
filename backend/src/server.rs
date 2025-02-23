@@ -12,6 +12,7 @@ pub mod test {
     use rocket::{http, local::blocking};
 
     use super::{launch, ServerState};
+    use crate::events::Event;
     use crate::state::MockStateManager;
     use crate::trees::{debug_tree, parsley_tree};
 
@@ -34,6 +35,9 @@ pub mod test {
         mock.expect_set_tree()
             .with(predicate::eq(debug_tree::test::tree()))
             .times(NUM_REPEATS)
+            .returning(|_| Ok(()));
+
+        mock.expect_emit().withf(|other| &Event::NewTree == other)
             .returning(|_| Ok(()));
 
         mock.expect_get_tree()

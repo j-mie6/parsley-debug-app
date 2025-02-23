@@ -1,6 +1,7 @@
 use crate::{state::StateError, trees::DebugTree};
 
 /* Event enum representing an event fired and managed by State */
+#[derive(Debug, PartialEq)]
 pub enum Event<'a> {
     TreeReady(&'a DebugTree),   /* Tree is ready for loading in frontend */
     NewTree,                    /* New tree is sent from RemoteView */

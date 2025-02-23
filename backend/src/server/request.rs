@@ -70,6 +70,7 @@ pub mod test {
     use mockall::predicate;
     use rocket::{http, local::blocking};
 
+    use crate::events::Event;
     use crate::server::test::tracked_client; 
     use crate::state::MockStateManager;
     use crate::trees::{debug_tree, parsley_tree};
@@ -111,7 +112,10 @@ pub mod test {
         mock.expect_set_tree()
             .with(predicate::eq(debug_tree::test::tree()))
             .returning(|_| Ok(()));
-
+        
+        mock.expect_emit().withf(|other| &Event::NewTree == other)
+            .returning(|_| Ok(()));
+        
         let client: blocking::Client = tracked_client(mock);
 
         /* Perform POST request to '/api/remote/tree' */
@@ -180,6 +184,9 @@ pub mod test {
             .returning(|_| Ok(()));
 
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
+        
+        mock.expect_emit().withf(|other| &Event::NewTree == other)
+            .returning(|_| Ok(()));
 
         let client: blocking::Client = tracked_client(mock);
 
