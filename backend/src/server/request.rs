@@ -1,6 +1,7 @@
 use rocket::{get, post, http, serde::json::Json};
 
 use super::ServerState;
+use crate::events::Event;
 use crate::trees::{DebugTree, ParsleyTree};
 use crate::state::{StateError, StateManager};
 
@@ -39,13 +40,16 @@ fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (ht
     );
 
     /* Update state with new debug_tree and return response */
-    match state.set_tree(debug_tree) {
+    match state.set_tree(debug_tree).and(state.emit(Event::NewTree)) {
         Ok(()) => (http::Status::Ok, response),
         
+        Err(StateError::EventEmitFailed) => 
+            (http::Status::InternalServerError, String::from("New Tree event could not be emitted - try again")), 
+
         Err(StateError::LockFailed) => 
             (http::Status::InternalServerError, String::from("Locking state mutex failed - try again")), 
             
-        Err(_) => panic!("Unexpected error on set_tree"),
+        Err(_) => panic!("Unexpected error on post_tree"),
     }
 
 }

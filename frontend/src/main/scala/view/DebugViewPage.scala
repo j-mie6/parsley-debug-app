@@ -58,30 +58,12 @@ abstract class DebugViewPage extends Page {
         h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
-    /* Random number generator */
-    private val rand = new scala.util.Random
-
     /* Visual call to action for user to save the current tree */
      private lazy val saveIcon: HtmlElement = i(
         className := "bi bi-floppy-fill",
         fontSize.px := 25, marginRight.px := 10
     )
 
-    /* Generate random name for file */
-    def getName: String = s"tree-${rand.nextInt(100)}"
-
-    /* Adds ability to save and store current tree. */
-    private lazy val saveButton: Element = button(
-        className := "save-button",
-
-        saveIcon, /* Floppy disk icon */
-
-        onClick.mapTo(getName)
-            .tapEach(TabViewController.saveTree)
-            .tapEach(TabViewController.addFileName.onNext)
-            .flatMapSignal(TabViewController.getFileNameIndex)
-            --> TabViewController.setSelectedTab
-    )
 
     /* Button used to toggle the theme */
     private lazy val themeButton: Element = div(
@@ -107,7 +89,6 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-right",
         div(
             className := "debug-view-header-right-buttons",
-            child <-- TreeViewController.treeExists.map(if (_) then saveButton else div()),
             themeButton,
             githubButton,
         )
