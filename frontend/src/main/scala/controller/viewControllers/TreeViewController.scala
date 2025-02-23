@@ -16,26 +16,26 @@ object TreeViewController {
     /* Reactive DebugTree */
     private val tree: Var[Option[DebugTree]] = Var(None) 
 
-    /* Helpers for writing the tree */
+    /* Set debug tree */
     def setTree: Observer[DebugTree] = tree.someWriter
+
+    /* Set debug tree (can be None) */
     def setTreeOpt: Observer[Option[DebugTree]] = tree.writer
     
-    /* Gets display tree element */
-    def getDisplayTree: Signal[HtmlElement] = tree.signal.map(_ match 
+    /* Get debug tree element */
+    def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
         /* Default tree view when no tree is loaded */
         case None => div(
             className := "tree-view-error",
             "No tree found! Start debugging by attaching DillRemoteView to a parser"
         )
+
+        /* Render as DebugTreeDisplay */
         case Some(tree) => DebugTreeDisplay(tree)
     )
 
     
-    /**
-    * Fetch the debug tree root from the tauri backend.
-    *
-    * @param displayTree The var that the display tree HTML element will be written into.
-    */
-    def reloadTree(): EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
+    /* Fetch the debug tree root from the backend, return in EventStream */
+    def reloadTree: EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
     
 }

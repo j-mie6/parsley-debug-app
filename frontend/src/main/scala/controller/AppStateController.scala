@@ -8,7 +8,8 @@ import org.scalajs.dom
   * Object containing functions and variables defining page state
   */
 object AppStateController {
-    /* Boolean representing the current page theme */
+    
+    /* Reactive variable representing the current page theme */
     private val theme: Var[Boolean] = Var(!dom.window.matchMedia("(prefers-color-scheme: dark)").matches)
     
     val isLightMode: Signal[Boolean] = theme.signal
@@ -24,4 +25,5 @@ object AppStateController {
                 .setAttribute("data-theme", if isLightTheme then "dark" else "light")
         )
     }
+
 }

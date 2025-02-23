@@ -21,8 +21,10 @@ object TabViewController {
     /* List of file names (excluding path and ext) wrapped in Var */
     private val fileNames: Var[List[String]] = Var(Nil)
 
-    /* Expose writing facilities */
+    /* Set file names */
     def setFileNames: Observer[List[String]] = fileNames.writer
+    
+    /* Add name to file names */
     def addFileName: Observer[String] = fileNames.updater((names, name) => names :+ name)
     
     /* Fetches all tree names saved by the user from the backend */

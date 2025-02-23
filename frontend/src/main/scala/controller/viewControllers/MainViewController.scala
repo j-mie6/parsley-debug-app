@@ -13,6 +13,7 @@ import view.TreeView
  * rendering the tree or input view depending on the user's selection
  */
 object MainViewController {
+    
     /* View selected */
     enum View(val elem: HtmlElement) {
         case Tree extends View(TreeView())

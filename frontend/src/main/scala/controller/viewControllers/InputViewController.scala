@@ -11,7 +11,10 @@ object InputViewController {
     /* The input element to be render by InputView */
     private val input: Var[String] = Var("Please attach a parser to DillRemoteView")
 
+    /* Get input string */
     def getInput: Signal[String] = input.signal
+
+    /* Set input string */
     def setInput = input.writer
 
 }
