@@ -53,6 +53,7 @@ object DebugTreeDisplay {
 * Object containing rendering methods for a reactive node (and children).
 */
 private object ReactiveNodeDisplay {
+
     /**
     * Render a reactive node display. This display enables optional rendering
     * of children nodes, toggled by ReactiveNode.reloadChildren() and 
@@ -63,9 +64,11 @@ private object ReactiveNodeDisplay {
     * @return HTML element representing a reactive node with optional children.
     */
     def apply(node: ReactiveNode): HtmlElement = {
+        /* True if start of a user-defined type */
         val newType: Boolean = node.debugNode.internal != node.debugNode.name
         
         div(
+            /* Render a box for user-defined parser types */
             cls("debug-tree-node-type-box") := newType,
             when (newType) {
                 p(className := "debug-tree-node-type-name", node.debugNode.name)
@@ -73,27 +76,29 @@ private object ReactiveNodeDisplay {
 
             div(
                 className := s"debug-tree-node",
-                
+
+                /* Set reactive class names */
                 cls("compress") <-- node.children.signal.map(_.isEmpty),
                 cls("fail") := !node.debugNode.success,
                 cls("leaf") := node.debugNode.isLeaf,
 
+                /* Render debug node information */
                 div(
                     p(className := "debug-tree-node-name", node.debugNode.internal),
                     p(fontStyle := "italic", node.debugNode.input)
                 ),
 
-                //TODO: on double click, expand all
-
+                /* Expand/compress node on click */
                 onClick(_
-                    .sample(node.children.signal) 
+                    .sample(node.children.signal)
                     .filter(_ => !node.debugNode.isLeaf)
                     .map(_.isEmpty)
                     .flatMapMerge(
-                        if (_) {
-                            Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId)
-                                .collectRight
+                        if (_) { 
+                            /* If no children, load them in */
+                            Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
                         } else {
+                            /* Otherwise set them to empty list */
                             EventStream.fromValue(Nil)
                         }
                     )
@@ -101,6 +106,7 @@ private object ReactiveNodeDisplay {
 
             ),
 
+            /* Flex container for rendering children */
             div(
                 className := "debug-tree-node-container",
                 children <-- node.children.signal.map((nodes) =>
@@ -109,33 +115,5 @@ private object ReactiveNodeDisplay {
             ),
         )
     }
-}
 
-// /**
-// * Object containing render methods for a single debug node.
-// */
-// private object DebugNodeDisplay {
-//     /**
-//     * Render a debug node. This function returns an HTML element representing
-//     * a single node of the tree.
-//     *
-//     * @param debugNode Representation of the debug node structure.
-//     * @param buttons Collapse / expand buttons. They are passed in here so
-//     * that the onClick functions can affect the reactive node (parent) object.
-//     * 
-//     * @return HTML Element representing a debug node.
-//     */
-//     def apply(debugNode: DebugNode, buttons: HtmlElement): HtmlElement = {
-//         val showButtons: Var[Boolean] = Var(false)
-//         div(
-//             className := s"debug-tree-node debug-tree-node-${if debugNode.success then "success" else "fail"}",
-//             onMouseEnter --> { _ => showButtons.set(true)},
-//             onMouseLeave --> { _ => showButtons.set(false)},
-//             div(
-//                 p(className := "debug-tree-node-name", debugNode.internal),
-//                 p(fontStyle := "italic", debugNode.input)
-//             ),
-//             buttons.amend(display <-- showButtons.signal.map(if (_) "block" else "none"))
-//         )
-//     }
-// }
+}
