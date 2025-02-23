@@ -42,11 +42,13 @@ sealed trait Event(private val name: String) {
 
 
 object Event {
-    case object TreeReady extends Event("tree-ready"):
+    case object TreeReady extends Event("tree-ready") {
         type Out = DebugTree
+    }
 
-    case object NewTree extends Event("new-tree"):
+    case object NewTree extends Event("new-tree") {
         type Out = Unit
+    }
 
 }
 
