@@ -30,8 +30,6 @@ abstract class DebugViewPage extends Page {
     private lazy val treeIcon: Element = i(className := "bi bi-tree-fill", fontSize.px := 30)
     private lazy val fileIcon: Element = i(className := "bi bi-file-earmark-text-fill", fontSize.px := 25)
     private lazy val gitIcon: Element = i(className := "bi bi-github", fontSize.px := 40)
-    private lazy val sunIcon: Element = i(className := "bi bi-brightness-high-fill", fontSize.px := 33)
-    private lazy val moonIcon: Element = i(className := "bi bi-moon-fill", fontSize.px := 33)
 
     /* Left section of the page header, containing tree and source view tabs */
     private lazy val headerLeft: Element = div(
@@ -70,11 +68,8 @@ abstract class DebugViewPage extends Page {
         cursor.pointer,
         alignContent.center,
 
-        marginRight.px := 20, //TODO: move to css
-        
         /* Render moonIcon in light mode; sunIcon in dark mode */
-        child <-- AppStateController.isLightMode.signal
-            .map(if (_) then moonIcon else sunIcon), 
+        child <-- AppStateController.getThemeIcon, 
 
         onClick.mapToUnit --> AppStateController.toggleTheme()
     )
