@@ -65,21 +65,23 @@ private object ReactiveNodeDisplay {
     */
     def apply(node: ReactiveNode): HtmlElement = {
         /* True if start of a user-defined type */
-        val newType: Boolean = node.debugNode.internal != node.debugNode.name
+        val hasUserType: Boolean = node.debugNode.internal != node.debugNode.name
         val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty);
 
         div(
+            className := "debug-tree-node-container",
+
             /* Render a box for user-defined parser types */
-            cls("debug-tree-node-type-box") := newType,
-            when (newType) {
-                p(className := "debug-tree-node-type-name", node.debugNode.name)
+            cls("type-box") := hasUserType,
+            when (hasUserType) {
+                p(className := "type-name", node.debugNode.name)
             },
 
             /* Line connecting node to parent */
             div(className := "node-line"),
 
             div(
-                className := s"debug-tree-node",
+                className := "debug-tree-node",
 
                 /* Set reactive class names */
                 cls("compress") <-- compressed,
@@ -119,7 +121,7 @@ private object ReactiveNodeDisplay {
 
             /* Flex container for rendering children */
             div(
-                className := "debug-tree-node-container",
+                className := "debug-tree-children-container",
                 children <-- node.children.signal.map((nodes) =>
                     nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply)
                 )
