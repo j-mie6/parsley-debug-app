@@ -28,6 +28,6 @@ object Tauri {
      * @param event Name of Tauri Event to listen for.
      * @return Tuple of EventStream and Future holding a function to un-listen
      */
-    def listen(event: Event): (EventStream[Either[Tauri.Error, event.Out]], Future[() => Unit]) = event.listen()
+    def listen(event: Event): (EventStream[Either[Tauri.Error, event.Out]], Future[Event.UnlistenFn]) = event.listen()
 
 }

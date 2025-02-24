@@ -9,6 +9,7 @@ import upickle.default as up
 import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent}
 
 import model.DebugTree
+import controller.tauri.Event.UnlistenFn
 
 
 sealed trait Event(private val name: String) {
@@ -16,8 +17,6 @@ sealed trait Event(private val name: String) {
     /* Output type associated with Event */
     type Out
     given up.Reader[Out] = scala.compiletime.deferred
-
-    type UnlistenFn = () => Unit
 
     
     /* Listen to backend event using Tauri JS interface */
@@ -41,6 +40,8 @@ sealed trait Event(private val name: String) {
 
 
 object Event {
+    type UnlistenFn = () => Unit
+
     case object TreeReady extends Event("tree-ready") {
         type Out = DebugTree
     }
