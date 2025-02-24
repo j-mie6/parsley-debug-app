@@ -1,12 +1,12 @@
 package controller.errors
 
-import com.raquo.laminar.api.L.*
-
 import scala.scalajs.js
 
-import model.errors.*
+import com.raquo.laminar.api.L.*
 
 import controller.MalformedJSONException
+
+import model.errors.*
 
 /** 
   * ErrorController keeps track of the error state of the app 
@@ -31,18 +31,18 @@ object ErrorController {
     )
 
     /* Maps an error passed by the backend to a frontend DillException object */
-    def mapError(error: Throwable): DillException = {
+    def mapException(error: Throwable): DillException = {
         error match {
             /* Backend errors */
-            case js.JavaScriptException(jsErr) => jsErr match {
-                case err if err.toString.contains("TreeNotFound") => TreeNotFound
-                case err if err.toString.contains("LockFailed") => LockFailed
-                case err if err.toString.contains("NodeNotFound") => NodeNotFound(0)
-                case err if err.toString.contains("SerialiseFailed") => SerialiseFailed
-                case err if err.toString.contains("ReadDirFailed") => ReadDirFailed
-                case err if err.toString.contains("ReadPathFailed") => ReadPathFailed
-                case err if err.toString.contains("StringContainsInvalidUnicode") => StringContainsInvalidUnicode
-                case err if err.toString.contains("SuffixNotFound") => SuffixNotFound
+            case js.JavaScriptException(jsErr) => jsErr.toString.stripPrefix(": ") match {
+                case "TreeNotFound" => TreeNotFound
+                case "LockFailed" => LockFailed
+                case "NodeNotFound" => NodeNotFound(0)
+                case "SerialiseFailed" => SerialiseFailed
+                case "ReadDirFailed" => ReadDirFailed
+                case "ReadPathFailed" => ReadPathFailed
+                case "StringContainsInvalidUnicode" => StringContainsInvalidUnicode
+                case "SuffixNotFound" => SuffixNotFound
 
                 case _ => new UnknownError(s"Unknown backend error: ${jsErr.toString()}")
             }
@@ -56,9 +56,9 @@ object ErrorController {
     }
 
     /* Updates the error var with error that has been passed by the backend */
-    def handleError(error: Throwable): Unit = {
+    def handleException(error: Throwable): Unit = {
         println(s"Error was: ${error.toString()}")
-        errorVar.set(Some(mapError(error)))
+        errorVar.set(Some(mapException(error)))
     }
 
     /* Sets the error var back to no errors, used when a warning is clicked to make it disappear */

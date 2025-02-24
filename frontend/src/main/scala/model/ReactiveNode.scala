@@ -37,7 +37,7 @@ case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
                     DebugTreeController.decodeDebugNodes(nodesString) match {
                         case Success(nodes) => nodes
                         case Failure(exception) => {
-                            ErrorController.handleError(exception)
+                            ErrorController.handleException(exception)
                             Nil
                         }
                     }

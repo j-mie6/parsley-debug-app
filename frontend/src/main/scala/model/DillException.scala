@@ -63,7 +63,7 @@ case object TreeNotFound extends Error {
     override def message: String = 
         "The application server failed to retrieve the debug tree from Remote View. " +
         "Ensure that the debug session is active and reachable. If the problem persists, please" + 
-        "contact Jamie Willis."
+        "write a GitHub issue on the repo"
 }
 
 case object LockFailed extends Error {
@@ -83,7 +83,7 @@ case object SerialiseFailed extends Error {
     override def message: String = 
         "Failed to serialize the display tree. " +
         "This may indicate an issue with the serialization process. " +
-        "Please report this issue to Jamie Willis"
+        "Please report this issue on GitHub issues if the problem persists"
 }
 
 case object ReadDirFailed extends Error {
@@ -115,7 +115,7 @@ case object MalformedJSON extends Error {
     override def message: String = 
         "Failed to serialize the display tree. " +
         "This may indicate an issue with the serialization process. " +
-        "Please report this issue to Jamie Willis if the problem persists"
+        "Please report this issue on GitHub issues if the problem persists"
 }
 
 /* Used when an unexpected error occurs */

@@ -54,9 +54,9 @@ object TreeViewController {
                     setDisplayTree(DebugTreeDisplay(debugTree))
                 } 
                 
-                case Failure(error) => println(s"Failed, but couldn't deserialise $error"); ErrorController.handleError(error)
+                case Failure(error) => println(s"Failed, but couldn't deserialise $error"); ErrorController.handleException(error)
             }
-            case Failure(error) => println(s"Error: $error"); ErrorController.handleError(error)
+            case Failure(error) => println(s"Error: $error"); ErrorController.handleException(error)
         }
     }
 
@@ -68,7 +68,7 @@ object TreeViewController {
     def saveTree(treeName: String): Unit = {
         Tauri.invoke[String](Command.SaveTree, Map("name" -> treeName)).onComplete {
             case Success(_) => ()
-            case Failure(error) => ErrorController.handleError(error)
+            case Failure(error) => ErrorController.handleException(error)
         }
     }
 
@@ -82,7 +82,7 @@ object TreeViewController {
             case Success(names: String) => 
                 /* Update fileNames with parsed names */
                 fileNames.update(_ => up.read[List[String]](names))
-            case Failure(error) => ErrorController.handleError(error)
+            case Failure(error) => ErrorController.handleException(error)
         }
     }
 
@@ -97,7 +97,7 @@ object TreeViewController {
             case Success(trees) => trees.foreach { _ =>
                 TreeViewController.reloadTree()
             }
-            case Failure(error) => ErrorController.handleError(error)
+            case Failure(error) => ErrorController.handleException(error)
         }
     }
         
