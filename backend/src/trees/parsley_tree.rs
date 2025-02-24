@@ -18,7 +18,7 @@ pub struct ParsleyNode {
 pub struct ParsleyTree {
     input: String,     /* The input string being parsed */
     root: ParsleyNode, /* Root node of the debug tree */
-    is_debuggable: bool, /* TODO */
+    is_debuggable: bool, /* If this tree was produced by a currently-running parser */
 }
 
 impl ParsleyTree {
