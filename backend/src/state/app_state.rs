@@ -3,6 +3,8 @@ use std::sync::{Mutex, MutexGuard};
 
 use rocket::tokio::{self, sync::mpsc};
 
+use crate::events::Event;
+
 use crate::trees::{DebugTree, DebugNode};
 use super::{StateError, StateManager, AppHandle};
 
@@ -62,11 +64,13 @@ impl StateManager for AppState {
 
         insert_node(&mut state, tree.get_root())?;
 
+        
         /* Update tree */
         state.tree = Some(tree);
-        
-        /* Notify frontend listener */
-        state.app.emit("tree-ready", ())
+    
+        /* Unwrap cannot fail as tree has just been set */
+        let event: Event = Event::TreeReady(&state.tree.as_ref().unwrap());
+        state.app.emit(event) /* Notify frontend listener - call inline to avoid deadlock */ 
             .map_err(|_| StateError::EventEmitFailed)
     }
     
@@ -86,6 +90,11 @@ impl StateManager for AppState {
             .get(&id)
             .ok_or(StateError::NodeNotFound(id))
             .cloned()
+    }
+
+    /* Notify frontend listeners of an event */        
+    fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError> {
+        self.inner()?.app.emit(event)
     }
 
     fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(), StateError> {

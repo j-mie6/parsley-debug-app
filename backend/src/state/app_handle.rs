@@ -1,7 +1,7 @@
-use serde::Serialize;
 use tauri::{Emitter, Manager};
 
-use crate::trees::{DebugTree, DebugNode};
+use crate::events::Event;
+use crate::trees::{DebugNode, DebugTree};
 use super::{AppState, StateManager, StateError};
 
 
@@ -14,12 +14,8 @@ impl AppHandle {
     }
 
     /* Delegate emit to wrapped Tauri AppHandle */
-    pub fn emit<S>(&self, event: &str, payload: S) -> Result<(), StateError>
-    where 
-        S: Serialize + Clone
-    {
-        self.0.emit(event, payload)
-            .map_err(|_| StateError::EventEmitFailed)
+    pub fn emit(&self, event: Event) -> Result<(), StateError> {
+        StateManager::emit(&self.0, event)
     }
 }
 
@@ -36,6 +32,12 @@ impl StateManager for tauri::AppHandle {
 
     fn get_node(&self, id: u32) -> Result<DebugNode, StateError> {
         self.state::<AppState>().get_node(id)
+    }
+
+    /* Emit event using the Tauri AppHandle */
+    fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError> {
+        Emitter::emit(self, &event.name(), event.payload()?)
+            .map_err(|_| StateError::EventEmitFailed)
     }
 
     fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(),StateError> {

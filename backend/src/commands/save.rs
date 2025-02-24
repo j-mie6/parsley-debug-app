@@ -6,6 +6,7 @@ use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, SavedTree};
 use crate::files::SAVED_TREE_DIR;
 
+
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
 pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<(), SaveTreeError> {
@@ -46,6 +47,8 @@ impl From<StateError> for SaveTreeError {
     }
 }
 
+
+/* Delete file associated with where tree is saved */
 #[tauri::command]
 pub fn delete_tree(tree_name: String) -> Result<(), DeleteTreeError> {
     /* Path to the json file used to store the tree */
@@ -94,7 +97,7 @@ pub enum FetchTreeNameError {
 
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
-pub fn load_saved_tree(state: tauri::State<AppState>, tree_name: String) -> Result<(), LoadTreeError>  {
+pub fn load_saved_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), LoadTreeError>  {
     /* Get the file path of the tree to be reloaded */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
 

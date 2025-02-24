@@ -5,13 +5,14 @@ import com.raquo.laminar.api.L.*
 import model.{DebugTree, DebugNode, ReactiveNode}
 
 import controller.viewControllers.MainViewController
-import controller.tauri.Tauri
+import controller.tauri.{Tauri, Command}
 
 /**
 * Object containing rendering methods for the Debug Tree Display, which is
 * used to display the debug tree in the UI.
 */
 object DebugTreeDisplay {
+    
     /* Variable that keeps track of how much the tree has been zoomed into */
     val zoomFactor: Var[Double] = Var(1.0)
     
@@ -21,8 +22,8 @@ object DebugTreeDisplay {
     
     /* Updater for the zoom factor */
     val zoomUpdate = zoomFactor.updater[Double]((prev, delta) => 
-            val zoomChange = 1.0 + (delta * zoomSpeed)
-            (prev * zoomChange).min(minZoomFactor).max(maxZoomFactor)
+        val zoomChange = 1.0 + (delta * zoomSpeed)
+        (prev * zoomChange).min(minZoomFactor).max(maxZoomFactor)
     )
     
     /* Event handler for zooming in and out of the tree */
@@ -40,9 +41,11 @@ object DebugTreeDisplay {
     */
     def apply(tree: DebugTree): HtmlElement = div(
         className := "debug-tree-display zoom-container",
-        ReactiveNodeDisplay(ReactiveNode(tree.root)),
+        
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
-        wheelHandler
+        wheelHandler,
+        
+        ReactiveNodeDisplay(ReactiveNode(tree.root)),
     )
 }
 
@@ -50,6 +53,7 @@ object DebugTreeDisplay {
 * Object containing rendering methods for a reactive node (and children).
 */
 private object ReactiveNodeDisplay {
+
     /**
     * Render a reactive node display. This display enables optional rendering
     * of children nodes, toggled by ReactiveNode.reloadChildren() and 
@@ -60,62 +64,56 @@ private object ReactiveNodeDisplay {
     * @return HTML element representing a reactive node with optional children.
     */
     def apply(node: ReactiveNode): HtmlElement = {
-        val newType =  node.debugNode.internal != node.debugNode.name
+        /* True if start of a user-defined type */
+        val newType: Boolean = node.debugNode.internal != node.debugNode.name
+        
         div(
+            /* Render a box for user-defined parser types */
             cls("debug-tree-node-type-box") := newType,
             when (newType) {
                 p(className := "debug-tree-node-type-name", node.debugNode.name)
             },
-            DebugNodeDisplay(node.debugNode, 
-            div(when (!node.debugNode.isLeaf) {
+
+            div(
+                className := s"debug-tree-node",
+
+                /* Set reactive class names */
+                cls("compress") <-- node.children.signal.map(_.isEmpty),
+                cls("fail") := !node.debugNode.success,
+                cls("leaf") := node.debugNode.isLeaf,
+
+                /* Render debug node information */
                 div(
-                    child <-- node.children.signal.map(_.isEmpty).map(
-                    if (_) 
-                        button("Expand",
-                            className := "debug-tree-node-button debug-tree-node-button-expand",
-                            onClick --> { _ => node.reloadChildren() }) 
-                    else 
-                        button("Compress",
-                            className := "debug-tree-node-button debug-tree-node-button-compress",
-                            onClick --> { _ => node.resetChildren() })
+                    p(className := "debug-tree-node-name", node.debugNode.internal),
+                    p(fontStyle := "italic", node.debugNode.input)
+                ),
+
+                /* Expand/compress node on click */
+                onClick(_
+                    .sample(node.children.signal)
+                    .filter(_ => !node.debugNode.isLeaf)
+                    .map(_.isEmpty)
+                    .flatMapMerge(
+                        if (_) { 
+                            /* If no children, load them in */
+                            Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                        } else {
+                            /* Otherwise set them to empty list */
+                            EventStream.fromValue(Nil)
+                        }
                     )
-                )
-            })
+                ) --> node.children.writer,
+
             ),
+
+            /* Flex container for rendering children */
             div(
                 className := "debug-tree-node-container",
-                children <-- node.children.signal.map(_.map((child) => 
-                    ReactiveNodeDisplay(ReactiveNode(child))))
+                children <-- node.children.signal.map((nodes) =>
+                    nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply)
+                )
             ),
         )
     }
-}
 
-/**
-* Object containing render methods for a single debug node.
-*/
-private object DebugNodeDisplay {
-    /**
-    * Render a debug node. This function returns an HTML element representing
-    * a single node of the tree.
-    *
-    * @param debugNode Representation of the debug node structure.
-    * @param buttons Collapse / expand buttons. They are passed in here so
-    * that the onClick functions can affect the reactive node (parent) object.
-    * 
-    * @return HTML Element representing a debug node.
-    */
-    def apply(debugNode: DebugNode, buttons: HtmlElement): HtmlElement = {
-        val showButtons: Var[Boolean] = Var(false)
-        div(
-            className := s"debug-tree-node debug-tree-node-${if debugNode.success then "success" else "fail"}",
-            onMouseEnter --> { _ => showButtons.set(true)},
-            onMouseLeave --> { _ => showButtons.set(false)},
-            div(
-                p(className := "debug-tree-node-name", debugNode.internal),
-                p(fontStyle := "italic", debugNode.input)
-            ),
-            buttons.amend(display <-- showButtons.signal.map(if (_) "block" else "none"))
-        )
-    }
 }

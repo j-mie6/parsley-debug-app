@@ -1,114 +1,53 @@
 package controller.viewControllers
 
-import scala.util.{Try, Success, Failure}
-import scala.concurrent.ExecutionContext.Implicits.global
-
-import org.scalablytyped.runtime.StringDictionary
 import com.raquo.laminar.api.L.*
-import upickle.default as up
 
-import controller.DebugTreeController
-import controller.tauri.{Tauri, Command}
-import controller.viewControllers.InputViewController
-
+import model.DebugTree
 import view.DebugTreeDisplay
+import controller.tauri.Tauri
+import controller.tauri.Command
 
 
 /**
-* Object containing methods for manipulating the DebugTree.
-*/
+  * Object containing methods for manipulating the DebugTree.
+  */
 object TreeViewController {
-    
-    /* Display tree that will be rendered by TreeView */
-    private val displayTree: Var[HtmlElement] = Var(div())
 
-    /* Default tree view when no tree is loaded */
-    private val noTreeFound: HtmlElement = div(
-        className := "tree-view-error",
-        "No tree found! Start debugging by attaching DillRemoteView to a parser"
+    /* Reactive DebugTree */
+    private val tree: Var[Option[DebugTree]] = Var(None) 
+
+    /** Set debug tree */
+    val setTree: Observer[DebugTree] = tree.someWriter
+
+    /** Set optional debug tree (can be None) */
+    val setTreeOpt: Observer[Option[DebugTree]] = tree.writer
+
+    /** Set debug tree to None to stop rendering */
+    def unloadTree: Observer[Unit] = Observer(_ => tree.set(None))
+    
+    /** Return true signal if tree is loaded into frontend */
+    def treeExists: Signal[Boolean] = tree.signal.map(_.isDefined)
+
+    /** Get debug tree element or warning if no tree found */
+    def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
+        /* Default tree view when no tree is loaded */
+        case None => div(
+            className := "tree-view-error",
+            "No tree found! Start debugging by attaching DillRemoteView to a parser"
+        )
+
+        /* Render as DebugTreeDisplay */
+        case Some(tree) => DebugTreeDisplay(tree)
     )
-    
-    /**
-    * Gets display tree element
-    */
-    def getDisplayTree: HtmlElement = div(child <-- displayTree.signal)
-    
-    /**
-    * Mutably updates the displayTree variable
-    *
-    * @param tree New element to update the displayTree variable
-    */
-    def setDisplayTree(tree: HtmlElement) = displayTree.set(tree)
 
-    /**
-    * Sets the display tree to the default noTreeFound element
-    */
-    def setEmptyTree(): Unit = setDisplayTree(noTreeFound)
+    /** Fetch the debug tree root from the backend, return in EventStream */
+    def reloadTree: EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
     
-    /**
-    * Fetch the debug tree root from the tauri backend.
-    *
-    * @param displayTree The var that the display tree HTML element will be written into.
-    */
-    def reloadTree(): Unit = {
-        for {
-            treeString <- Tauri.invoke[String](Command.FetchDebugTree)
-        } do {
-            setDisplayTree(
-                if treeString.isEmpty then div("No tree found") else 
-                DebugTreeController.decodeDebugTree(treeString) match {
-                    case Failure(exception) => 
-                        println(s"Error in decoding debug tree : ${exception.getMessage()}");
-                        div()
-                    case Success(debugTree) => {
-                        InputViewController.setInput(debugTree.input)
-                        DebugTreeDisplay(debugTree)
-                    }
-                }
-            )
-        }
-    }
-
-    /**
-    * Saves the current tree to a file
-    *
-    * @param treeName The name of the tree to save
-    */
-    def saveTree(treeName: String): Unit =
-        Tauri.invoke[String](Command.SaveTree, Map("name" -> treeName))
-
-    /**
-      * Fetches all tree names saved by the user from the backend
+    /** Skips the current breakpoint 'skips' times
       *
-      * @param fileNames List of all trees saved by the user
+      * @param skips The amount of times to skip a breakpoint
       */
-    def fetchSavedTreeNames(fileNames: Var[List[String]]): Unit = {
-        Tauri.invoke[String](Command.FetchSavedTreeNames).foreach { serializedNames =>
-            // Update fileNames with parsed names
-            fileNames.update(_ => up.read[List[String]](serializedNames))
-        }
-    }
-
-    /**
-      * Loads a saved tree from the backend into the display tree
-      *
-      * @param treeName User-defined name of the tree to be loaded
-      * @param displayTree Tree element to load and display in a given tree
-      */
-    def loadSavedTree(treeName: String, displayTree: Var[HtmlElement]): Unit = {
-        Tauri.invoke[String](Command.LoadSavedTree, Map("name" -> treeName))
-            .foreach { _ =>
-                TreeViewController.reloadTree()
-        }
-    }
-
-    /**
-    * Skips the current breakpoint 'skips' times
-    *
-    * @param skips The amount of times to skip a breakpoint
-    */
     def skipBreakpoints(skips: Int): Unit =
-        Tauri.invoke[String](Command.SkipBreakpoints , Map("skips" -> skips))
-
-        
+        Tauri.invoke(Command.SkipBreakpoints, skips)
+    
 }

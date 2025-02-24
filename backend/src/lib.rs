@@ -6,6 +6,7 @@ use rocket::tokio::sync::{Mutex, mpsc};
 mod server;
 mod state;
 mod commands;
+mod events;
 mod trees;
 mod files;
 

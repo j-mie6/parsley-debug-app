@@ -1,6 +1,7 @@
 use rocket::{get, post, http, serde::json::Json};
 
 use super::ServerState;
+use crate::events::Event;
 use crate::trees::{DebugTree, ParsleyTree};
 use crate::state::{StateError, StateManager};
 
@@ -53,7 +54,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     );
 
     /* Update state with new debug_tree and return response */
-    match state.set_tree(debug_tree) {
+    match state.set_tree(debug_tree).and(state.emit(Event::NewTree)) {
         Ok(()) => {
             let skip_breakpoint: Option<i32> = if is_debugging {
                 match state.receive_breakpoint_skips().await {
@@ -73,7 +74,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         Err(StateError::LockFailed) => 
             (http::Status::InternalServerError, bad_response("Locking state mutex failed - try again")), 
             
-        Err(_) => panic!("Unexpected error on set_tree"),
+        Err(_) => panic!("Unexpected error on post_tree"),
     }
 
 }
@@ -95,6 +96,7 @@ pub mod test {
     use mockall::predicate;
     use rocket::{http, local::blocking};
 
+    use crate::events::Event;
     use crate::server::test::tracked_client; 
     use crate::state::MockStateManager;
     use crate::trees::{debug_tree, parsley_tree};
@@ -136,7 +138,10 @@ pub mod test {
         mock.expect_set_tree()
             .with(predicate::eq(debug_tree::test::tree()))
             .returning(|_| Ok(()));
-
+        
+        mock.expect_emit().withf(|expected| &Event::NewTree == expected)
+            .returning(|_| Ok(()));
+        
         let client: blocking::Client = tracked_client(mock);
 
         /* Perform POST request to '/api/remote/tree' */
@@ -205,6 +210,9 @@ pub mod test {
             .returning(|_| Ok(()));
 
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
+        
+        mock.expect_emit().withf(|expected| &Event::NewTree == expected)
+            .returning(|_| Ok(()));
 
         let client: blocking::Client = tracked_client(mock);
 

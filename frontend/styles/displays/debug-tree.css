@@ -7,31 +7,58 @@
     align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
 }
 
-.debug-tree-title {
+.debug-input-title {
     text-align: center;
     margin-bottom: 10px;
+}
+
+.debug-input-description {
+    margin: 0px; 
+    
+    font-size: 15px; 
+    font-style: italic;
+    font-weight: lighter;
 }
 
 .debug-tree-node {
     padding: 10px;
     margin: 5px;
+    
     border-radius: 10px;
     border-width: 2px;
-    border-color: var(--font-color-primary);
-    text-align: center;
-    width: auto;
-}
-
-.debug-tree-node-success {
     border-style: solid;
+    border-bottom-width: 4px;
+    border-color: var(--font-color-primary);
+
     color: var(--font-color-secondary);
     background-color: var(--background-tertiary-60);
+    
+    text-align: center;
+    width: auto;
+    cursor: pointer;
+    transition: all 0.5s;
+    transition: border 0s !important;
 }
 
-.debug-tree-node-fail {
-    border-style: dashed;
+.debug-tree-node.fail {
     background-color: var(--background-tertiary-20);
+    color: var(--font-color-primary);
 }
+
+.debug-tree-node:hover:not(.leaf) {
+    background-color: var(--background-tertiary-40);
+}
+
+.debug-tree-node.leaf {
+    border-bottom-style: double !important;
+
+}
+
+.debug-tree-node.compress  {
+    border-bottom-style: dashed;
+    border-bottom-width: 3px !important;
+}
+
 
 .debug-tree-node-container {
     display: flex;
@@ -41,32 +68,6 @@
     justify-content: space-evenly;
 }
 
-.debug-tree-node-button {
-    border-radius: 5px;
-    padding-inline: 10px;
-    padding-block: 3px;
-    margin-top: 7px;
-    font-size: 10px;
-    font-weight: bold;
-    border: 1px solid var(--font-color-primary);
-    transition: all 0.5s;
-    cursor: pointer;
-}
-
-.debug-tree-node-button-compress {
-    color: var(--font-color-secondary);
-    background-color: var(--background-tertiary);
-}
-
-.debug-tree-node-button-expand {
-    color: var(--font-color-secondary);
-    background-color: var(--background-tertiary-60);
-}
-
-.debug-tree-node-button:hover {
-    color: var(--font-color-secondary);
-    background-color: var(--background-tertiary);
-}
 
 .debug-tree-node-type-box {
     position: relative;
