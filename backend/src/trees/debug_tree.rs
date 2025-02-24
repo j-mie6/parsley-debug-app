@@ -101,7 +101,7 @@ pub mod test {
                 "input": "Test",
                 "isLeaf": true
             },
-            "is_debuggable": false
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect::<String>()
@@ -119,7 +119,7 @@ pub mod test {
                 "input": "0",
                 "isLeaf": false
             },
-            "is_debuggable": false
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
