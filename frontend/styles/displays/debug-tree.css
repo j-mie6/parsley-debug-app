@@ -60,11 +60,6 @@
 }
 
 
-/* No node-line displayed for type-box */
-.debug-node-container.type-box > .debug-node-line {
-    display: none;
-}
-
 /* No node-line displayed on the first node */
 .debug-tree-container:first-child > .debug-node-container > .debug-node-line {
     display: none;
