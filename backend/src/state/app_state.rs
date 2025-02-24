@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
+use rocket::tokio::{self, sync::mpsc};
+
 use crate::trees::{DebugTree, DebugNode};
 use super::{StateError, StateManager, AppHandle};
 
@@ -9,6 +11,7 @@ struct AppStateInternal {
     app: AppHandle,                 /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
+    skips_tx: tokio::sync::Mutex<mpsc::Sender<i32>>, /* Transmitter how many breakpoints to skip, sent to parsley */
 }
 
 
@@ -17,13 +20,14 @@ pub struct AppState(Mutex<AppStateInternal>);
 
 impl AppState {
     /* Create a new app state with the app_handle */
-    pub fn new(app_handle: tauri::AppHandle) -> AppState {
+    pub fn new(app_handle: tauri::AppHandle, skips_tx: tokio::sync::Mutex<mpsc::Sender<i32>>) -> AppState {
         AppState(
             Mutex::new(
                 AppStateInternal {
                     app: AppHandle::new(app_handle),
                     tree: None,
                     map: HashMap::new(),
+                    skips_tx,
                 }
             )
         )
@@ -82,5 +86,9 @@ impl StateManager for AppState {
             .get(&id)
             .ok_or(StateError::NodeNotFound(id))
             .cloned()
+    }
+
+    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(), StateError> {
+        self.inner()?.skips_tx.blocking_lock().blocking_send(skips).map_err(|_| StateError::ChannelError)
     }
 }

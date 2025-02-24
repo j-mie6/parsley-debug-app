@@ -12,6 +12,19 @@ pub fn routes() -> Vec<rocket::Route> {
     rocket::routes![get_index, get_tree, post_tree]
 }
 
+#[derive(Debug, serde::Serialize)]
+struct PostTreeResponse {
+    message: String,
+    #[serde(skip_serializing_if = "Option::is_none")] skip_breakpoint: Option<i32>,
+}
+
+fn bad_response(m: impl Into<String>) -> Json<PostTreeResponse> {
+    Json(PostTreeResponse {
+        message: m.into(),
+        skip_breakpoint: None,
+    })
+}
+
 /* Placeholder GET request handler to print 'Hello world!' */
 #[get("/")]
 fn get_index() -> String {
@@ -20,14 +33,15 @@ fn get_index() -> String {
 
 /* Post request handler to accept debug tree */
 #[post("/api/remote/tree", format = "application/json", data = "<data>")]
-fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, String) {
+async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, Json<PostTreeResponse>) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
+    let is_debugging: bool = parsley_tree.is_debugging();
     let debug_tree: DebugTree = parsley_tree.into();
 
     /* Format informative response for RemoteView */
     let input: &str = debug_tree.get_input();
-    let response: String = format!(
+    let message: String = format!(
         "Posted parser tree handling input: \"{}{}\" to Dill",
         /* Include first few chars of input */
         &input[..std::cmp::min(input.len(), RESPONSE_INPUT_LEN)],
@@ -40,10 +54,24 @@ fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (ht
 
     /* Update state with new debug_tree and return response */
     match state.set_tree(debug_tree) {
-        Ok(()) => (http::Status::Ok, response),
+        Ok(()) => {
+            let skip_breakpoint: Option<i32> = if is_debugging {
+                match state.receive_breakpoint_skips().await {
+                    Ok(value) => Some(value),
+                    Err(_) => return (http::Status::InternalServerError, bad_response("Unknown internal error or timeout")),
+                }
+            } else { None };
+
+            let response = PostTreeResponse {
+                message,
+                skip_breakpoint,
+            };
+
+            (http::Status::Ok, Json(response))
+        },
         
         Err(StateError::LockFailed) => 
-            (http::Status::InternalServerError, String::from("Locking state mutex failed - try again")), 
+            (http::Status::InternalServerError, bad_response("Locking state mutex failed - try again")), 
             
         Err(_) => panic!("Unexpected error on set_tree"),
     }
@@ -59,6 +87,7 @@ fn get_tree(state: &rocket::State<ServerState>) -> String {
         Err(err) => format!("{:?}", err),
     }
 }
+
 
 #[cfg(test)]
 pub mod test {

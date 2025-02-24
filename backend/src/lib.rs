@@ -1,6 +1,8 @@
 use tauri::Manager;
 use tauri::RunEvent;
 
+use rocket::tokio::sync::{Mutex, mpsc};
+
 mod server;
 mod state;
 mod commands;
@@ -21,14 +23,16 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         )?;
     }
 
+    let (tx, rx) = mpsc::channel::<i32>(1);
+
     /* Manage the app state using Tauri */
-    let app_state: AppState = AppState::new(app.app_handle().clone());
+    let app_state: AppState = AppState::new(app.app_handle().clone(), Mutex::new(tx));
     app.manage(app_state);
 
     files::create_saved_trees_dir().expect("Error occured while making saved_trees folder");
     
     /* Clone the app handle and use to create a ServerState */
-    let server_state: ServerState = ServerState::new(app.handle().clone());
+    let server_state: ServerState = ServerState::new(app.handle().clone(), Mutex::new(rx));
 
     /* Mount the Rocket server to the running instance of Tauri */
     tauri::async_runtime::spawn(async move {
