@@ -109,8 +109,10 @@ private object ReactiveNodeDisplay {
 
             ),
 
-            when (node.debugNode.isLeaf) {
+            if (node.debugNode.isLeaf) {
                 div(className := "leaf-line")
+            } else {
+                child(p(className := "compress-ellipsis", "...")) <-- compressed
             },
 
             /* Flex container for rendering children */
