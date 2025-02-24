@@ -45,7 +45,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, false) // TODO?
+        DebugTree::new(debug_tree.get_input().clone(), node, false)
     }
 }
 
