@@ -108,6 +108,10 @@ private object ReactiveNodeDisplay {
 
             ),
 
+            when (node.debugNode.isLeaf) {
+                div(className := "leaf-line")
+            },
+
             /* Flex container for rendering children */
             div(
                 className := "debug-tree-node-container",

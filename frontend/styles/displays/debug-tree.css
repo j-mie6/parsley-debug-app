@@ -68,11 +68,22 @@
     background-color: var(--background-tertiary-40);
 }
 
-.debug-tree-node.leaf {
-    border-bottom-style: double !important;
+
+.leaf-line {
+    width: inherit;
+    height: 2px;
+
+    border-radius: 10px;
+    
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 4px;
+    
+    background-color: var(--font-color-primary);
 }
 
-.debug-tree-node.compress  {
+
+.debug-tree-node.compress:not(.leaf)  {
     border-bottom-style: dashed;
     border-bottom-width: 3px !important;
 }
