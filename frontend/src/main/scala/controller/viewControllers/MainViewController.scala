@@ -32,19 +32,4 @@ object MainViewController {
     /** Get selected view element */
     val getViewElem: Signal[HtmlElement] = view.signal.map(_.elem)
 
-    /* If the current view is the tree view element */
-    private val isTreeView: Var[Boolean] = Var(true)
-
-    /* Default tree view when no tree is loaded */
-    private val noTreeFound: HtmlElement = div(
-        className := "tree-view-error",
-        "No tree found! Start debugging by attaching DillRemoteView to a parser"
-    )
-
-    /**
-      * Returns a div showing that no tree has been fed
-      * to Remote View yet
-      */
-    def getNoTreeFound: HtmlElement = noTreeFound
-    
 }

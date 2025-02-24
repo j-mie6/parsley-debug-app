@@ -2,8 +2,6 @@ package controller.viewControllers
 
 import com.raquo.laminar.api.L.*
 
-import controller.viewControllers.MainViewController
-
 /**
  * Object containing functions and variables defining the input view,
  * which displays the input string of the tree from Parsley Debug
@@ -11,37 +9,12 @@ import controller.viewControllers.MainViewController
 object InputViewController {
 
     /* The input element to be render by InputView */
-    private val inputElement: Var[HtmlElement] = Var(MainViewController.getNoTreeFound)
+    private val input: Var[String] = Var("Please attach a parser to DillRemoteView")
 
-    /**
-     * Gets the input string
-     * 
-     * @return An HTML element displaying the tree's input string
-     */
-    def getInput: HtmlElement = div(
-        child <-- inputElement,
-    )
-    
-    /**
-     * Sets the input string
-     * 
-     * @param input The new input string
-     */
-    private def setInput(input: HtmlElement): Unit = inputElement.set(input)
+    /** Get input string */
+    val getInput: Signal[String] = input.signal
 
-    /**
-     * Converts an input string to an HTML element
-     * 
-     * @param input The input string
-     */
-    def toInputElement(input: String): Unit = {
-        setInput (
-            h1(
-                className := "debug-tree-title",
-                p("Parser Input : ", margin.px := 0, fontSize.px := 15, 
-                    fontStyle.italic, fontWeight.lighter),
-                input
-            )
-        )
-    }
+    /** Set input string */
+    val setInput: Observer[String] = input.writer
+
 }
