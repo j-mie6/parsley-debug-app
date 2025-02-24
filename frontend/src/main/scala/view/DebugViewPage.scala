@@ -191,7 +191,7 @@ abstract class DebugViewPage extends Page {
     /* Button bar internal to the view. */
     private lazy val buttonBar: HtmlElement = div(
         className := "debug-view-button-bar",
-        boxShadow <-- scrollDistance.signal.map(_ >= 3.0).splitBoolean(_ => "0 4px 6px -1px rgb(0 0 0 / 0.1)", _ => "none"),
+        boxShadow <-- scrollDistance.signal.map(_ >= 3.0).splitBoolean(_ => "0 10px 15px -3px rgb(0 0 0 / 0.1)", _ => "none"),
         /* Button bar left. */
         div(
             display.flex,
@@ -232,8 +232,11 @@ abstract class DebugViewPage extends Page {
             div(
                 className := "tree-view-page",
                 buttonBar,
+                paddingBottom.px := 20,
                 onScroll.map(_ => dom.document.getElementsByClassName("tree-view-page").apply(0).scrollTop) --> scrollDistance,
-                child.getOrElse(div())
+                div(
+                    child.getOrElse(div())
+                )
             )
         )))
     } 
