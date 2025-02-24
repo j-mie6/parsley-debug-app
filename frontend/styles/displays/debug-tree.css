@@ -2,7 +2,6 @@
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    flex-basis: auto;
     justify-content: flex-start;
     align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
 }
@@ -20,9 +19,30 @@
     font-weight: lighter;
 }
 
+
+.debug-tree-node-type-box > .node-line {
+    display: none;
+}
+
+.debug-tree-display > div:first-child > .node-line {
+    display: none;
+}
+
+.node-line {
+    border-left-style: solid;
+    border-left-width: 4px;
+    border-left-color: var(--font-color-primary);
+
+    height: 18px;
+    
+    margin-left: 50%;
+}
+
+
 .debug-tree-node {
     padding: 10px;
-    margin: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
     
     border-radius: 10px;
     border-width: 2px;
@@ -49,14 +69,28 @@
     background-color: var(--background-tertiary-40);
 }
 
-.debug-tree-node.leaf {
-    border-bottom-style: double !important;
 
+.leaf-line {
+    width: inherit;
+    height: 2px;
+
+    border-radius: 10px;
+    
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 3px;
+    
+    background-color: var(--font-color-primary);
 }
 
-.debug-tree-node.compress  {
+
+.debug-tree-node.compress:not(.leaf)  {
     border-bottom-style: dashed;
     border-bottom-width: 3px !important;
+}
+
+.debug-tree-node.leaf  {
+    border-bottom-width: 2px !important;
 }
 
 
@@ -71,8 +105,15 @@
 
 .debug-tree-node-type-box {
     position: relative;
-    padding: 10px;
-    top: 5px;
+    top: 10px;
+    
+    padding: 15px;
+    padding-right: 8px;
+    padding-left: 8px;
+    
+    margin-top: 0;
+    margin: 10px;
+
     border-style: dashed;
     border-radius: 10px;
 }
