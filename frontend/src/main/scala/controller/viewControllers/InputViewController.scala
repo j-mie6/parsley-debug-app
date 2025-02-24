@@ -12,9 +12,9 @@ object InputViewController {
     private val input: Var[String] = Var("Please attach a parser to DillRemoteView")
 
     /** Get input string */
-    def getInput: Signal[String] = input.signal
+    val getInput: Signal[String] = input.signal
 
     /** Set input string */
-    def setInput: Observer[String] = input.writer
+    val setInput: Observer[String] = input.writer
 
 }
