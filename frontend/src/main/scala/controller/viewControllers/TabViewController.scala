@@ -9,6 +9,7 @@ import upickle.default as up
 
 import controller.tauri.{Tauri, Command}
 import controller.viewControllers.TreeViewController
+import model.DebugTree
 
 
 /**
@@ -16,111 +17,58 @@ import controller.viewControllers.TreeViewController
 * saved/loaded trees
 */
 object TabViewController {
-    /* Scrollable tab that holds all saved trees */
-    private val scrollableTab: Var[HtmlElement] = Var(div())
     
     /* List of file names (excluding path and ext) wrapped in Var */
     private val fileNames: Var[List[String]] = Var(Nil)
 
-    /* The tab that is currented selected */
-    private val selectedTab: Var[String] = Var("")
+    /** Get file name associated with tab at index */
+    def getFileName(index: Int): Signal[String] = fileNames.signal.map(_(index))
 
-    /**
-    * Gets the scrollable tab element
-    */
-    def getTabBar: Var[HtmlElement] = scrollableTab
+    /** Get list of file names */
+    val getFileNames: Signal[List[String]] = fileNames.signal
+
+    /** Set file names */
+    val setFileNames: Observer[List[String]] = fileNames.writer
     
-    /**
-      * Sets tab bar element
-      *
-      * @param tab An individual tab comprising of title and delete button
-      */
-    def setTabBar(tab: HtmlElement): Unit = scrollableTab.set(tab)
+    /** Add name to file names */
+    val addFileName: Observer[String] = fileNames.updater((names, name) => names :+ name)
     
-    /**
-    * Gets filenames of saved trees
-    */
-    def getFileNames: Var[List[String]] = {
-        fetchSavedTreeNames()
-        fileNames
+    /** Fetches all tree names saved by the user from the backend */
+    def loadFileNames: EventStream[List[String]] = Tauri.invoke(Command.FetchSavedTreeNames, ()).collectRight
+
+    /** Returns true if there are no saved trees */
+    def noSavedTrees: Signal[Boolean] = getFileNames.signal.map(_.isEmpty)
+
+    
+    /* Index of tab that is currented selected */
+    private lazy val selectedTab: Var[Int] = Var(0)
+
+    /** Set current selected tab index */
+    val setSelectedTab: Observer[Int] = selectedTab.writer
+
+    /** Get index of tab with associated name */
+    def getFileNameIndex(name: String): Signal[Int] = getFileNames.map(_.indexOf(name))
+            
+    /** Get selected tab index */
+    val getSelectedTab: Signal[Int] = selectedTab.signal
+    
+    /** Get name of tree associated with selected tab */
+    def getSelectedFileName: Signal[String] = getSelectedTab.flatMapSwitch(getFileName)
+
+    /** Checks if tab is currently selected */
+    def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)
+
+
+    /** Saves current tree to the backend with given name, returning assigned tab index  */
+    def saveTree(name: String): EventStream[Unit] = Tauri.invoke(Command.SaveTree, name).collectRight
+
+    /** Loads a saved tree from the backend as DebugTree */
+    def loadSavedTree(name: String): EventStream[Unit] = Tauri.invoke(Command.LoadSavedTree, name).collectRight
+
+    /** Delete tree loaded within tab, returning updated list of names */
+    def deleteSavedTree(name: String): EventStream[List[String]] = {
+        Tauri.invoke(Command.DeleteTree, name).collectRight
+            .compose(_ => loadFileNames)
     }
 
-    /**
-      * Returns the title of the selected tab
-      */
-    def getSelectedTab: Var[String] = selectedTab
-
-    /**
-      * Sets the shared signal for selected tab to a particular tab title
-      *
-      * @param tabTitle The title of the tab that has been selected
-      */
-    def setSelectedTab(tabTitle: String): Unit = {
-        selectedTab.set(tabTitle)
-
-        /* Loads in the respective tree */
-        TabViewController.loadSavedTree(tabTitle) 
-
-        /* Reload the tree */
-        TreeViewController.reloadTree()
-    } 
-
-    /**
-      * Checks if a tab is the currently selected tab
-      *
-      * @param tabTitle The title of the tab we are checking
-      */
-    def isSelectedTab(tabTitle: String): Signal[Boolean] =
-        selectedTab.signal.map(selected => selected == tabTitle)
-
-    /**
-      * Returns true if there are no saved trees
-      */
-    def noSavedTrees: Signal[Boolean] = 
-        getFileNames.signal.map(names => names.isEmpty)
-    
-    /**
-    * Fetches all tree names saved by the user from the backend
-    *
-    * @param fileNames List of all trees saved by the user within a session
-    */
-    def fetchSavedTreeNames(): Unit = {
-        Tauri.invoke[String](Command.FetchSavedTreeNames).foreach { serializedNames =>
-            /* Update fileNames with parsed names */
-            fileNames.update(_ => up.read[List[String]](serializedNames))
-        }
-    }
-    
-    /**
-      * Deletes a tab within the tab bar and reloads saved tree names
-      *
-      * @param treeName The name of the tree belonging to the tab to be deleted
-      */
-    def deleteTab(name: String): Unit = {
-        Tauri.invoke[Unit](Command.DeleteTree, Map("treeName" -> name))
-        fetchSavedTreeNames()
-    }
-    
-    /**
-    * Saves the the curren tree to the backend as a given name
-    *
-    * @param treeName User-defined name of tree to be saved
-    */
-    def saveTree(name: String): Unit = {
-        Tauri.invoke[String](Command.SaveTree, Map("treeName" -> name))
-        fetchSavedTreeNames()
-        setSelectedTab(name)
-    }
-    
-    /**
-    * Loads a saved tree from the backend into the display tree
-    *
-    * @param treeName User-defined name of the tree to be loaded
-    * @param displayTree Tree element to load and display in a given tree
-    */
-    def loadSavedTree(treeName: String): Unit = 
-        Tauri.invoke[String](Command.LoadSavedTree, Map("treeName" -> treeName))
-          .foreach { _ =>
-            TreeViewController.reloadTree()
-        }
 }
