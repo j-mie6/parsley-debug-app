@@ -38,6 +38,7 @@
     margin-left: 50%;
 }
 
+
 .debug-tree-node {
     padding: 10px;
     margin-left: 5px;
@@ -100,12 +101,13 @@
 
 .debug-tree-node-type-box {
     position: relative;
-    top: 15px;
+    top: 10px;
     
     padding: 15px;
     padding-right: 8px;
     padding-left: 8px;
     
+    margin-top: 0;
     margin: 10px;
 
     border-style: dashed;
