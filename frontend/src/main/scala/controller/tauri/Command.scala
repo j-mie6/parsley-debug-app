@@ -8,17 +8,17 @@ import upickle.default as up
 import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
-import model.{DebugTree, DebugNode}
+import model.{DebugNode, DebugTree}
 import controller.tauri.Args
 
 
 /* Argument trait implemented for types passed to Command invoke call */ 
-private[tauri] sealed trait Args[A] {
+private [tauri] sealed trait Args[A] {
     extension (a: A) 
         def namedArgs: Map[String, Any]
 }
 
-private[tauri] object Args {
+private [tauri] object Args {
     /* Default conversion from Unit to empty Arg Map */
     given noArgs: Args[Unit] {
         extension (unit: Unit) 
@@ -40,7 +40,7 @@ sealed trait Command(private val name: String) {
 
     
     /* Invoke backend command using Tauri JS interface */
-    private[tauri] def invoke(args: In): EventStream[Either[Tauri.Error, Out]] = {
+    private [tauri] def invoke(args: In): EventStream[Either[Tauri.Error, Out]] = {
         val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
