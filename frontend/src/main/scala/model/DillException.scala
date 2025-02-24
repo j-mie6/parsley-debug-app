@@ -3,6 +3,7 @@ package model.errors
 import com.raquo.laminar.api.L.*
 
 import controller.errors.ErrorController
+import com.raquo.laminar.api.features.unitArrows
 
 /**
   * DillException is the generic frontend representation of an Exception
@@ -17,6 +18,7 @@ sealed trait DillException {
     def message: String
     def closable: Boolean
     def style: String
+    def clickFunc: Unit
 
     def displayElement: HtmlElement = {
         div(
@@ -31,7 +33,7 @@ sealed trait DillException {
                 className := "popup-text",
                 this.message,
             ),
-            if closable then onClick --> {_ => ErrorController.clearError()} else onClick --> {_ => ()}
+            onClick --> clickFunc
         )
     }
 }
@@ -42,6 +44,7 @@ sealed trait DillException {
 sealed trait Warning extends DillException {
     override def closable: Boolean = true
     override def style: String = "warning"
+    override def clickFunc: Unit = ErrorController.clearError() 
 }
 
 /**
@@ -50,6 +53,7 @@ sealed trait Warning extends DillException {
 sealed trait Error extends DillException {
     override def closable: Boolean = false
     override def style: String = "error"
+    override def clickFunc: Unit = ()
 }
 
 /* List of DILL Exceptions */
@@ -115,7 +119,7 @@ case object MalformedJSON extends Error {
 }
 
 /* Used when an unexpected error occurs */
-case class UnknownError(mes: String) extends Error {
+case class UnknownError(msg: String) extends Error {
     override def name: String = "Unknown Error"
-    override def message: String = s"Something unexpected went wrong: $mes"
+    override def message: String = s"Something unexpected went wrong: $msg"
 }

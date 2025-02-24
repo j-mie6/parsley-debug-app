@@ -19,6 +19,7 @@ object DebugTreeController {
       * Decode a JSON string into a DebugTree class.
       *
       * @param jsonString The JSON string to convert.
+      * 
       * @return A Try containing DebugTree class or an error message.
       */
     def decodeDebugTree(jsonString: String): Try[DebugTree] = {
