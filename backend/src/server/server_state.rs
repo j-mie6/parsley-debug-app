@@ -1,11 +1,11 @@
 use crate::events::Event;
-
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
 use super::TokioMutex;
 
 pub type SkipsReceiver = rocket::tokio::sync::mpsc::Receiver<i32>;
+
 
 /* Wrapper for StateManager implementation used for Rocket server state management */
 pub struct ServerState(Box<dyn StateManager>, TokioMutex<SkipsReceiver>);
