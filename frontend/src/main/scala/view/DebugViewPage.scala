@@ -91,9 +91,14 @@ abstract class DebugViewPage extends Page {
         i(className := "bi bi-gear-wide-connected")
     )
 
-    // private val viewSelectorsExpandedHandle: Var[Option[SetTimeoutHandle]] = Var(None) 
-    private val shouldCloseExpanded: Var[Boolean] = Var(true)
-    private val viewSelectorsExpanded: Var[Boolean] = Var(false)
+    /**
+     * Semaphore controlling expansion of the descriptions.
+     * 
+     * A value > 0 represents expanded.
+     */
+    private val viewCloseSemaphore: Var[Int] = Var(0)
+    private val viewCloseSemaphoreIncrement: Observer[Unit] = viewCloseSemaphore.updater((x, unit) => x + 1)
+    private val viewCloseSemaphoreDecrement: Observer[Unit] = viewCloseSemaphore.updater((x, unit) => x - 1)
 
     private lazy val treeViewTabButton: HtmlElement = button(
         className := "debug-view-select-button debug-view-tree-button",
@@ -103,7 +108,7 @@ abstract class DebugViewPage extends Page {
 
         div(
             className := "debug-view-expand-button debug-view-expand-tree",
-            cls("expanded") <-- viewSelectorsExpanded.signal,
+            cls("expanded") <-- viewCloseSemaphore.signal.map(_ > 0),
             p("Tree View", marginLeft.px := 5),
         ),
 
@@ -118,7 +123,7 @@ abstract class DebugViewPage extends Page {
 
         div(
             className := "debug-view-expand-button debug-view-expand-source",
-            cls("expanded") <-- viewSelectorsExpanded.signal,
+            cls("expanded") <-- viewCloseSemaphore.signal.map(_ > 0),
             p("Source View", marginLeft.px := 5)
         ),
 
@@ -133,7 +138,7 @@ abstract class DebugViewPage extends Page {
 
         div(
             className := "debug-view-expand-button debug-view-expand-code",
-            cls("expanded") <-- viewSelectorsExpanded.signal,
+            cls("expanded") <-- viewCloseSemaphore.signal.map(_ > 0),
             p("Code View", marginLeft.px := 5),
         ),
 
@@ -186,11 +191,8 @@ abstract class DebugViewPage extends Page {
             display.flex,
             alignItems.center,
 
-            onMouseEnter.mapTo(false) --> shouldCloseExpanded.writer,
-            onMouseLeave.mapTo(true) --> shouldCloseExpanded.writer,
-
-            onMouseEnter.mapTo(true) --> viewSelectorsExpanded.writer,
-            onMouseLeave(_.delay(1000).filter(_ => shouldCloseExpanded.now()).mapTo(false)) --> viewSelectorsExpanded.writer,
+            onMouseEnter.mapToUnit --> viewCloseSemaphoreIncrement,
+            onMouseLeave(_.delay(400).mapToUnit) --> viewCloseSemaphoreDecrement,
 
             settingsTabButton,
             treeViewTabButton,
