@@ -115,7 +115,7 @@ abstract class DebugViewPage extends Page {
         headerLeft,
         title,
         headerRight,
-    )
+    )        
 
     /**
       * Render the DebugViewPage header and a child element. This allows different views to 
@@ -133,7 +133,6 @@ abstract class DebugViewPage extends Page {
             TabView(),
             div(
                 className := "tree-view-page",
-
                 child.getOrElse(div())
             )
         )))
