@@ -74,6 +74,8 @@ private object ReactiveNodeDisplay {
                 p(className := "debug-tree-node-type-name", node.debugNode.name)
             },
 
+            div(className := "node-line"),
+
             div(
                 className := s"debug-tree-node",
 
