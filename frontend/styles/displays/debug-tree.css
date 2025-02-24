@@ -114,6 +114,8 @@
     margin-top: 0;
     margin: 10px;
 
+    height: fit-content;
+
     border-style: dashed;
     border-radius: 10px;
 }
