@@ -22,17 +22,17 @@
 }
 
 [data-theme="light"] {
-    --background-primary: #96dec4;	        /* Parsley green. */
-    --background-secondary: #b8eeda;	    /* Lighter grey. */
+    --background-primary: #d9eae3;	        /* Greenish white. */
+    --background-secondary: #F3F3F3;	    /* Light grey. */
     --background-tertiary: #242526;	    /* Grey 60% transparency. */
     --background-tertiary-60: #24252699;	/* Grey 60% transparency. */
-    --background-tertiary-40: #24252666;	/* Grey 60% transparency. */
+    --background-tertiary-40: #4a4c4f66;	/* Grey 60% transparency. */
     --background-tertiary-20: #24252633;	/* Grey 20% transparancy. */
-    --tab: #3e4041;                        /* Tab green */
-    --tab-hover: #5a5e60;                  /* 5% lighter tab */
-    --tab-selected: #242526;               /* 10% lighter tab */
-    --font-color-primary: #242526;	        /* Black. */
-    --font-color-secondary: #96DEC4;	    /* Parsley green. */
+    --tab: #669883;                        /* Tab green */
+    --tab-hover: #547266;                  /* 5% lighter tab */
+    --tab-selected: #2b815d;               /* 10% lighter tab */
+    --font-color-primary: #0d4416;	        /* Dark green. */
+    --font-color-secondary: #d3ffda;	    /* Lighter green. */
     --font-color-error: #fd4659;	        /* Red error. */
 }
 

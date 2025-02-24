@@ -19,8 +19,12 @@ import controller.viewControllers.TreeViewController
   */
 
 object InputView {
+    def apply(): HtmlElement = {
+        h1(
+            className := "debug-input-title",
 
-    def apply(): HtmlElement = div(
-        InputViewController.getInput
-    )
+            p(className := "debug-input-description", "Parser Input : "),
+            text <-- InputViewController.getInput
+        )
+    }
 }

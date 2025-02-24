@@ -9,6 +9,7 @@ import controller.viewControllers.MainViewController
  * which displays the input string of the tree from Parsley Debug
  */
 object InputViewController {
+
     /* The input element to be render by InputView */
     private val inputElement: Var[HtmlElement] = Var(MainViewController.getNoTreeFound)
 

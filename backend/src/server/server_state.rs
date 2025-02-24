@@ -1,3 +1,4 @@
+use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
@@ -9,19 +10,28 @@ impl ServerState {
     pub fn new<S: StateManager>(state: S) -> Self {
         ServerState(Box::new(state))
     }
+
+    /* Get wrapped StateManager implementation */
+    fn inner(&self) -> &dyn StateManager {
+        self.0.as_ref()
+    }
 }
 
 /* Delegate StateManager implementations to wrapped StateManager */
 impl StateManager for ServerState {
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
-        self.0.as_ref().set_tree(tree)
+        self.inner().set_tree(tree)
     }
 
     fn get_tree(&self) -> Result<DebugTree, StateError> {
-        self.0.as_ref().get_tree()
+        self.inner().get_tree()
     }
 
     fn get_node(&self, id: u32) -> Result<DebugNode, StateError> {
-        self.0.as_ref().get_node(id)
+        self.inner().get_node(id)
+    }
+
+    fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError> {
+        self.inner().emit(event)
     }
 }

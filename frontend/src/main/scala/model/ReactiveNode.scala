@@ -6,8 +6,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import com.raquo.laminar.api.L.*
 
 import model.DebugNode
-import controller.DebugTreeController
-import controller.tauri.{Tauri, Command}
+import controller.tauri.{Command, Tauri}
 
 import controller.errors.ErrorController
 
@@ -17,35 +16,7 @@ import controller.errors.ErrorController
   * @param debugNode holds information about debug node
   * @param children reactive children updated at runtime
   */
-case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]]) {
-    /**
-      * Clear the children from this mode.
-      */
-    def resetChildren(): Unit = { 
-        children.set(Nil)
-    }
-  
-    /**
-      * Query the Tauri backend to get the children of this node.
-      */
-    def reloadChildren(): Unit = {
-        for {
-            nodesString: String <- Tauri.invoke[String](Command.FetchNodeChildren, Map("nodeId" -> debugNode.nodeId))
-        } do {
-            if (!nodesString.isEmpty) {
-                children.set(
-                    DebugTreeController.decodeDebugNodes(nodesString) match {
-                        case Success(nodes) => nodes
-                        case Failure(exception) => {
-                            ErrorController.handleException(exception)
-                            Nil
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
+case class ReactiveNode(debugNode: DebugNode, children: Var[List[DebugNode]])
 
 /**
   * Companion object for a ReactiveNode.

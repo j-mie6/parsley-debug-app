@@ -1,19 +1,21 @@
 package view
 
-import com.raquo.laminar.api.L.*
+import scala.util.Try
 
+import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 
-import controller.tauri.Tauri
-import controller.viewControllers.TabViewController
-import controller.viewControllers.TreeViewController
+import model.DebugTree
+import controller.tauri.{Tauri, Command}
+import controller.viewControllers.{TabViewController, TreeViewController, InputViewController}
 
 
 object TabView {
     val inputName: Var[String] = Var("")
 
     /* Input for the name of the tree to be saved */
-    val nameInput =
+    //TODO: use for naming saved trees
+    val nameInput: HtmlElement = {
         input(
             typ := "text",
             placeholder := "Enter text...",
@@ -22,47 +24,57 @@ object TabView {
                 onInput.mapToValue --> inputName.writer
             )
         )
+    }
 
     /* Renders a tab button from a saved tree name */
-    private def tabButton(tabTitle: String, selectedTab: Var[String]): HtmlElement = {
-            button(
-                className := "tab-button",
-                /* Passing on the signal of the selected tab to each tab*/
-                cls("selected") <-- TabViewController.isSelectedTab(tabTitle),
-                transition := "all 0.5s",
-                tabTitle,
-                closeTabButton(tabTitle),
-                onClick --> {_ => {
-                        /* Sets selected tab signal to newly selected tab */
-                        TabViewController.setSelectedTab(tabTitle)
-                    }
-                }
-            )
-    }
-
-    def closeTabButton(tabTitle: String): HtmlElement = {
+    private def tabButton(index: Int): HtmlElement = {
         button(
-                    className := "close-tab-button",
+            className := "tab-button",
 
-                    /* Close 'X' icon */
-                    i(className := "bi bi-x"),
+            /* Passing on the signal of the selected tab to each tab*/
+            cls("selected") <-- TabViewController.tabSelected(index),
 
-                    onClick --> {_ => 
-                        /* Deletes the respective tab */
-                        TabViewController.deleteTab(tabTitle)
-                    },
-                )
+            text <-- TabViewController.getFileName(index),
+            closeTabButton(index),
+
+            /* Sets selected tab signal to newly selected tab */
+            onClick.mapTo(index) --> TabViewController.setSelectedTab
+        )
     }
+
+    def closeTabButton(index: Int): HtmlElement = {
+        button(
+            className := "close-tab-button",
+
+            /* Close 'X' icon */
+            i(className := "bi bi-x"),
+
+            /* Deletes the respective tab */
+            onClick(event => event.sample(TabViewController.getFileName(index))
+                .flatMapMerge(TabViewController.deleteSavedTree)
+                .tapEach(_ => EventStream.fromValue(0) --> TabViewController.setSelectedTab)
+            ) --> TabViewController.setFileNames,
+        )
+    }
+
+    /* Get selected file name as possible error */
+    val selectedTab: EventStream[Try[String]] = TabViewController.getSelectedFileName.changes.recoverToTry
     
     def apply(): HtmlElement = {
         div(
             className:= "tab-bar",
+            
+            /* Update tree on new tab selected */  
+            selectedTab.collectSuccess
+                .flatMapMerge(TabViewController.loadSavedTree) 
+                --> Observer.empty,
+
+            /* If no tab can be found, unload tree from frontend */  
+            selectedTab.collectFailure.mapToUnit --> TreeViewController.unloadTree,
 
             /* Renders tabs */ 
-            children <-- TabViewController.getFileNames.signal.map(names =>
-                names.map(name => {
-                    tabButton(name, TabViewController.getSelectedTab)
-                })
+            children <-- TabViewController.getFileNames.signal.map(
+                _.indices.map(tabButton(_))
             )
         )
     }

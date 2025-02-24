@@ -1,14 +1,12 @@
 package view
 
-import com.raquo.laminar.api.L.*
-
-import org.scalajs.dom
-
 import scala.util.Failure
 import scala.util.Success
 
-import model.DebugTree
+import org.scalajs.dom
+import com.raquo.laminar.api.L.*
 
+import model.DebugTree
 import controller.viewControllers.TreeViewController
 
 /**
@@ -16,14 +14,9 @@ import controller.viewControllers.TreeViewController
   */
 object TreeView {
 
-    /**
-      * Converts a tree to an HTML element
-      *
-      * @return An HTML element displaying the tree
-      */
-    def apply(): HtmlElement = {
-        div(
-            TreeViewController.getDisplayTree   /* Renders the tree */
-        )
-    }
+    /* Render tree as HtmlElement */
+    def apply(): HtmlElement = div(
+        child <-- TreeViewController.getTreeElem, /* Renders the tree */
+    )
+            
 }
