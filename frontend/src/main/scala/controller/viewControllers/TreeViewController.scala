@@ -17,10 +17,10 @@ object TreeViewController {
     private val tree: Var[Option[DebugTree]] = Var(None) 
 
     /** Set debug tree */
-    def setTree: Observer[DebugTree] = tree.someWriter
+    val setTree: Observer[DebugTree] = tree.someWriter
 
     /** Set optional debug tree (can be None) */
-    def setTreeOpt: Observer[Option[DebugTree]] = tree.writer
+    val setTreeOpt: Observer[Option[DebugTree]] = tree.writer
 
     /** Set debug tree to None to stop rendering */
     def unloadTree: Observer[Unit] = Observer(_ => tree.set(None))
