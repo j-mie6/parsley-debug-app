@@ -1,15 +1,15 @@
-use rocket::tokio::sync::Mutex;
-use rocket::tokio::sync::mpsc;
+use rocket::tokio::{self, sync::mpsc};
 
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
+type SkipsReceiver = tokio::sync::Mutex<mpsc::Receiver<i32>>;
 
 /* Wrapper for StateManager implementation used for Rocket server state management */
-pub struct ServerState(Box<dyn StateManager>, Mutex<mpsc::Receiver<i32>>);
+pub struct ServerState(Box<dyn StateManager>, SkipsReceiver);
 
 impl ServerState {
-    pub fn new<S: StateManager>(state: S, rx: Mutex<mpsc::Receiver<i32>>) -> Self {
+    pub fn new<S: StateManager>(state: S, rx: SkipsReceiver) -> Self {
         ServerState(Box::new(state), rx)
     }
 }

@@ -1,6 +1,7 @@
-use rocket::tokio::sync::{Mutex, mpsc};
 use tauri::Manager;
 use tauri::RunEvent;
+
+use rocket::tokio::sync::{Mutex, mpsc};
 
 mod server;
 mod state;
