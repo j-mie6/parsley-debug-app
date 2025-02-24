@@ -2,6 +2,7 @@ use super::{SavedTree, SavedNode};
 
 /* Placeholder ParserInfo structures for state management */
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DebugTree {
     input: String,
     root: DebugNode,
