@@ -75,6 +75,7 @@ private object ReactiveNodeDisplay {
                 p(className := "debug-tree-node-type-name", node.debugNode.name)
             },
 
+            /* Line connecting node to parent */
             div(className := "node-line"),
 
             div(
@@ -109,6 +110,7 @@ private object ReactiveNodeDisplay {
 
             ),
 
+            /* Set isLeaf/isCompressed indicators below node */
             if (node.debugNode.isLeaf) {
                 div(className := "leaf-line")
             } else {
