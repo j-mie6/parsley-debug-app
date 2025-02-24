@@ -18,7 +18,6 @@ sealed trait DillException {
     def message: String
     def closable: Boolean
     def style: String
-    def clickFunc: Unit
 
     def displayElement: HtmlElement = {
         div(
@@ -33,7 +32,7 @@ sealed trait DillException {
                 className := "popup-text",
                 this.message,
             ),
-            onClick --> clickFunc
+            onClick.mapTo(None).filter(_ => this.closable) --> ErrorController.setOptError,
         )
     }
 }
@@ -44,7 +43,6 @@ sealed trait DillException {
 sealed trait Warning extends DillException {
     override def closable: Boolean = true
     override def style: String = "warning"
-    override def clickFunc: Unit = ErrorController.clearError() 
 }
 
 /**
@@ -53,7 +51,6 @@ sealed trait Warning extends DillException {
 sealed trait Error extends DillException {
     override def closable: Boolean = false
     override def style: String = "error"
-    override def clickFunc: Unit = ()
 }
 
 /* List of DILL Exceptions */

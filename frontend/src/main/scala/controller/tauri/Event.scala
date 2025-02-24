@@ -1,6 +1,6 @@
 package controller.tauri
 
-import scala.util.Try
+import scala.util.{Try, Success, Failure}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -10,7 +10,9 @@ import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent
 
 import model.DebugTree
 import controller.tauri.Event.UnlistenFn
-
+import model.errors.MalformedJSON
+import model.errors.DillException
+import controller.errors.ErrorController
 
 sealed trait Event(private val name: String) {
     
@@ -20,7 +22,7 @@ sealed trait Event(private val name: String) {
 
     
     /* Listen to backend event using Tauri JS interface */
-    private[tauri] def listen(): (EventStream[Either[MalformedJSONException, Out]], Future[UnlistenFn]) = {
+    private[tauri] def listen(): (EventStream[Either[DillException, Out]], Future[UnlistenFn]) = {
         val (stream, callback) = EventStream.withCallback[String]
         
         /* Call Tauri function and get future of unlisten function */
@@ -29,10 +31,11 @@ sealed trait Event(private val name: String) {
             .mapTo[() => Unit]
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
-        val responseStream: EventStream[Either[MalformedJSONException, Out]] = stream
-            .map(up.read[Out](_).nn)
-            .recoverToEither
-            .mapLeft(MalformedJSONException)
+        val responseStream: EventStream[Either[DillException, Out]] = stream
+            .map(ret => Try(up.read[Out](ret)) match {
+                case Success(suc) => Right(suc)
+                case Failure(err) => Left(ErrorController.mapException(err))
+            })  
 
         (responseStream, unlisten)
     }

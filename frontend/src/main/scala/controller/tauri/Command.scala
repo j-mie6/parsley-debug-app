@@ -1,6 +1,6 @@
 package controller.tauri
 
-import scala.util.Try
+import scala.util.{Try, Success, Failure}
 import scala.scalajs.js
 
 import com.raquo.laminar.api.L.*
@@ -9,8 +9,11 @@ import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import controller.tauri.Args
+import model.errors.MalformedJSON
+import model.errors.DillException
+import controller.errors.ErrorController
 
+import controller.tauri.Args
 
 /* Argument trait implemented for types passed to Command invoke call */ 
 private [tauri] sealed trait Args[A] {
@@ -40,7 +43,7 @@ sealed trait Command(private val name: String) {
 
     
     /* Invoke backend command using Tauri JS interface */
-    private [tauri] def invoke(args: In): EventStream[Either[MalformedJSONException, Out]] = {
+    private [tauri] def invoke(args: In): EventStream[Either[DillException, Out]] = {
         val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
@@ -48,9 +51,10 @@ sealed trait Command(private val name: String) {
         
         /* Start EventStream from invoke and deserialise invoke response */
         EventStream.fromJsPromise(invoke, emitOnce = true)
-            .map(up.read[Out](_).nn)
-            .recoverToEither
-            .mapLeft(MalformedJSONException)
+            .map(ret => Try(up.read[Out](ret)) match {
+                case Success(suc) => Right(suc)
+                case Failure(err) => Left(ErrorController.mapException(err))
+            })  
     }
 
 }

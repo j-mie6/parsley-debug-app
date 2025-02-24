@@ -3,8 +3,7 @@ package controller.errors
 import scala.scalajs.js
 
 import com.raquo.laminar.api.L.*
-
-import controller.MalformedJSONException
+import scala.scalajs.js.internal.UnitOps.unitOrOps
 
 import model.errors.*
 
@@ -13,7 +12,7 @@ import model.errors.*
   * and the code to display error popups in the app 
   */
 object ErrorController {
-    
+
     /**
       * Icon to show a popup is a warning
       */
@@ -23,12 +22,22 @@ object ErrorController {
     )
 
     /* Holds current error information */
-    val errorVar: Var[Option[DillException]] = Var(None)
+    private val errorVar: Var[Option[DillException]] = Var(None)
+
+    /* Used to set an error to the var */
+    val setError: Observer[DillException] = errorVar.someWriter
+
+    /* Used to set an optional error to the var */
+    val setOptError: Observer[Option[DillException]] = errorVar.writer
+
+    /* Get current error in the var */
+    val getError: Signal[Option[DillException]] = errorVar.signal
     
-    /* EmptyNode will not be rendered when there isn't an error */
-    val displayError: HtmlElement = div(
-        child <-- errorVar.signal.map(_.map(err => err.displayElement).getOrElse(emptyNode)),
-    )
+    /* Signal containing the html element to display the current error */
+    val getErrorElem: Signal[Option[HtmlElement]] = getError.map(_.map(_.displayElement))
+
+    /* Sets the error var back to no errors, used when a warning is clicked to make it disappear */
+    val clearError: Observer[Unit] = Observer((_: Unit) => errorVar.set(None))
 
     /* Maps an error passed by the backend to a frontend DillException object */
     def mapException(error: Throwable): DillException = {
@@ -46,23 +55,9 @@ object ErrorController {
 
                 case _ => new UnknownError(s"Unknown backend error: ${jsErr.toString()}")
             }
-
-            /* Frontend errors */
-            case MalformedJSONException => MalformedJSON
             
             /* Unknown error if not from backend or frontend */
             case _ => new UnknownError(s"Unknown error: ${error.toString()}")
         }
-    }
-
-    /* Updates the error var with error that has been passed by the backend */
-    def handleException(error: Throwable): Unit = {
-        println(s"Error was: ${error.toString()}")
-        errorVar.set(Some(mapException(error)))
-    }
-
-    /* Sets the error var back to no errors, used when a warning is clicked to make it disappear */
-    def clearError(): Unit = {
-        errorVar.set(None)
     }
 }
