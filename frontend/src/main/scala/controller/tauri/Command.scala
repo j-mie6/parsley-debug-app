@@ -40,7 +40,7 @@ sealed trait Command(private val name: String) {
 
     
     /* Invoke backend command using Tauri JS interface */
-    private[tauri] def invoke(args: In): EventStream[Tauri.Response[Out]] = {
+    private[tauri] def invoke(args: In): EventStream[Either[Tauri.Error, Out]] = {
         val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
@@ -50,7 +50,7 @@ sealed trait Command(private val name: String) {
         EventStream.fromJsPromise(invoke, emitOnce = true)
             .map(up.read[Out](_).nn)
             .recoverToEither
-            .mapLeft(error => new Tauri.Error("Parsing command response failed! " + error.toString))
+            .mapLeft(error => "Parsing command response failed! " + error.toString)
     }
 
 }

@@ -9,7 +9,6 @@ import upickle.default as up
 import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent}
 
 import model.DebugTree
-import Tauri.Response
 
 
 sealed trait Event(private val name: String) {
@@ -22,7 +21,7 @@ sealed trait Event(private val name: String) {
 
     
     /* Listen to backend event using Tauri JS interface */
-    private[tauri] def listen(): (EventStream[Response[Out]], Future[UnlistenFn]) = {
+    private[tauri] def listen(): (EventStream[Either[Tauri.Error, Out]], Future[UnlistenFn]) = {
         val (stream, callback) = EventStream.withCallback[String]
         
         /* Call Tauri function and get future of unlisten function */
@@ -31,10 +30,10 @@ sealed trait Event(private val name: String) {
             .mapTo[() => Unit]
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
-        val responseStream: EventStream[Response[Out]] = stream
+        val responseStream: EventStream[Either[Tauri.Error, Out]] = stream
             .map(up.read[Out](_).nn)
             .recoverToEither
-            .mapLeft(error => new Tauri.Error("Parsing event payload failed! " + error.toString))
+            .mapLeft(error => "Parsing event payload failed! " + error.toString)
 
         (responseStream, unlisten)
     }
