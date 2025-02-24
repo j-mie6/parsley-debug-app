@@ -1,10 +1,12 @@
 use crate::events::Event;
-use rocket::tokio::{self, sync::mpsc};
+use rocket::tokio::sync::mpsc;
 
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
-type SkipsReceiver = tokio::sync::Mutex<mpsc::Receiver<i32>>;
+use super::TokioMutex;
+
+type SkipsReceiver = TokioMutex<mpsc::Receiver<i32>>;
 
 /* Wrapper for StateManager implementation used for Rocket server state management */
 pub struct ServerState(Box<dyn StateManager>, SkipsReceiver);
@@ -44,7 +46,7 @@ impl StateManager for ServerState {
 }
 
 impl ServerState {
-    pub async fn receive_breakpoint_skips(&self) -> Result<i32, ()> {
-        self.1.lock().await.recv().await.ok_or(()) 
+    pub async fn receive_breakpoint_skips(&self) -> Option<i32> {
+        self.1.lock().await.recv().await
     }
 }

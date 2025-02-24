@@ -5,11 +5,14 @@ mod server_state;
 pub use launch::launch;
 pub use server_state::ServerState;
 
+pub type TokioMutex<T> = rocket::tokio::sync::Mutex<T>;
+
 #[cfg(test)]
 pub mod test {
 
     use mockall::predicate;
-    use rocket::{http, local::blocking, tokio::{self, sync::mpsc}};
+    use rocket::{http, local::blocking};
+    use rocket::tokio::sync::mpsc;
 
     use super::{launch, ServerState};
     use crate::events::Event;
@@ -23,7 +26,7 @@ pub mod test {
     The mock should already be set with expectations */
     pub fn tracked_client(mock: MockStateManager) -> blocking::Client {
         let rx = empty_channel::<i32>();
-        let state = ServerState::new(mock, tokio::sync::Mutex::new(rx));
+        let state = ServerState::new(mock, super::TokioMutex::new(rx));
         blocking::Client::tracked(launch::build(state)).expect("Could not launch rocket")
     }
 

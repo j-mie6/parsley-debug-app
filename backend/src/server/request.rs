@@ -19,11 +19,20 @@ struct PostTreeResponse {
     #[serde(skip_serializing_if = "Option::is_none")] skip_breakpoint: Option<i32>,
 }
 
-fn bad_response(m: impl Into<String>) -> Json<PostTreeResponse> {
-    Json(PostTreeResponse {
-        message: m.into(),
-        skip_breakpoint: None,
-    })
+impl PostTreeResponse {
+    fn new(msg: impl Into<String>, skips: i32) -> Json<PostTreeResponse> {
+        Json(PostTreeResponse {
+            message: msg.into(),
+            skip_breakpoint: Some(skips),
+        })
+    }
+
+    fn no_skips(msg: impl Into<String>) -> Json<PostTreeResponse> {
+        Json(PostTreeResponse {
+            message: msg.into(),
+            skip_breakpoint: None,
+        })
+    }
 }
 
 /* Placeholder GET request handler to print 'Hello world!' */
@@ -56,23 +65,22 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     /* Update state with new debug_tree and return response */
     match state.set_tree(debug_tree).and(state.emit(Event::NewTree)) {
         Ok(()) => {
-            let skip_breakpoint: Option<i32> = if is_debugging {
-                match state.receive_breakpoint_skips().await {
-                    Ok(value) => Some(value),
-                    Err(_) => return (http::Status::InternalServerError, bad_response("Unknown internal error or timeout")),
-                }
-            } else { None };
-
-            let response = PostTreeResponse {
-                message,
-                skip_breakpoint,
+            if !is_debugging {
+                return (http::Status::Ok, PostTreeResponse::no_skips(message))
             };
 
-            (http::Status::Ok, Json(response))
+            match state.receive_breakpoint_skips().await {
+                Some(skips) => (http::Status::Ok, PostTreeResponse::new(message, skips)),
+                None => (http::Status::InternalServerError, PostTreeResponse::no_skips(message)),
+            }
+
         },
         
         Err(StateError::LockFailed) => 
-            (http::Status::InternalServerError, bad_response("Locking state mutex failed - try again")), 
+            (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again")),
+
+        Err(StateError::ChannelError) =>
+            (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again")),
             
         Err(_) => panic!("Unexpected error on post_tree"),
     }
