@@ -72,6 +72,12 @@
 }
 
 .debug-view-button-bar {
+    background-color: var(--background-secondary);
+    z-index: 1;
+    position: sticky;
+    top: 0px;
+    left: 0px;
+    padding: 20px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -107,12 +113,9 @@
 .debug-view-select-button {
     cursor: pointer;
     color: var(--font-color-tertiary);
-    background-color: #ffffff00;
     border: 1px solid var(--font-color-tertiary);
     border-radius: 15px;
     margin-left: 19px;
-    transition: color 0.5s;
-    transition: background-color 0.5s;
 }
 
 .debug-view-select-button.selected {

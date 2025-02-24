@@ -22,6 +22,9 @@ import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.InputViewController
 import scala.concurrent.duration.FiniteDuration
+import org.scalajs.dom.UIEvent
+import org.scalajs.dom.EventTarget
+import typings.std.stdStrings.document
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -37,6 +40,8 @@ abstract class DebugViewPage extends Page {
     private lazy val gitIcon: HtmlElement = i(className := "bi bi-github", fontSize.px := 40)
     private lazy val sunIcon: HtmlElement = i(className := "bi bi-brightness-high-fill", fontSize.px := 33)
     private lazy val moonIcon: HtmlElement = i(className := "bi bi-moon-fill", fontSize.px := 33)
+
+    private val scrollDistance: Var[Double] = Var(0.0)
 
     /* Left section of the page header, containing tree and source view tabs */
     private lazy val headerLeft: HtmlElement = div(
@@ -112,7 +117,7 @@ abstract class DebugViewPage extends Page {
             p("Tree View", marginLeft.px := 5),
         ),
 
-        onClick.mapTo(View.Tree) --> MainViewController.setView,
+        onClick.preventDefault.mapTo(View.Tree) --> MainViewController.setView,
     )
 
     private lazy val sourceViewTabButton: HtmlElement = button(
@@ -127,7 +132,7 @@ abstract class DebugViewPage extends Page {
             p("Source View", marginLeft.px := 5)
         ),
 
-        onClick.mapTo(View.Input) --> MainViewController.setView,
+        onClick.preventDefault.mapTo(View.Input) --> MainViewController.setView,
     )
 
     private lazy val codeViewTabButton: HtmlElement = button(
@@ -142,7 +147,7 @@ abstract class DebugViewPage extends Page {
             p("Code View", marginLeft.px := 5),
         ),
 
-        onClick.mapTo(View.Code) --> MainViewController.setView,
+        onClick.preventDefault.mapTo(View.Code) --> MainViewController.setView,
     )
 
     /* Button used to toggle the theme */
@@ -186,6 +191,7 @@ abstract class DebugViewPage extends Page {
     /* Button bar internal to the view. */
     private lazy val buttonBar: HtmlElement = div(
         className := "debug-view-button-bar",
+        boxShadow <-- scrollDistance.signal.map(_ >= 3.0).splitBoolean(_ => "0 4px 6px -1px rgb(0 0 0 / 0.1)", _ => "none"),
         /* Button bar left. */
         div(
             display.flex,
@@ -226,6 +232,7 @@ abstract class DebugViewPage extends Page {
             div(
                 className := "tree-view-page",
                 buttonBar,
+                onScroll.map(_ => dom.document.getElementsByClassName("tree-view-page").apply(0).scrollTop) --> scrollDistance,
                 child.getOrElse(div())
             )
         )))

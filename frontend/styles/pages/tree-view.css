@@ -1,6 +1,5 @@
 .tree-view-page {
     background-color: var(--background-secondary);
-    padding: 20px;
     height: 85%;
     overflow: auto;
     border: 2px solid var(--font-color-primary);
