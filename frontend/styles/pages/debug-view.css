@@ -16,7 +16,6 @@
 }
 
 .debug-view-header-right-buttons {
-    width: 30%;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -68,14 +67,95 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-.save-button {
-    margin-right: 20px;
-    background: transparent;
-    color: inherit;
-    border: none;
-    font: inherit;
-    outline: inherit;
+.debug-view-button-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.debug-view-save {
+    font-size: 18px;
+    margin-right: 10px;
     cursor: pointer;
+}
+
+.debug-view-button-save {
+    font-size: 20px;
+    margin-right: 14px;
+}
+
+.debug-view-button-info {
+    font-size: 22px;
+    margin-right: 2px;
+}
+
+.debug-view-button-settings {
+    font-size: 30px;
+    margin-left: 5px;
+}
+
+.debug-view-button {
+    cursor: pointer;
+    color: var(--font-color-tertiary);
+}
+
+.debug-view-select-button {
+    cursor: pointer;
+    color: var(--font-color-tertiary);
+    background-color: #ffffff00;
+    border: 1px solid var(--font-color-tertiary);
+    border-radius: 15px;
+    margin-left: 19px;
+    transition: color 0.5s;
+    transition: background-color 0.5s;
+}
+
+.debug-view-select-button.selected {
+    color: var(--background-secondary);
+    background-color: var(--font-color-tertiary);
+}
+
+.debug-view-tree-button {
+    font-size: 25px;
+    padding-inline: 7px;
+    padding-block: 4px;
+}
+
+.debug-view-code-button {
+    font-size: 25px;
+    padding-inline: 7px;
+    padding-block: 4px;
+}
+
+.debug-view-source-button {
+    font-size: 25px;
+    padding-inline: 7px;
+    padding-block: 4px;
+}
+
+.debug-view-expand-button {
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0;
+    transition: margin-left 0.5s;
+    transition: width 0.5s;
+    margin-left: 0px;
+    font-size: 20px;
+}
+
+.debug-view-expand-tree.expanded {
+    width: 102px;
+}
+
+.debug-view-expand-source.expanded {
+    width: 129px;
+}
+
+.debug-view-expand-code.expanded {
+    width: 110px;
 }
