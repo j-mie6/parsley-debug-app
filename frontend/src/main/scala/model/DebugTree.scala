@@ -7,8 +7,9 @@ import upickle.default.ReadWriter
   *
   * @param input the input string the tree node has to parse
   * @param root the debug tree root node
+  * @param isDebuggable if this tree is using live debugging operations like breakpoint skipping
   */
-case class DebugTree(input: String, root: DebugNode) derives ReadWriter
+case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean) derives ReadWriter
 
 /**
   * Case class used to represent tauri's debug tree automatically using upickle.

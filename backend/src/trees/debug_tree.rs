@@ -5,11 +5,12 @@ use super::{SavedTree, SavedNode};
 pub struct DebugTree {
     input: String,
     root: DebugNode,
+    is_debuggable: bool,
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode) -> Self {
-        DebugTree { input, root }
+    pub fn new(input: String, root: DebugNode, is_debuggable: bool) -> Self {
+        DebugTree { input, root, is_debuggable }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -43,7 +44,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node)
+        DebugTree::new(debug_tree.get_input().clone(), node, false) // TODO?
     }
 }
 
@@ -98,7 +99,8 @@ pub mod test {
                 "childId": 0,
                 "input": "Test",
                 "isLeaf": true
-            }
+            },
+            "is_debuggable": false
         }"#
         .split_whitespace()
         .collect::<String>()
@@ -115,7 +117,8 @@ pub mod test {
                 "childId": 0,
                 "input": "0",
                 "isLeaf": false
-            }
+            },
+            "is_debuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -132,7 +135,8 @@ pub mod test {
                 Some(0),
                 String::from("Test"),
                 Vec::new()
-            )
+            ),
+            false
         )
     }
 
@@ -186,7 +190,8 @@ pub mod test {
                         ]
                     )
                 ]
-            )
+            ),
+            false
         )
     }
  
