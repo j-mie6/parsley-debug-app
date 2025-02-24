@@ -50,4 +50,6 @@ object TreeViewController {
     def skipBreakpoints(skips: Int): Unit =
         Tauri.invoke(Command.SkipBreakpoints, skips)
     
+    /* Toggle whether the button to skip through breakpoints is visible */
+    val getSkipVisibility: Signal[Boolean] = tree.signal.tapEach(println).map(_.exists(_.isDebuggable))
 }
