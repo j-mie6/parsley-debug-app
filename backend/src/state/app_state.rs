@@ -1,13 +1,11 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
-use rocket::tokio::sync::mpsc;
-
 use crate::events::Event;
 use crate::server::TokioMutex;
 use crate::trees::{DebugTree, DebugNode};
 
-type SkipsSender = TokioMutex<mpsc::Sender<i32>>;
+pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<i32>;
 
 use super::{StateError, StateManager, AppHandle};
 
@@ -16,7 +14,7 @@ struct AppStateInternal {
     app: AppHandle,                 /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
-    skips_tx: SkipsSender, /* Transmitter how many breakpoints to skip, sent to parsley */
+    skips_tx: TokioMutex<SkipsSender>, /* Transmitter how many breakpoints to skip, sent to parsley */
 }
 
 
@@ -25,7 +23,7 @@ pub struct AppState(Mutex<AppStateInternal>);
 
 impl AppState {
     /* Create a new app state with the app_handle */
-    pub fn new(app_handle: tauri::AppHandle, skips_tx: SkipsSender) -> AppState {
+    pub fn new(app_handle: tauri::AppHandle, skips_tx: TokioMutex<SkipsSender>) -> AppState {
         AppState(
             Mutex::new(
                 AppStateInternal {

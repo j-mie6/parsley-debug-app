@@ -3,7 +3,7 @@ mod request;
 mod server_state;
 
 pub use launch::launch;
-pub use server_state::ServerState;
+pub use server_state::{ServerState, SkipsReceiver};
 
 pub type TokioMutex<T> = rocket::tokio::sync::Mutex<T>;
 
