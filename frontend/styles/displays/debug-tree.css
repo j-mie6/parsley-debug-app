@@ -78,7 +78,7 @@
     
     margin-left: 10px;
     margin-right: 10px;
-    margin-top: 4px;
+    margin-top: 3px;
     
     background-color: var(--font-color-primary);
 }
@@ -87,6 +87,10 @@
 .debug-tree-node.compress:not(.leaf)  {
     border-bottom-style: dashed;
     border-bottom-width: 3px !important;
+}
+
+.debug-tree-node.leaf  {
+    border-bottom-width: 2px !important;
 }
 
 
