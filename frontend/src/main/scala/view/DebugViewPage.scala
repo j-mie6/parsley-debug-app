@@ -6,6 +6,9 @@ import com.raquo.laminar.api.features.unitArrows
 
 import org.scalajs.dom
 
+import scala.scalajs.js.timers._
+import scala.concurrent.duration._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Try, Success, Failure}
 
@@ -13,9 +16,12 @@ import model.Page
 
 import controller.AppStateController
 import controller.tauri.Tauri
+import controller.viewControllers.MainViewController.View
 import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
+import controller.viewControllers.InputViewController
+import scala.concurrent.duration.FiniteDuration
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -37,21 +43,17 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-left",
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewController.isTreeView(true),
+            cls("selected") <-- MainViewController.getView.map(_ == View.Tree),
             treeIcon,
             h2("Tree View", marginLeft.px := 7),
-            onClick --> { _ => 
-                MainViewController.setIsTreeView(true) 
-            }
+            onClick.mapTo(View.Tree) --> MainViewController.setView,
         ),
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewController.isTreeView(false),
+            cls("selected") <-- MainViewController.getView.map(_ == View.Input),
             fileIcon,
             h2("Input View", marginLeft.px := 12),
-            onClick --> { _ => 
-                MainViewController.setIsTreeView(false) 
-            }
+            onClick.mapTo(View.Input) --> MainViewController.setView,
         )
     )
 
@@ -69,11 +71,11 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-button-save debug-view-button",
         i(className := "bi bi-floppy-fill"),
         
-        onClick --> { _ => {
-            val treeName: String = (rand.nextInt).toString()
-            TabViewController.saveTree(treeName)
-            TabViewController.setSelectedTab(treeName)
-        }}
+        // onClick --> { _ => {
+        //     val treeName: String = (rand.nextInt).toString()
+        //     TabViewController.saveTree(treeName)
+        //     TabViewController.setSelectedTab(treeName)
+        // }}
     )
 
     /* Overview information tab. */
@@ -89,11 +91,13 @@ abstract class DebugViewPage extends Page {
         i(className := "bi bi-gear-wide-connected")
     )
 
-    private val viewSelectorsExpanded : Var[Boolean] = Var(false)
+    // private val viewSelectorsExpandedHandle: Var[Option[SetTimeoutHandle]] = Var(None) 
+    private val shouldCloseExpanded: Var[Boolean] = Var(true)
+    private val viewSelectorsExpanded: Var[Boolean] = Var(false)
 
     private lazy val treeViewTabButton: HtmlElement = button(
         className := "debug-view-select-button debug-view-tree-button",
-        cls("selected") <-- MainViewController.isTreeView(true),
+        cls("selected") <-- MainViewController.getView.map(_ == View.Tree),
 
         i(className := "bi bi-tree-fill"),
 
@@ -103,16 +107,14 @@ abstract class DebugViewPage extends Page {
             p("Tree View", marginLeft.px := 5),
         ),
 
-        onClick --> { _ => 
-            MainViewController.setIsTreeView(true) 
-        },
+        onClick.mapTo(View.Tree) --> MainViewController.setView,
     )
 
     private lazy val sourceViewTabButton: HtmlElement = button(
         className := "debug-view-select-button debug-view-source-button",
         i(className := "bi bi-file-earmark-text-fill"),
         
-        cls("selected") <-- MainViewController.isTreeView(false),
+        cls("selected") <-- MainViewController.getView.map(_ == View.Input),
 
         div(
             className := "debug-view-expand-button debug-view-expand-source",
@@ -120,16 +122,14 @@ abstract class DebugViewPage extends Page {
             p("Source View", marginLeft.px := 5)
         ),
 
-        onClick --> { _ => 
-            MainViewController.setIsTreeView(false) 
-        },
+        onClick.mapTo(View.Input) --> MainViewController.setView,
     )
 
     private lazy val codeViewTabButton: HtmlElement = button(
         className := "debug-view-select-button debug-view-code-button",
         i(className := "bi bi-file-earmark-code-fill"),
         
-        // cls("selected") <-- MainViewController.isTreeView(true),
+        cls("selected") <-- MainViewController.getView.map(_ == View.Code),
 
         div(
             className := "debug-view-expand-button debug-view-expand-code",
@@ -137,19 +137,20 @@ abstract class DebugViewPage extends Page {
             p("Code View", marginLeft.px := 5),
         ),
 
-        onClick --> { _ => 
-            // MainViewController.setIsTreeView(true) 
-        },
+        onClick.mapTo(View.Code) --> MainViewController.setView,
     )
 
     /* Button used to toggle the theme */
-    private lazy val themeButton: HtmlElement = div(
-        child <-- AppStateController.isLightMode.signal
-            .map((project: Boolean) => if project then moonIcon else sunIcon),
+    private lazy val themeButton: Element = div(
         cursor.pointer,
         alignContent.center,
+
         marginRight.px := 20,
-        onClick --> {_ => AppStateController.toggleTheme()}
+
+        /* Render moonIcon in light mode; sunIcon in dark mode */
+        child <-- AppStateController.getThemeIcon, 
+
+        onClick.mapToUnit --> AppStateController.toggleTheme()
     )
 
     /* Button that links to the 'parsley-debug-app' Github repo */
@@ -162,9 +163,8 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-right",
         div(
             className := "debug-view-header-right-buttons",
-            // saveButton,
             themeButton,
-            githubButton
+            githubButton,
         )
     )
 
@@ -186,9 +186,11 @@ abstract class DebugViewPage extends Page {
             display.flex,
             alignItems.center,
 
-            onMouseEnter --> viewSelectorsExpanded.set(true),
-            onMouseLeave --> viewSelectorsExpanded.set(false),
+            onMouseEnter.mapTo(false) --> shouldCloseExpanded.writer,
+            onMouseLeave.mapTo(true) --> shouldCloseExpanded.writer,
 
+            onMouseEnter.mapTo(true) --> viewSelectorsExpanded.writer,
+            onMouseLeave(_.delay(1000).filter(_ => shouldCloseExpanded.now()).mapTo(false)) --> viewSelectorsExpanded.writer,
 
             settingsTabButton,
             treeViewTabButton,
@@ -214,7 +216,6 @@ abstract class DebugViewPage extends Page {
       * @return HTML element of the DebugView page.
       */
     override def render(child: Option[HtmlElement]): HtmlElement = {
-
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,

@@ -11,10 +11,8 @@ import controller.tauri.Tauri
 
 
 @main def app = {
-    dom.document.documentElement.setAttribute("data-theme", if AppStateController.isLightMode.now() then "light" else "dark")
     renderOnDomContentLoaded(
         dom.document.getElementById("app"),
         MainView()
-
     )
 }

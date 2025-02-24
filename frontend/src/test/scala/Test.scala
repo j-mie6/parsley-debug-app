@@ -1,13 +1,13 @@
+import scala.util.{Try, Success, Failure}
 import org.scalatest
 import org.scalatest.flatspec.AnyFlatSpec   
 import org.scalatest.matchers.*
 
-import scala.util.{Try, Success, Failure}
+import upickle.default as up
 
 import model.DebugTree
 import model.DebugNode
 
-import controller.DebugTreeController
 
 class Test extends AnyFlatSpec with should.Matchers {
 
@@ -24,7 +24,7 @@ class Test extends AnyFlatSpec with should.Matchers {
         }
     }"""
 
-    val tree: DebugTree = DebugTreeController.decodeDebugTree(jsonTree).get
+    val tree: DebugTree = up.read[DebugTree](jsonTree)
     
     "The tree" should "be deserialised" in {
         /* Check that the root tree has been deserialised correctly */
@@ -40,6 +40,6 @@ class Test extends AnyFlatSpec with should.Matchers {
 
     it should "not be deserialised if the JSON is not properly formatted" in {
         val wrongJson: String = "Testing..."
-        DebugTreeController.decodeDebugTree(wrongJson) shouldBe a [Failure[_]]
+        Try(up.read[DebugTree](wrongJson)) shouldBe a [Failure[?]]
     }
 }
