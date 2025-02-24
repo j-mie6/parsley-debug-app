@@ -97,8 +97,8 @@ abstract class DebugViewPage extends Page {
      * A value > 0 represents expanded.
      */
     private val viewCloseSemaphore: Var[Int] = Var(0)
-    private val viewCloseSemaphoreIncrement: Observer[Unit] = viewCloseSemaphore.updater((x, unit) => x + 1)
-    private val viewCloseSemaphoreDecrement: Observer[Unit] = viewCloseSemaphore.updater((x, unit) => x - 1)
+    private val viewCloseSemaphoreIncrement: Observer[Int] = viewCloseSemaphore.updater((x, add) => x + add)
+    private val viewCloseSemaphoreDecrement: Observer[Int] = viewCloseSemaphore.updater((x, min) => x - min)
 
     private lazy val treeViewTabButton: HtmlElement = button(
         className := "debug-view-select-button debug-view-tree-button",
@@ -191,8 +191,9 @@ abstract class DebugViewPage extends Page {
             display.flex,
             alignItems.center,
 
-            onMouseEnter.mapToUnit --> viewCloseSemaphoreIncrement,
-            onMouseLeave(_.delay(400).mapToUnit) --> viewCloseSemaphoreDecrement,
+            onMouseEnter.mapTo(2) --> viewCloseSemaphoreIncrement,
+            onMouseEnter(_.delay(500).mapTo(1)) --> viewCloseSemaphoreDecrement,
+            onMouseLeave(_.delay(200).mapTo(1)) --> viewCloseSemaphoreDecrement,
 
             settingsTabButton,
             treeViewTabButton,
@@ -204,7 +205,7 @@ abstract class DebugViewPage extends Page {
             display.flex,
             alignItems.center,
 
-            saveButton,
+            // saveButton, // Don't actually need this because of new tabs etc... uncomment if we fix our brains someday
             infoButton,
         )
     )   
