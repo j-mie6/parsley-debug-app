@@ -79,8 +79,8 @@ object Command {
     case object SaveTree extends Command("save_tree") {
         type In = String
         given args: Args[String] {
-            extension (name: String)
-                def namedArgs: Map[String, Any] = Map("treeName" -> name)
+            extension (treeName: String)
+                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
         type Out = Unit
