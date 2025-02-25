@@ -21,6 +21,10 @@ impl DebugTree {
     pub fn get_input(&self) -> &String {
         &self.input
     }
+
+    pub fn is_debuggable(&self) -> bool {
+        self.is_debuggable
+    }
 }
 
 impl From<SavedTree> for DebugTree {
@@ -45,7 +49,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, false)
+        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
     }
 }
 
