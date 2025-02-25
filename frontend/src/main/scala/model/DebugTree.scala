@@ -21,6 +21,7 @@ case class DebugTree(input: String, root: DebugNode) derives ReadWriter
   * @param input the input string the tree node has to parse
   * @param children list of children nodes
   * @param isLeaf if a node is a leaf
+  * @param isIterative if a node is iterative (and opaque)
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean) derives ReadWriter
+    childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean) derives ReadWriter
