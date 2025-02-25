@@ -66,7 +66,10 @@ private object ReactiveNodeDisplay {
     def apply(node: ReactiveNode): HtmlElement = {
         /* True if start of a user-defined type */
         val hasUserType: Boolean = node.debugNode.internal != node.debugNode.name
-        val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty);
+        val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty)
+
+        val iterativeNodeIndex: Var[Int] = Var(0)
+        val moveIndex: Observer[Int] = iterativeNodeIndex.updater(_ + _)
 
         div(
             className := "debug-node-container",
@@ -87,6 +90,7 @@ private object ReactiveNodeDisplay {
                 cls("compress") <-- compressed,
                 cls("fail") := !node.debugNode.success,
                 cls("leaf") := node.debugNode.isLeaf,
+                cls("iterative") := node.debugNode.isIterative,
 
                 /* Render debug node information */
                 div(
@@ -96,9 +100,8 @@ private object ReactiveNodeDisplay {
 
                 /* Expand/compress node on click */
                 onClick(_
-                    .sample(node.children.signal)
+                    .sample(compressed)
                     .filter(_ => !node.debugNode.isLeaf)
-                    .map(_.isEmpty)
                     .flatMapMerge(
                         if (_) { 
                             /* If no children, load them in */
@@ -112,6 +115,19 @@ private object ReactiveNodeDisplay {
 
             ),
 
+            child(div(
+                className := "iterative-button",
+                button(
+                    "Prev node",
+                    onClick.mapTo(-1) --> moveIndex,
+                ),
+                button(
+                    "Next node",
+                    onClick.mapTo(1) --> moveIndex,
+                ),
+            )) <-- compressed.not.map(_ && node.debugNode.isIterative),
+
+
             /* Set isLeaf/isCompressed indicators below node */
             if (node.debugNode.isLeaf) {
                 div(className := "leaf-line")
@@ -122,10 +138,16 @@ private object ReactiveNodeDisplay {
             /* Flex container for rendering children */
             div(
                 className := "debug-node-children-container",
-                children <-- node.children.signal.map((nodes) =>
-                    nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply)
-                )
-            ),
+                children <-- node.children.signal
+                    .compose(_.changes
+                            .filter(!_.isEmpty && node.debugNode.isIterative)
+                            .toSignal(Nil)
+                            .combineWithFn(iterativeNodeIndex.signal)((nodes: List[DebugNode], index: Int) => nodes(index % nodes.length))
+                            .map((node: DebugNode) => List(node))
+                    )
+                    .map((nodes: List[DebugNode]) => nodes.map((node: DebugNode) => ReactiveNodeDisplay(ReactiveNode(node))))
+            )
+
         )
     }
 

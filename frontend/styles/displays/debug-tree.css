@@ -122,6 +122,11 @@
     border-bottom-width: 2px !important;
 }
 
+/* To check if iterative is being passed through */
+.debug-node.iterative {
+    background: red !important
+}
+
 /* Bar rendered below leaf nodes to indicate no more nodes */
 .leaf-line {
     width: inherit;
