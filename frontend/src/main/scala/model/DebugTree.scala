@@ -1,5 +1,7 @@
 package model
 
+import model.json.Reader
+
 
 /**
   * Case class used to represent tauri's debug tree automatically using upickle.
