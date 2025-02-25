@@ -2,14 +2,16 @@ use super::{SavedTree, SavedNode};
 
 /* Placeholder ParserInfo structures for state management */
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DebugTree {
     input: String,
     root: DebugNode,
+    is_debuggable: bool,
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode) -> Self {
-        DebugTree { input, root }
+    pub fn new(input: String, root: DebugNode, is_debuggable: bool) -> Self {
+        DebugTree { input, root, is_debuggable }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -18,6 +20,10 @@ impl DebugTree {
 
     pub fn get_input(&self) -> &String {
         &self.input
+    }
+
+    pub fn is_debuggable(&self) -> bool {
+        self.is_debuggable
     }
 }
 
@@ -43,7 +49,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node)
+        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
     }
 }
 
@@ -98,7 +104,8 @@ pub mod test {
                 "childId": 0,
                 "input": "Test",
                 "isLeaf": true
-            }
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect::<String>()
@@ -115,7 +122,8 @@ pub mod test {
                 "childId": 0,
                 "input": "0",
                 "isLeaf": false
-            }
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -132,7 +140,8 @@ pub mod test {
                 Some(0),
                 String::from("Test"),
                 Vec::new()
-            )
+            ),
+            false
         )
     }
 
@@ -186,7 +195,8 @@ pub mod test {
                         ]
                     )
                 ]
-            )
+            ),
+            false
         )
     }
  
