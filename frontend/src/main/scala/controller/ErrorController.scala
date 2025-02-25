@@ -40,7 +40,7 @@ object ErrorController {
     val clearError: Observer[Unit] = Observer((_: Unit) => errorVar.set(None))
 
     /* Maps an error passed by the backend to a frontend DillException object */
-    def mapException(error: Throwable): DillException = {
+    def mapException(error: Any): DillException = {
         error match {
             /* Backend errors */
             case js.JavaScriptException(jsErr) => jsErr.toString.stripPrefix(": ") match {
@@ -56,6 +56,8 @@ object ErrorController {
                 case _ => new UnknownError(s"Unknown backend error: ${jsErr.toString()}")
             }
             
+            case MalformedJSON => MalformedJSON
+
             /* Unknown error if not from backend or frontend */
             case _ => new UnknownError(s"Unknown error: ${error.toString()}")
         }

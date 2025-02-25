@@ -32,10 +32,11 @@ sealed trait Event(private val name: String) {
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
         val responseStream: EventStream[Either[DillException, Out]] = stream
-            .map(ret => Try(up.read[Out](ret)) match {
-                case Success(suc) => Right(suc)
-                case Failure(err) => Left(ErrorController.mapException(err))
-            })  
+            .map((s: String) => 
+                Try(up.read[Out](s)) match 
+                    case Success(suc) => Right(suc)
+                    case Failure(err) => Left(ErrorController.mapException(s))
+            )   
 
         (responseStream, unlisten)
     }

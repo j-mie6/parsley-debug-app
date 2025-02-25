@@ -60,10 +60,10 @@ object TabViewController {
 
 
     /** Saves current tree to the backend with given name, returning assigned tab index  */
-    def saveTree(name: String): EventStream[Unit] = Tauri.invoke(Command.SaveTree, name).collectRight
+    def saveTree(name: String): EventStream[Either[model.errors.DillException, Unit]] = Tauri.invoke(Command.SaveTree, name)
 
     /** Loads a saved tree from the backend as DebugTree */
-    def loadSavedTree(name: String): EventStream[Unit] = Tauri.invoke(Command.LoadSavedTree, name).collectRight
+    def loadSavedTree(name: String): EventStream[Either[model.errors.DillException, Unit]] = Tauri.invoke(Command.LoadSavedTree, name)
 
     /** Delete tree loaded within tab, returning updated list of names */
     def deleteSavedTree(name: String): EventStream[List[String]] = {
