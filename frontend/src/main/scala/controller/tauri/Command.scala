@@ -10,9 +10,9 @@ import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 import model.{DebugNode, DebugTree}
 import controller.tauri.Args
 import model.json.Reader
+import model.json.JsonError
 import model.errors.DillException
 import controller.errors.ErrorController
-
 
 
 /* Argument trait implemented for types passed to Command invoke call */ 

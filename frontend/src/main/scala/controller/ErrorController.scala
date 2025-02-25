@@ -6,6 +6,7 @@ import com.raquo.laminar.api.L.*
 import scala.scalajs.js.internal.UnitOps.unitOrOps
 
 import model.errors.*
+import model.json.JsonError
 
 /** 
   * ErrorController keeps track of the error state of the app 
@@ -57,7 +58,7 @@ object ErrorController {
             }
             
             /* Frontend errors */
-            case MalformedJSONException => MalformedJSON
+            case JsonError => MalformedJSON
 
             /* Unknown error if not from backend or frontend */
             case _ => new UnknownError(s"Unknown error: ${error.toString()}")

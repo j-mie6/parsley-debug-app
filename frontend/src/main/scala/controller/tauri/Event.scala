@@ -10,7 +10,7 @@ import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent
 import model.DebugTree
 import model.json.{Reader, JsonError}
 import controller.tauri.Event.UnlistenFn
-import model.errors.MalformedJSON
+import model.json.JsonError
 import model.errors.DillException
 import controller.errors.ErrorController
 
