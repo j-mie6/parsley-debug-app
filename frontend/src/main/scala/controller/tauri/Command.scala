@@ -41,19 +41,26 @@ sealed trait Command(private val name: String) {
     type Out
     given up.Reader[Out] = scala.compiletime.deferred 
 
-    
+    val isUnit: Boolean = false
+
     /* Invoke backend command using Tauri JS interface */
     private [tauri] def invoke(args: In): EventStream[Either[DillException, Out]] = {
+        println(s"Running Command: $name")
         val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
-        val invoke: js.Promise[String] = tauriInvoke[String](name, strArgs);
-        
+        // val invoke: js.Promise[String] = tauriInvoke[String](name, strArgs)
+
         /* Start EventStream from invoke and deserialise invoke response */
-        EventStream.fromJsPromise(invoke, emitOnce = true)
-            .map(ret => Try(up.read[Out](ret)) match {
-                case Success(suc) => Right(suc)
-                case Failure(err) => Left(ErrorController.mapException(err))
+        EventStream.fromJsPromise(tauriInvoke[String](name, strArgs), emitOnce = true)
+            .recoverToEither //Fail(throwable error with message to be cnverted to DillException) or Success(string to be serialised)
+            .map(_ match {
+                    case Left(err) => Left(ErrorController.mapException(err))
+                    case Right(ret) => (Try(up.read[Out](ret))) match {
+                        case Success(suc) => { println(s"Normal success. Command: $name"); Right(suc) }
+                        case Failure(err) if this.isUnit && ret == "null" => { println(s"It was null, succeed. Err: $err, Ret: $ret"); Right(().asInstanceOf[Out]) }
+                        case Failure(err) => { println(s"Errorring while reading: $err, $ret, command was $name"); Left(ErrorController.mapException(err)) }
+                    }
             })  
     }
 
@@ -90,6 +97,7 @@ object Command {
         }
 
         type Out = Unit
+        override val isUnit: Boolean = true
     }
 
     case object FetchSavedTreeNames extends Command("fetch_saved_tree_names") {
@@ -107,6 +115,7 @@ object Command {
         }
 
         type Out = Unit
+        override val isUnit: Boolean = true
     }
 
     case object DeleteTree extends Command("delete_tree") {
@@ -117,6 +126,7 @@ object Command {
         }
 
         type Out = Unit
+        override val isUnit: Boolean = true
     }
 
 }

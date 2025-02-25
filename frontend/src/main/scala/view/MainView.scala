@@ -42,12 +42,12 @@ object MainView extends DebugViewPage {
                 treeStream.collectLeft --> ErrorController.setError,
 
                 /* Save any new trees when received */
-                newTreeStream.collectRight.sample(Counter.genName).flatMapSwitch(TabViewController.saveTree).collectLeft --> ErrorController.setError,
-                newTreeStream.collectRight.sample(Counter.genName)
-                    .tapEach(TabViewController.addFileName.onNext)
-                    .tapEach(_ => Counter.increment.onNext(()))
-                    .flatMapSwitch(TabViewController.getFileNameIndex)
-                    --> TabViewController.setSelectedTab,
+                newTreeStream.collectRight.sample(Counter.genName).tapEach(a => println(s"save file $a")).flatMapMerge(TabViewController.saveTree).tapEach(println).collectLeft --> ErrorController.setError,
+                // newTreeStream.collectRight.sample(Counter.genName)
+                //     .tapEach(TabViewController.addFileName.onNext)
+                //     .tapEach(_ => Counter.increment.onNext(()))
+                //     .flatMapSwitch(TabViewController.getFileNameIndex)
+                //     --> TabViewController.setSelectedTab,
 
                 /* Notify of any errors caught by newTreeStream */
                 newTreeStream.collectLeft --> ErrorController.setError,
