@@ -4,16 +4,16 @@ import scala.util.{Try, Success, Failure}
 import scala.scalajs.js
 
 import com.raquo.laminar.api.L.*
-import upickle.default as up
 import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import model.errors.MalformedJSONException
+import controller.tauri.Args
+import model.json.Reader
 import model.errors.DillException
 import controller.errors.ErrorController
 
-import controller.tauri.Args
+
 
 /* Argument trait implemented for types passed to Command invoke call */ 
 private [tauri] sealed trait Args[A] {
@@ -36,48 +36,41 @@ sealed trait Command(private val name: String) {
 
     /* Argument type associated with Command */
     type In
-    given args: Args[In]  
+    given args: Args[In]
 
     /* Response type associated with Command */
     type Out
-    given up.Reader[Out] = scala.compiletime.deferred 
+    given Reader[Out] = scala.compiletime.deferred 
 
-    /* Determines whether we should ignore empty JSON errors */
-    val isUnit: Boolean = false
-
+    
     /* Invoke backend command using Tauri JS interface */
     private [tauri] def invoke(args: In): EventStream[Either[DillException, Out]] = {
         val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
+        val invoke: js.Promise[String] = tauriInvoke[String](name, strArgs);
+        
         /* Start EventStream from invoke and deserialise invoke response */
-        EventStream.fromJsPromise(tauriInvoke[String](name, strArgs), emitOnce = true)
-            .recoverToEither
-            .map(_ match {
-                    case Left(err) => Left(ErrorController.mapException(err))
-                    case Right(response) => (Try(up.read[Out](response))) match {
-                        case Success(output) => Right(output)
-                        case Failure(_) if this.isUnit && response == null => Right(().asInstanceOf[Out])
-                        case Failure(err) => Left(ErrorController.mapException(MalformedJSONException))
-                    }
-            })  
+        EventStream.fromJsPromise(invoke, emitOnce = true)
+            .map((json: String) => Reader[Out].read(json)
+                .swap
+                .map(_ => ErrorController.mapException(new Exception(json))) //TODO: map exception properly in Json.scala
+                .swap
+            )
     }
 
 }
 
-/**
-  * Companion object of Command, which defines the different possible 
-  * commands from the backend.
-  */
+
 object Command {
 
     /* Fetch commands */
     case object FetchDebugTree extends Command("fetch_debug_tree") {
         type In = Unit
-        given args: Args[In] = Args.noArgs 
+        given args: Args[In] = Args.noArgs
 
         type Out = DebugTree
-    }
+    } 
 
     case object FetchNodeChildren extends Command("fetch_node_children") {
         type In = Int
@@ -94,12 +87,12 @@ object Command {
     case object SaveTree extends Command("save_tree") {
         type In = String
         given args: Args[String] {
-            extension (treeName: String) 
+            extension (treeName: String)
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
         type Out = Unit
-        override val isUnit: Boolean = true
+        // override val isUnit: Boolean = true TODO: remove
     }
 
     case object FetchSavedTreeNames extends Command("fetch_saved_tree_names") {
@@ -117,7 +110,7 @@ object Command {
         }
 
         type Out = Unit
-        override val isUnit: Boolean = true
+        // override val isUnit: Boolean = true TODO: remove
     }
 
     case object DeleteTree extends Command("delete_tree") {
@@ -128,7 +121,7 @@ object Command {
         }
 
         type Out = Unit
-        override val isUnit: Boolean = true
+        // override val isUnit: Boolean = true TODO: remove
     }
 
 }

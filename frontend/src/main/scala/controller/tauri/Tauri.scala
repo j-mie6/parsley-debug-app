@@ -7,6 +7,7 @@ import com.raquo.laminar.api.L.*
 
 import model.errors.DillException
 
+
 /**
   * Object containing methods for communicating with the Tauri backend.
   */

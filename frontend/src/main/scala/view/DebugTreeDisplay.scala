@@ -40,7 +40,7 @@ object DebugTreeDisplay {
     * @return HTML element representing the whole tree.
     */
     def apply(tree: DebugTree): HtmlElement = div(
-        className := "debug-tree-display zoom-container",
+        className := "debug-tree-container zoom-container",
         
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
         wheelHandler,
@@ -65,26 +65,32 @@ private object ReactiveNodeDisplay {
     */
     def apply(node: ReactiveNode): HtmlElement = {
         /* True if start of a user-defined type */
-        val newType: Boolean = node.debugNode.internal != node.debugNode.name
-        
+        val hasUserType: Boolean = node.debugNode.internal != node.debugNode.name
+        val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty);
+
         div(
+            className := "debug-node-container",
+
             /* Render a box for user-defined parser types */
-            cls("debug-tree-node-type-box") := newType,
-            when (newType) {
-                p(className := "debug-tree-node-type-name", node.debugNode.name)
+            cls("type-box") := hasUserType,
+            when (hasUserType) { 
+                p(className := "type-box-name", node.debugNode.name)
             },
+                
+            /* Line connecting node to parent */
+            div(className := "debug-node-line"),
 
             div(
-                className := s"debug-tree-node",
+                className := "debug-node",
 
                 /* Set reactive class names */
-                cls("compress") <-- node.children.signal.map(_.isEmpty),
+                cls("compress") <-- compressed,
                 cls("fail") := !node.debugNode.success,
                 cls("leaf") := node.debugNode.isLeaf,
 
                 /* Render debug node information */
                 div(
-                    p(className := "debug-tree-node-name", node.debugNode.internal),
+                    p(className := "debug-node-name", node.debugNode.internal),
                     p(fontStyle := "italic", node.debugNode.input)
                 ),
 
@@ -106,9 +112,16 @@ private object ReactiveNodeDisplay {
 
             ),
 
+            /* Set isLeaf/isCompressed indicators below node */
+            if (node.debugNode.isLeaf) {
+                div(className := "leaf-line")
+            } else {
+                child(p(className := "compress-ellipsis", "...")) <-- compressed
+            },
+
             /* Flex container for rendering children */
             div(
-                className := "debug-tree-node-container",
+                className := "debug-node-children-container",
                 children <-- node.children.signal.map((nodes) =>
                     nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply)
                 )

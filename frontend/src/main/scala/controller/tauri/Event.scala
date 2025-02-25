@@ -5,10 +5,10 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.raquo.laminar.api.L.*
-import upickle.default as up
 import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent}
 
 import model.DebugTree
+import model.json.{Reader, JsonError}
 import controller.tauri.Event.UnlistenFn
 import model.errors.MalformedJSON
 import model.errors.DillException
@@ -24,7 +24,7 @@ sealed trait Event(private val name: String) {
     
     /* Output type associated with Event */
     type Out
-    given up.Reader[Out] = scala.compiletime.deferred
+    given Reader[Out] = scala.compiletime.deferred
 
     /* Determines whether we should ignore empty JSON errors */
     val isUnit: Boolean = false
@@ -39,12 +39,19 @@ sealed trait Event(private val name: String) {
             .mapTo[() => Unit]
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
+        // val responseStream: EventStream[Either[DillException, Out]] = stream
+        //     .map(response => (Try(up.read[Out](response))) match {
+        //         case Success(output) => Right(output)
+        //         case Failure(_) if this.isUnit && response == null => Right(().asInstanceOf[Out]) 
+        //         case Failure(err) => Left(ErrorController.mapException(err))
+        //     })  
+            
         val responseStream: EventStream[Either[DillException, Out]] = stream
-            .map(response => (Try(up.read[Out](response))) match {
-                case Success(output) => Right(output)
-                case Failure(_) if this.isUnit && response == null => Right(().asInstanceOf[Out]) 
-                case Failure(err) => Left(ErrorController.mapException(err))
-            })  
+            .map((json: String) => Reader[Out].read(json)
+                .swap
+                .map(_ => ErrorController.mapException(new Exception(json))) //TODO: map exception properly in Json.scala
+                .swap
+            )
 
         (responseStream, unlisten)
     }
