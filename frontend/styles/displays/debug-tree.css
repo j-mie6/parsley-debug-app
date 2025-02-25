@@ -52,18 +52,13 @@
 .debug-node-container.type-box > .type-box-name {
     position: absolute;
     top: -13px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--background-secondary);
-    padding: 0 5px;
+    padding: 0px 5px;
+    align-self: center;
+
     font-weight: bold;
+    background-color: var(--background-secondary);
 }
 
-
-/* No node-line displayed on the first node */
-.debug-tree-container:first-child > .debug-node-container > .debug-node-line {
-    display: none;
-}
 
 /* Line connecting node child to parent */
 .debug-node-line {
@@ -71,6 +66,19 @@
     width: 4px;
     height: 15px;
     background-color: var(--font-color-primary);    
+}
+
+/* No node-line displayed on the first node */
+.debug-tree-container:first-child > .debug-node-container > .debug-node-line {
+    display: none !important;
+}
+
+/* Move .debug-node-line above .type-box */
+.debug-node-container.type-box > .debug-node-line {
+    position: absolute;
+    top: -23px;
+    height: 18px !important;
+    z-index: -1;
 }
 
 

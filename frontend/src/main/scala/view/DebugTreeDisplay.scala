@@ -73,12 +73,12 @@ private object ReactiveNodeDisplay {
 
             /* Render a box for user-defined parser types */
             cls("type-box") := hasUserType,
-            if (hasUserType) {
+            when (hasUserType) { 
                 p(className := "type-box-name", node.debugNode.name)
-            } else {
-                /* Line connecting node to parent */
-                div(className := "debug-node-line")
             },
+                
+            /* Line connecting node to parent */
+            div(className := "debug-node-line"),
 
             div(
                 className := "debug-node",
