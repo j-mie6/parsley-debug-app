@@ -18,6 +18,7 @@ object MainViewController {
     enum View(val elem: HtmlElement) {
         case Tree extends View(TreeView())
         case Input extends View(InputView())
+        case Code extends View(InputView()) // TODO
     }
 
     /* Current view selected */
