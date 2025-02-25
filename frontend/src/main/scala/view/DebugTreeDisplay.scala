@@ -40,7 +40,7 @@ object DebugTreeDisplay {
     * @return HTML element representing the whole tree.
     */
     def apply(tree: DebugTree): HtmlElement = div(
-        className := "debug-tree-display zoom-container",
+        className := "debug-tree-container zoom-container",
         
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
         wheelHandler,
@@ -65,21 +65,23 @@ private object ReactiveNodeDisplay {
     */
     def apply(node: ReactiveNode): HtmlElement = {
         /* True if start of a user-defined type */
-        val newType: Boolean = node.debugNode.internal != node.debugNode.name
+        val hasUserType: Boolean = node.debugNode.internal != node.debugNode.name
         val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty);
 
         div(
-            /* Render a box for user-defined parser types */
-            cls("debug-tree-node-type-box") := newType,
-            when (newType) {
-                p(className := "debug-tree-node-type-name", node.debugNode.name)
-            },
+            className := "debug-node-container",
 
+            /* Render a box for user-defined parser types */
+            cls("type-box") := hasUserType,
+            when (hasUserType) { 
+                p(className := "type-box-name", node.debugNode.name)
+            },
+                
             /* Line connecting node to parent */
-            div(className := "node-line"),
+            div(className := "debug-node-line"),
 
             div(
-                className := s"debug-tree-node",
+                className := "debug-node",
 
                 /* Set reactive class names */
                 cls("compress") <-- compressed,
@@ -88,7 +90,7 @@ private object ReactiveNodeDisplay {
 
                 /* Render debug node information */
                 div(
-                    p(className := "debug-tree-node-name", node.debugNode.internal),
+                    p(className := "debug-node-name", node.debugNode.internal),
                     p(fontStyle := "italic", node.debugNode.input)
                 ),
 
@@ -119,7 +121,7 @@ private object ReactiveNodeDisplay {
 
             /* Flex container for rendering children */
             div(
-                className := "debug-tree-node-container",
+                className := "debug-node-children-container",
                 children <-- node.children.signal.map((nodes) =>
                     nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply)
                 )
