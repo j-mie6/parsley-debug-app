@@ -2,7 +2,11 @@ use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
 use crate::events::Event;
+use crate::server::TokioMutex;
 use crate::trees::{DebugTree, DebugNode};
+
+pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<i32>;
+
 use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
@@ -10,6 +14,7 @@ struct AppStateInternal {
     app: AppHandle,                 /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
+    skips_tx: TokioMutex<SkipsSender>, /* Transmitter how many breakpoints to skip, sent to parsley */
 }
 
 
@@ -18,13 +23,14 @@ pub struct AppState(Mutex<AppStateInternal>);
 
 impl AppState {
     /* Create a new app state with the app_handle */
-    pub fn new(app_handle: tauri::AppHandle) -> AppState {
+    pub fn new(app_handle: tauri::AppHandle, skips_tx: TokioMutex<SkipsSender>) -> AppState {
         AppState(
             Mutex::new(
                 AppStateInternal {
                     app: AppHandle::new(app_handle),
                     tree: None,
                     map: HashMap::new(),
+                    skips_tx,
                 }
             )
         )
@@ -90,5 +96,13 @@ impl StateManager for AppState {
     /* Notify frontend listeners of an event */        
     fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError> {
         self.inner()?.app.emit(event)
+    }
+
+    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(), StateError> {
+        self.inner()?
+            .skips_tx
+            .blocking_lock()
+            .blocking_send(skips)
+            .map_err(|_| StateError::ChannelError)
     }
 }
