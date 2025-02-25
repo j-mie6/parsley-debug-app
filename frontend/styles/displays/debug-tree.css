@@ -36,11 +36,8 @@
     position: relative;
     top: 10px;
     
-    padding: 15px;
-    padding-right: 8px;
-    padding-left: 8px;
+    padding: 15px 8px;
     
-    margin-top: 0;
     margin: 10px;
 
     height: fit-content;
@@ -85,9 +82,8 @@
 /* Debug tree node information */
 .debug-node {
     padding: 10px;
-    margin-left: 5px;
-    margin-right: 5px;
-    
+    margin: 0px 5px;
+
     border-radius: 10px;
     border-width: 2px;
     border-style: solid;
@@ -133,9 +129,7 @@
 
     border-radius: 10px;
     
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 3px;
+    margin: 3px 10px 0px 10px;
     
     background-color: var(--font-color-primary);
 }
