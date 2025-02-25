@@ -5,8 +5,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.raquo.laminar.api.L.*
 
-import upickle.default as up
-
 import controller.tauri.{Tauri, Command}
 import controller.viewControllers.TreeViewController
 import model.DebugTree
