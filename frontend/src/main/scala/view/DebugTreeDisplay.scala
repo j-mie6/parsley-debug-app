@@ -66,7 +66,8 @@ private object ReactiveNodeDisplay {
     def apply(node: ReactiveNode): HtmlElement = {
         /* True if start of a user-defined type */
         val newType: Boolean = node.debugNode.internal != node.debugNode.name
-        
+        val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty);
+
         div(
             /* Render a box for user-defined parser types */
             cls("debug-tree-node-type-box") := newType,
@@ -74,11 +75,14 @@ private object ReactiveNodeDisplay {
                 p(className := "debug-tree-node-type-name", node.debugNode.name)
             },
 
+            /* Line connecting node to parent */
+            div(className := "node-line"),
+
             div(
                 className := s"debug-tree-node",
 
                 /* Set reactive class names */
-                cls("compress") <-- node.children.signal.map(_.isEmpty),
+                cls("compress") <-- compressed,
                 cls("fail") := !node.debugNode.success,
                 cls("leaf") := node.debugNode.isLeaf,
 
@@ -105,6 +109,13 @@ private object ReactiveNodeDisplay {
                 ) --> node.children.writer,
 
             ),
+
+            /* Set isLeaf/isCompressed indicators below node */
+            if (node.debugNode.isLeaf) {
+                div(className := "leaf-line")
+            } else {
+                child(p(className := "compress-ellipsis", "...")) <-- compressed
+            },
 
             /* Flex container for rendering children */
             div(
