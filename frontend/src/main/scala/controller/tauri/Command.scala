@@ -80,7 +80,7 @@ object Command {
         type In = String
         given args: Args[String] {
             extension (name: String)
-                def namedArgs: Map[String, Any] = Map("name" -> name)
+                def namedArgs: Map[String, Any] = Map("treeName" -> name)
         }
 
         type Out = Unit
