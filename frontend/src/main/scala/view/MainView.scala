@@ -7,9 +7,9 @@ import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
 
 import controller.tauri.{Tauri, Event}
+import controller.errors.ErrorController
 import controller.AppStateController
 import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController}
-
 
 object MainView extends DebugViewPage {
     
@@ -38,16 +38,25 @@ object MainView extends DebugViewPage {
                 treeStream.collectRight --> TreeViewController.setTree,
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
 
+                /* Notify of any errors caught by treeStream */
+                treeStream.collectLeft --> ErrorController.setError,
+
                 /* Save any new trees when received */
+                newTreeStream.collectRight.sample(Counter.genName).flatMapMerge(TabViewController.saveTree).collectLeft --> ErrorController.setError,
                 newTreeStream.collectRight.sample(Counter.genName)
-                    .tapEach(TabViewController.saveTree)
                     .tapEach(TabViewController.addFileName.onNext)
                     .tapEach(_ => Counter.increment.onNext(()))
                     .flatMapSwitch(TabViewController.getFileNameIndex)
                     --> TabViewController.setSelectedTab,
 
+                /* Notify of any errors caught by newTreeStream */
+                newTreeStream.collectLeft --> ErrorController.setError,
+
                 /* Load main page */
                 child <-- MainViewController.getViewElem,
+
+                /* Displaying Dill Exceptions */
+                child.maybe <-- ErrorController.getErrorElem,
 
                 /* Unlisten to TreeReady event */
                 onUnmountCallback(_ => unlistenTree.get),

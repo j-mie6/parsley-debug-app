@@ -9,6 +9,7 @@ import view.MainView
 import controller.AppStateController
 import controller.tauri.Tauri
 
+import controller.errors.ErrorController
 
 @main def app = {
     renderOnDomContentLoaded(
