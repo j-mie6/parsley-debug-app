@@ -39,13 +39,6 @@ sealed trait Event(private val name: String) {
             .mapTo[() => Unit]
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
-        // val responseStream: EventStream[Either[DillException, Out]] = stream
-        //     .map(response => (Try(up.read[Out](response))) match {
-        //         case Success(output) => Right(output)
-        //         case Failure(_) if this.isUnit && response == null => Right(().asInstanceOf[Out]) 
-        //         case Failure(err) => Left(ErrorController.mapException(err))
-        //     })  
-            
         val responseStream: EventStream[Either[DillException, Out]] = stream
             .map((json: String) => Reader[Out].read(json)
                 .swap

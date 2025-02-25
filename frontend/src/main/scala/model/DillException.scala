@@ -10,8 +10,8 @@ import com.raquo.laminar.api.features.unitArrows
   * 
   * @param name Name of Exception
   * @param message More detailed error message displayed to the user
-  * @param canDelete Whether the popup can be cleared by clicking on it (only for non-breaking warnings)
-  * @param colour Outline colour for popup, red for errors and yellow for warnings
+  * @param closable Whether the popup can be cleared by clicking on it (only for non-breaking warnings)
+  * @param style css style used for popup, red for errors and yellow for warnings
   */
 sealed trait DillException {
     def name: String

@@ -8,8 +8,6 @@ import com.raquo.laminar.api.L.*
 import model.DebugNode
 import controller.tauri.{Command, Tauri}
 
-import controller.errors.ErrorController
-
 /**
   * Wrapper for DebugNode to add reactive children.
   *
