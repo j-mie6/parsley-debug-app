@@ -96,5 +96,5 @@ This will launch the container with SSH access and X-Forwarding enabled, allowin
 
 Before running the project, ensure that Rust's package manager is set to the latest version by running `rustup default stable`. Once this is done, you can follow the commands listed in [building](#building) to work on Dill.
 
-### Alternative: Editing Outside Docker
-If you prefer working on the code outside the container, you can edit files locally and copy them into the container using: `sbt dockerBuild`.
+### Editing Outside Docker
+Alternatively, if you prefer working on the code outside the container, you can edit files locally and copy them into the container using: `sbt dockerBuild`.
