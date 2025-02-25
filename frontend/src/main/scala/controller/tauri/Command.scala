@@ -9,7 +9,7 @@ import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import model.errors.MalformedJSON
+import model.errors.MalformedJSONException
 import model.errors.DillException
 import controller.errors.ErrorController
 
@@ -45,21 +45,18 @@ sealed trait Command(private val name: String) {
 
     /* Invoke backend command using Tauri JS interface */
     private [tauri] def invoke(args: In): EventStream[Either[DillException, Out]] = {
-        println(s"Running Command: $name")
         val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
-        // val invoke: js.Promise[String] = tauriInvoke[String](name, strArgs)
-
         /* Start EventStream from invoke and deserialise invoke response */
         EventStream.fromJsPromise(tauriInvoke[String](name, strArgs), emitOnce = true)
             .recoverToEither //Fail(throwable error with message to be cnverted to DillException) or Success(string to be serialised)
             .map(_ match {
                     case Left(err) => Left(ErrorController.mapException(err))
                     case Right(ret) => (Try(up.read[Out](ret))) match {
-                        case Success(suc) => { println(s"Normal success. Command: $name"); Right(suc) }
-                        case Failure(err) if this.isUnit && ret == "null" => { println(s"It was null, succeed. Err: $err, Ret: $ret"); Right(().asInstanceOf[Out]) }
-                        case Failure(err) => { println(s"Errorring while reading: $err, $ret, command was $name"); Left(ErrorController.mapException(err)) }
+                        case Success(suc) => Right(suc)
+                        case Failure(err) if this.isUnit && ret == null => Right(().asInstanceOf[Out])
+                        case Failure(err) => Left(ErrorController.mapException(MalformedJSONException))
                     }
             })  
     }

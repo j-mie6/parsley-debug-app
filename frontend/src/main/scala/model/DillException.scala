@@ -6,6 +6,11 @@ import controller.errors.ErrorController
 import com.raquo.laminar.api.features.unitArrows
 
 /**
+  * Exception representing a malformed JSON has reached the frontend from the backend
+  */
+case object MalformedJSONException extends Exception
+
+/**
   * DillException is the generic frontend representation of an Exception
   * 
   * @param name Name of Exception
