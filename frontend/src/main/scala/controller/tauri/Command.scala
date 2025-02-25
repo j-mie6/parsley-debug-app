@@ -21,6 +21,7 @@ private [tauri] sealed trait Args[A] {
         def namedArgs: Map[String, Any]
 }
 
+
 private [tauri] object Args {
     /* Default conversion from Unit to empty Arg Map */
     given noArgs: Args[Unit] {
@@ -41,6 +42,7 @@ sealed trait Command(private val name: String) {
     type Out
     given up.Reader[Out] = scala.compiletime.deferred 
 
+    /* Determines whether we should ignore empty JSON errors */
     val isUnit: Boolean = false
 
     /* Invoke backend command using Tauri JS interface */
@@ -50,12 +52,12 @@ sealed trait Command(private val name: String) {
         /* Invoke command with arguments passed as JS string dictionary */
         /* Start EventStream from invoke and deserialise invoke response */
         EventStream.fromJsPromise(tauriInvoke[String](name, strArgs), emitOnce = true)
-            .recoverToEither //Fail(throwable error with message to be cnverted to DillException) or Success(string to be serialised)
+            .recoverToEither
             .map(_ match {
                     case Left(err) => Left(ErrorController.mapException(err))
-                    case Right(ret) => (Try(up.read[Out](ret))) match {
-                        case Success(suc) => Right(suc)
-                        case Failure(err) if this.isUnit && ret == null => Right(().asInstanceOf[Out])
+                    case Right(response) => (Try(up.read[Out](response))) match {
+                        case Success(output) => Right(output)
+                        case Failure(_) if this.isUnit && response == null => Right(().asInstanceOf[Out])
                         case Failure(err) => Left(ErrorController.mapException(MalformedJSONException))
                     }
             })  
@@ -63,7 +65,10 @@ sealed trait Command(private val name: String) {
 
 }
 
-
+/**
+  * Companion object of Command, which defines the different possible 
+  * commands from the backend.
+  */
 object Command {
 
     /* Fetch commands */

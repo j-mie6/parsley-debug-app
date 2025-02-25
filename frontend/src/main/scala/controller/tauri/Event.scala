@@ -14,12 +14,19 @@ import model.errors.MalformedJSON
 import model.errors.DillException
 import controller.errors.ErrorController
 
+/**
+ * Trait defining event functionality, such as the output type, listen/unlistening
+ * function and how to read the JSON received.
+ * 
+ * @param name Name of the event
+ */
 sealed trait Event(private val name: String) {
     
     /* Output type associated with Event */
     type Out
     given up.Reader[Out] = scala.compiletime.deferred
 
+    /* Determines whether we should ignore empty JSON errors */
     val isUnit: Boolean = false
     
     /* Listen to backend event using Tauri JS interface */
@@ -33,9 +40,9 @@ sealed trait Event(private val name: String) {
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
         val responseStream: EventStream[Either[DillException, Out]] = stream
-            .map(ret => (Try(up.read[Out](ret))) match {
-                case Success(suc) => Right(suc)
-                case Failure(err) if this.isUnit && ret == null => Right(().asInstanceOf[Out]) 
+            .map(response => (Try(up.read[Out](response))) match {
+                case Success(output) => Right(output)
+                case Failure(_) if this.isUnit && response == null => Right(().asInstanceOf[Out]) 
                 case Failure(err) => Left(ErrorController.mapException(err))
             })  
 
@@ -43,7 +50,9 @@ sealed trait Event(private val name: String) {
     }
 }
 
-
+/**
+  * Companion object of Event, which defines the different possible events
+  */
 object Event {
     type UnlistenFn = () => Unit
 

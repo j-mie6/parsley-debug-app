@@ -56,6 +56,7 @@ object ErrorController {
                 case _ => new UnknownError(s"Unknown backend error: ${jsErr.toString()}")
             }
             
+            /* Frontend errors */
             case MalformedJSONException => MalformedJSON
 
             /* Unknown error if not from backend or frontend */
