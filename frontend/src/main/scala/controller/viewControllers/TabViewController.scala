@@ -19,78 +19,54 @@ object TabViewController {
     /* List of file names (excluding path and ext) wrapped in Var */
     private val fileNames: Var[List[String]] = Var(Nil)
 
-    /* Expose writing facilities */
-    def setFileNames(): Observer[List[String]] = fileNames.writer
-    def addFileName(): Observer[String] = fileNames.updater((names, name) => names :+ name)
+    /** Get file name associated with tab at index */
+    def getFileName(index: Int): Signal[String] = fileNames.signal.map(_(index))
+
+    /** Get list of file names */
+    val getFileNames: Signal[List[String]] = fileNames.signal
+
+    /** Set file names */
+    val setFileNames: Observer[List[String]] = fileNames.writer
     
-    /* Fetches all tree names saved by the user from the backend */
-    def getFileNames: Signal[List[String]] = {
-        Tauri.invoke(Command.FetchSavedTreeNames, ())
-            .collectRight
-            .toSignal(Nil)
-    }
+    /** Add name to file names */
+    val addFileName: Observer[String] = fileNames.updater((names, name) => names :+ name)
+    
+    /** Fetches all tree names saved by the user from the backend */
+    def loadFileNames: EventStream[List[String]] = Tauri.invoke(Command.FetchSavedTreeNames, ()).collectRight
 
+    /** Returns true if there are no saved trees */
+    def noSavedTrees: Signal[Boolean] = getFileNames.signal.map(_.isEmpty)
 
+    
     /* Index of tab that is currented selected */
     private lazy val selectedTab: Var[Int] = Var(0)
 
-    //TODO: see if this can be moved into setSelectedTab()
-    def getTab(tabName: String): Signal[Int] = {
-        getFileNames.map((names: List[String]) => names.indexOf(tabName))
-    } 
+    /** Set current selected tab index */
+    val setSelectedTab: Observer[Int] = selectedTab.writer
 
-    /* Set current selected tab index */
-    def setSelectedTab(): Observer[Int] = selectedTab.writer
+    /** Get index of tab with associated name */
+    def getFileNameIndex(name: String): Signal[Int] = getFileNames.map(_.indexOf(name))
             
-    /* Get selected tab name */
-    def getSelectedTab: Signal[String] = {
-        fileNames.signal.withCurrentValueOf(selectedTab.signal).map((names, i) => names(i))
-    }
-
-    /* Checks if tab is currently selected */
-    def isSelectedTab(tabTitle: String): Signal[Boolean] = getSelectedTab.map(_ == tabTitle)
-
-
-    /**
-      * Returns true if there are no saved trees
-      */
-    def noSavedTrees: Signal[Boolean] = {
-        getFileNames.signal.map(names => names.isEmpty)
-    }
-
-
-    /**
-      * Deletes a tab within the tab bar and reloads saved tree names
-      *
-      * @param treeName The name of the tree belonging to the tab to be deleted
-      */
-    def deleteTab(name: String): EventStream[List[String]] = {
-        Tauri.invoke(Command.DeleteTree, name)
-            .collectRight
-            .sample(getFileNames)
-    }
+    /** Get selected tab index */
+    val getSelectedTab: Signal[Int] = selectedTab.signal
     
-    //TODO
-    /**
-    * Saves the the curren tree to the backend as a given name
-    *
-    * @param treeName User-defined name of tree to be saved
-    */
-    def saveTree(name: EventStream[String]): EventStream[DebugTree] = {
-        name.flatMapMerge(Tauri.invoke(Command.SaveTree, _))
-            .collectRight
-            .sample(name.toWeakSignal) //FIXME
-            .collectSome
-            .compose(loadSavedTree(_))
-    }
+    /** Get name of tree associated with selected tab */
+    def getSelectedFileName: Signal[String] = getSelectedTab.flatMapSwitch(getFileName)
 
-    /**
-    * Loads a saved tree from the backend into the display tree
-    *
-    * @param treeName User-defined name of the tree to be loaded
-    */
-    def loadSavedTree(treeName: EventStream[String]): EventStream[DebugTree] = {
-        treeName.flatMapMerge((name: String) => Tauri.invoke(Command.LoadSavedTree, name)).collectRight
+    /** Checks if tab is currently selected */
+    def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)
+
+
+    /** Saves current tree to the backend with given name, returning assigned tab index  */
+    def saveTree(name: String): EventStream[Unit] = Tauri.invoke(Command.SaveTree, name).collectRight
+
+    /** Loads a saved tree from the backend as DebugTree */
+    def loadSavedTree(name: String): EventStream[Unit] = Tauri.invoke(Command.LoadSavedTree, name).collectRight
+
+    /** Delete tree loaded within tab, returning updated list of names */
+    def deleteSavedTree(name: String): EventStream[List[String]] = {
+        Tauri.invoke(Command.DeleteTree, name).collectRight
+            .compose(_ => loadFileNames)
     }
 
 }

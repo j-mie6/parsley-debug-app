@@ -1,8 +1,10 @@
 use crate::{state::StateError, trees::DebugTree};
 
 /* Event enum representing an event fired and managed by State */
+#[derive(Debug, PartialEq)]
 pub enum Event<'a> {
-    TreeReady(&'a DebugTree) /* Tree is ready for loading in frontend */
+    TreeReady(&'a DebugTree),   /* Tree is ready for loading in frontend */
+    NewTree,                    /* New tree is sent from RemoteView */
 }
 
 impl Event<'_> {
@@ -11,6 +13,7 @@ impl Event<'_> {
     pub fn name(&self) -> String {
         match self {
             Event::TreeReady(_) => "tree-ready",
+            Event::NewTree => "new-tree",
         }.to_string()
     }
 
@@ -18,6 +21,7 @@ impl Event<'_> {
     pub fn payload(self) -> Result<String, EventError> {
         match self {
             Event::TreeReady(tree) => serde_json::to_string(tree),
+            Event::NewTree => serde_json::to_string(&()),
         }.map_err(EventError::from)
     }
 
@@ -30,7 +34,6 @@ pub enum EventError {
 }
 
 /* Event error conversions */
-
 impl From<serde_json::Error> for EventError {
     fn from(_: serde_json::Error) -> Self {
         EventError::SerializeFailed

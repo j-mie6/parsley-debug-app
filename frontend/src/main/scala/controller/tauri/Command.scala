@@ -7,13 +7,12 @@ import com.raquo.laminar.api.L.*
 import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
-import model.DebugTree
-import model.DebugNode
-import model.Reader
-import model.JsonError
+import model.{DebugNode, DebugTree}
+import model.{Reader, JsonError}
+import controller.tauri.Args
 
 
-/* Trait for specifying named arguments to pass in invoke */
+/* Argument trait implemented for types passed to Command invoke call */ 
 private[tauri] sealed trait Args[A] {
     extension (a: A) 
         def namedArgs: Map[String, Any]
@@ -41,7 +40,7 @@ sealed trait Command(private val name: String) {
 
 
     /* Invoke backend command using Tauri JS interface */
-    protected[tauri] def invoke(args: In): EventStream[Either[JsonError, Out]] = {
+    private[tauri] def invoke(args: In): EventStream[Either[JsonError, Out]] = {
         val stringDict: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
         /* Invoke command with arguments passed as JS string dictionary */
@@ -101,7 +100,7 @@ object Command {
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
-        type Out = DebugTree
+        type Out = Unit
     }
 
     case object DeleteTree extends Command("delete_tree") {

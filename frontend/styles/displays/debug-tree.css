@@ -1,21 +1,89 @@
-.debug-tree-display {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    flex-basis: auto;
-    justify-content: flex-start;
-    align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
-}
-
-.debug-tree-title {
+/* Render parser input */
+.debug-input-title {
     text-align: center;
     margin-bottom: 10px;
 }
 
-.debug-tree-node {
-    padding: 10px;
-    margin: 5px;
+.debug-input-description {
+    margin: 0px; 
     
+    font-size: 15px; 
+    font-style: italic;
+    font-weight: lighter;
+}
+
+
+/* Container of debug tree */
+.debug-tree-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
+}
+
+
+/* Contain node and all subsequent children */
+.debug-node-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+
+/* Render box around self-contained named parser */
+.debug-node-container.type-box {
+    position: relative;
+    top: 10px;
+    
+    padding: 15px 8px;
+    
+    margin: 10px;
+
+    height: fit-content;
+
+    border-style: dashed;
+    border-radius: 10px;
+}
+
+.debug-node-container.type-box > .type-box-name {
+    position: absolute;
+    top: -13px;
+    padding: 0px 5px;
+    align-self: center;
+
+    font-weight: bold;
+    background-color: var(--background-secondary);
+}
+
+
+/* Line connecting node child to parent */
+.debug-node-line {
+    align-self: center;
+    width: 4px;
+    height: 15px;
+    background-color: var(--font-color-primary);    
+}
+
+/* No node-line displayed on the first node */
+.debug-tree-container:first-child > .debug-node-container > .debug-node-line {
+    display: none !important;
+}
+
+/* Move .debug-node-line above .type-box */
+.debug-node-container.type-box > .debug-node-line {
+    position: absolute;
+    top: -23px;
+    height: 18px !important;
+    z-index: -1;
+}
+
+
+/* Debug tree node information */
+.debug-node {
+    padding: 10px;
+    margin: 0px 5px;
+
     border-radius: 10px;
     border-width: 2px;
     border-style: solid;
@@ -32,27 +100,52 @@
     transition: border 0s !important;
 }
 
-.debug-tree-node.fail {
+.debug-node-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Darken failed nodes */
+.debug-node.fail {
     background-color: var(--background-tertiary-20);
     color: var(--font-color-primary);
 }
 
-.debug-tree-node:hover:not(.leaf) {
+/* On hover of expandable (i.e., not leaf) nodes, darken */
+.debug-node:hover:not(.leaf) {
     background-color: var(--background-tertiary-40);
 }
 
-.debug-tree-node.leaf {
-    border-bottom-style: double !important;
 
+/* Set bottom border of leaf equal to other borders */
+.debug-node.leaf  {
+    border-bottom-width: 2px !important;
 }
 
-.debug-tree-node.compress  {
-    border-bottom-style: dashed;
-    border-bottom-width: 3px !important;
+/* Bar rendered below leaf nodes to indicate no more nodes */
+.leaf-line {
+    width: inherit;
+    height: 2px;
+
+    border-radius: 10px;
+    
+    margin: 3px 10px 0px 10px;
+    
+    background-color: var(--font-color-primary);
 }
 
 
-.debug-tree-node-container {
+/* Ellipsis rendered below compressed nodes to indicate more nodes available */
+.compress-ellipsis {
+    position: relative;
+    bottom: 4px;
+    
+    font-size: large;
+    text-align: center;
+}
+
+/* Wrap node's children in a flexbox */
+.debug-node-children-container {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -60,26 +153,3 @@
     justify-content: space-evenly;
 }
 
-
-.debug-tree-node-type-box {
-    position: relative;
-    padding: 10px;
-    top: 5px;
-    border-style: dashed;
-    border-radius: 10px;
-}
-
-.debug-tree-node-type-name {
-    position: absolute;
-    top: -13px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--background-secondary);
-    padding: 0 5px;
-    font-weight: bold;
-}
-
-.debug-tree-node-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-}

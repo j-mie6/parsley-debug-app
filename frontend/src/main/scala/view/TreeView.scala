@@ -14,13 +14,9 @@ import controller.viewControllers.TreeViewController
   */
 object TreeView {
 
-    /**
-      * Converts a tree to an HTML element
-      *
-      * @return An HTML element displaying the tree
-      */
+    /* Render tree as HtmlElement */
     def apply(): HtmlElement = div(
-        child <-- TreeViewController.getDisplayTree, /* Renders the tree */
+        child <-- TreeViewController.getTreeElem, /* Renders the tree */
     )
             
 }

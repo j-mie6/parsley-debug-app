@@ -16,31 +16,31 @@ object TreeViewController {
     /* Reactive DebugTree */
     private val tree: Var[Option[DebugTree]] = Var(None) 
 
-    /* Helpers for writing the tree */
-    def setTree(): Observer[DebugTree] = tree.someWriter
-    def setTreeOpt(): Observer[Option[DebugTree]] = tree.writer
+    /** Set debug tree */
+    val setTree: Observer[DebugTree] = tree.someWriter
+
+    /** Set optional debug tree (can be None) */
+    val setTreeOpt: Observer[Option[DebugTree]] = tree.writer
+
+    /** Set debug tree to None to stop rendering */
+    def unloadTree: Observer[Unit] = Observer(_ => tree.set(None))
     
-    
-    /**
-    * Fetch the debug tree root from the tauri backend.
-    *
-    * @param displayTree The var that the display tree HTML element will be written into.
-    */
-    def reloadTree(): EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
-    
-    
-    /* Default tree view when no tree is loaded */
-    private val noTreeFound: HtmlElement = div(
-        className := "tree-view-error",
-        "No tree found! Start debugging by attaching DillRemoteView to a parser"
+    /** Return true signal if tree is loaded into frontend */
+    def treeExists: Signal[Boolean] = tree.signal.map(_.isDefined)
+
+    /** Get debug tree element or warning if no tree found */
+    def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
+        /* Default tree view when no tree is loaded */
+        case None => div(
+            className := "tree-view-error",
+            "No tree found! Start debugging by attaching DillRemoteView to a parser"
+        )
+
+        /* Render as DebugTreeDisplay */
+        case Some(tree) => DebugTreeDisplay(tree)
     )
 
-    /**
-     * Gets display tree element
-     */
-    def getDisplayTree: Signal[HtmlElement] = tree.signal.map(_ match 
-        case None => noTreeFound
-        case Some(tree) => DebugTreeDisplay(tree)
-    ) 
+    /** Fetch the debug tree root from the backend, return in EventStream */
+    def reloadTree: EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
     
 }
