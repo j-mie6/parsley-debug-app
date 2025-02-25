@@ -12,9 +12,11 @@ import model.Page
 
 import controller.AppStateController
 import controller.tauri.Tauri
+import controller.viewControllers.MainViewController.View
 import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
+import controller.viewControllers.InputViewController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -36,21 +38,17 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-left",
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewController.isTreeView(true),
+            cls("selected") <-- MainViewController.getView.map(_ == View.Tree),
             treeIcon,
             h2("Tree View", marginLeft.px := 7),
-            onClick --> { _ => 
-                MainViewController.setIsTreeView(true) 
-            }
+            onClick.mapTo(View.Tree) --> MainViewController.setView,
         ),
         div(
             className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewController.isTreeView(false),
+            cls("selected") <-- MainViewController.getView.map(_ == View.Input),
             fileIcon,
             h2("Input View", marginLeft.px := 12),
-            onClick --> { _ => 
-                MainViewController.setIsTreeView(false) 
-            }
+            onClick.mapTo(View.Input) --> MainViewController.setView,
         )
     )
 
@@ -60,36 +58,24 @@ abstract class DebugViewPage extends Page {
         h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
-    /* Random number generator */
-    private val rand = new scala.util.Random
-
     /* Visual call to action for user to save the current tree */
      private lazy val saveIcon: HtmlElement = i(
         className := "bi bi-floppy-fill",
         fontSize.px := 25, marginRight.px := 10
     )
 
-    /* Adds ability to save and store current tree. */
-    private lazy val saveButton: Element = button(
-        className := "save-button",
-
-        saveIcon, /* Floppy disk icon */
-
-        onClick --> { _ => {
-            val treeName: String = (rand.nextInt).toString()
-            TabViewController.saveTree(treeName)
-            TabViewController.setSelectedTab(treeName)
-        }}
-    )
 
     /* Button used to toggle the theme */
     private lazy val themeButton: Element = div(
-        child <-- AppStateController.isLightMode.signal
-            .map((project: Boolean) => if project then moonIcon else sunIcon),
         cursor.pointer,
         alignContent.center,
+
         marginRight.px := 20,
-        onClick --> {_ => AppStateController.toggleTheme()}
+
+        /* Render moonIcon in light mode; sunIcon in dark mode */
+        child <-- AppStateController.getThemeIcon, 
+
+        onClick.mapToUnit --> AppStateController.toggleTheme()
     )
 
     /* Button that links to the 'parsley-debug-app' Github repo */
@@ -102,9 +88,8 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-header-right",
         div(
             className := "debug-view-header-right-buttons",
-            saveButton,
             themeButton,
-            githubButton
+            githubButton,
         )
     )
 
@@ -126,7 +111,6 @@ abstract class DebugViewPage extends Page {
       * @return HTML element of the DebugView page.
       */
     override def render(child: Option[HtmlElement]): HtmlElement = {
-
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,
