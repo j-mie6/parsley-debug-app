@@ -5,7 +5,7 @@ import scala.concurrent.Future
 
 import com.raquo.laminar.api.L.*
 
-import model.JsonError
+import model.json.JsonError
 
 
 /**

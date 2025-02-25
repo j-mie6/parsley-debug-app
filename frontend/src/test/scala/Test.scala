@@ -5,9 +5,7 @@ import org.scalatest.matchers.*
 
 import model.DebugTree
 import model.DebugNode
-import model.JsonError
-import model.Reader
-import model.Writer
+import model.json.{JsonError, Reader, Writer}
 
 
 class Test extends AnyFlatSpec with should.Matchers {

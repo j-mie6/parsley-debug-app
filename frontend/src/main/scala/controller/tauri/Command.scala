@@ -8,7 +8,7 @@ import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import model.{Reader, JsonError}
+import model.json.{Reader, JsonError}
 import controller.tauri.Args
 
 

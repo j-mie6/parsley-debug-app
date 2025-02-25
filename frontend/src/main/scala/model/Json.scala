@@ -1,4 +1,4 @@
-package model
+package model.json
 
 import scala.util.{Try, Failure, Success}
 import scala.deriving.Mirror
