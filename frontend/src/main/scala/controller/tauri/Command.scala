@@ -54,7 +54,7 @@ sealed trait Command(private val name: String) {
         EventStream.fromJsPromise(invoke, emitOnce = true)
             .map((json: String) => Reader[Out].read(json)
                 .swap
-                .map(_ => ErrorController.mapException(new Exception(json))) //TODO: map exception properly in Json.scala
+                .map(_ => ErrorController.mapException(JsonError("")))
                 .swap
             )
     }

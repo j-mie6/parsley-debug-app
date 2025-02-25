@@ -8,7 +8,7 @@ import upickle.default as up
 
 
 /* Error returned by Serializer/Deserializer */
-case class JsonError(private val msg: String) extends Throwable
+case class JsonError(private val msg:String) extends Throwable 
 
 /* Convert Try to Either containing JsonError or Output */
 private def tryToEither[O](tryError: Try[O]): Either[JsonError, O] = {
@@ -59,6 +59,10 @@ object Writer {
     /* Delegate to upickle for JSON writing */
     given upickleWriter: [I: upickle] => Writer[I] {
         def write(input: I) = tryToEither(Try(up.write[I](input).nn))
+    }
+
+    given unitReader: Reader[Unit] {
+        def read(s: String) = Right(())
     }
 
 }
