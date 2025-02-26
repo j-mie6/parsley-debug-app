@@ -21,18 +21,12 @@ sealed trait DillException {
 
     def displayElement: HtmlElement = {
         div(
-            className := "popup",
-            cls := style,
-            h2(
-                this.name,
-                color := "#ffffff",
-            ),
-            br(),
-            div(
-                className := "popup-text",
-                this.message,
-            ),
-            onClick.mapTo(None).filter(_ => this.closable) --> ErrorController.setOptError,
+            cls("popup", style),
+
+            h2(name),
+            div(className := "popup-text", message),
+
+            onClick.mapTo(None).filter(_ => closable) --> ErrorController.setOptError,
         )
     }
 }
