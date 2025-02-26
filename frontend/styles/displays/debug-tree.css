@@ -153,8 +153,14 @@
     justify-content: space-evenly;
 }
 
-/* Arrow buttons for iternative nodes */
+/* Arrow buttons for iterative nodes */
 .debug-node-iterative-buttons {
-
+    background: none;
+    height: fit-content;
+    background-color: var(--background-tertiary-60);
+    color: var(--font-color-secondary);
+    box-shadow: none;
+    border: none;
+    padding: 2px 5px;
 }
 

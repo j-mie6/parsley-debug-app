@@ -74,7 +74,7 @@ private object ReactiveNodeDisplay {
             val indexSum: Int = currIndex + delta
             val childrenLen: Int = node.children.now().length
 
-            /* Bound return values between 0 and the number of children */
+            /* Wrap indices of children around */
             if indexSum < 0 then
                 childrenLen - 1
             else if indexSum > childrenLen - 1 then
@@ -82,10 +82,6 @@ private object ReactiveNodeDisplay {
             else
                 indexSum
         })
-
-        // val debugChildrenStream: EventStream[List[ReactiveNode]] = ???
-        // val debugChildrenElementsSignal: Signal[List[HtmlElement]] =
-        //     debugChildrenStream.split(_.debugNode.nodeId)(newRenderDebugChild)
 
         div(
             className := "debug-node-container",
@@ -101,10 +97,11 @@ private object ReactiveNodeDisplay {
             div(
                 display.flex,
                 flexDirection.row,
-                
+                alignItems.center,
+
                 child(button(
                     className := "debug-node-iterative-buttons",
-                    i(className := "bi bi-arrow-left"),
+                    i(className := "bi bi-caret-left-fill"),
                     onClick.mapTo(-1) --> moveIndex,
                 )) <-- compressed.not.map(_ && node.debugNode.isIterative),
 
@@ -142,8 +139,8 @@ private object ReactiveNodeDisplay {
                 ),
 
                 child(button(
-                    className := "iterative-button",
-                    i(className := "bi bi-arrow-right"),
+                    className := "debug-node-iterative-buttons",
+                    i(className := "bi bi-caret-right-fill"),
                     onClick.mapTo(1) --> moveIndex,
                 )) <-- compressed.not.map(_ && node.debugNode.isIterative),
                 
@@ -157,7 +154,6 @@ private object ReactiveNodeDisplay {
             } else {
                 child(p(className := "compress-ellipsis", "...")) <-- compressed
             },
-
             /* Flex container for rendering children */
             div(
                 className := "debug-node-children-container",
@@ -170,9 +166,4 @@ private object ReactiveNodeDisplay {
 
         )
     }
-
-    // def newRenderDebugChild(nodeId: Int, initialNode: ReactiveNode, reactiveNodeSignal: Signal[ReactiveNode]): HtmlElement = {
-    //     ReactiveNodeDisplay(node <-- reactiveNodeSignal.map(_.debugNode), children <-- reactiveNodeSignal.map(_.children))
-    // }
-
 }
