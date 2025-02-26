@@ -6,6 +6,7 @@ import model.DebugTree
 import view.DebugTreeDisplay
 import controller.tauri.Tauri
 import controller.tauri.Command
+import model.errors.DillException
 
 
 /**
@@ -41,7 +42,7 @@ object TreeViewController {
     )
 
     /** Fetch the debug tree root from the backend, return in EventStream */
-    def reloadTree: EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
+    def reloadTree: EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.FetchDebugTree, ())
     
     /** Skips the current breakpoint 'skips' times
       *
