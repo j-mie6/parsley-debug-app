@@ -67,6 +67,7 @@ private object ReactiveNodeDisplay {
         /* True if start of a user-defined type */
         val hasUserType: Boolean = node.debugNode.internal != node.debugNode.name
         val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty)
+        val treatIteratively: Var[Boolean] = Var(node.debugNode.isIterative)
 
         val iterativeNodeIndex: Var[Int] = Var(0)
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
@@ -97,50 +98,58 @@ private object ReactiveNodeDisplay {
                 
             /* Line connecting node to parent */
             div(className := "debug-node-line"),
-
             div(
-                className := "debug-node",
-
-                /* Set reactive class names */
-                cls("compress") <-- compressed,
-                cls("fail") := !node.debugNode.success,
-                cls("leaf") := node.debugNode.isLeaf,
-                cls("iterative") := node.debugNode.isIterative,
-
-                child(div(
-                className := "iterative-button",
-                button(
-                    "Prev node",
+                display.flex,
+                flexDirection.row,
+                
+                child(button(
+                    className := "debug-node-iterative-buttons",
+                    i(className := "bi bi-arrow-left"),
                     onClick.mapTo(-1) --> moveIndex,
-                ),
-                button(
-                    "Next node",
-                    onClick.mapTo(1) --> moveIndex,
-                ),
-            )) <-- compressed.not.map(_ && node.debugNode.isIterative),
-            
-                /* Render debug node information */
+                )) <-- compressed.not.map(_ && node.debugNode.isIterative),
+
                 div(
-                    p(className := "debug-node-name", node.debugNode.internal),
-                    p(fontStyle := "italic", node.debugNode.input)
+                    className := "debug-node",
+                    flexGrow := 1,
+                    /* Set reactive class names */
+                    cls("compress") <-- compressed,
+                    cls("fail") := !node.debugNode.success,
+                    cls("leaf") := node.debugNode.isLeaf,
+                    cls("iterative") := node.debugNode.isIterative,
+
+                    /* Render debug node information */
+                    div(
+                        p(className := "debug-node-name", node.debugNode.internal),
+                        p(text <-- iterativeNodeIndex.signal),
+                        p(fontStyle := "italic", node.debugNode.input)
+                    ),
+
+                    /* Expand/compress node on click */
+                    onClick(_
+                        .sample(compressed)
+                        .filter(_ => !node.debugNode.isLeaf)
+                        .flatMapMerge(
+                            if (_) { 
+                                /* If no children, load them in */
+                                Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                            } else {
+                                /* Otherwise set them to empty list */
+                                EventStream.fromValue(Nil)
+                            }
+                        )
+                    ) --> node.children.writer,
+
                 ),
 
-                /* Expand/compress node on click */
-                onClick(_
-                    .sample(compressed)
-                    .filter(_ => !node.debugNode.isLeaf)
-                    .flatMapMerge(
-                        if (_) { 
-                            /* If no children, load them in */
-                            Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
-                        } else {
-                            /* Otherwise set them to empty list */
-                            EventStream.fromValue(Nil)
-                        }
-                    )
-                ) --> node.children.writer,
+                child(button(
+                    className := "iterative-button",
+                    i(className := "bi bi-arrow-right"),
+                    onClick.mapTo(1) --> moveIndex,
+                )) <-- compressed.not.map(_ && node.debugNode.isIterative),
+                
 
             ),
+
 
             /* Set isLeaf/isCompressed indicators below node */
             if (node.debugNode.isLeaf) {
@@ -153,7 +162,7 @@ private object ReactiveNodeDisplay {
             div(
                 className := "debug-node-children-container",
                 children <-- node.children.signal.combineWith(iterativeNodeIndex).map((nodes, index) => 
-                    if node.debugNode.isIterative then
+                    if node.debugNode.isIterative && !nodes.isEmpty then
                         List(ReactiveNodeDisplay(ReactiveNode(nodes(index))))
                     else
                         nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply))
