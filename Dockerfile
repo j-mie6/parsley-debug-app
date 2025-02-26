@@ -12,7 +12,8 @@ COPY ./build.sbt ./build.sbt
 COPY ./index.html ./index.html
 COPY ./package-lock.json ./package-lock.json
 COPY ./package.json ./package.json
-COPY ./vite.config.ts ./vite.config.ts
+COPY ./styles.css ./styles.css
+COPY ./.jvmopts ./.jvmopts
 
 
 # Scala and sbt
@@ -41,9 +42,6 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y nodejs
 RUN apt-get install -y npm
 RUN npm install
-
-# Build Frontend (Optional to do here)
-RUN /sbt buildFrontend
 
 # Rust and tauri
 RUN cargo install tauri-cli
