@@ -6,6 +6,7 @@
     right: 15vw;
     transform: translateY(-50%);
     margin: auto; 
+    color: var(--font-color-secondary);
     background-color: var(--background-tertiary);
     filter: drop-shadow(5px 5px 8px #000000);
     padding: 5vh 5vw;
