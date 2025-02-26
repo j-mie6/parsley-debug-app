@@ -1,5 +1,6 @@
 @import url('frontend/styles/pages/debug-view.css');
 @import url('frontend/styles/pages/tree-view.css');
+@import url('frontend/styles/pages/error-popup.css');
 @import url('frontend/styles/pages/tab-bar.css');
 @import url('frontend/styles/displays/debug-tree.css');
 @import url('frontend/styles/icons/bootstrap-icons.min.css');
@@ -23,6 +24,7 @@
     --font-color-primary: #96DEC4;	        /* Parsley green. */
     --font-color-secondary: #242526;	    /* Dark grey. */
     --font-color-error: #d2042d;	        /* Red error. */
+    --font-color-warning: #ffcc00;	        /* Yellow warning colour. */
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif;
 }
 

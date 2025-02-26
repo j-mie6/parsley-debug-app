@@ -1,0 +1,34 @@
+.popup {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 15vw;
+    right: 15vw;
+    transform: translateY(-50%);
+    margin: auto; 
+    color: var(--font-color-secondary);
+    background-color: var(--background-tertiary);
+    filter: drop-shadow(5px 5px 8px #000000);
+    padding: 5vh 5vw;
+    border-style: solid;
+    border-radius: 10px;
+    overflow-y: fill;
+    padding: 5vh 5vw 5vw;
+    padding-bottom: 5vh;
+    align-items: centre;
+    justify-content: center;
+    word-wrap: break-word;
+    overflow: auto;
+}
+
+.popup.warning {
+    border-color: var(--font-color-warning);
+}
+
+.popup.error {
+    border-color: var(--font-color-error);
+}
+
+.popup-text {
+    color: var(--font-color-secondary);
+}
