@@ -14,9 +14,7 @@ import model.errors.*
   */
 object ErrorController {
 
-    /**
-      * Icon to show a popup is a warning
-      */
+    /* Icon to show a popup is a warning */
     private lazy val alertIcon: Element = i (
         className := "bi bi-exclamation-triangle-fill", 
         fontSize.px := 30,

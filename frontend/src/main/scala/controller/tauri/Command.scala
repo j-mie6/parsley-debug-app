@@ -86,7 +86,6 @@ object Command {
         }
 
         type Out = Unit
-        // override val isUnit: Boolean = true TODO: remove
     }
 
     case object FetchSavedTreeNames extends Command("fetch_saved_tree_names") {
