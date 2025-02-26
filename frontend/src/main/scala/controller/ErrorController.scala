@@ -53,7 +53,6 @@ object ErrorController {
 
     /* Read error name and match against Error case object */
     def parseException(errorName: String): DillException = {
-        println("Found error - parsing")
         errorName.trim match
             case "TreeNotFound" => TreeNotFound
             case "LockFailed" => LockFailed
