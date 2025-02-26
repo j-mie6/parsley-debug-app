@@ -96,6 +96,18 @@ private object ReactiveNodeDisplay {
                 cls("leaf") := node.debugNode.isLeaf,
                 cls("iterative") := node.debugNode.isIterative,
 
+                child(div(
+                className := "iterative-button",
+                button(
+                    "Prev node",
+                    onClick.mapTo(-1) --> moveIndex,
+                ),
+                button(
+                    "Next node",
+                    onClick.mapTo(1) --> moveIndex,
+                ),
+            )) <-- compressed.map(_ && node.debugNode.isIterative),
+            
                 /* Render debug node information */
                 div(
                     p(className := "debug-node-name", node.debugNode.internal),
@@ -119,19 +131,6 @@ private object ReactiveNodeDisplay {
 
             ),
 
-            child(div(
-                className := "iterative-button",
-                button(
-                    "Prev node",
-                    onClick.mapTo(-1) --> moveIndex,
-                ),
-                button(
-                    "Next node",
-                    onClick.mapTo(1) --> moveIndex,
-                ),
-            )) <-- compressed.not.map(_ && node.debugNode.isIterative),
-
-
             /* Set isLeaf/isCompressed indicators below node */
             if (node.debugNode.isLeaf) {
                 div(className := "leaf-line")
@@ -142,9 +141,9 @@ private object ReactiveNodeDisplay {
             /* Flex container for rendering children */
             div(
                 className := "debug-node-children-container",
-                children <-- node.children.signal.map((nodes) => 
+                children <-- node.children.signal.combineWith(iterativeNodeIndex).map((nodes, index) => 
                     if node.debugNode.isIterative then
-                        nodes.map(node => ReactiveNodeDisplay(ReactiveNode(nodes(iterativeNodeIndex.now()))))
+                        List(ReactiveNodeDisplay(ReactiveNode(nodes(index))))
                     else
                         nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply))
             )
