@@ -31,7 +31,7 @@ object TreeView {
 
     /* Render tree as HtmlElement */
     def apply(): HtmlElement = div(
-        child(skipButton) <-- TreeViewController.getSkipVisibility,
+        child(skipButton) <-- TreeViewController.isDebuggingSession,
         child <-- TreeViewController.getTreeElem, /* Renders the tree */
     )
             
