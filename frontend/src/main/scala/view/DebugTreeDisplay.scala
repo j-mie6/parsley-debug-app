@@ -69,7 +69,18 @@ private object ReactiveNodeDisplay {
         val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty)
 
         val iterativeNodeIndex: Var[Int] = Var(0)
-        val moveIndex: Observer[Int] = iterativeNodeIndex.updater(_ + _)
+        val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
+            val indexSum: Int = currIndex + delta
+            val childrenLen: Int = node.children.now().length
+
+            /* Bound return values between 0 and the number of children */
+            if indexSum < 0 then
+                childrenLen - 1
+            else if indexSum > childrenLen - 1 then
+                0
+            else
+                indexSum
+        })
 
         // val debugChildrenStream: EventStream[List[ReactiveNode]] = ???
         // val debugChildrenElementsSignal: Signal[List[HtmlElement]] =
@@ -106,7 +117,7 @@ private object ReactiveNodeDisplay {
                     "Next node",
                     onClick.mapTo(1) --> moveIndex,
                 ),
-            )) <-- compressed.map(_ && node.debugNode.isIterative),
+            )) <-- compressed.not.map(_ && node.debugNode.isIterative),
             
                 /* Render debug node information */
                 div(
