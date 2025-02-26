@@ -42,7 +42,11 @@ object MainView extends DebugViewPage {
                 treeStream.collectLeft --> ErrorController.setError,
 
                 /* Save any new trees when received */
-                newTreeStream.collectRight.sample(Counter.genName).flatMapMerge(TabViewController.saveTree).collectLeft --> ErrorController.setError,
+                newTreeStream.collectRight.sample(Counter.genName)
+                    .flatMapMerge(TabViewController.saveTree)
+                    .collectLeft --> ErrorController.setError,
+
+                /* Add new tab when new tree saved */ 
                 newTreeStream.collectRight.sample(Counter.genName)
                     .tapEach(TabViewController.addFileName.onNext)
                     .tapEach(_ => Counter.increment.onNext(()))

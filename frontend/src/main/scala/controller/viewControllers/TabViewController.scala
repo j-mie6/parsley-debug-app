@@ -8,6 +8,7 @@ import com.raquo.laminar.api.L.*
 import controller.tauri.{Tauri, Command}
 import controller.viewControllers.TreeViewController
 import model.DebugTree
+import model.errors.DillException
 
 
 /**
@@ -32,7 +33,7 @@ object TabViewController {
     val addFileName: Observer[String] = fileNames.updater((names, name) => names :+ name)
     
     /** Fetches all tree names saved by the user from the backend */
-    def loadFileNames: EventStream[List[String]] = Tauri.invoke(Command.FetchSavedTreeNames, ()).collectRight
+    def loadFileNames: EventStream[Either[DillException, List[String]]] = Tauri.invoke(Command.FetchSavedTreeNames, ())
 
     /** Returns true if there are no saved trees */
     def noSavedTrees: Signal[Boolean] = getFileNames.signal.map(_.isEmpty)
@@ -58,15 +59,12 @@ object TabViewController {
 
 
     /** Saves current tree to the backend with given name, returning assigned tab index  */
-    def saveTree(name: String): EventStream[Either[model.errors.DillException, Unit]] = Tauri.invoke(Command.SaveTree, name)
+    def saveTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.SaveTree, name)
 
     /** Loads a saved tree from the backend as DebugTree */
-    def loadSavedTree(name: String): EventStream[Either[model.errors.DillException, Unit]] = Tauri.invoke(Command.LoadSavedTree, name)
+    def loadSavedTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.LoadSavedTree, name)
 
     /** Delete tree loaded within tab, returning updated list of names */
-    def deleteSavedTree(name: String): EventStream[List[String]] = {
-        Tauri.invoke(Command.DeleteTree, name).collectRight
-            .compose(_ => loadFileNames)
-    }
+    def deleteSavedTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DeleteTree, name)
 
 }

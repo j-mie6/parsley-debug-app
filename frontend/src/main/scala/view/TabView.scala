@@ -6,7 +6,9 @@ import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 
 import model.DebugTree
+import model.errors.DillException
 import controller.tauri.{Tauri, Command}
+import controller.errors.ErrorController
 import controller.viewControllers.{TabViewController, TreeViewController, InputViewController}
 
 
@@ -43,6 +45,8 @@ object TabView {
     }
 
     def closeTabButton(index: Int): HtmlElement = {
+        val deleteBus: EventBus[Either[DillException, List[String]]] = EventBus()
+
         button(
             className := "close-tab-button",
 
@@ -51,9 +55,15 @@ object TabView {
 
             /* Deletes the respective tab */
             onClick(event => event.sample(TabViewController.getFileName(index))
-                .flatMapMerge(TabViewController.deleteSavedTree)
-                .tapEach(_ => EventStream.fromValue(0) --> TabViewController.setSelectedTab)
-            ) --> TabViewController.setFileNames,
+                .flatMapMerge(TabViewController.deleteSavedTree(_).flatMapTo(TabViewController.loadFileNames))
+            ) --> deleteBus.writer,
+
+            /* Pipe errors */
+            deleteBus.stream.collectLeft --> ErrorController.setError,
+
+            /* Update selected tab and tab names */
+            deleteBus.stream.collectRight.mapTo(0) --> TabViewController.setSelectedTab,
+            deleteBus.stream.collectRight --> TabViewController.setFileNames,
         )
     }
 
@@ -68,7 +78,6 @@ object TabView {
             selectedTab.collectSuccess
                 .flatMapMerge(TabViewController.loadSavedTree) 
                 .collectLeft --> controller.errors.ErrorController.setError,
-                // --> Observer.empty,
 
             /* If no tab can be found, unload tree from frontend */  
             selectedTab.collectFailure.mapToUnit --> TreeViewController.unloadTree,

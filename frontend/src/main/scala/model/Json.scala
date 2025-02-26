@@ -33,7 +33,7 @@ object Reader {
                 case Failure(err) => Left(MalformedJSON)
         }
     }
-    
+
     /* Read null value or "null" to () or fail with JsonError */
     given unitReader: Reader[Unit] {
         //FIXME: check == null and == "null" fail indeterminately
