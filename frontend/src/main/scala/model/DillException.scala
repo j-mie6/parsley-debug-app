@@ -107,6 +107,11 @@ case object SuffixNotFound extends Error {
         "The expected suffix was not found in the input. Verify that the correct format is being used."
 }
 
+case object EventEmitFailed extends Error {
+    override def name: String = "Event Emitting Failed"
+    override def message: String = "An event could not be emitted from the backend. Try again."
+}
+
 case object MalformedJSON extends Error {
     override def name: String = "Malformed JSON Received"
     override def message: String = 

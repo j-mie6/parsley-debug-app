@@ -63,6 +63,7 @@ object ErrorController {
             case "ReadPathFailed" => ReadPathFailed
             case "StringContainsInvalidUnicode" => StringContainsInvalidUnicode
             case "SuffixNotFound" => SuffixNotFound
+            case "EventEmitFailed" => EventEmitFailed
             case _ => new UnknownError(s"Unknown backend error: ${errorName}")
     }
     
