@@ -1,16 +1,16 @@
-use rocket::figment::{
-    providers::{Format, Toml},
-    Figment,
-};
 use rocket::{Build, Config, Ignite, Rocket};
+use rocket::figment::Figment;
+use rocket::figment::providers::{Format, Toml};
 
-use crate::state::StateHandle;
+use super::ServerState;
+
 
 /* Embed Rocket.toml as a string to allow post-compilation access */
 const ROCKET_CONFIG: &str = include_str!("Rocket.toml");
 
+
 /* Build the Rocket server */
-pub fn build(handle: StateHandle) -> Rocket<Build> {
+pub fn build(server_state: ServerState) -> Rocket<Build> {
     /* Override the default config with values from Rocket.toml */
     let figment: Figment =
         Figment::from(Config::default()).merge(Toml::string(ROCKET_CONFIG).nested());
@@ -18,12 +18,12 @@ pub fn build(handle: StateHandle) -> Rocket<Build> {
     /* Build the rocket server */
     rocket::custom(figment) /* Install our custom config */
         .mount("/", super::request::routes()) /* Mount routes to the base path '/' */
-        .manage(handle) /* Manage the app handle using Rocket state management */
+        .manage(server_state) /* Manage the server state using Rocket state management */
 }
 
 /* Launch the Rocket server */
-pub async fn launch(handle: StateHandle) -> Result<Rocket<Ignite>, rocket::Error> {
-    build(handle).launch().await
+pub async fn launch(server_state: ServerState) -> Result<Rocket<Ignite>, rocket::Error> {
+    build(server_state).launch().await
 }
 
 #[cfg(test)]
@@ -34,17 +34,17 @@ mod test {
     use rocket::{Build, Config, Rocket};
 
     use super::ROCKET_CONFIG;
-    use crate::server;
-    use crate::state::{MockStateManager, StateHandle};
+    use crate::server::{self, ServerState};
+    use crate::state::MockStateManager;
 
     /* Launch unit testing */
 
     #[test]
     fn rocket_client_launches_successfully() {
         let mock = MockStateManager::new();
-        let handle = StateHandle::new(mock);
+        let state = ServerState::new(mock);
 
-        let rocket: Rocket<Build> = super::build(handle);
+        let rocket: Rocket<Build> = super::build(state);
 
         /* Fails if launching rocket would fail */
         assert!(blocking::Client::tracked(rocket).is_ok())

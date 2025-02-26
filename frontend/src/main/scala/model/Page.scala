@@ -10,6 +10,12 @@ import org.scalajs.dom.console
   * Base class of the Dill Page.
   */
 sealed abstract class BasePage {
+    /**
+      * Render a page.
+      *
+      * @param child The content to be rendered on the page.
+      * @return
+      */
     def render(child: Option[HtmlElement]): HtmlElement
     final def render(): HtmlElement = render(None)
 }
