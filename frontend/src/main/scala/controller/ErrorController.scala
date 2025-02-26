@@ -59,7 +59,7 @@ object ErrorController {
             case "NodeNotFound" => NodeNotFound(0)
             case "SerialiseFailed" => SerialiseFailed
             case "ReadDirFailed" => ReadDirFailed
-            case "ReadPathFailed" => ReadPathFailed
+            case "ReadPathFailed" | "ReadFileFailed" => ReadPathFailed
             case "StringContainsInvalidUnicode" => StringContainsInvalidUnicode
             case "SuffixNotFound" => SuffixNotFound
             case "EventEmitFailed" => EventEmitFailed

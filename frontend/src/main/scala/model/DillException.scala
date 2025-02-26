@@ -83,7 +83,7 @@ case object ReadDirFailed extends Error {
         "The system encountered an error while attempting to read a directory. Ensure the directory exists."
 }
 
-case object ReadPathFailed extends Error {
+case object ReadPathFailed extends Warning {
     override def name: String = "Path Read Failure"
     override def message: String = 
         "Failed to access the specified file path. Ensure the path is correct and not blocked by another process."
