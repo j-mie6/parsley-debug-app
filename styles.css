@@ -3,6 +3,12 @@
 @import url('frontend/styles/pages/tab-bar.css');
 @import url('frontend/styles/displays/debug-tree.css');
 
+@font-face {
+    font-family: "bootstrap-icons";
+    src: url("frontend/styles/icons/bootstrap-icons.woff2") format("woff2");
+    font-display: block;
+}
+
 :root {
     --background-primary: #242526;	        /* Dark grey. */
     --background-secondary: #2e2f30;	    /* Grey. */
