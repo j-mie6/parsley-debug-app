@@ -7,7 +7,7 @@ val Scala3 = "3.6.3"
 
 val scalatestVersion = "3.2.19"
 
-val Version = "0.1"
+val Version = "0.3.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / excludeLintKeys += dillFrontend / Compile / stMinimize
