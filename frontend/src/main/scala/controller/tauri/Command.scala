@@ -8,10 +8,9 @@ import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import controller.tauri.Args
 import model.json.Reader
-import model.json.JsonError
 import model.errors.DillException
+import controller.tauri.Args
 import controller.errors.ErrorController
 
 
@@ -45,18 +44,13 @@ sealed trait Command(private val name: String) {
     
     /* Invoke backend command using Tauri JS interface */
     private [tauri] def invoke(args: In): EventStream[Either[DillException, Out]] = {
-        val strArgs: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
+        val stringDict: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
-        /* Invoke command with arguments passed as JS string dictionary */
-        val invoke: js.Promise[String] = tauriInvoke[String](name, strArgs);
-        
-        /* Start EventStream from invoke and deserialise invoke response */
-        EventStream.fromJsPromise(invoke, emitOnce = true)
-            .map((json: String) => Reader[Out].read(json)
-                .swap
-                .map((err: JsonError) => ErrorController.mapException(err))
-                .swap
-            )
+        /* Start EventStream from JS Tauri invoke with argument passed as a string dictionary */
+        EventStream.fromJsPromise(tauriInvoke[String](name, stringDict), emitOnce = true)
+            .recoverToEither                                            /* Catch backend exceptions */
+            .mapLeft(ErrorController.mapException)                      /* Map exception to a DillException */
+            .map(_.flatMap((json: String) => Reader[Out].read(json)))   /* Deserialise response using deferred Reader */
     }
 
 }
@@ -110,7 +104,6 @@ object Command {
         }
 
         type Out = Unit
-        // override val isUnit: Boolean = true TODO: remove
     }
 
     case object DeleteTree extends Command("delete_tree") {
@@ -121,7 +114,6 @@ object Command {
         }
 
         type Out = Unit
-        // override val isUnit: Boolean = true TODO: remove
     }
 
 }

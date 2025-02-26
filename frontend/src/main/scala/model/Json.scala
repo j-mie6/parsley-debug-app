@@ -5,22 +5,14 @@ import scala.deriving.Mirror
 import scala.reflect.ClassTag
 
 import upickle.default as up
-
-
-/* Error returned by Serializer/Deserializer */
-case class JsonError(private val msg:String) extends Throwable 
-
-/* Convert Try to Either containing JsonError or Output */
-private def tryToEither[O](tryError: Try[O]): Either[JsonError, O] = {
-    tryError match 
-        case Failure(err) => Left(JsonError(err.getMessage))
-        case Success(value) => Right(value)
-}
+import model.errors.MalformedJSON
+import model.errors.DillException
+import controller.errors.ErrorController
 
 
 /* Defines JSON parsing interface */
 trait Reader[+O] {
-    def read(s: String): Either[JsonError, O]
+    def read(s: String): Either[DillException, O]
 }
 
 object Reader {
@@ -35,34 +27,49 @@ object Reader {
 
     /* Delegate to upickle for JSON reading */
     given upickleReader: [O: upickle] => Reader[O] {
-        def read(s: String) = tryToEither(Try(up.read[O](s).nn))
+        def read(s: String): Either[DillException, O] = {
+            Try(up.read[O](s).nn) match
+                case Success(value) => Right(value)
+                case Failure(err) => Left(MalformedJSON)
+        }
     }
     
+    /* Read null value or "null" to () or fail with JsonError */
+    given unitReader: Reader[Unit] {
+        //FIXME: check == null and == "null" fail indeterminately
+        def read(s: String): Either[DillException, Unit] = Either.cond(s == null || s == "null", (), MalformedJSON)
+    }
+
 }
 
 
 /* Defines JSON writing interface */
 trait Writer[-I] {
-    def write(input: I): Either[JsonError, String]
+    def write(input: I): Either[DillException, String]
 }
 
 object Writer {
     /* Expose serialize object for calling write function */
-    def apply[I](using serialize: Writer[I]) = serialize 
+    def apply[I](using serialize: Writer[I]) = serialize
 
     /* Define upickle writer */
-    type upickle[I] = up.Writer[I] 
+    type upickle[I] = up.Writer[I]
     object upickle {
         inline def derived[I](using Mirror.Of[I], ClassTag[I]) = up.Writer.derived[I]
     }
     
     /* Delegate to upickle for JSON writing */
     given upickleWriter: [I: upickle] => Writer[I] {
-        def write(input: I) = tryToEither(Try(up.write[I](input).nn))
+        def write(input: I): Either[DillException, String] = {
+            Try(up.write[I](input).nn) match
+                case Success(value) => Right(value)
+                case Failure(err) => Left(MalformedJSON)
+        }
     }
 
-    given unitReader: Reader[Unit] {
-        def read(s: String) = Right(())
+    /* Write Unit type as "null" */
+    given unitWriter: Writer[Unit] {
+        def write(input: Unit): Either[DillException, String] = Right("null")
     }
 
 }

@@ -8,11 +8,11 @@ import com.raquo.laminar.api.L.*
 import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent}
 
 import model.DebugTree
-import model.json.{Reader, JsonError}
+import model.json.Reader
 import controller.tauri.Event.UnlistenFn
-import model.json.JsonError
 import model.errors.DillException
 import controller.errors.ErrorController
+
 
 /**
  * Trait defining event functionality, such as the output type, listen/unlistening
@@ -40,11 +40,9 @@ sealed trait Event(private val name: String) {
 
         /* Deserialise event response and map stream to a Tauri.Response stream */
         val responseStream: EventStream[Either[DillException, Out]] = stream
-            .map((json: String) => Reader[Out].read(json)
-                .swap
-                .map((err:JsonError) => ErrorController.mapException(err)) 
-                .swap
-            )
+            .recoverToEither
+            .mapLeft(ErrorController.mapException)
+            .map(_.flatMap((json: String) => Reader[Out].read(json)))
 
         (responseStream, unlisten)
     }

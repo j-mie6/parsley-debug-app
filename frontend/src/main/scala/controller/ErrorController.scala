@@ -6,7 +6,7 @@ import com.raquo.laminar.api.L.*
 import scala.scalajs.js.internal.UnitOps.unitOrOps
 
 import model.errors.*
-import model.json.JsonError
+
 
 /** 
   * ErrorController keeps track of the error state of the app 
@@ -44,24 +44,26 @@ object ErrorController {
     def mapException(error: Throwable): DillException = {
         error match {
             /* Backend errors */
-            case js.JavaScriptException(jsErr) => jsErr.toString.stripPrefix(": ") match {
-                case "TreeNotFound" => TreeNotFound
-                case "LockFailed" => LockFailed
-                case "NodeNotFound" => NodeNotFound(0)
-                case "SerialiseFailed" => SerialiseFailed
-                case "ReadDirFailed" => ReadDirFailed
-                case "ReadPathFailed" => ReadPathFailed
-                case "StringContainsInvalidUnicode" => StringContainsInvalidUnicode
-                case "SuffixNotFound" => SuffixNotFound
-
-                case _ => new UnknownError(s"Unknown backend error: ${jsErr.toString()}")
-            }
-            
-            /* Frontend errors */
-            case _:JsonError => MalformedJSON
+            case js.JavaScriptException(jsErr) => parseException(jsErr.toString.stripPrefix(": "))
 
             /* Unknown error if not from backend or frontend */
             case _ => new UnknownError(s"Unknown error: ${error.toString()}")
         }
     }
+
+    /* Read error name and match against Error case object */
+    def parseException(errorName: String): DillException = {
+        println("Found error - parsing")
+        errorName.trim match
+            case "TreeNotFound" => TreeNotFound
+            case "LockFailed" => LockFailed
+            case "NodeNotFound" => NodeNotFound(0)
+            case "SerialiseFailed" => SerialiseFailed
+            case "ReadDirFailed" => ReadDirFailed
+            case "ReadPathFailed" => ReadPathFailed
+            case "StringContainsInvalidUnicode" => StringContainsInvalidUnicode
+            case "SuffixNotFound" => SuffixNotFound
+            case _ => new UnknownError(s"Unknown backend error: ${errorName}")
+    }
+    
 }
