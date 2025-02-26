@@ -71,6 +71,10 @@ private object ReactiveNodeDisplay {
         val iterativeNodeIndex: Var[Int] = Var(0)
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater(_ + _)
 
+        // val debugChildrenStream: EventStream[List[ReactiveNode]] = ???
+        // val debugChildrenElementsSignal: Signal[List[HtmlElement]] =
+        //     debugChildrenStream.split(_.debugNode.nodeId)(newRenderDebugChild)
+
         div(
             className := "debug-node-container",
 
@@ -138,17 +142,18 @@ private object ReactiveNodeDisplay {
             /* Flex container for rendering children */
             div(
                 className := "debug-node-children-container",
-                children <-- node.children.signal
-                    .compose(_.changes
-                            .filter(!_.isEmpty && node.debugNode.isIterative)
-                            .toSignal(Nil)
-                            .combineWithFn(iterativeNodeIndex.signal)((nodes: List[DebugNode], index: Int) => nodes(index % nodes.length))
-                            .map((node: DebugNode) => List(node))
-                    )
-                    .map((nodes: List[DebugNode]) => nodes.map((node: DebugNode) => ReactiveNodeDisplay(ReactiveNode(node))))
+                children <-- node.children.signal.map((nodes) => 
+                    if node.debugNode.isIterative then
+                        nodes.map(node => ReactiveNodeDisplay(ReactiveNode(nodes(iterativeNodeIndex.now()))))
+                    else
+                        nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply))
             )
 
         )
     }
+
+    // def newRenderDebugChild(nodeId: Int, initialNode: ReactiveNode, reactiveNodeSignal: Signal[ReactiveNode]): HtmlElement = {
+    //     ReactiveNodeDisplay(node <-- reactiveNodeSignal.map(_.debugNode), children <-- reactiveNodeSignal.map(_.children))
+    // }
 
 }
