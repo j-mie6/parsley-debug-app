@@ -6,6 +6,7 @@
     border: 2px solid var(--font-color-primary);
     border-radius: 20px;
     box-sizing: border-box;
+    justify-items: center;
 }
 
 .tree-view-error {
@@ -37,4 +38,14 @@
     height: 100%;
     align-items: flex-start;
     justify-content: flex-start;
+}
+
+.skip-button {
+    margin-right: 20px;
+    background: transparent;
+    color: inherit;
+    border: none;
+    font: inherit;
+    outline: inherit;
+    cursor: pointer;
 }
