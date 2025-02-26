@@ -3,11 +3,11 @@ import sys.process.*
 
 val Scala213 = "2.13.14"
 val Scala212 = "2.12.18"
-val Scala3 = "3.3.3"
+val Scala3 = "3.6.3"
 
 val scalatestVersion = "3.2.19"
 
-val Version = "0.1"
+val Version = "0.3.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / excludeLintKeys += dillFrontend / Compile / stMinimize
