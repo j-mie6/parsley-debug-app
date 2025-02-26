@@ -83,6 +83,10 @@ private object ReactiveNodeDisplay {
                 indexSum
         })
 
+        val leftHovered = Var(false)
+        val rightHovered = Var(false)
+
+
         div(
             className := "debug-node-container",
 
@@ -91,18 +95,27 @@ private object ReactiveNodeDisplay {
             when (hasUserType) { 
                 p(className := "type-box-name", node.debugNode.name)
             },
+
                 
             /* Line connecting node to parent */
             div(className := "debug-node-line"),
             div(
                 display.flex,
                 flexDirection.row,
-                alignItems.center,
+                alignItems.stretch,
 
                 child(button(
                     className := "debug-node-iterative-buttons",
-                    i(className := "bi bi-caret-left-fill"),
+                    i(
+                        cls("bi bi-caret-left-fill") <-- leftHovered.signal,
+                        cls("bi bi-caret-left") <-- leftHovered.signal.not,
+                        onMouseOver.mapTo(true) --> leftHovered,
+                        onMouseOut.mapTo(false) --> leftHovered
+                    ),
                     onClick.mapTo(-1) --> moveIndex,
+                    onMouseOver.mapTo(true) --> leftHovered,
+                    onMouseOut.mapTo(false) --> leftHovered
+
                 )) <-- compressed.not.map(_ && node.debugNode.isIterative),
 
                 div(
@@ -140,8 +153,15 @@ private object ReactiveNodeDisplay {
 
                 child(button(
                     className := "debug-node-iterative-buttons",
-                    i(className := "bi bi-caret-right-fill"),
+                    i(
+                        cls("bi bi-caret-right-fill") <-- rightHovered.signal,
+                        cls("bi bi-caret-right") <-- rightHovered.signal.not,
+                        onMouseOver.mapTo(true) --> rightHovered,
+                        onMouseOut.mapTo(false) --> rightHovered
+                    ),
                     onClick.mapTo(1) --> moveIndex,
+                    onMouseOver.mapTo(true) --> rightHovered,
+                    onMouseOut.mapTo(false) --> rightHovered
                 )) <-- compressed.not.map(_ && node.debugNode.isIterative),
                 
 
