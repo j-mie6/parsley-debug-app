@@ -45,6 +45,7 @@ impl From<SavedTree> for DebugTree {
                 node.child_id,
                 node.input,
                 children,
+                node.is_iterative
             )
         }
 
@@ -65,12 +66,14 @@ pub struct DebugNode {
     pub child_id: Option<u32>, /* The unique child number of this node */
     pub input: String,         /* The input string passed to the parser */
     #[serde(skip_serializing)] pub children: Vec<DebugNode>, /* The children of this node */
-    pub is_leaf: bool,
+    pub is_leaf: bool,         /* Whether this node is a leaf node */
+    pub is_iterative: bool,    /* Whether this node needs bubbling (iterative and transparent) */
 }
 
 impl DebugNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
-            child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
+            child_id: Option<u32>, input: String, children: Vec<DebugNode>,
+            is_iterative: bool) -> Self {
 
         DebugNode {
             node_id,
@@ -81,6 +84,7 @@ impl DebugNode {
             input,
             is_leaf: children.is_empty(),
             children,
+            is_iterative
         }
     }
 }
@@ -103,7 +107,8 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "input": "Test",
-                "isLeaf": true
+                "isLeaf": true,
+                "isIterative": false
             },
             "isDebuggable": false
         }"#
@@ -121,7 +126,8 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "input": "0",
-                "isLeaf": false
+                "isLeaf": false,
+                "isIterative": false
             },
             "isDebuggable": false
         }"#
@@ -139,7 +145,8 @@ pub mod test {
                 true,
                 Some(0),
                 String::from("Test"),
-                Vec::new()
+                Vec::new(),
+                false
             ),
             false
         )
@@ -172,8 +179,10 @@ pub mod test {
                                 Some(2),
                                 String::from("2"),
                                 vec![],
+                                false
                             )
-                        ]
+                        ],
+                        false
                     ),
                     DebugNode::new(
                         3,
@@ -191,10 +200,13 @@ pub mod test {
                                 Some(4),
                                 String::from("4"),
                                 vec![],
+                                false
                             )
-                        ]
+                        ],
+                        false
                     )
-                ]
+                ],
+                false
             ),
             false
         )
