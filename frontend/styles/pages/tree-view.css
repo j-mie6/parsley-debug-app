@@ -30,6 +30,25 @@
     box-sizing: border-box;
 }
 
+.tree-view-download-button {
+    position: absolute;
+    padding: inherit;
+    right: 60px; 
+    /* background: transparent; */
+    color: inherit;
+    border: none;
+    font: inherit;
+    border: red 1px !important;
+    /* outline: inherit; */
+    /* cursor: pointer;    */
+}
+
+@media (max-width: 450px) {
+    .tree-view-download-button {
+        display: none;
+    }
+}
+
 .zoom-container {
     display: flex;
     transform-origin: left top;

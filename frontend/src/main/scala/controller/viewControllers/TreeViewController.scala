@@ -16,6 +16,9 @@ object TreeViewController {
     /* Reactive DebugTree */
     private val tree: Var[Option[DebugTree]] = Var(None) 
 
+    /* DebugTree signal */
+    val treeSignal: Signal[Option[DebugTree]] = tree.signal
+
     /** Set debug tree */
     val setTree: Observer[DebugTree] = tree.someWriter
 

@@ -22,7 +22,6 @@ object MainView extends DebugViewPage {
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
     }
 
-
     /* Listen for posted tree */
     val (treeStream, unlistenTree) = Tauri.listen(Event.TreeReady)
     val (newTreeStream, unlistenNewTree) = Tauri.listen(Event.NewTree)
@@ -31,6 +30,7 @@ object MainView extends DebugViewPage {
     def apply(): HtmlElement = {
         super.render(Some(
             div(
+
                 /* Update DOM theme with theme value */
                 AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
 
