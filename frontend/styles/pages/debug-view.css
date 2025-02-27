@@ -79,10 +79,3 @@
     outline: inherit;
     cursor: pointer;
 }
-
-@keyframes highlightDebugSession {
-    from { }
-    to {
-        border: 2px solid #de2100d8
-    }
-}

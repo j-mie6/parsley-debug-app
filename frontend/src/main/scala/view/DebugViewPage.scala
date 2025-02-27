@@ -17,7 +17,6 @@ import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.InputViewController
-import controller.viewControllers.DebugViewController
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -118,7 +117,7 @@ abstract class DebugViewPage extends Page {
             TabView(),
             div(
                 className := "tree-view-page",
-                animation <-- DebugViewController.setBorderAnimation,
+                cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
                 child.getOrElse(div())
             )
         )))
