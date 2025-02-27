@@ -21,8 +21,8 @@ object DebugTreeDisplay {
     val minZoomFactor: Double = 3.0 /* Minimum zoom factor */
     
     /* Updater for the zoom factor */
-    val zoomUpdate = zoomFactor.updater[Double]((prev, delta) => 
-        val zoomChange = 1.0 + (delta * zoomSpeed)
+    val zoomUpdate: Observer[Double] = zoomFactor.updater[Double]((prev, delta) => 
+        val zoomChange: Double = 1.0 + (delta * zoomSpeed)
         (prev * zoomChange).min(minZoomFactor).max(maxZoomFactor)
     )
     
@@ -66,11 +66,18 @@ private object ReactiveNodeDisplay {
     def apply(node: ReactiveNode): HtmlElement = {
         /* True if start of a user-defined type */
         val hasUserType: Boolean = node.debugNode.internal != node.debugNode.name
-        val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty)
+        /* If the current node should be considered iterative */
         val treatIteratively: Var[Boolean] = Var(node.debugNode.isIterative)
+        /* In the case of an iterative node, should all children be expanded */
+        val expandAllChildren: Var[Boolean] = Var(!node.debugNode.isIterative)
+        /* If the current node's children are visible (or exist) */
+        val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty)
+        /* If the current node only has one child */
         val hasOneChild: Signal[Boolean] = node.children.signal.map(_.length == 1)
 
+        /* The index of the current child rendered for iterative nodes */
         val iterativeNodeIndex: Var[Int] = Var(0)
+        /* Incrementing iterative node index */
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
             val indexSum: Int = currIndex + delta
             val childrenLen: Int = node.children.now().length
@@ -85,11 +92,12 @@ private object ReactiveNodeDisplay {
         })
 
         /* Vars to keep track of when the mouse is within either arrow button */
-        val leftIterativeButtonHovered = Var(false)
-        val rightIterativeButtonHovered = Var(false)
+        val leftIterativeButtonHovered: Var[Boolean] = Var(false)
+        val rightIterativeButtonHovered: Var[Boolean] = Var(false)
 
         /* Signal for when to show arrow buttons */
-        val showIterativeButtons: Signal[Boolean] = compressed.not.combineWith(hasOneChild.not).map(_ && _ && node.debugNode.isIterative)
+        val showIterativeButtons: Signal[Boolean] = compressed.not.combineWith(hasOneChild.not)
+            .combineWith(expandAllChildren.signal.not).map(_ && _ && _ && node.debugNode.isIterative)
 
         div(
             className := "debug-node-container",
@@ -134,11 +142,13 @@ private object ReactiveNodeDisplay {
                     /* Render debug node information */
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
-                        child(p("Child #", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal.combineWith(compressed.not).map(_ && _),
+                        child(p("Child #", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal
+                            .combineWith(compressed.not).combineWith(expandAllChildren.signal.not)
+                            .map(_ && _ && _),
                         p(fontStyle := "italic", node.debugNode.input)
                     ),
 
-                    /* Expand/compress node on click */
+                    /* Expand/compress node with (with arrows for iterative) on click */
                     onClick(_
                         .sample(compressed)
                         .filter(_ => !node.debugNode.isLeaf)
@@ -152,6 +162,18 @@ private object ReactiveNodeDisplay {
                             }
                         )
                     ) --> node.children.writer,
+
+                    /* Expand/compress iterative nodes to all children on double click */
+                    onDblClick(_
+                        .sample(compressed)
+                        .filter(_ => node.debugNode.isIterative)
+                        .flatMapMerge(
+                            if (_) then
+                                EventStream.fromValue(true)
+                            else
+                                EventStream.fromValue(false)
+                        )
+                    ) --> expandAllChildren
 
                 ),
 
@@ -181,8 +203,8 @@ private object ReactiveNodeDisplay {
             /* Flex container for rendering children */
             div(
                 className := "debug-node-children-container",
-                children <-- node.children.signal.combineWith(iterativeNodeIndex).map((nodes, index) => 
-                    if node.debugNode.isIterative && !nodes.isEmpty then
+                children <-- node.children.signal.combineWith(iterativeNodeIndex).combineWith(expandAllChildren).map((nodes, index, expandAllCs) => 
+                    if node.debugNode.isIterative && !nodes.isEmpty && !expandAllCs then
                         List(ReactiveNodeDisplay(ReactiveNode(nodes(index))))
                     else
                         nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply))
