@@ -37,7 +37,7 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
     /* Get path to Downloads folder (OS agnostic) and copy saved tree to Downloads folder */
     let download_path: String = state.get_path().download_dir().unwrap();
     fs::copy(file_path, download_path).map_err(|_| SaveTreeError::DownloadFailed)?;
-    Ok()
+    Ok(())
 }
 
 #[derive(Debug, serde::Serialize)]
