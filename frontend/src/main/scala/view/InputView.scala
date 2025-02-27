@@ -17,7 +17,6 @@ import controller.viewControllers.TreeViewController
 /**
   * Object containing rendering functions for the input view page.
   */
-
 object InputView {
     def apply(): HtmlElement = {
         h1(
