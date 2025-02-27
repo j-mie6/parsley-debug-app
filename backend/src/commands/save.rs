@@ -35,9 +35,14 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
     /* Path to the json file used to store the tree */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
 
-    /* Get path to Downloads folder and copy saved tree to Downloads folder */
-    let download_path: PathBuf = state.get_download_path().unwrap();
+    /* Get path to Downloads folder */
+    let mut download_path: PathBuf = state.get_download_path().unwrap();
+    download_path.push(format!("{}.json", tree_name));
+
+    /* Creates a file in Downloads and copies data into it */
+    let _ = File::create(&download_path).map_err(|_| SaveTreeError::DownloadFailed)?;
     fs::copy(file_path, download_path).map_err(|_| SaveTreeError::DownloadFailed)?;
+    
     Ok(())
 }
 
