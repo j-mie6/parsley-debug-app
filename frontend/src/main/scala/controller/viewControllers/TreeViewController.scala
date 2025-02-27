@@ -44,6 +44,13 @@ object TreeViewController {
     )
 
     /** Fetch the debug tree root from the backend, return in EventStream */
+<<<<<<< Updated upstream
     def reloadTree: EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
+=======
+    def reloadTree: EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.FetchDebugTree, ())
+
+    /* Downloads tree to users device */
+    def downloadTree: EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, ())
+>>>>>>> Stashed changes
     
 }

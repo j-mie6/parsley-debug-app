@@ -9,6 +9,7 @@ pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         save::save_tree, 
         save::fetch_saved_tree_names, 
         save::load_saved_tree,
-        save::delete_tree
+        save::delete_tree,
+        save::download_tree
     ]
 }

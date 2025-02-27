@@ -113,4 +113,14 @@ object Command {
         type Out = Unit
     }
 
+    case object DownloadTree extends Command("download_tree") {
+        type In = String
+        given args: Args[String] {
+            extension (treeName: String)
+                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
+        }
+
+        type Out = Unit
+    }
+
 }

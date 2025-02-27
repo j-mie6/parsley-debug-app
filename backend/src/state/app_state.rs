@@ -35,6 +35,11 @@ impl AppState {
         self.0.lock()
             .map_err(|_| StateError::LockFailed)
     }
+
+    fn get_path(&self) { //-> Result<, StateError> {
+        self.inner.app.path()
+            .map_err(|_| StateError::LockFailed)
+    }
 }
 
 

@@ -10,9 +10,7 @@ import com.raquo.laminar.api.features.unitArrows
 import model.DebugTree
 import controller.viewControllers.TreeViewController
 
-/**
-  * Object containing rendering functions for the TreeView
-  */
+/* Object containing rendering functions for the TreeView */
 object TreeView {
 
     val downloadButton: HtmlElement = button(
