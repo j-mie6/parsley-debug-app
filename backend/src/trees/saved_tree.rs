@@ -5,6 +5,7 @@ use super::{DebugNode, DebugTree};
 pub struct SavedTree {
     input: String,
     root: SavedNode,
+    is_debuggable: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -44,15 +45,16 @@ impl From<DebugTree> for SavedTree {
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
   
-        SavedTree::new(debug_tree.get_input().clone(), node)
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode) -> Self {
+    pub fn new(input: String, root: SavedNode, is_debuggable: bool) -> Self {
         SavedTree { 
             input,
-            root
+            root,
+            is_debuggable,
         }
     }
 
@@ -62,6 +64,10 @@ impl SavedTree {
 
     pub fn get_input(&self) -> &String {
         &self.input
+    }
+
+    pub fn is_debuggable(&self) -> bool {
+        self.is_debuggable
     }
 }
 
@@ -110,7 +116,8 @@ pub mod test {
                 "input": "Test",
                 "children": [],
                 "is_iterative": false
-            }
+            },
+            "is_debuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -171,7 +178,8 @@ pub mod test {
                     }
                 ],
                 "is_iterative": false
-            }
+            },
+            "is_debuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -189,7 +197,8 @@ pub mod test {
                 String::from("Test"),
                 Vec::new(),
                 false
-            )
+            ),
+            false
         )
     }
     
@@ -248,7 +257,8 @@ pub mod test {
                     )
                 ],
                 false
-            )
+            ),
+            false
         )
     }
 

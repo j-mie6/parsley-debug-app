@@ -83,3 +83,18 @@ Then, create a new [issue](https://github.com/j-mie6/parsley-debug-app/issues) -
 - The [`Rocket`](https://rocket.rs/) server transforms and passes off a representation of the debug tree to the [`Tauri`](https://v2.tauri.app/) application in `Rust`.
 - The frontend then queries the [`Tauri`](https://v2.tauri.app/) application for the debug tree.
 - Upon receiving of the tree, the frontend renders the tree on the screen.
+
+
+## Docker
+
+We provide a Dockerfile that lets you modify and test the project without installing additional dependencies.
+
+### How to use?
+After building an image, you can start a container using the command `docker run -it --rm -e DISPLAY=:0 -v /tmp/.X11-unix:/tmp/.X11-unix -p 2222:22 <IMAGE_ID>`. **You must be using a Linux-based terminal or have an X-Server installed on your machine to support GUI forwarding.**
+
+This will launch the container with SSH access and X-Forwarding enabled, allowing the GUI to display on your local machine. Once the container is running, you can SSH into it using `ssh -X -p 2222 root@localhost`, then navigate to the Dill root directory with `cd /home`.
+
+Before running the project, ensure that Rust's package manager is set to the latest version by running `rustup default stable`. Once this is done, you can follow the commands listed in [building](#building) to work on Dill.
+
+### Editing Outside Docker
+Alternatively, if you prefer working on the code outside the container, you can edit files locally and copy them into the container using: `sbt dockerBuild`.

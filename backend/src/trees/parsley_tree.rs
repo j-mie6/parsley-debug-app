@@ -15,9 +15,17 @@ pub struct ParsleyNode {
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ParsleyTree {
     input: String,     /* The input string being parsed */
     root: ParsleyNode, /* Root node of the debug tree */
+    is_debuggable: bool, /* If this tree was produced by a currently-running parser */
+}
+
+impl ParsleyTree {
+    pub fn is_debugging(&self) -> bool {
+        self.is_debuggable
+    }
 }
 
 /* Convert from ParsleyTree to DebugTree */
@@ -62,7 +70,7 @@ impl From<ParsleyTree> for DebugTree {
 
         /* Convert the root node and return DebugTree */
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node)
+        DebugTree::new(tree.input, node, tree.is_debuggable)
     }
 }
 
@@ -87,7 +95,8 @@ pub mod test {
                 "toOffset": 4,
                 "children": [],
                 "isIterative": false
-            }
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -148,7 +157,8 @@ pub mod test {
                     }
                 ],
                 "isIterative": false
-            }
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -166,7 +176,8 @@ pub mod test {
                 to_offset: 4,
                 children: vec![],
                 is_iterative: false
-            }
+            },
+            is_debuggable: false,
         }
     }
 
@@ -225,7 +236,8 @@ pub mod test {
                     }
                 ],
                 is_iterative: false,
-            }
+            },
+            is_debuggable: false,
         }
     }
 
