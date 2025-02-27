@@ -158,6 +158,7 @@ private object ReactiveNodeDisplay {
                                 Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
                             } else {
                                 /* Otherwise set them to empty list */
+                                expandAllChildren.set(false)
                                 EventStream.fromValue(Nil)
                             }
                         )
