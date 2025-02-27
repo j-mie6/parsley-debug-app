@@ -33,6 +33,6 @@ object AppStateController {
 
     /** Get boolean signal indicating whether light theme is active */
     def getThemeIcon: Signal[HtmlElement] = theme.signal
-        .map(if (_) then moonIcon else sunIcon)
+        .foldBoolean(moonIcon, sunIcon)
 
 }
