@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
+use std::path::PathBuf;
 
 use crate::events::Event;
 use crate::trees::{DebugTree, DebugNode};
@@ -36,9 +37,9 @@ impl AppState {
             .map_err(|_| StateError::LockFailed)
     }
 
-    pub fn get_path(&self) { //-> Result<, StateError> {
-        self.inner().app.path()
-            .map_err(|_| StateError::LockFailed)
+    /* Finds path to Downloads folder (OS agnostic) */
+    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.inner().unwrap().app.get_download_path()
     }
 }
 

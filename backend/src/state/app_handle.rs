@@ -3,7 +3,7 @@ use tauri::{Emitter, Manager};
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 use super::{AppState, StateManager, StateError};
-
+use std::path::PathBuf;
 
 /* Wrapper for Tauri AppHandle */
 pub struct AppHandle(tauri::AppHandle);
@@ -16,6 +16,11 @@ impl AppHandle {
     /* Delegate emit to wrapped Tauri AppHandle */
     pub fn emit(&self, event: Event) -> Result<(), StateError> {
         StateManager::emit(&self.0, event)
+    }
+
+    /* Finds path to Downloads folder (OS agnostic) */
+    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.0.path().download_dir().map_err(|_| StateError::LockFailed)
     }
 }
 

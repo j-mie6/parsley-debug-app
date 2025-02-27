@@ -1,5 +1,6 @@
 use std::fs::{self, File};
 use std::io::Write;
+use std::path::PathBuf;
 
 use crate::AppState;
 use crate::state::{StateError, StateManager};
@@ -34,8 +35,8 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
     /* Path to the json file used to store the tree */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
 
-    /* Get path to Downloads folder (OS agnostic) and copy saved tree to Downloads folder */
-    let download_path: String = state.get_path().download_dir().unwrap();
+    /* Get path to Downloads folder and copy saved tree to Downloads folder */
+    let download_path: PathBuf = state.get_download_path().unwrap();
     fs::copy(file_path, download_path).map_err(|_| SaveTreeError::DownloadFailed)?;
     Ok(())
 }
