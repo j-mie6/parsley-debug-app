@@ -66,38 +66,46 @@ private object ReactiveNodeDisplay {
     def apply(node: ReactiveNode): HtmlElement = {
         /* True if start of a user-defined type */
         val hasUserType: Boolean = node.debugNode.internal != node.debugNode.name
+
         /* If the current node should be considered iterative */
         val treatIteratively: Var[Boolean] = Var(node.debugNode.isIterative)
+
         /* In the case of an iterative node, should all children be expanded */
         val expandAllChildren: Var[Boolean] = Var(!node.debugNode.isIterative)
+
         /* If the current node's children are visible (or exist) */
         val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty)
+
         /* If the current node only has one child */
         val hasOneChild: Signal[Boolean] = node.children.signal.map(_.length == 1)
 
         /* The index of the current child rendered for iterative nodes */
         val iterativeNodeIndex: Var[Int] = Var(0)
+
         /* Incrementing iterative node index */
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
-            val indexSum: Int = currIndex + delta
-            val childrenLen: Int = node.children.now().length
-
             /* Wrap indices of children around */
-            if indexSum < 0 then
-                childrenLen - 1
-            else if indexSum > childrenLen - 1 then
-                0
-            else
-                indexSum
+            (currIndex + delta) % node.children.now().length
         })
 
-        /* Vars to keep track of when the mouse is within either arrow button */
-        val leftIterativeButtonHovered: Var[Boolean] = Var(false)
-        val rightIterativeButtonHovered: Var[Boolean] = Var(false)
-
         /* Signal for when to show arrow buttons */
-        val showIterativeButtons: Signal[Boolean] = compressed.not.combineWith(hasOneChild.not)
-            .combineWith(expandAllChildren.signal.not).map(_ && _ && _ && node.debugNode.isIterative)
+        val showIterativeButtons: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
+
+        def iterativeArrowButton(isRight: Boolean): HtmlElement = {
+            val directionSignal: Var[Boolean] = Var(false)
+            button(
+                    className := "debug-node-iterative-buttons",
+                    i(
+                        cls(s"bi bi-caret-${direction}-fill") <-- directionSignal.signal,
+                        cls(s"bi bi-caret-${direction}") <-- directionSignal.signal.not,
+                        onMouseOver.mapTo(true) --> directionSignal,
+                        onMouseOut.mapTo(false) --> directionSignal
+                    ),
+                    onClick.mapTo(if isRight then 1 else -1) --> moveIndex,
+                    onMouseOver.mapTo(true) --> directionSignal,
+                    onMouseOut.mapTo(false) --> directionSignal
+            )
+        }
 
         div(
             className := "debug-node-container",
@@ -116,23 +124,12 @@ private object ReactiveNodeDisplay {
                 flexDirection.row,
                 alignItems.stretch,
 
-                child(button(
-                    className := "debug-node-iterative-buttons",
-                    i(
-                        cls("bi bi-caret-left-fill") <-- leftIterativeButtonHovered.signal,
-                        cls("bi bi-caret-left") <-- leftIterativeButtonHovered.signal.not,
-                        onMouseOver.mapTo(true) --> leftIterativeButtonHovered,
-                        onMouseOut.mapTo(false) --> leftIterativeButtonHovered
-                    ),
-                    onClick.mapTo(-1) --> moveIndex,
-                    onMouseOver.mapTo(true) --> leftIterativeButtonHovered,
-                    onMouseOut.mapTo(false) --> leftIterativeButtonHovered
-
-                )) <-- showIterativeButtons,
+                child(iterativeArrowButton(isRight = false)) <-- showIterativeButtons,
 
                 div(
                     className := "debug-node",
                     flexGrow := 1,
+                    
                     /* Set reactive class names */
                     cls("compress") <-- compressed,
                     cls("fail") := !node.debugNode.success,
@@ -143,8 +140,7 @@ private object ReactiveNodeDisplay {
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         child(p("Child #", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal
-                            .combineWith(compressed.not).combineWith(expandAllChildren.signal.not)
-                            .map(_ && _ && _),
+                            .combineWithFn(compressed.not, expandAllChildren.signal.not)(_ && _ && _),
                         p(fontStyle := "italic", node.debugNode.input)
                     ),
 
@@ -166,30 +162,14 @@ private object ReactiveNodeDisplay {
 
                     /* Expand/compress iterative nodes to all children on double click */
                     onDblClick(_
-                        .sample(compressed)
                         .filter(_ => node.debugNode.isIterative)
-                        .flatMapMerge(
-                            if (_) then
-                                EventStream.fromValue(true)
-                            else
-                                EventStream.fromValue(false)
-                        )
+                        .sample(compressed)
+                        .flatMapMerge(EventStream.fromValue(_))
                     ) --> expandAllChildren
 
                 ),
 
-                child(button(
-                    className := "debug-node-iterative-buttons",
-                    i(
-                        cls("bi bi-caret-right-fill") <-- rightIterativeButtonHovered.signal,
-                        cls("bi bi-caret-right") <-- rightIterativeButtonHovered.signal.not,
-                        onMouseOver.mapTo(true) --> rightIterativeButtonHovered,
-                        onMouseOut.mapTo(false) --> rightIterativeButtonHovered
-                    ),
-                    onClick.mapTo(1) --> moveIndex,
-                    onMouseOver.mapTo(true) --> rightIterativeButtonHovered,
-                    onMouseOut.mapTo(false) --> rightIterativeButtonHovered
-                )) <-- showIterativeButtons,
+                child(iterativeArrowButton(isRight = true)) <-- showIterativeButtons,
                 
 
             ),
@@ -204,13 +184,13 @@ private object ReactiveNodeDisplay {
             /* Flex container for rendering children */
             div(
                 className := "debug-node-children-container",
-                children <-- node.children.signal.combineWith(iterativeNodeIndex).combineWith(expandAllChildren).map((nodes, index, expandAllCs) => 
-                    if node.debugNode.isIterative && !nodes.isEmpty && !expandAllCs then
-                        List(ReactiveNodeDisplay(ReactiveNode(nodes(index))))
-                    else
-                        nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply))
-            )
-
+                children <-- node.children.signal.combineWith(iterativeNodeIndex, compressed.not, expandAllChildren)
+                    .map((nodes, index, notCompressed, expandAllCs) => 
+                        if node.debugNode.isIterative && notCompressed && !expandAllCs then
+                            List(ReactiveNodeDisplay(ReactiveNode(nodes(index))))
+                        else
+                            nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply))
+                )
         )
     }
 }

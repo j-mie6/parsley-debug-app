@@ -158,7 +158,6 @@
     width: 20px;
 
     background: none;
-    /* background-color: var(--background-tertiary-20); */
     background-color: none;
     color: var(--font-color-primary);
     
@@ -167,10 +166,4 @@
     border-style: solid;
     border-color: var(--font-color-primary);
     border-radius: 8px;
-    
-    /* padding: 8px 5px; */
-}
-
-.debug-node-iterative-buttons:hover {
-    /* background-color: var(--background-tertiary-40); */
 }
