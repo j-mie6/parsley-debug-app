@@ -12,34 +12,34 @@
 }
 
 :root {
-    --background-primary: #242526; /* Dark grey. */
-    --background-secondary: #2E2F30; /* Grey. */
-    --background-secondary-hover: #525252; /* Lighter Grey. */
-    --background-tertiary: #96DEC4; /* Parsley green 60% transparency. */
-    --background-tertiary-60: #96DEC499; /* Parsley green 60% transparency. */
-    --background-tertiary-40: #96DEC466; /* Parsley green 20% transparency. */
-    --background-tertiary-20: #96DEC433; /* Parsley green 20% transparency. */
-    --font-color-primary: #96DEC4; /* Parsley green. */
-    --font-color-secondary: #242526; /* Dark grey. */
-    --font-color-tertiary: #96DEC4; /* Parsley green. */
-    --font-color-quaternary: #242526; /* Parsley green. */
-    --font-color-error: #D2042D; /* Red error. */
+    --background-primary: #242526;          /* Dark grey. */
+    --background-secondary: #2E2F30;        /* Grey. */
+    --background-secondary-hover: #525252;  /* Lighter Grey. */
+    --background-tertiary: #96DEC4;         /* Parsley green 60% transparency. */
+    --background-tertiary-60: color-mix(in srgb, var(--background-tertiary) 60%, transparent);    /* Parsley green 60% transparency. */
+    --background-tertiary-40: color-mix(in srgb, var(--background-tertiary) 40%, transparent);    /* Parsley green 40% transparency. */
+    --background-tertiary-20: color-mix(in srgb, var(--background-tertiary) 20%, transparent);    /* Parsley green 20% transparency. */
+    --font-color-primary: #96DEC4;          /* Parsley green. */
+    --font-color-secondary: #242526;        /* Dark grey. */
+    --font-color-tertiary: #96DEC4;         /* Parsley green. */
+    --font-color-quaternary: #242526;       /* Parsley green. */
+    --font-color-error: #D2042D;            /* Red error. */
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
 }
 
 [data-theme="light"] {
-    --background-primary: #F3F3F3; /* Light grey. */
-    --background-secondary: #FFFFFF; /* White. */
-    --background-secondary-hover: #e1e1e1; /* White. */
-    --background-tertiary: #7eb9a6; /* Light green. */
+    --background-primary: #F3F3F3;          /* Light grey. */
+    --background-secondary: #FFFFFF;        /* White. */
+    --background-secondary-hover: #e1e1e1;  /* White. */
+    --background-tertiary: #7eb9a6;         /* Light green. */
     --background-tertiary-60: color-mix(in srgb, var(--background-tertiary) 60%, transparent); /* Light green 60% transparency. */
-    --background-tertiary-40: color-mix(in srgb, var(--background-tertiary) 40%, transparent);; /* Light green 40% transparency. */
-    --background-tertiary-20: color-mix(in srgb, var(--background-tertiary) 20%, transparent);; /* Light green 20% transparency. */
-    --font-color-primary: #1F3D34; /* Dark green. */
-    --font-color-secondary: #7EB9A6; /* Lighter green. */
-    --font-color-tertiary: #7EB9A6; /* Lighter green. */
-    --font-color-quaternary: #1F3D34; /* Parsley green. */
-    --font-color-error: #fd4659; /* Red error. */
+    --background-tertiary-40: color-mix(in srgb, var(--background-tertiary) 40%, transparent); /* Light green 40% transparency. */
+    --background-tertiary-20: color-mix(in srgb, var(--background-tertiary) 20%, transparent); /* Light green 20% transparency. */
+    --font-color-primary: #1F3D34;      /* Dark green. */
+    --font-color-secondary: #7EB9A6;    /* Lighter green. */
+    --font-color-tertiary: #7EB9A6;     /* Lighter green. */
+    --font-color-quaternary: #1F3D34;   /* Parsley green. */
+    --font-color-error: #fd4659;        /* Red error. */
 }
 
 body {

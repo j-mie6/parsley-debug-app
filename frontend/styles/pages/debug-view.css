@@ -86,15 +86,8 @@
     align-items: center;
 }
 
-.debug-view-save {
-    font-size: 18px;
-    margin-right: 10px;
-    cursor: pointer;
-}
-
-.debug-view-button-save {
-    font-size: 20px;
-    margin-right: 14px;
+.debug-view-button-bar:scrolled {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
 
 .debug-view-button-info {

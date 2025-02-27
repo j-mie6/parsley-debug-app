@@ -24,6 +24,27 @@ object MainViewController {
     /* Current view selected */
     private val view: Var[View] = Var(View.Tree)
 
+    private def renderButton(buttonType: String, icon: String, text: String, view: View, openSemaphore: Var[Int]): HtmlElement = button(
+        className := f"debug-view-select-button debug-view-${buttonType}-button",
+        i(className := f"bi bi-${icon}"),
+        
+        cls("selected") <-- MainViewController.getView.map(_ == view),
+
+        div(
+            className := f"debug-view-expand-button debug-view-expand-${buttonType}",
+            cls("expanded") <-- openSemaphore.signal.map(_ > 0),
+            p(text, marginLeft.px := 5),
+        ),
+
+        onClick.preventDefault.mapTo(view) --> MainViewController.setView,
+    )
+
+    def renderViewButton(view: View, openSemaphore: Var[Int]): HtmlElement = view match {
+        case View.Tree =>   renderButton("tree", "tree-fill", "Tree View", View.Tree, openSemaphore)
+        case View.Input =>  renderButton("source", "file-earmark-text-fill", "Source View", View.Input, openSemaphore)
+        case View.Code =>   renderButton("code", "file-earmark-code-fill", "Code View", View.Code, openSemaphore)
+    }
+
     /** Get current selected view */
     val getView: Signal[View] = view.signal
 

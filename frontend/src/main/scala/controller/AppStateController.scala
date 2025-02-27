@@ -28,8 +28,8 @@ object AppStateController {
     }
 
     /* Icons for showing page theme */
-    private lazy val sunIcon: HtmlElement = i(className := "bi bi-brightness-high-fill", fontSize.px := 33)
-    private lazy val moonIcon: HtmlElement = i(className := "bi bi-moon-fill", fontSize.px := 33)
+    private lazy val sunIcon: HtmlElement = i(className := "bi bi-brightness-high-fill")
+    private lazy val moonIcon: HtmlElement = i(className := "bi bi-moon-fill")
 
     /** Get boolean signal indicating whether light theme is active */
     def getThemeIcon: Signal[HtmlElement] = theme.signal
