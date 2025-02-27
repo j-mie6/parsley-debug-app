@@ -118,7 +118,7 @@
     color: var(--font-color-tertiary);
     border: 1px solid var(--font-color-tertiary);
     border-radius: 15px;
-    margin-left: 19px;
+    margin-left: 13px;
 }
 
 .debug-view-select-button.selected {
@@ -155,13 +155,13 @@
 }
 
 .debug-view-expand-tree.expanded {
-    width: 102px;
+    width: 105px;
 }
 
 .debug-view-expand-source.expanded {
-    width: 129px;
+    width: 132px;
 }
 
 .debug-view-expand-code.expanded {
-    width: 110px;
+    width: 113px;
 }
