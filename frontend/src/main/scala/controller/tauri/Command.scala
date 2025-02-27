@@ -119,6 +119,8 @@ object Command {
             extension (treeName: String)
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
+
+        type Out = Unit
     }
 
     case object SkipBreakpoints extends Command("skip_breakpoints") {
