@@ -6,13 +6,14 @@
 :root {
     --background-primary: #242526; /* Dark grey. */
     --background-secondary: #2E2F30; /* Grey. */
+    --background-secondary-hover: #525252; /* Grey. */
     --background-tertiary: #96DEC4; /* Parsley green 60% transparency. */
     --background-tertiary-60: #96DEC499; /* Parsley green 60% transparency. */
     --background-tertiary-40: #96DEC466; /* Parsley green 20% transparency. */
     --background-tertiary-20: #96DEC433; /* Parsley green 20% transparency. */
-    --tab: #8FE4C5; /* Tab green */
-    --tab-hover: #6DAD96; /* 5% lighter tab */
-    --tab-selected: #64E3B4; /* 10% lighter tab */
+    --tab-background-color: #8FE4C5; /* Tab green */
+    --tab-background-hover: #6DAD96; /* 5% lighter tab */
+    --tab-background-selected: #64E3B4; /* 10% lighter tab */
     --font-color-primary: #96DEC4; /* Parsley green. */
     --font-color-secondary: #242526; /* Dark grey. */
     --font-color-tertiary: #96DEC4; /* Parsley green. */
@@ -24,13 +25,14 @@
 [data-theme="light"] {
     --background-primary: #F3F3F3; /* Light grey. */
     --background-secondary: #FFFFFF; /* White. */
+    --background-secondary-hover: #e1e1e1; /* White. */
     --background-tertiary: #7eb9a6; /* Light green. */
     --background-tertiary-60: color-mix(in srgb, var(--background-tertiary) 60%, transparent); /* Light green 60% transparency. */
     --background-tertiary-40: color-mix(in srgb, var(--background-tertiary) 40%, transparent);; /* Light green 40% transparency. */
     --background-tertiary-20: color-mix(in srgb, var(--background-tertiary) 20%, transparent);; /* Light green 20% transparency. */
-    --tab: #3e4041; /* Tab Grey */
-    --tab-hover: #5a5e60; /* 5% lighter tab */
-    --tab-selected: #242526; /* 10% lighter tab */
+    --tab-background-color: #3e4041; /* Tab Grey */
+    --tab-background-hover: #5a5e60; /* 5% lighter tab */
+    --tab-background-selected: #242526; /* 10% lighter tab */
     --font-color-primary: #1F3D34; /* Dark green. */
     --font-color-secondary: #7EB9A6; /* Lighter green. */
     --font-color-tertiary: #7EB9A6; /* Lighter green. */

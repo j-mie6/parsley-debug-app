@@ -2,7 +2,7 @@
     background-color: var(--background-secondary);
     height: 85%;
     overflow: auto;
-    border: 2px solid var(--font-color-primary);
+    border: 2px solid var(--font-color-tertiary);
     border-radius: 20px;
     box-sizing: border-box;
     flex: 1;
