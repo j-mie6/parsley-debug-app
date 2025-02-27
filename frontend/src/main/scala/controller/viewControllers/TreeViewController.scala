@@ -6,6 +6,7 @@ import model.DebugTree
 import view.DebugTreeDisplay
 import controller.tauri.Tauri
 import controller.tauri.Command
+import model.errors.DillException
 
 
 /**
@@ -43,10 +44,20 @@ object TreeViewController {
         case Some(tree) => DebugTreeDisplay(tree)
     )
 
-    /** Fetch the debug tree root from the backend, return in EventStream */
-    def reloadTree: EventStream[DebugTree] = Tauri.invoke(Command.FetchDebugTree, ()).collectRight
 
     /* Downloads tree to users device */
-    def downloadTree(name: String): EventStream[Unit] = Tauri.invoke(Command.DownloadTree, name).collectRight
+    def downloadTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, name)
     
+    /** Fetch the debug tree root from the backend, return in EventStream */
+    def reloadTree: EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.FetchDebugTree, ())
+    
+    /** Skips the current breakpoint 'skips' times
+      *
+      * @param skips The amount of times to skip a breakpoint
+      */
+    def skipBreakpoints(skips: Int): Unit =
+        Tauri.invoke(Command.SkipBreakpoints, skips)
+    
+    /* Toggle whether the button to skip through breakpoints is visible */
+    val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
 }

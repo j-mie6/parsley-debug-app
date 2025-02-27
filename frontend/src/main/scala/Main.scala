@@ -9,7 +9,6 @@ import view.MainView
 import controller.AppStateController
 import controller.tauri.Tauri
 
-
 @main def app = {
     renderOnDomContentLoaded(
         dom.document.getElementById("app"),

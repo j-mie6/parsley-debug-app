@@ -5,18 +5,20 @@ use super::{DebugNode, DebugTree};
 pub struct SavedTree {
     input: String,
     root: SavedNode,
+    is_debuggable: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SavedNode {
-    pub node_id: u32,
-    pub name: String,
-    pub internal: String,
-    pub success: bool,
-    pub child_id: Option<u32>,
-    pub input: String,
-    pub children: Vec<SavedNode>,
-}
+    pub node_id: u32,               /* The user-defined name */
+    pub name: String,               /* The internal name of the parser */
+    pub internal: String,           /* Whether the parser was successful */
+    pub success: bool,              /* The unique child number of this node */
+    pub child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
+    pub input: String,              /* Offset into the input in which this node's parse attempt finished */
+    pub children: Vec<SavedNode>,   /* The children of this node */
+    pub is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
+} 
 
 impl From<DebugTree> for SavedTree {
     fn from(debug_tree: DebugTree) -> Self {
@@ -37,20 +39,22 @@ impl From<DebugTree> for SavedTree {
                 node.child_id,
                 node.input,
                 children,
+                node.is_iterative
             )
         }
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
   
-        SavedTree::new(debug_tree.get_input().clone(), node)
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode) -> Self {
+    pub fn new(input: String, root: SavedNode, is_debuggable: bool) -> Self {
         SavedTree { 
             input,
-            root
+            root,
+            is_debuggable,
         }
     }
 
@@ -61,11 +65,16 @@ impl SavedTree {
     pub fn get_input(&self) -> &String {
         &self.input
     }
+
+    pub fn is_debuggable(&self) -> bool {
+        self.is_debuggable
+    }
 }
 
 impl SavedNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
-            child_id: Option<u32>, input: String, children: Vec<SavedNode>) -> Self {
+            child_id: Option<u32>, input: String, children: Vec<SavedNode>,
+            is_iterative: bool) -> Self {
 
         SavedNode {
             node_id,
@@ -75,6 +84,7 @@ impl SavedNode {
             child_id,
             input,
             children,
+            is_iterative
         }
     }
 }
@@ -104,8 +114,10 @@ pub mod test {
                 "success": true,
                 "child_id": 0,
                 "input": "Test",
-                "children": []
-            }
+                "children": [],
+                "is_iterative": false
+            },
+            "is_debuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -137,9 +149,11 @@ pub mod test {
                                 "success": true,
                                 "child_id": 2,
                                 "input": "2",
-                                "children": []
+                                "children": [],
+                                "is_iterative": false
                             }
-                        ]
+                        ],
+                        "is_iterative": false
                     },
                     {
                         "node_id": 3,
@@ -156,12 +170,16 @@ pub mod test {
                                 "success": true,
                                 "child_id": 4,
                                 "input": "4",
-                                "children": []
+                                "children": [],
+                                "is_iterative": false
                             }
-                        ]
+                        ],
+                        "is_iterative": false
                     }
-                ]
-            }
+                ],
+                "is_iterative": false
+            },
+            "is_debuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -177,8 +195,10 @@ pub mod test {
                 true,
                 Some(0),
                 String::from("Test"),
-                Vec::new()
-            )
+                Vec::new(),
+                false
+            ),
+            false
         )
     }
     
@@ -209,8 +229,10 @@ pub mod test {
                                 Some(2),
                                 String::from("2"),
                                 vec![],
+                                false
                             )
-                        ]
+                        ],
+                        false
                     ),
                     SavedNode::new(
                         3,
@@ -228,11 +250,15 @@ pub mod test {
                                 Some(4),
                                 String::from("4"),
                                 vec![],
+                                false
                             )
-                        ]
+                        ],
+                        false
                     )
-                ]
-            )
+                ],
+                false
+            ),
+            false
         )
     }
 

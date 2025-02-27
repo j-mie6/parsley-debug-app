@@ -2,14 +2,16 @@ use super::{SavedTree, SavedNode};
 
 /* Placeholder ParserInfo structures for state management */
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DebugTree {
     input: String,
     root: DebugNode,
+    is_debuggable: bool,
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode) -> Self {
-        DebugTree { input, root }
+    pub fn new(input: String, root: DebugNode, is_debuggable: bool) -> Self {
+        DebugTree { input, root, is_debuggable }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -18,6 +20,10 @@ impl DebugTree {
 
     pub fn get_input(&self) -> &String {
         &self.input
+    }
+
+    pub fn is_debuggable(&self) -> bool {
+        self.is_debuggable
     }
 }
 
@@ -39,11 +45,12 @@ impl From<SavedTree> for DebugTree {
                 node.child_id,
                 node.input,
                 children,
+                node.is_iterative
             )
         }
 
         let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node)
+        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
     }
 }
 
@@ -59,12 +66,14 @@ pub struct DebugNode {
     pub child_id: Option<u32>, /* The unique child number of this node */
     pub input: String,         /* The input string passed to the parser */
     #[serde(skip_serializing)] pub children: Vec<DebugNode>, /* The children of this node */
-    pub is_leaf: bool,
+    pub is_leaf: bool,         /* Whether this node is a leaf node */
+    pub is_iterative: bool,    /* Whether this node needs bubbling (iterative and transparent) */
 }
 
 impl DebugNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
-            child_id: Option<u32>, input: String, children: Vec<DebugNode>) -> Self {
+            child_id: Option<u32>, input: String, children: Vec<DebugNode>,
+            is_iterative: bool) -> Self {
 
         DebugNode {
             node_id,
@@ -75,6 +84,7 @@ impl DebugNode {
             input,
             is_leaf: children.is_empty(),
             children,
+            is_iterative
         }
     }
 }
@@ -97,8 +107,10 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "input": "Test",
-                "isLeaf": true
-            }
+                "isLeaf": true,
+                "isIterative": false
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect::<String>()
@@ -114,8 +126,10 @@ pub mod test {
                 "success": true,
                 "childId": 0,
                 "input": "0",
-                "isLeaf": false
-            }
+                "isLeaf": false,
+                "isIterative": false
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -131,8 +145,10 @@ pub mod test {
                 true,
                 Some(0),
                 String::from("Test"),
-                Vec::new()
-            )
+                Vec::new(),
+                false
+            ),
+            false
         )
     }
 
@@ -163,8 +179,10 @@ pub mod test {
                                 Some(2),
                                 String::from("2"),
                                 vec![],
+                                false
                             )
-                        ]
+                        ],
+                        false
                     ),
                     DebugNode::new(
                         3,
@@ -182,11 +200,15 @@ pub mod test {
                                 Some(4),
                                 String::from("4"),
                                 vec![],
+                                false
                             )
-                        ]
+                        ],
+                        false
                     )
-                ]
-            )
+                ],
+                false
+            ),
+            false
         )
     }
  

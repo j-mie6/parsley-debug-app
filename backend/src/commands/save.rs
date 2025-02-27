@@ -140,12 +140,14 @@ pub enum LoadTreeError {
     LockFailed,
     ReadFileFailed,
     DeserialiseFailed,
+    EventEmitFailed,
 }
 
 impl From<StateError> for LoadTreeError {
     fn from(state_error: StateError) -> Self {
         match state_error {
             StateError::LockFailed => LoadTreeError::LockFailed,
+            StateError::EventEmitFailed => LoadTreeError::EventEmitFailed,
             _ => panic!("Unexpected error on load_saved_tree"),
         }
     }

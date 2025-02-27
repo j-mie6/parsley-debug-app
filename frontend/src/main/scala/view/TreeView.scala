@@ -31,14 +31,27 @@ object TreeView {
         onClick --> downloadCurrentTree,
     )
 
+    /* Fast forward icon for skipping */
+    private lazy val skipIcon: Element = i(className := "bi bi-fast-forward-fill", fontSize.px := 33)
+
+    /* Adds ability to skip the current breakpoint. */
+    private lazy val skipButton: Element = button(
+        className := "skip-button",
+
+        skipIcon, /* Fast forward icon */
+
+        onClick --> { _ => {
+            TreeViewController.skipBreakpoints(0)
+        }}
+    )
+
+
     /* Render tree as HtmlElement */
     def apply(): HtmlElement = div(
-
-        /* Render save button */
+        /* Render download button */
         child(downloadButton) <-- TreeViewController.treeExists,
-
-        /* Renders the tree */
-        child <-- TreeViewController.getTreeElem,
+        child(skipButton) <-- TreeViewController.isDebuggingSession,
+        child <-- TreeViewController.getTreeElem, /* Renders the tree */
     )
             
 }

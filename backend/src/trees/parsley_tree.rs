@@ -11,12 +11,21 @@ pub struct ParsleyNode {
     from_offset: i32,           /* Offset into the input in which this node's parse attempt starts */
     to_offset: i32,             /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
+    is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ParsleyTree {
-    input: String,     /* The input string being parsed */
-    root: ParsleyNode, /* Root node of the debug tree */
+    input: String,       /* The input string being parsed */
+    root: ParsleyNode,   /* Root node of the debug tree */
+    is_debuggable: bool, /* If this tree was produced by a currently-running parser */
+}
+
+impl ParsleyTree {
+    pub fn is_debugging(&self) -> bool {
+        self.is_debuggable
+    }
 }
 
 /* Convert from ParsleyTree to DebugTree */
@@ -52,6 +61,7 @@ impl From<ParsleyTree> for DebugTree {
                 child_id,
                 input_slice,
                 children,
+                node.is_iterative
             )
         }
 
@@ -60,7 +70,7 @@ impl From<ParsleyTree> for DebugTree {
 
         /* Convert the root node and return DebugTree */
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node)
+        DebugTree::new(tree.input, node, tree.is_debuggable)
     }
 }
 
@@ -83,8 +93,10 @@ pub mod test {
                 "childId": 0,
                 "fromOffset": 0,
                 "toOffset": 4,
-                "children": []
-            }
+                "children": [],
+                "isIterative": false
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -116,9 +128,11 @@ pub mod test {
                                 "childId": 2,
                                 "fromOffset": 2,
                                 "toOffset": 3,
-                                "children": []
+                                "children": [],
+                                "isIterative": false
                             }
-                        ]
+                        ],
+                        "isIterative": false
                     },
                     {
                         "name": "3",
@@ -135,12 +149,16 @@ pub mod test {
                                 "childId": 4,
                                 "fromOffset": 4,
                                 "toOffset": 5,
-                                "children": []
+                                "children": [],
+                                "isIterative": false
                             }
-                        ]
+                        ],
+                        "isIterative": false
                     }
-                ]
-            }
+                ],
+                "isIterative": false
+            },
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
@@ -156,8 +174,10 @@ pub mod test {
                 child_id: 0,
                 from_offset: 0,
                 to_offset: 4,
-                children: vec![]
-            }
+                children: vec![],
+                is_iterative: false
+            },
+            is_debuggable: false,
         }
     }
 
@@ -187,9 +207,11 @@ pub mod test {
                                 child_id: 2,
                                 from_offset: 2,
                                 to_offset: 3,
-                                children: vec![]
+                                children: vec![],
+                                is_iterative: false
                             }
-                        ]
+                        ],
+                        is_iterative: false
                     },
                     ParsleyNode {
                         name: String::from("3"),
@@ -206,12 +228,16 @@ pub mod test {
                                 child_id: 4,
                                 from_offset: 4,
                                 to_offset: 5,
-                                children: vec![]
+                                children: vec![],
+                                is_iterative: false
                             }
-                        ]
+                        ],
+                        is_iterative: false
                     }
-                ]
-            }
+                ],
+                is_iterative: false,
+            },
+            is_debuggable: false,
         }
     }
 

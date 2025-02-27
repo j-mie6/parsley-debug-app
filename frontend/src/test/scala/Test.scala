@@ -5,7 +5,8 @@ import org.scalatest.matchers.*
 
 import model.DebugTree
 import model.DebugNode
-import model.json.{JsonError, Reader, Writer}
+import model.json.{Reader, Writer}
+import model.errors.DillException
 
 
 class Test extends AnyFlatSpec with should.Matchers {
@@ -19,17 +20,20 @@ class Test extends AnyFlatSpec with should.Matchers {
             "success": true,
             "childId": 0,
             "input": "Test",
-            "isLeaf": false
-        }
+            "isLeaf": false,
+            "isIterative": false
+        },
+        "isDebuggable": false
     }"""
 
     
     "The tree" should "be deserialised" in {
-        val parsed: Either[JsonError, DebugTree] = Reader[DebugTree].read(jsonTree)
+        val parsed: Either[DillException, DebugTree] = Reader[DebugTree].read(jsonTree)
         val tree: DebugTree = parsed.toOption.get /* Throws exception if JsonError is returned */
 
         /* Check that the root tree has been deserialised correctly */
         tree.input should be ("Test")
+        tree.isDebuggable should be (false)
         tree.root.nodeId should be (0)
         tree.root.name should be ("Test")
         tree.root.internal should be ("Test")
@@ -37,6 +41,7 @@ class Test extends AnyFlatSpec with should.Matchers {
         tree.root.childId should be (0)
         tree.root.input should be ("Test")
         tree.root.isLeaf should be (false)
+        tree.root.isIterative should be (false)
     }
 
     it should "not be deserialised if the JSON is not properly formatted" in {

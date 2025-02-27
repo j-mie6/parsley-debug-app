@@ -44,4 +44,8 @@ impl StateManager for tauri::AppHandle {
         Emitter::emit(self, &event.name(), event.payload()?)
             .map_err(|_| StateError::EventEmitFailed)
     }
+
+    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(),StateError> {
+        self.state::<AppState>().transmit_breakpoint_skips(skips)
+    }
 }

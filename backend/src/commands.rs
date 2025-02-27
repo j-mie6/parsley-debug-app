@@ -1,5 +1,6 @@
 mod fetch;
 mod save;
+mod breakpoint;
 
 /* Expose command handlers for Tauri setup */
 pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
@@ -10,6 +11,7 @@ pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         save::fetch_saved_tree_names, 
         save::load_saved_tree,
         save::delete_tree,
-        save::download_tree
+        save::download_tree,
+        breakpoint::skip_breakpoints,
     ]
 }

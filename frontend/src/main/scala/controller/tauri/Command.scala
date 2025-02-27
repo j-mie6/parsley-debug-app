@@ -1,6 +1,6 @@
 package controller.tauri
 
-import scala.util.Try
+import scala.util.{Try, Success, Failure}
 import scala.scalajs.js
 
 import com.raquo.laminar.api.L.*
@@ -8,8 +8,10 @@ import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import model.json.{Reader, JsonError}
+import model.json.Reader
+import model.errors.DillException
 import controller.tauri.Args
+import controller.errors.ErrorController
 
 
 /* Argument trait implemented for types passed to Command invoke call */ 
@@ -17,6 +19,7 @@ private [tauri] sealed trait Args[A] {
     extension (a: A) 
         def namedArgs: Map[String, Any]
 }
+
 
 private [tauri] object Args {
     /* Default conversion from Unit to empty Arg Map */
@@ -38,21 +41,18 @@ sealed trait Command(private val name: String) {
     type Out
     given Reader[Out] = scala.compiletime.deferred 
 
-
+    
     /* Invoke backend command using Tauri JS interface */
-    private [tauri] def invoke(args: In): EventStream[Either[JsonError, Out]] = {
+    private [tauri] def invoke(args: In): EventStream[Either[DillException, Out]] = {
         val stringDict: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
 
-        /* Invoke command with arguments passed as JS string dictionary */
-        val invoke: js.Promise[String] = tauriInvoke[String](name, stringDict);
-        
-        /* Start EventStream from invoke and deserialise invoke response */
-        EventStream.fromJsPromise(invoke, emitOnce = true)
-            .map((json: String) => Reader[Out].read(json))
+        /* Start EventStream from JS Tauri invoke with argument passed as a string dictionary */
+        EventStream.fromJsPromise(tauriInvoke[String](name, stringDict), emitOnce = true)
+            .recoverToEither                                            /* Catch backend exceptions */
+            .mapLeft(ErrorController.mapException)                      /* Map exception to a DillException */
+            .map(_.flatMap((json: String) => Reader[Out].read(json)))   /* Deserialise response using deferred Reader */
     }
-
 }
-
 
 object Command {
 
@@ -119,7 +119,14 @@ object Command {
             extension (treeName: String)
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
+    }
 
+    case object SkipBreakpoints extends Command("skip_breakpoints") {
+        type In = Int
+        given args: Args[In] {
+            extension (skips: Int) 
+                def namedArgs: Map[String, Any] = Map("skips" -> skips)
+        }
         type Out = Unit
     }
 
