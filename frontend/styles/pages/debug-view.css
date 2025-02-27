@@ -86,10 +86,6 @@
     align-items: center;
 }
 
-.debug-view-button-bar:scrolled {
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-}
-
 .debug-view-button-info {
     font-size: 22px;
     margin-right: 2px;
