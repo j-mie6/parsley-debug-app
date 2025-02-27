@@ -92,6 +92,7 @@ private object ReactiveNodeDisplay {
         val showIterativeButtons: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
 
         def iterativeArrowButton(isRight: Boolean): HtmlElement = {
+            val direction: String = if isRight then "right" else "left"
             val directionSignal: Var[Boolean] = Var(false)
             button(
                     className := "debug-node-iterative-buttons",
