@@ -44,4 +44,13 @@ object TreeViewController {
     /** Fetch the debug tree root from the backend, return in EventStream */
     def reloadTree: EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.FetchDebugTree, ())
     
+    /** Skips the current breakpoint 'skips' times
+      *
+      * @param skips The amount of times to skip a breakpoint
+      */
+    def skipBreakpoints(skips: Int): Unit =
+        Tauri.invoke(Command.SkipBreakpoints, skips)
+    
+    /* Toggle whether the button to skip through breakpoints is visible */
+    val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
 }

@@ -52,9 +52,7 @@ sealed trait Command(private val name: String) {
             .mapLeft(ErrorController.mapException)                      /* Map exception to a DillException */
             .map(_.flatMap((json: String) => Reader[Out].read(json)))   /* Deserialise response using deferred Reader */
     }
-
 }
-
 
 object Command {
 
@@ -112,6 +110,15 @@ object Command {
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
+        type Out = Unit
+    }
+
+    case object SkipBreakpoints extends Command("skip_breakpoints") {
+        type In = Int
+        given args: Args[In] {
+            extension (skips: Int) 
+                def namedArgs: Map[String, Any] = Map("skips" -> skips)
+        }
         type Out = Unit
     }
 
