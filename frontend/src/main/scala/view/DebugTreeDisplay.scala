@@ -84,9 +84,12 @@ private object ReactiveNodeDisplay {
                 indexSum
         })
 
-        val leftHovered = Var(false)
-        val rightHovered = Var(false)
+        /* Vars to keep track of when the mouse is within either arrow button */
+        val leftIterativeButtonHovered = Var(false)
+        val rightIterativeButtonHovered = Var(false)
 
+        /* Signal for when to show arrow buttons */
+        val showIterativeButtons: Signal[Boolean] = compressed.not.combineWith(hasOneChild.not).map(_ && _ && node.debugNode.isIterative)
 
         div(
             className := "debug-node-container",
@@ -108,16 +111,16 @@ private object ReactiveNodeDisplay {
                 child(button(
                     className := "debug-node-iterative-buttons",
                     i(
-                        cls("bi bi-caret-left-fill") <-- leftHovered.signal,
-                        cls("bi bi-caret-left") <-- leftHovered.signal.not,
-                        onMouseOver.mapTo(true) --> leftHovered,
-                        onMouseOut.mapTo(false) --> leftHovered
+                        cls("bi bi-caret-left-fill") <-- leftIterativeButtonHovered.signal,
+                        cls("bi bi-caret-left") <-- leftIterativeButtonHovered.signal.not,
+                        onMouseOver.mapTo(true) --> leftIterativeButtonHovered,
+                        onMouseOut.mapTo(false) --> leftIterativeButtonHovered
                     ),
                     onClick.mapTo(-1) --> moveIndex,
-                    onMouseOver.mapTo(true) --> leftHovered,
-                    onMouseOut.mapTo(false) --> leftHovered
+                    onMouseOver.mapTo(true) --> leftIterativeButtonHovered,
+                    onMouseOut.mapTo(false) --> leftIterativeButtonHovered
 
-                )) <-- compressed.not.combineWith(hasOneChild.not).map(_ && _ && node.debugNode.isIterative),
+                )) <-- showIterativeButtons,
 
                 div(
                     className := "debug-node",
@@ -155,15 +158,15 @@ private object ReactiveNodeDisplay {
                 child(button(
                     className := "debug-node-iterative-buttons",
                     i(
-                        cls("bi bi-caret-right-fill") <-- rightHovered.signal,
-                        cls("bi bi-caret-right") <-- rightHovered.signal.not,
-                        onMouseOver.mapTo(true) --> rightHovered,
-                        onMouseOut.mapTo(false) --> rightHovered
+                        cls("bi bi-caret-right-fill") <-- rightIterativeButtonHovered.signal,
+                        cls("bi bi-caret-right") <-- rightIterativeButtonHovered.signal.not,
+                        onMouseOver.mapTo(true) --> rightIterativeButtonHovered,
+                        onMouseOut.mapTo(false) --> rightIterativeButtonHovered
                     ),
                     onClick.mapTo(1) --> moveIndex,
-                    onMouseOver.mapTo(true) --> rightHovered,
-                    onMouseOut.mapTo(false) --> rightHovered
-                )) <-- compressed.not.combineWith(hasOneChild.not).map(_ && _ && node.debugNode.isIterative),
+                    onMouseOver.mapTo(true) --> rightIterativeButtonHovered,
+                    onMouseOut.mapTo(false) --> rightIterativeButtonHovered
+                )) <-- showIterativeButtons,
                 
 
             ),
