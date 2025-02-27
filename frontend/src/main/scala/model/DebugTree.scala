@@ -1,14 +1,17 @@
 package model
 
-import upickle.default.ReadWriter
+import model.json.Reader
+
 
 /**
   * Case class used to represent tauri's debug tree automatically using upickle.
   *
   * @param input the input string the tree node has to parse
   * @param root the debug tree root node
+  * @param isDebuggable if this tree is using live debugging operations like breakpoint skipping
   */
-case class DebugTree(input: String, root: DebugNode) derives ReadWriter
+case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean) derives Reader.upickle
+
 
 /**
   * Case class used to represent tauri's debug tree automatically using upickle.
@@ -23,4 +26,5 @@ case class DebugTree(input: String, root: DebugNode) derives ReadWriter
   * @param isLeaf if a node is a leaf
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean) derives ReadWriter
+    childId: Int, input: String, isLeaf: Boolean) derives Reader.upickle
+
