@@ -8,14 +8,7 @@ import com.raquo.laminar.api.L.*
 object DebugViewController {
 
     private val animationTimeSeconds: Float = 1.8
-
-    private def animationString(isDebugSession: Boolean): String = {
-        if (isDebugSession) {
-            f"highlightDebugSession ${animationTimeSeconds}s infinite alternate ease-in"
-        } else {
-            ""
-        }
-    }
+    private val setAnimationStr: String = f"highlightDebugSession ${animationTimeSeconds}s infinite alternate ease-in"
     
-    val setBorderAnimation: Signal[String] = TreeViewController.isDebuggingSession.signal.map(animationString)
+    val setBorderAnimation: Signal[String] = TreeViewController.isDebuggingSession.signal.foldBoolean(setAnimationStr, "")
 }
