@@ -67,7 +67,7 @@ pub struct DebugNode {
     pub input: String,         /* The input string passed to the parser */
     #[serde(skip_serializing)] pub children: Vec<DebugNode>, /* The children of this node */
     pub is_leaf: bool,         /* Whether this node is a leaf node */
-    pub is_iterative: bool, /* Whether this node needs bubbling (iterative and transparent) */
+    pub is_iterative: bool,    /* Whether this node needs bubbling (iterative and transparent) */
 }
 
 impl DebugNode {

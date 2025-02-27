@@ -17,7 +17,7 @@ pub struct SavedNode {
     pub child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
     pub input: String,              /* Offset into the input in which this node's parse attempt finished */
     pub children: Vec<SavedNode>,   /* The children of this node */
-    pub is_iterative: bool,   /* Whether this node needs bubbling (iterative and transparent) */
+    pub is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
 } 
 
 impl From<DebugTree> for SavedTree {
