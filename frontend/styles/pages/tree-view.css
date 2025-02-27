@@ -49,3 +49,15 @@
     outline: inherit;
     cursor: pointer;
 }
+
+.tree-view-page.highlight-debug-session {
+    animation: borderPulseRed 1.8s infinite alternate ease-in !important;
+}
+
+
+@keyframes borderPulseRed {
+    from { }
+    to {
+        border: 2px solid #de2100d8
+    }
+}
