@@ -77,11 +77,13 @@
     position: sticky;
     top: 0px;
     left: 0px;
-    padding: 20px;
+    padding: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: start;
+    align-items: center;
 }
 
 .debug-view-save {
@@ -112,6 +114,7 @@
 
 .debug-view-select-button {
     cursor: pointer;
+    transition: color 0.5s;
     color: var(--font-color-tertiary);
     border: 1px solid var(--font-color-tertiary);
     border-radius: 15px;

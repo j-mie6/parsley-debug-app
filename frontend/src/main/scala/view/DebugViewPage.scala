@@ -234,9 +234,7 @@ abstract class DebugViewPage extends Page {
                 buttonBar,
                 paddingBottom.px := 20,
                 onScroll.map(_ => dom.document.getElementsByClassName("tree-view-page").apply(0).scrollTop) --> scrollDistance,
-                div(
-                    child.getOrElse(div())
-                )
+                child.getOrElse(div())
             )
         )))
     } 

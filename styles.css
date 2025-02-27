@@ -15,7 +15,8 @@
     --tab-selected: #64E3B4; /* 10% lighter tab */
     --font-color-primary: #96DEC4; /* Parsley green. */
     --font-color-secondary: #242526; /* Dark grey. */
-    --font-color-tertiary: #96DEC4; /* Dark grey. */
+    --font-color-tertiary: #96DEC4; /* Parsley green. */
+    --font-color-quaternary: #242526; /* Parsley green. */
     --font-color-error: #D2042D; /* Red error. */
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
 }
@@ -23,16 +24,17 @@
 [data-theme="light"] {
     --background-primary: #F3F3F3; /* Light grey. */
     --background-secondary: #FFFFFF; /* White. */
-    --background-tertiary: #7EB9A6; /* Light green. */
-    --background-tertiary-60: #7EB9A699; /* Light green 60% transparency. */
-    --background-tertiary-40: #7EB9A666; /* Light green 40% transparency. */
-    --background-tertiary-20: #7EB9A633; /* Light green 20% transparency. */
+    --background-tertiary: #7eb9a6; /* Light green. */
+    --background-tertiary-60: color-mix(in srgb, var(--background-tertiary) 60%, transparent); /* Light green 60% transparency. */
+    --background-tertiary-40: color-mix(in srgb, var(--background-tertiary) 40%, transparent);; /* Light green 40% transparency. */
+    --background-tertiary-20: color-mix(in srgb, var(--background-tertiary) 20%, transparent);; /* Light green 20% transparency. */
     --tab: #3e4041; /* Tab Grey */
     --tab-hover: #5a5e60; /* 5% lighter tab */
     --tab-selected: #242526; /* 10% lighter tab */
     --font-color-primary: #1F3D34; /* Dark green. */
     --font-color-secondary: #7EB9A6; /* Lighter green. */
     --font-color-tertiary: #7EB9A6; /* Lighter green. */
+    --font-color-quaternary: #1F3D34; /* Parsley green. */
     --font-color-error: #fd4659; /* Red error. */
 }
 
