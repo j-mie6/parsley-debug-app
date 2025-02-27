@@ -85,7 +85,10 @@ private object ReactiveNodeDisplay {
         /* Incrementing iterative node index */
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
             /* Wrap indices of children around */
-            (currIndex + delta) % node.children.now().length
+            val childrenLen: Int = node.children.now().length
+            val indexSum: Int = (currIndex + delta) % childrenLen
+            
+            if (indexSum < 0) then indexSum + childrenLen else indexSum
         })
 
         /* Signal for when to show arrow buttons */
