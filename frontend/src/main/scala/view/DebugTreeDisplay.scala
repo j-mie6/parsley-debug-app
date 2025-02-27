@@ -68,6 +68,7 @@ private object ReactiveNodeDisplay {
         val hasUserType: Boolean = node.debugNode.internal != node.debugNode.name
         val compressed: Signal[Boolean] = node.children.signal.map(_.isEmpty)
         val treatIteratively: Var[Boolean] = Var(node.debugNode.isIterative)
+        val hasOneChild: Signal[Boolean] = node.children.signal.map(_.length == 1)
 
         val iterativeNodeIndex: Var[Int] = Var(0)
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
@@ -116,7 +117,7 @@ private object ReactiveNodeDisplay {
                     onMouseOver.mapTo(true) --> leftHovered,
                     onMouseOut.mapTo(false) --> leftHovered
 
-                )) <-- compressed.not.map(_ && node.debugNode.isIterative),
+                )) <-- compressed.not.combineWith(hasOneChild.not).map(_ && _ && node.debugNode.isIterative),
 
                 div(
                     className := "debug-node",
@@ -130,7 +131,7 @@ private object ReactiveNodeDisplay {
                     /* Render debug node information */
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
-                        p(text <-- iterativeNodeIndex.signal),
+                        child(p("Child #", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal.combineWith(compressed.not).map(_ && _),
                         p(fontStyle := "italic", node.debugNode.input)
                     ),
 
@@ -162,7 +163,7 @@ private object ReactiveNodeDisplay {
                     onClick.mapTo(1) --> moveIndex,
                     onMouseOver.mapTo(true) --> rightHovered,
                     onMouseOut.mapTo(false) --> rightHovered
-                )) <-- compressed.not.map(_ && node.debugNode.isIterative),
+                )) <-- compressed.not.combineWith(hasOneChild.not).map(_ && _ && node.debugNode.isIterative),
                 
 
             ),
