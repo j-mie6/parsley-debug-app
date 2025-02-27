@@ -32,15 +32,16 @@
 
 .tree-view-download-button {
     position: absolute;
+    z-index: 1;
     padding: inherit;
     right: 60px; 
-    /* background: transparent; */
+    background: transparent;
     color: inherit;
     border: none;
     font: inherit;
     border: red 1px !important;
-    /* outline: inherit; */
-    /* cursor: pointer;    */
+    outline: inherit; 
+    cursor: pointer;   
 }
 
 @media (max-width: 450px) {
