@@ -11,14 +11,14 @@ pub struct ParsleyNode {
     from_offset: i32,           /* Offset into the input in which this node's parse attempt starts */
     to_offset: i32,             /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
-    is_iterative: bool,   /* Whether this node needs bubbling (iterative and transparent) */
+    is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ParsleyTree {
-    input: String,     /* The input string being parsed */
-    root: ParsleyNode, /* Root node of the debug tree */
+    input: String,       /* The input string being parsed */
+    root: ParsleyNode,   /* Root node of the debug tree */
     is_debuggable: bool, /* If this tree was produced by a currently-running parser */
 }
 
