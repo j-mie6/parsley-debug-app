@@ -48,15 +48,22 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
 
 /* Imports JSON file to display a tree */
 #[tauri::command]
-pub fn import_tree(state: tauri::State<AppState>, external_path: String) -> Result<(), SaveTreeError> {
+pub fn import_tree(state: tauri::State<AppState>, _external_path: String) -> Result<(), SaveTreeError> {
+    let mut external_path = state.get_download_path().unwrap();
+    println!("External path: {}", external_path.display());
+    external_path.push(format!("{}/input-tree.json", external_path.display()));
+    println!("External path: {}", external_path.display());
+
+    let external_file_name = external_path.clone().into_os_string().into_string().unwrap().replace("/", "");
+
     /* Path to the json file used to store the tree */
-    let app_path: String = format!("{}{}.json", SAVED_TREE_DIR, external_path);
+    let app_path: String = format!("{}{}", SAVED_TREE_DIR, external_file_name);
 
     /* Creates a file in apps local saved tree folders and copies data from external json it */
-    let _ = File::create(&app_path).map_err(|_| SaveTreeError::ImportFailed)?;
-    fs::copy(external_path, app_path).map_err(|_| SaveTreeError::ImportFailed)?;
-    
-    load_saved_tree(external_path, state)?;
+    let _ = File::create(&app_path).map_err(|err| {println!("{}", err); SaveTreeError::ImportFailed})?;
+    fs::copy(&external_path, &app_path).map_err(|err| {println!("{}", err); SaveTreeError::ImportFailed})?;
+
+    let _ = load_path(app_path, state).map_err(|err| {println!("{:?}", err); SaveTreeError::ImportFailed})?;
 
     Ok(())
 }
@@ -135,7 +142,12 @@ pub enum FetchTreeNameError {
 pub fn load_saved_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), LoadTreeError>  {
     /* Get the file path of the tree to be reloaded */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+    load_path(file_path, state)?;
+    Ok(())
+}
 
+/* Loads a tree from the specified file path */
+pub fn load_path(file_path: String, state: tauri::State<AppState>) -> Result<(), LoadTreeError> {
     /* Read the contents of the file as a string */
     let contents: String = fs::read_to_string(file_path)
         .map_err(|_| LoadTreeError::ReadFileFailed)?;

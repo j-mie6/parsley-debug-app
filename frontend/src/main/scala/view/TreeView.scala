@@ -28,15 +28,14 @@ object TreeView {
         ) --> Observer.empty,
     )
 
-    /* Import tree button */
-    val uploadButton: HtmlElement = button(
+    val uploadButton: HtmlElement = label(
         className := "tree-view-upload-button",
-
-        /* Save button icon */
+        forId := "file-upload",
+        
         i(className := "bi bi-upload", fontSize.px := 35),
 
-        /* Exports current tree */
-        onClick --> (_ => TreeViewController.importTree("/home/ap3222/Downloads/tree-0.json"))
+        /* Triggers the file input */
+        onClick --> (_ => TreeViewController.importTree("This String does not matter"))
     )
 
     /* Fast forward icon for skipping */
@@ -58,6 +57,9 @@ object TreeView {
     def apply(): HtmlElement = div(
         /* Render download button */
         child(downloadButton) <-- TreeViewController.treeExists,
+
+        /* Render upload button */
+        uploadButton,
 
         /* Render skip button */
         child(skipButton) <-- TreeViewController.isDebuggingSession,
