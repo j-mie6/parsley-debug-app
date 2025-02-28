@@ -1,11 +1,15 @@
 package view
 
-import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
+import com.raquo.laminar.codecs.*
 
 import org.scalajs.dom
 
+import scala.scalajs.js.timers._
+import scala.concurrent.duration._
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.FiniteDuration
 import scala.util.{Try, Success, Failure}
 
 import model.Page
@@ -18,6 +22,7 @@ import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.InputViewController
 
+
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
 /**
@@ -26,51 +31,42 @@ val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
   * light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {
-    /* Bootstrap icons used on the page (https://icons.getbootstrap.com/) */
-    private lazy val treeIcon: Element = i(className := "bi bi-tree-fill", fontSize.px := 30)
-    private lazy val fileIcon: Element = i(className := "bi bi-file-earmark-text-fill", fontSize.px := 25)
-    private lazy val gitIcon: Element = i(className := "bi bi-github", fontSize.px := 40)
-    private lazy val sunIcon: Element = i(className := "bi bi-brightness-high-fill", fontSize.px := 33)
-    private lazy val moonIcon: Element = i(className := "bi bi-moon-fill", fontSize.px := 33)
-
-    /* Left section of the page header, containing tree and source view tabs */
-    private lazy val headerLeft: Element = div(
-        className := "debug-view-header-left",
-        div(
-            className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewController.getView.map(_ == View.Tree),
-            treeIcon,
-            h2("Tree View", marginLeft.px := 7),
-            onClick.mapTo(View.Tree) --> MainViewController.setView,
-        ),
-        div(
-            className := "debug-view-header-left-container",
-            cls("selected") <-- MainViewController.getView.map(_ == View.Input),
-            fileIcon,
-            h2("Input View", marginLeft.px := 12),
-            onClick.mapTo(View.Input) --> MainViewController.setView,
-        )
-    )
+    private lazy val gitIcon: HtmlElement = i(className := "bi bi-github", fontSize.px := 40)
 
     /* Title element */
-    private lazy val title: Element = div(
+    private lazy val title: HtmlElement = div(
         className := "debug-view-header-title",
         h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
-    /* Visual call to action for user to save the current tree */
-     private lazy val saveIcon: HtmlElement = i(
-        className := "bi bi-floppy-fill",
-        fontSize.px := 25, marginRight.px := 10
+    /* Overview information tab. */
+    private lazy val infoButton: HtmlElement = button(
+        // TODO
+        className := "debug-view-button debug-view-button-info",
+        i(className := "bi bi-info-circle-fill"),
     )
 
+    /* Opener for the settings tab. */
+    private lazy val settingsTabButton: HtmlElement = button(
+        className := "debug-view-button debug-view-button-settings",
+        i(className := "bi bi-gear-wide-connected")
+    )
+
+    /**
+     * Semaphore controlling expansion of the descriptions.
+     * 
+     * A value > 0 represents expanded.
+     */
+    private val viewCloseSemaphore: Var[Int] = Var(0)
+    private val viewCloseSemaphoreIncrement: Observer[Int] = viewCloseSemaphore.updater((x, add) => x + add)
+    private val viewCloseSemaphoreDecrement: Observer[Int] = viewCloseSemaphore.updater((x, sub) => x - sub)
 
     /* Button used to toggle the theme */
     private lazy val themeButton: Element = div(
         cursor.pointer,
         alignContent.center,
-
         marginRight.px := 20,
+        fontSize.px := 33,
 
         /* Render moonIcon in light mode; sunIcon in dark mode */
         child <-- AppStateController.getThemeIcon, 
@@ -79,12 +75,12 @@ abstract class DebugViewPage extends Page {
     )
 
     /* Button that links to the 'parsley-debug-app' Github repo */
-    private lazy val githubButton: Element = a(
+    private lazy val githubButton: HtmlElement = a(
         href := "https://github.com/j-mie6/parsley-debug-app", target := "_blank", gitIcon
     )
 
     /* Right section of the page header, containing various buttons */
-    private lazy val headerRight: Element = div(
+    private lazy val headerRight: HtmlElement = div(
         className := "debug-view-header-right",
         div(
             className := "debug-view-header-right-buttons",
@@ -94,13 +90,43 @@ abstract class DebugViewPage extends Page {
     )
 
     /* The page header */
-    private lazy val headerView: Element = headerTag(
+    private lazy val headerView: HtmlElement = headerTag(
         className := "debug-view-header",
 
-        headerLeft,
+        div(),
         title,
         headerRight,
-    )        
+    )
+
+    /* Delays for the button bar expanding */
+    private final val mouseEnterOpenDelay = 500
+    private final val mouseLeaveCloseDelay = 200
+
+    /* Button bar internal to the view. */
+    private lazy val buttonBar: HtmlElement = div(
+        className := "debug-view-button-bar",
+        /* Button bar left. */
+        div(
+            display.flex,
+            alignItems.center,
+
+            onMouseEnter.mapTo(2) --> viewCloseSemaphoreIncrement,
+            onMouseEnter(_.delay(mouseEnterOpenDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
+            onMouseLeave(_.delay(mouseLeaveCloseDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
+
+            settingsTabButton,
+            MainViewController.renderViewButton(View.Tree, viewCloseSemaphore),
+            MainViewController.renderViewButton(View.Input, viewCloseSemaphore),
+            MainViewController.renderViewButton(View.Code, viewCloseSemaphore),
+        ),
+        /* Button bar right. */
+        div(
+            display.flex,
+            alignItems.center,
+
+            infoButton,
+        )
+    )   
 
     /**
       * Render the DebugViewPage header and a child element. This allows different views to 
@@ -117,6 +143,7 @@ abstract class DebugViewPage extends Page {
             TabView(),
             div(
                 className := "tree-view-page",
+                buttonBar,
                 cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
                 child.getOrElse(div())
             )
