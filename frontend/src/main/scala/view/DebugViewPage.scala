@@ -93,6 +93,7 @@ abstract class DebugViewPage extends Page {
     private lazy val headerView: HtmlElement = headerTag(
         className := "debug-view-header",
 
+        div(),
         title,
         headerRight,
     )
