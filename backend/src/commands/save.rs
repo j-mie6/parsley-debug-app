@@ -29,7 +29,7 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<(),
     Ok(())
 }
 
-/* Saves current tree to saved_trees/name.json */
+/* Downloads the tree into Downloads folder */
 #[tauri::command]
 pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result<(), SaveTreeError> {
     /* Path to the json file used to store the tree */
@@ -46,6 +46,21 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
     Ok(())
 }
 
+/* Imports JSON file to display a tree */
+#[tauri::command]
+pub fn import_tree(state: tauri::State<AppState>, external_path: String) -> Result<(), SaveTreeError> {
+    /* Path to the json file used to store the tree */
+    let app_path: String = format!("{}{}.json", SAVED_TREE_DIR, external_path);
+
+    /* Creates a file in apps local saved tree folders and copies data from external json it */
+    let _ = File::create(&app_path).map_err(|_| SaveTreeError::ImportFailed)?;
+    fs::copy(external_path, app_path).map_err(|_| SaveTreeError::ImportFailed)?;
+    
+    load_saved_tree(external_path, state)?;
+
+    Ok(())
+}
+
 #[derive(Debug, serde::Serialize)]
 pub enum SaveTreeError {
     LockFailed,
@@ -54,6 +69,7 @@ pub enum SaveTreeError {
     CreateDirFailed,
     WriteTreeFailed,
     DownloadFailed,
+    ImportFailed,
 }
 
 impl From<StateError> for SaveTreeError {

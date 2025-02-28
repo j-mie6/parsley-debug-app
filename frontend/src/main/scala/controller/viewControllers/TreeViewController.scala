@@ -3,11 +3,13 @@ package controller.viewControllers
 import com.raquo.laminar.api.L.*
 
 import model.DebugTree
+import model.errors.DillException
+
 import view.DebugTreeDisplay
+
 import controller.tauri.Tauri
 import controller.tauri.Command
 import model.errors.DillException
-
 
 /**
   * Object containing methods for manipulating the DebugTree.
@@ -47,6 +49,9 @@ object TreeViewController {
 
     /* Downloads tree to users device */
     def downloadTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, name)
+
+    /* Imports JSON in path from users device */
+    def importTree(path: String): EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.ImportTree, path)
     
     /** Fetch the debug tree root from the backend, return in EventStream */
     def reloadTree: EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.FetchDebugTree, ())

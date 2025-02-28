@@ -123,6 +123,16 @@ object Command {
         type Out = Unit
     }
 
+    case object ImportTree extends Command("import_tree") {
+        type In = String
+        given args: Args[String] {
+            extension (externalPath: String)
+                def namedArgs: Map[String, Any] = Map("externalPath" -> externalPath)
+        }
+
+        type Out = DebugTree
+    }
+
     case object SkipBreakpoints extends Command("skip_breakpoints") {
         type In = Int
         given args: Args[In] {

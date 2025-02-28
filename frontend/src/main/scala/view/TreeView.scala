@@ -28,6 +28,17 @@ object TreeView {
         ) --> Observer.empty,
     )
 
+    /* Import tree button */
+    val uploadButton: HtmlElement = button(
+        className := "tree-view-upload-button",
+
+        /* Save button icon */
+        i(className := "bi bi-upload", fontSize.px := 35),
+
+        /* Exports current tree */
+        onClick --> (_ => TreeViewController.importTree("/home/ap3222/Downloads/tree-0.json"))
+    )
+
     /* Fast forward icon for skipping */
     private lazy val skipIcon: Element = i(className := "bi bi-fast-forward-fill", fontSize.px := 33)
 
@@ -47,8 +58,12 @@ object TreeView {
     def apply(): HtmlElement = div(
         /* Render download button */
         child(downloadButton) <-- TreeViewController.treeExists,
+
+        /* Render skip button */
         child(skipButton) <-- TreeViewController.isDebuggingSession,
-        child <-- TreeViewController.getTreeElem, /* Renders the tree */
+
+        /* Renders the tree */
+        child <-- TreeViewController.getTreeElem, 
     )
             
 }
