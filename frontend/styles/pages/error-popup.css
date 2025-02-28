@@ -1,34 +1,86 @@
 .popup {
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
     position: absolute;
+
     top: 50%;
     left: 15vw;
     right: 15vw;
     transform: translateY(-50%);
+
     margin: auto; 
-    color: var(--font-color-secondary);
-    background-color: var(--background-tertiary);
+
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
+
     filter: drop-shadow(5px 5px 8px #000000);
-    padding: 5vh 5vw;
+
     border-style: solid;
     border-radius: 10px;
+
     overflow-y: fill;
-    padding: 5vh 5vw 5vw;
-    padding-bottom: 5vh;
-    align-items: centre;
+
+    padding: 5vh 30px 5vh;
+    
+    align-items: center;
     justify-content: center;
     word-wrap: break-word;
     overflow: auto;
 }
 
+.popup-icon-container {
+    align-items: center;
+    background-color: var(--background-secondary);
+    margin:auto;
+    margin-right: 20px;
+    /* width: 20px;
+    height: 20px; */
+    padding: 10px;
+    border-radius: 50%;
+}
+
+.popup-icon-container.info {
+    color: var(--font-color-info);
+    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-info) r g b));
+}
+
+.popup.info {
+    border-color: var(--font-color-info);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-info) r g b / 0.17), rgb(from var(--font-color-info) r g b / 0.01));
+}
+
+.popup-icon-container.success {
+    color: var(--font-color-success);
+    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-success) r g b));
+}
+
+.popup.success {
+    border-color: var(--font-color-success);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-success) r g b / 0.17), rgb(from var(--font-color-success) r g b / 0.01));
+}
+
+.popup-icon-container.warning {
+    color: var(--font-color-warning);
+    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-warning) r g b));
+}
+
 .popup.warning {
     border-color: var(--font-color-warning);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-warning) r g b / 0.17), rgb(from var(--font-color-warning) r g b / 0.01));
+}
+
+.popup-icon-container.error {
+    color: var(--font-color-error);
+    box-shadow: 0 0 10px rgb(from var(--font-color-error) r g b / 0.3);
 }
 
 .popup.error {
     border-color: var(--font-color-error);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-error) r g b / 0.17), rgb(from var(--font-color-error) r g b / 0.01));
 }
 
 .popup-text {
-    color: var(--font-color-secondary);
+    /* color: var(--font-color-secondary); */
+    margin-top: 10px;
+    color: rgb(from var(--font-color-primary) r g b / 0.8);
 }

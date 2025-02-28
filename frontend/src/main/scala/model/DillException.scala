@@ -5,46 +5,88 @@ import com.raquo.laminar.api.L.*
 import controller.errors.ErrorController
 import com.raquo.laminar.api.features.unitArrows
 
+
 /**
-  * DillException is the generic frontend representation of an Exception
+  * PopUp is the generic frontend representation of any pop us that the user sees
   * 
-  * @param name Name of Exception
-  * @param message More detailed error message displayed to the user
-  * @param closable Whether the popup can be cleared by clicking on it (only for non-breaking warnings)
-  * @param style css style used for popup, red for errors and yellow for warnings
+  * @param name Title of a pop up
+  * @param message More detailed message displayed to the user
+  * @param closable Whether the popup can be cleared by clicking on it (for info and non-breaking warnings)
+  * @param icon Class name of the bootstrap icon relating to the pop up style
+  * @param style css style used for popup, blue for info, yellow for warnings and red for errors
+  * 
   */
-sealed trait DillException {
+sealed trait PopUp {
     def name: String
     def message: String
     def closable: Boolean
+    def icon: String
     def style: String
 
     def displayElement: HtmlElement = {
         div(
             cls("popup", style),
 
-            h2(name),
-            div(className := "popup-text", message),
+            div(
+                cls("popup-icon-container", style),
+                i(className:= icon, width.px := 30, height.px := 30)
+            ),
+
+            div(
+                h2(name),
+                div(className := "popup-text", message),
+            ),
 
             onClick.mapTo(None).filter(_ => closable) --> ErrorController.setOptError,
         )
     }
 }
 
+
 /**
-  * Represents a non-breaking Exception in Dill. Overrides colour to yellow and canDelete to true
+  * The generic pop up for information that needs to be passed to the user, styled in blue and can be closed
+  */
+sealed trait InfoPopup extends PopUp {
+    override def closable: Boolean = true
+    override def icon: String = "bi bi-info-circle-fill"
+    override def style: String = "info" 
+}
+
+/**
+  * The generic pop up for success, styled in green and can be closed
+  */
+sealed trait SuccessPopUp extends PopUp {
+    override def name: String = "Success"
+    override def closable: Boolean = true
+    override def style: String = "success"
+    override def icon: String = "bi bi-check-circle-fill"
+}
+
+case object TreeDownloaded extends SuccessPopUp {
+    override def message: String = "Tree downloaded successfully"
+}
+
+/**
+  * DillException is the generic frontend representation of an Exception
+  */
+sealed trait DillException extends PopUp
+
+/**
+  * Represents a non-breaking Exception in Dill, styled in yellow and can be closed
   */
 sealed trait Warning extends DillException {
     override def closable: Boolean = true
     override def style: String = "warning"
+    override def icon: String = "bi bi-exclamation-circle-fill"
 }
 
 /**
-  * Represents a breaking Exception in Dill. Overrides colour to red and canDelete to false
+  * Represents a breaking Exception in Dill, styled in red and cannot be closed
   */
 sealed trait Error extends DillException {
     override def closable: Boolean = false
     override def style: String = "error"
+    override def icon: String = "bi bi-exclamation-triangle-fill"
 }
 
 /* List of DILL Exceptions */
