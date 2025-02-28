@@ -24,7 +24,8 @@ case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean) deri
   * @param input the input string the tree node has to parse
   * @param children list of children nodes
   * @param isLeaf if a node is a leaf
+  * @param isIterative if a node is iterative (and opaque)
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean) derives Reader.upickle
+    childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean) derives Reader.upickle
 
