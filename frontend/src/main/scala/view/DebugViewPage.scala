@@ -22,7 +22,6 @@ import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.InputViewController
 
-import com.raquo.laminar.api.features.unitArrows
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
@@ -60,7 +59,7 @@ abstract class DebugViewPage extends Page {
      */
     private val viewCloseSemaphore: Var[Int] = Var(0)
     private val viewCloseSemaphoreIncrement: Observer[Int] = viewCloseSemaphore.updater((x, add) => x + add)
-    private val viewCloseSemaphoreDecrement: Observer[Int] = viewCloseSemaphore.updater((x, min) => x - min)
+    private val viewCloseSemaphoreDecrement: Observer[Int] = viewCloseSemaphore.updater((x, sub) => x - sub)
 
     /* Button used to toggle the theme */
     private lazy val themeButton: Element = div(
@@ -94,7 +93,6 @@ abstract class DebugViewPage extends Page {
     private lazy val headerView: HtmlElement = headerTag(
         className := "debug-view-header",
 
-        div(),
         title,
         headerRight,
     )
