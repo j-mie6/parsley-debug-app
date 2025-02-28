@@ -36,7 +36,7 @@ object TreeView {
         i(className := "bi bi-upload", fontSize.px := 35),
 
         /* Exports current tree */
-        onClick --> (_ => TreeViewController.importTree("/home/ap3222/Downloads/tree-0.json"))
+        onClick --> (_ => TreeViewController.importTree("/home/ap3222/Downloads/tree-0.json")),
     )
 
     /* Fast forward icon for skipping */
