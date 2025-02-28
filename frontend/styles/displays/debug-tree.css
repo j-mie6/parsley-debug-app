@@ -161,15 +161,9 @@
 
 /* Arrow buttons for iterative nodes */
 .debug-node-iterative-buttons {
-    width: 20px;
-
     background: none;
-    background-color: none;
     color: var(--font-color-primary);
     
     box-shadow: none;
-
-    border-style: solid;
-    border-color: var(--font-color-primary);
-    border-radius: 8px;
+    cursor: pointer;
 }
