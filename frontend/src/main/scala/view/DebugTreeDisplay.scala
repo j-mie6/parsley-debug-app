@@ -92,7 +92,7 @@ private object ReactiveNodeDisplay {
         })
 
         /* Signal for when to show arrow buttons */
-        val showIterativeButtons: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
+        val showIterativeOneByOne: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
 
         def iterativeArrowButton(isRight: Boolean): HtmlElement = {
             val direction: String = if isRight then "right" else "left"
@@ -113,6 +113,10 @@ private object ReactiveNodeDisplay {
             )
         }
 
+        def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal.map { index =>
+            ((index.toDouble + 1.0) / (node.children.now().length)) * 100
+        }
+
         div(
             className := "debug-node-container",
 
@@ -130,7 +134,7 @@ private object ReactiveNodeDisplay {
                 flexDirection.row,
                 alignItems.stretch,
 
-                child(iterativeArrowButton(isRight = false)) <-- showIterativeButtons,
+                child(iterativeArrowButton(isRight = false)) <-- showIterativeOneByOne,
 
                 div(
                     className := "debug-node",
@@ -146,8 +150,15 @@ private object ReactiveNodeDisplay {
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
-                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal
-                            .combineWithFn(compressed.not, expandAllChildren.signal.not)(_ && _ && _),
+                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
+                        child(
+                            div(cls("iterative-progress-container"),
+                                div(
+                                cls("iterative-progress-fill"),
+                                width <-- iterativeChildrenPercentage.map(p => s"${p}%")
+                                )
+                            )
+                        ) <-- showIterativeOneByOne
                     ),
 
                     /* Expand/compress node with (with arrows for iterative) on click */
@@ -175,7 +186,7 @@ private object ReactiveNodeDisplay {
 
                 ),
 
-                child(iterativeArrowButton(isRight = true)) <-- showIterativeButtons,
+                child(iterativeArrowButton(isRight = true)) <-- showIterativeOneByOne,
                 
 
             ),

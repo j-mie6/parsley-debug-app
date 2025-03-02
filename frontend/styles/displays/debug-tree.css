@@ -167,3 +167,18 @@
     box-shadow: none;
     cursor: pointer;
 }
+
+.iterative-progress-container {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 1.5vh;
+}
+
+.iterative-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--background-tertiary-20);
+    transition: width 0.3s ease-in-out;
+}
