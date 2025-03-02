@@ -7,7 +7,7 @@ import com.raquo.laminar.api.features.unitArrows
 
 
 /**
-  * PopUp is the generic frontend representation of any pop ups that the user sees
+  * Popup is the generic frontend representation of any pop ups that the user sees
   * 
   * @param name Title of a pop up
   * @param message More detailed message displayed to the user
@@ -16,7 +16,7 @@ import com.raquo.laminar.api.features.unitArrows
   * @param style css style used for popup yellow for warnings and red for errors
   * 
   */
-sealed trait PopUp {
+sealed trait Popup {
     def name: String
     def message: String
     def closable: Boolean
@@ -43,12 +43,12 @@ sealed trait PopUp {
 }
 
 /**
-  * ToAT is the generic frontend representation of any toast that the user sees
+  * Toast is the generic frontend representation of any toast that the user sees
   * 
   * @param name Header of the toast
   * @param message More detailed message displayed to the user
   * @param icon Class name of the bootstrap icon relating to the pop up style
-  * @param style css style used for toast, blue for info and green for success
+  * @param style CSS style used for toast, blue for info and green for success
   */
 sealed trait Toast {
     def name: String
@@ -100,7 +100,7 @@ case object TreeDownloaded extends SuccessToast {
 /**
   * DillException is the generic frontend representation of an Exception
   */
-sealed trait DillException extends PopUp
+sealed trait DillException extends Popup
 
 /**
   * Represents a non-breaking Exception in Dill, styled in yellow and can be closed
