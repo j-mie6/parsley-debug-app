@@ -92,25 +92,54 @@ private object ReactiveNodeDisplay {
         })
 
         /* Signal for when to show arrow buttons */
-        val showIterativeButtons: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
+        val showIterativeOneByOne: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
+
+        /* Signal for if a node has more than 10 children */
+        val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
         def iterativeArrowButton(isRight: Boolean): HtmlElement = {
-            val direction: String = if isRight then "right" else "left"
-            val directionSignal: Var[Boolean] = Var(false)
-            button(
+            val singleDirection: String = if isRight then "end" else "start"
+
+            val singleHoverVar: Var[Boolean] = Var(false)
+            button(                    
                     className := "debug-node-iterative-buttons",
+                    marginBottom.px := 2, 
                     i(
-                        cls(s"bi bi-caret-${direction}-fill") <-- directionSignal.signal,
-                        cls(s"bi bi-caret-${direction}") <-- directionSignal.signal.not,
-                        onMouseOver.mapTo(true) --> directionSignal,
-                        onMouseOut.mapTo(false) --> directionSignal,
+                        cls(s"bi bi-skip-${singleDirection}-fill") <-- singleHoverVar.signal,
+                        cls(s"bi bi-skip-${singleDirection}") <-- singleHoverVar.signal.not,
+                        onMouseOver.mapTo(true) --> singleHoverVar,
+                        onMouseOut.mapTo(false) --> singleHoverVar,
                         height.px := 16,
                         margin.auto,
                     ),
                     onClick.mapTo(if isRight then 1 else -1) --> moveIndex,
-                    onMouseOver.mapTo(true) --> directionSignal,
-                    onMouseOut.mapTo(false) --> directionSignal
+                    onMouseOver.mapTo(true) --> singleHoverVar,
+                    onMouseOut.mapTo(false) --> singleHoverVar
             )
+        }
+
+        def iterativeDoubleArrowButton(isRight: Boolean): HtmlElement = {
+            val doubleDirection: String = if isRight then "forward" else "backward"
+            val doubleHoverVar: Var[Boolean] = Var(false)
+
+            button(
+                    className := "debug-node-iterative-buttons",
+                    i(
+                        cls(s"bi bi-skip-${doubleDirection}-fill") <-- doubleHoverVar.signal,
+                        cls(s"bi bi-skip-${doubleDirection}") <-- doubleHoverVar.signal.not,
+                        onMouseOver.mapTo(true) --> doubleHoverVar,
+                        onMouseOut.mapTo(false) --> doubleHoverVar,
+                        height.px := 16,
+                        margin.auto,
+                    ),
+                    onClick.mapTo(if isRight then 5 else -5) --> moveIndex,
+                    onMouseOver.mapTo(true) --> doubleHoverVar,
+                    onMouseOut.mapTo(false) --> doubleHoverVar
+            )                    
+        }
+
+        def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal.combineWith(node.children.signal).map { (index, ns) =>
+            ((index.toDouble + 1.0) / (ns.length)) * 100
         }
 
         div(
@@ -130,7 +159,17 @@ private object ReactiveNodeDisplay {
                 flexDirection.row,
                 alignItems.stretch,
 
-                child(iterativeArrowButton(isRight = false)) <-- showIterativeButtons,
+                div (
+                    display.flex,
+                    flexDirection.column,
+                    alignContent.end,
+                    justifyContent.center,
+
+                    child(iterativeArrowButton(isRight = false)) <-- showIterativeOneByOne,
+                    child(iterativeDoubleArrowButton(isRight = false)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
+
+                ),
+
 
                 div(
                     className := "debug-node",
@@ -146,8 +185,15 @@ private object ReactiveNodeDisplay {
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
-                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal
-                            .combineWithFn(compressed.not, expandAllChildren.signal.not)(_ && _ && _),
+                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
+                        child(
+                            div(cls("iterative-progress-container"),
+                                div(
+                                cls("iterative-progress-fill"),
+                                width <-- iterativeChildrenPercentage.map(p => s"${p}%")
+                                )
+                            )
+                        ) <-- showIterativeOneByOne
                     ),
 
                     /* Expand/compress node with (with arrows for iterative) on click */
@@ -174,8 +220,15 @@ private object ReactiveNodeDisplay {
                     ) --> expandAllChildren
 
                 ),
-
-                child(iterativeArrowButton(isRight = true)) <-- showIterativeButtons,
+                
+                div(
+                    display.flex,
+                    flexDirection.column,
+                    alignItems.flexStart,
+                    justifyContent.center,
+                    child(iterativeArrowButton(isRight = true)) <-- showIterativeOneByOne,
+                    child(iterativeDoubleArrowButton(isRight = true)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
+                ),
                 
 
             ),
