@@ -7,13 +7,13 @@ import com.raquo.laminar.api.features.unitArrows
 
 
 /**
-  * PopUp is the generic frontend representation of any pop us that the user sees
+  * PopUp is the generic frontend representation of any pop ups that the user sees
   * 
   * @param name Title of a pop up
   * @param message More detailed message displayed to the user
-  * @param closable Whether the popup can be cleared by clicking on it (for info and non-breaking warnings)
+  * @param closable Whether the popup can be cleared by clicking on it (non-breaking warnings)
   * @param icon Class name of the bootstrap icon relating to the pop up style
-  * @param style css style used for popup, blue for info, yellow for warnings and red for errors
+  * @param style css style used for popup yellow for warnings and red for errors
   * 
   */
 sealed trait PopUp {
@@ -42,6 +42,14 @@ sealed trait PopUp {
     }
 }
 
+/**
+  * ToAT is the generic frontend representation of any toast that the user sees
+  * 
+  * @param name Header of the toast
+  * @param message More detailed message displayed to the user
+  * @param icon Class name of the bootstrap icon relating to the pop up style
+  * @param style css style used for toast, blue for info and green for success
+  */
 sealed trait Toast {
     def name: String
     def message: String
@@ -69,7 +77,7 @@ sealed trait Toast {
 
 
 /**
-  * The generic pop up for information that needs to be passed to the user, styled in blue and can be closed
+  * The generic toast for information that needs to be passed to the user, styled in blue
   */
 sealed trait InfoToast extends Toast {
     override def icon: String = "bi bi-info-circle-fill"
@@ -77,7 +85,7 @@ sealed trait InfoToast extends Toast {
 }
 
 /**
-  * The generic pop up for success, styled in green and can be closed
+  * The generic toast for success, styled in green
   */
 sealed trait SuccessToast extends Toast  {
     override def name: String = "Success"
