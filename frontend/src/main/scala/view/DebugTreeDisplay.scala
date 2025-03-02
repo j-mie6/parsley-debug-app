@@ -97,25 +97,44 @@ private object ReactiveNodeDisplay {
         /* Signal for if a node has more than 10 children */
         val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
-        def iterativeArrowButton(isRight: Boolean, isDouble: Boolean): HtmlElement = {
-            val direction: String = if isRight then "right" else "left"
-            val isDoubleFactor: Int = if isDouble then 5 else 1
+        def iterativeArrowButton(isRight: Boolean): HtmlElement = {
+            val singleDirection: String = if isRight then "end" else "start"
 
-            val hoverVar: Var[Boolean] = Var(false)
+            val singleHoverVar: Var[Boolean] = Var(false)
             button(
                     className := "debug-node-iterative-buttons",
                     i(
-                        cls(s"bi bi-caret-${direction}-fill") <-- hoverVar.signal,
-                        cls(s"bi bi-caret-${direction}") <-- hoverVar.signal.not,
-                        onMouseOver.mapTo(true) --> hoverVar,
-                        onMouseOut.mapTo(false) --> hoverVar,
+                        cls(s"bi bi-skip-${singleDirection}-fill") <-- singleHoverVar.signal,
+                        cls(s"bi bi-skip-${singleDirection}") <-- singleHoverVar.signal.not,
+                        onMouseOver.mapTo(true) --> singleHoverVar,
+                        onMouseOut.mapTo(false) --> singleHoverVar,
                         height.px := 16,
                         margin.auto,
                     ),
-                    onClick.mapTo((if isRight then 1 else -1) * isDoubleFactor) --> moveIndex,
-                    onMouseOver.mapTo(true) --> hoverVar,
-                    onMouseOut.mapTo(false) --> hoverVar
+                    onClick.mapTo(if isRight then 1 else -1) --> moveIndex,
+                    onMouseOver.mapTo(true) --> singleHoverVar,
+                    onMouseOut.mapTo(false) --> singleHoverVar
             )
+        }
+
+        def iterativeDoubleArrowButton(isRight: Boolean): HtmlElement = {
+            val doubleDirection: String = if isRight then "forward" else "backward"
+            val doubleHoverVar: Var[Boolean] = Var(false)
+
+            button(
+                    className := "debug-node-iterative-buttons",
+                    i(
+                        cls(s"bi bi-skip-${doubleDirection}-fill") <-- doubleHoverVar.signal,
+                        cls(s"bi bi-skip-${doubleDirection}") <-- doubleHoverVar.signal.not,
+                        onMouseOver.mapTo(true) --> doubleHoverVar,
+                        onMouseOut.mapTo(false) --> doubleHoverVar,
+                        height.px := 16,
+                        margin.auto,
+                    ),
+                    onClick.mapTo(if isRight then 5 else -5) --> moveIndex,
+                    onMouseOver.mapTo(true) --> doubleHoverVar,
+                    onMouseOut.mapTo(false) --> doubleHoverVar
+            )                    
         }
 
         def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal.combineWith(node.children.signal).map { (index, ns) =>
@@ -139,8 +158,8 @@ private object ReactiveNodeDisplay {
                 flexDirection.row,
                 alignItems.stretch,
 
-                child(iterativeArrowButton(isRight = false, isDouble = true)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
-                child(iterativeArrowButton(isRight = false, isDouble = false)) <-- showIterativeOneByOne,
+                child(iterativeDoubleArrowButton(isRight = false)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
+                child(iterativeArrowButton(isRight = false)) <-- showIterativeOneByOne,
 
 
                 div(
@@ -193,9 +212,8 @@ private object ReactiveNodeDisplay {
 
                 ),
 
-                child(iterativeArrowButton(isRight = true, isDouble = false)) <-- showIterativeOneByOne,
-
-                child(iterativeArrowButton(isRight = true, isDouble = true)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
+                child(iterativeArrowButton(isRight = true)) <-- showIterativeOneByOne,
+                child(iterativeDoubleArrowButton(isRight = true)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
 
                 
 

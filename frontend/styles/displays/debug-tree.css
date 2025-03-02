@@ -179,6 +179,6 @@
 .iterative-progress-fill {
     height: 100%;
     width: 0%;
-    background: var(--background-tertiary-20);
+    background: var(--background-tertiary-40);
     transition: width 0.3s ease-in-out;
 }
