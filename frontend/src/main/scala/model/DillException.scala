@@ -34,7 +34,7 @@ sealed trait Popup {
             
             div(
                 h2(className := "popup-header",name),
-                div(className := "popup-text", checkGithubIssues(message)),
+                div(className := "popup-text", checkGithubIssue(message)),
             ),
 
             onClick.mapTo(None).filter(_ => closable) --> ErrorController.setOptError,
@@ -121,20 +121,20 @@ sealed trait Error extends DillException {
 }
 
 /**
-  * Checks for the string "Github Issues" and replaces it with a link to 
+  * Checks for the string "Github Issue" and replaces it with a link to 
   * create a Github Issue in the Dill repository
   *
   * @param msg Full message that we are checking on
-  * @return Github Issues as a link HTML element if "Github Issues" is in the message
+  * @return Github Issue as a link HTML element if "Github Issue" is in the message
   */
-def checkGithubIssues(msg: String): HtmlElement = {
+def checkGithubIssue(msg: String): HtmlElement = {
     val githubLink = a(
         href := "https://github.com/j-mie6/parsley-debug-app/issues/new",
         target := "_blank",
-        "GitHub Issues",
+        "GitHub Issue",
     )
 
-    val parts = msg.split("GitHub Issues")
+    val parts = msg.split("GitHub Issue")
     
     span(parts.head, githubLink, parts.last)
 }
@@ -166,7 +166,7 @@ case object SerialiseFailed extends Error {
     override def message: String = 
         "Failed to serialize the display tree. " +
         "This may indicate an issue with the serialization process. " +
-        "Please report this issue on GitHub Issues if the problem persists"
+        "Please report this issue a GitHub Issue if the problem persists"
 }
 
 case object ReadDirFailed extends Error {
@@ -203,7 +203,7 @@ case object MalformedJSON extends Error {
     override def message: String = 
         "Failed to serialize the display tree. " +
         "This may indicate an issue with the serialization process. " +
-        "Please report this issue on GitHub Issues if the problem persists"
+        "Please report this bug through a GitHub Issue if the problem persists"
 }
 
 /* Used when an unexpected error occurs */
