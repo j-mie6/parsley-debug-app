@@ -31,9 +31,9 @@ sealed trait PopUp {
                 cls("popup-icon-container", style),
                 i(className:= icon, width.px := 30, height.px := 30)
             ),
-
+            
             div(
-                h2(name),
+                h2(className := "popup-header",name),
                 div(className := "popup-text", message),
             ),
 
@@ -42,12 +42,36 @@ sealed trait PopUp {
     }
 }
 
+sealed trait Toast {
+    def name: String
+    def message: String
+    def icon: String
+    def style: String
+
+    def displayElement: HtmlElement = {
+        div(
+            cls("toast", style),
+
+            div(
+                cls("toast-icon-container", style),
+                i(className:= icon, width.px := 30, height.px := 30)
+            ),
+
+            div(
+                h3(className:= "toast-header", name),
+                div(className := "toast-text", message),
+            ),
+
+            onClick.mapTo(None) --> ErrorController.setOptError,
+        )
+    }
+}
+
 
 /**
   * The generic pop up for information that needs to be passed to the user, styled in blue and can be closed
   */
-sealed trait InfoPopup extends PopUp {
-    override def closable: Boolean = true
+sealed trait InfoToast extends Toast {
     override def icon: String = "bi bi-info-circle-fill"
     override def style: String = "info" 
 }
@@ -55,14 +79,13 @@ sealed trait InfoPopup extends PopUp {
 /**
   * The generic pop up for success, styled in green and can be closed
   */
-sealed trait SuccessPopUp extends PopUp {
+sealed trait SuccessToast extends Toast  {
     override def name: String = "Success"
-    override def closable: Boolean = true
     override def style: String = "success"
     override def icon: String = "bi bi-check-circle-fill"
 }
 
-case object TreeDownloaded extends SuccessPopUp {
+case object TreeDownloaded extends SuccessToast {
     override def message: String = "Tree downloaded successfully"
 }
 
@@ -90,13 +113,12 @@ sealed trait Error extends DillException {
 }
 
 /* List of DILL Exceptions */
-
 case object TreeNotFound extends Error {
     override def name: String = "Tree Not Found"
     override def message: String = 
         "The application server failed to retrieve the debug tree from Remote View. " +
         "Ensure that the debug session is active and reachable. If the problem persists, please" + 
-        "write a GitHub issue on the repo"
+        "write a GitHub Issue on the repository"
 }
 
 case object LockFailed extends Error {
@@ -116,7 +138,7 @@ case object SerialiseFailed extends Error {
     override def message: String = 
         "Failed to serialize the display tree. " +
         "This may indicate an issue with the serialization process. " +
-        "Please report this issue on GitHub issues if the problem persists"
+        "Please report this issue on GitHub Issues if the problem persists"
 }
 
 case object ReadDirFailed extends Error {
@@ -153,7 +175,7 @@ case object MalformedJSON extends Error {
     override def message: String = 
         "Failed to serialize the display tree. " +
         "This may indicate an issue with the serialization process. " +
-        "Please report this issue on GitHub issues if the problem persists"
+        "Please report this issue on GitHub Issues if the problem persists"
 }
 
 /* Used when an unexpected error occurs */

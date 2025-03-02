@@ -13,8 +13,6 @@
     color: var(--font-color-primary);
     background-color: var(--background-primary);
 
-    filter: drop-shadow(5px 5px 8px #000000);
-
     border-style: solid;
     border-radius: 10px;
 
@@ -30,33 +28,31 @@
 
 .popup-icon-container {
     align-items: center;
-    background-color: var(--background-secondary);
     margin:auto;
     margin-right: 20px;
-    /* width: 20px;
-    height: 20px; */
     padding: 10px;
     border-radius: 50%;
 }
 
-.popup-icon-container.info {
-    color: var(--font-color-info);
-    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-info) r g b));
+.popup-header {
+    font-size: 1.5vw;
+    margin-bottom: 1vh;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90%;
 }
 
-.popup.info {
-    border-color: var(--font-color-info);
-    background-image: linear-gradient(to bottom, rgb(from var(--font-color-info) r g b / 0.17), rgb(from var(--font-color-info) r g b / 0.01));
-}
-
-.popup-icon-container.success {
-    color: var(--font-color-success);
-    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-success) r g b));
-}
-
-.popup.success {
-    border-color: var(--font-color-success);
-    background-image: linear-gradient(to bottom, rgb(from var(--font-color-success) r g b / 0.17), rgb(from var(--font-color-success) r g b / 0.01));
+.popup-text {
+    font-size: 1.2vw;
+    max-height: 12vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    color: rgb(from var(--font-color-primary) r g b / 0.8);
 }
 
 .popup-icon-container.warning {
@@ -79,8 +75,100 @@
     background-image: linear-gradient(to bottom, rgb(from var(--font-color-error) r g b / 0.17), rgb(from var(--font-color-error) r g b / 0.01));
 }
 
-.popup-text {
-    /* color: var(--font-color-secondary); */
-    margin-top: 10px;
-    color: rgb(from var(--font-color-primary) r g b / 0.8);
+.toast {
+    display: flex;
+    position: fixed;
+    align-items: center;
+    gap: 0.5vh;
+
+    bottom: 5vh;
+    right: 3vw;
+    min-width: 20vw;
+    max-width: 30vw;
+    min-height: 8vh;
+    max-height: 15vh;
+    padding: 1.5vh 2vw;
+
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
+
+    border-radius: 8px;
+    
+    animation: fadeIn 0.3s ease-out, fadeOut 0.3s ease-in 5s forwards;
+}
+
+.toast-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4vw;
+    height: 4vw;
+    border-radius: 50%;
+}
+
+.toast-header {
+    font-size: 1.2vw;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toast-text {
+    flex-grow: 1;
+    font-size: 1vw;
+    line-height: 1.4;
+    max-height: 8vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit text to 3 lines */
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(2vw);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(2vw);
+    }
+}
+
+.toast-icon-container.info {
+    color: var(--font-color-info);
+    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-info) r g b));
+}
+
+.toast.info {
+    border-color: var(--font-color-info);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-info) r g b / 0.17), rgb(from var(--font-color-info) r g b / 0.01));
+}
+
+.toast-icon-container.success {
+    color: var(--font-color-success);
+    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-success) r g b));
+}
+
+.toast.success {
+    border-color: var(--font-color-success);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-success) r g b / 0.17), rgb(from var(--font-color-success) r g b / 0.01));
+}
+
+.toast-text {
+    text-overflow: ellipsis;
 }
