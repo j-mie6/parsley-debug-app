@@ -32,7 +32,10 @@ val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
   */
 abstract class DebugViewPage extends Page {
     private lazy val gitIcon: HtmlElement = i(className := "bi bi-github", fontSize.px := 40)
+    private lazy val infoIcon: HtmlElement = i(className := "bi bi-info-circle-fill")
 
+    private def link(url: String, elem: HtmlElement): Anchor = a(href := url, target := "_blank", elem)
+    
     /* Title element */
     private lazy val title: HtmlElement = div(
         className := "debug-view-header-title",
@@ -41,9 +44,9 @@ abstract class DebugViewPage extends Page {
 
     /* Overview information tab. */
     private lazy val infoButton: HtmlElement = button(
-        // TODO
+        // TODO: show in-app instructions
         className := "debug-view-button debug-view-button-info",
-        i(className := "bi bi-info-circle-fill"),
+        link("https://github.com/j-mie6/parsley-debug-app/blob/3c457146879d230ff5abc1b45c88a7e696b94d12/README.md", infoIcon)
     )
 
     /* Opener for the settings tab. */
@@ -75,9 +78,7 @@ abstract class DebugViewPage extends Page {
     )
 
     /* Button that links to the 'parsley-debug-app' Github repo */
-    private lazy val githubButton: HtmlElement = a(
-        href := "https://github.com/j-mie6/parsley-debug-app", target := "_blank", gitIcon
-    )
+    private lazy val githubButton: HtmlElement = link("https://github.com/j-mie6/parsley-debug-app", gitIcon)
 
     /* Right section of the page header, containing various buttons */
     private lazy val headerRight: HtmlElement = div(
