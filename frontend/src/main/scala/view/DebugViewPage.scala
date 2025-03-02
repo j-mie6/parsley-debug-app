@@ -14,8 +14,11 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
+import view.HelpView
+
 import controller.AppStateController
 import controller.tauri.Tauri
+import controller.viewControllers.HelpViewController
 import controller.viewControllers.MainViewController.View
 import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
@@ -40,10 +43,11 @@ abstract class DebugViewPage extends Page {
     )
 
     /* Overview information tab. */
-    private lazy val infoButton: HtmlElement = button(
+    private lazy val helpButton: HtmlElement = button(
         // TODO
         className := "debug-view-button debug-view-button-info",
-        i(className := "bi bi-info-circle-fill"),
+        i(className := "bi bi-question-circle-fill"),
+        onClick --> (_ => HelpViewController.openPopup())
     )
 
     /* Opener for the settings tab. */
@@ -123,8 +127,9 @@ abstract class DebugViewPage extends Page {
         div(
             display.flex,
             alignItems.center,
+            child(HelpView(HelpViewController.getActiveSection)) <-- HelpViewController.isPopupOpen,
 
-            infoButton,
+            helpButton,
         )
     )   
 
