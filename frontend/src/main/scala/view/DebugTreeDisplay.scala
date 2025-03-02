@@ -94,27 +94,32 @@ private object ReactiveNodeDisplay {
         /* Signal for when to show arrow buttons */
         val showIterativeOneByOne: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
 
-        def iterativeArrowButton(isRight: Boolean): HtmlElement = {
+        /* Signal for if a node has more than 10 children */
+        val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
+
+        def iterativeArrowButton(isRight: Boolean, isDouble: Boolean): HtmlElement = {
             val direction: String = if isRight then "right" else "left"
-            val directionSignal: Var[Boolean] = Var(false)
+            val isDoubleFactor: Int = if isDouble then 5 else 1
+
+            val hoverVar: Var[Boolean] = Var(false)
             button(
                     className := "debug-node-iterative-buttons",
                     i(
-                        cls(s"bi bi-caret-${direction}-fill") <-- directionSignal.signal,
-                        cls(s"bi bi-caret-${direction}") <-- directionSignal.signal.not,
-                        onMouseOver.mapTo(true) --> directionSignal,
-                        onMouseOut.mapTo(false) --> directionSignal,
+                        cls(s"bi bi-caret-${direction}-fill") <-- hoverVar.signal,
+                        cls(s"bi bi-caret-${direction}") <-- hoverVar.signal.not,
+                        onMouseOver.mapTo(true) --> hoverVar,
+                        onMouseOut.mapTo(false) --> hoverVar,
                         height.px := 16,
                         margin.auto,
                     ),
-                    onClick.mapTo(if isRight then 1 else -1) --> moveIndex,
-                    onMouseOver.mapTo(true) --> directionSignal,
-                    onMouseOut.mapTo(false) --> directionSignal
+                    onClick.mapTo((if isRight then 1 else -1) * isDoubleFactor) --> moveIndex,
+                    onMouseOver.mapTo(true) --> hoverVar,
+                    onMouseOut.mapTo(false) --> hoverVar
             )
         }
 
-        def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal.map { index =>
-            ((index.toDouble + 1.0) / (node.children.now().length)) * 100
+        def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal.combineWith(node.children.signal).map { (index, ns) =>
+            ((index.toDouble + 1.0) / (ns.length)) * 100
         }
 
         div(
@@ -134,7 +139,9 @@ private object ReactiveNodeDisplay {
                 flexDirection.row,
                 alignItems.stretch,
 
-                child(iterativeArrowButton(isRight = false)) <-- showIterativeOneByOne,
+                child(iterativeArrowButton(isRight = false, isDouble = true)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
+                child(iterativeArrowButton(isRight = false, isDouble = false)) <-- showIterativeOneByOne,
+
 
                 div(
                     className := "debug-node",
@@ -186,7 +193,10 @@ private object ReactiveNodeDisplay {
 
                 ),
 
-                child(iterativeArrowButton(isRight = true)) <-- showIterativeOneByOne,
+                child(iterativeArrowButton(isRight = true, isDouble = false)) <-- showIterativeOneByOne,
+
+                child(iterativeArrowButton(isRight = true, isDouble = true)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
+
                 
 
             ),
