@@ -34,7 +34,7 @@ object TreeViewController {
         /* Default tree view when no tree is loaded */
         case None => div(
             className := "tree-view-error",
-            "No tree found! Start debugging by attaching DillRemoteView to a parser"
+            "No tree found!"
         )
 
         /* Render as DebugTreeDisplay */

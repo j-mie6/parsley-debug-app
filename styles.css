@@ -25,6 +25,7 @@
     --font-color-quaternary: #242526;       /* Parsley green. */
     --font-color-error: #D2042D;            /* Red error. */
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
+    --font-color-no-tree: #3c4b46a3;
 }
 
 [data-theme="light"] {
@@ -40,6 +41,7 @@
     --font-color-tertiary: #7EB9A6;     /* Lighter green. */
     --font-color-quaternary: #1F3D34;   /* Parsley green. */
     --font-color-error: #fd4659;        /* Red error. */
+    --font-color-no-tree: #bde3d8;
 }
 
 body {
