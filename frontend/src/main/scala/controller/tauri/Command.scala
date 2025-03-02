@@ -50,7 +50,7 @@ sealed trait Command(private val name: String) {
         EventStream.fromJsPromise(tauriInvoke[String](name, stringDict), emitOnce = true)
             .recoverToEither                                            /* Catch backend exceptions */
             .mapLeft(ErrorController.mapException)                      /* Map exception to a DillException */
-            .map(_.flatMap((json: String) => Reader[Out].read(json)))   /* Deserialise response using deferred Reader */
+            .map(_.flatMap((json: String) => Reader[Out].read("json")))   /* Deserialise response using deferred Reader */
     }
 }
 
