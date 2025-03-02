@@ -34,7 +34,7 @@ sealed trait PopUp {
             
             div(
                 h2(className := "popup-header",name),
-                div(className := "popup-text", message),
+                div(className := "popup-text", checkGithubIssues(message)),
             ),
 
             onClick.mapTo(None).filter(_ => closable) --> ErrorController.setOptError,
@@ -112,7 +112,27 @@ sealed trait Error extends DillException {
     override def icon: String = "bi bi-exclamation-triangle-fill"
 }
 
+/**
+  * Checks for the string "Github Issues" and replaces it with a link to 
+  * create a Github Issue in the Dill repository
+  *
+  * @param msg Full message that we are checking on
+  * @return Github Issues as a link HTML element if "Github Issues" is in the message
+  */
+def checkGithubIssues(msg: String): HtmlElement = {
+    val githubLink = a(
+        href := "https://github.com/j-mie6/parsley-debug-app/issues/new",
+        target := "_blank",
+        "GitHub Issues",
+    )
+
+    val parts = msg.split("GitHub Issues")
+    
+    span(parts.head, githubLink, parts.last)
+}
+
 /* List of DILL Exceptions */
+
 case object TreeNotFound extends Error {
     override def name: String = "Tree Not Found"
     override def message: String = 
