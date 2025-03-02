@@ -57,7 +57,7 @@
 
 .popup-icon-container.warning {
     color: var(--font-color-warning);
-    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-warning) r g b));
+    box-shadow: 0 0 10px rgb(from var(--font-color-warning) r g b);
 }
 
 .popup.warning {
@@ -92,6 +92,7 @@
     color: var(--font-color-primary);
     background-color: var(--background-primary);
 
+    border-style: solid;
     border-radius: 8px;
     
     animation: fadeIn 0.3s ease-out, fadeOut 0.3s ease-in 5s forwards;
@@ -151,7 +152,7 @@
 
 .toast-icon-container.info {
     color: var(--font-color-info);
-    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-info) r g b));
+    box-shadow: 0 0 3px rgb(from var(--font-color-info) r g b);
 }
 
 .toast.info {
@@ -161,7 +162,7 @@
 
 .toast-icon-container.success {
     color: var(--font-color-success);
-    filter: drop-shadow(2px 2px 5px rgb(from var(--font-color-success) r g b));
+    box-shadow: 0 0 3px rgb(from var(--font-color-success) r g b);
 }
 
 .toast.success {
