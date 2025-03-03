@@ -3,7 +3,6 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
-
 import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}

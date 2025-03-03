@@ -7,7 +7,6 @@ import com.raquo.laminar.api.L.*
 
 import controller.tauri.{Tauri, Command}
 import controller.viewControllers.TreeViewController
-import view.DebugTreeDisplay
 import model.DebugTree
 import model.errors.DillException
 
