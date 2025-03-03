@@ -98,15 +98,16 @@ private object ReactiveNodeDisplay {
         val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
         def iterativeArrowButton(isRight: Boolean): HtmlElement = {
-            val singleDirection: String = if isRight then "end" else "start"
+            // val singleDirection: String = if isRight then "end" else "start"
 
             val singleHoverVar: Var[Boolean] = Var(false)
             button(                    
                     className := "debug-node-iterative-buttons",
                     marginBottom.px := 2, 
                     i(
-                        cls(s"bi bi-skip-${singleDirection}-fill") <-- singleHoverVar.signal,
-                        cls(s"bi bi-skip-${singleDirection}") <-- singleHoverVar.signal.not,
+                        styleAttr <-- Signal.fromValue(if !isRight then "transform: scaleX(-1)" else ""),
+                        cls(s"bi bi-play-fill") <-- singleHoverVar.signal,
+                        cls(s"bi bi-play") <-- singleHoverVar.signal.not,
                         onMouseOver.mapTo(true) --> singleHoverVar,
                         onMouseOut.mapTo(false) --> singleHoverVar,
                         height.px := 16,
@@ -119,14 +120,15 @@ private object ReactiveNodeDisplay {
         }
 
         def iterativeDoubleArrowButton(isRight: Boolean): HtmlElement = {
-            val doubleDirection: String = if isRight then "forward" else "backward"
+            // val doubleDirection: String = if isRight then "forward" else "backward"
             val doubleHoverVar: Var[Boolean] = Var(false)
 
             button(
                     className := "debug-node-iterative-buttons",
                     i(
-                        cls(s"bi bi-skip-${doubleDirection}-fill") <-- doubleHoverVar.signal,
-                        cls(s"bi bi-skip-${doubleDirection}") <-- doubleHoverVar.signal.not,
+                        styleAttr <-- Signal.fromValue(if !isRight then "transform: scaleX(-1)" else ""),
+                        cls(s"bi bi-fast-forward-fill") <-- doubleHoverVar.signal,
+                        cls(s"bi bi-fast-forward") <-- doubleHoverVar.signal.not,
                         onMouseOver.mapTo(true) --> doubleHoverVar,
                         onMouseOut.mapTo(false) --> doubleHoverVar,
                         height.px := 16,
