@@ -184,15 +184,21 @@ private object ReactiveNodeDisplay {
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
+
                         child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
-                        child(
-                            div(cls("iterative-progress-container"),
-                                div(
-                                cls("iterative-progress-fill"),
-                                width <-- iterativeChildrenPercentage.map(p => s"${p}%")
-                                )
-                            )
-                        ) <-- showIterativeOneByOne
+                        child(div(
+                            className := "iterative-progress-container",
+
+                            children <-- iterativeNodeIndex.signal
+                                .combineWith(node.children.signal.map(0 to _.length))
+                                .map((index, range) => range.map(i => 
+                                    div(
+                                        className := "iterative-progress", 
+                                        ".",
+                                        cls("fill") := i <= index,
+                                    )
+                                )),
+                        )) <-- showIterativeOneByOne
                     ),
 
                     /* Expand/compress node with (with arrows for iterative) on click */

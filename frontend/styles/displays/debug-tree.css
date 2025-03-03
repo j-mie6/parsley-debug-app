@@ -169,16 +169,21 @@
 }
 
 .iterative-progress-container {
-    width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 1.5vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    margin: 10px;
+    margin-bottom: 6px;
 }
 
-.iterative-progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--background-tertiary-40);
-    transition: width 0.3s ease-in-out;
+.iterative-progress {
+    font-size: 20px;
+    line-height: 6px;
+    color: var(--background-tertiary-40);
+}
+
+.iterative-progress.fill {
+    color: var(--background-tertiary);
 }
