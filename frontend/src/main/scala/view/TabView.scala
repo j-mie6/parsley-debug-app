@@ -54,8 +54,8 @@ object TabView {
             i(className := "bi bi-x"),
 
             /* Deletes the respective tab */
-            onClick(event => event.sample(TabViewController.getFileName(index))
-                .flatMapMerge(TabViewController.deleteSavedTree(_).flatMapTo(TabViewController.loadFileNames))
+            onClick(event => event.tapEach(ev => println(s"Getting called from closeTabButton. ev: $ev, index: $index")).sample(TabViewController.getFileName(index))
+                .flatMapMerge(TabViewController.deleteSavedTree(_).tapEach(_ => println("After deleteSavedTree")).flatMapTo(TabViewController.loadFileNames).tapEach(_ => println("After loadFileNames")))
             ) --> deleteBus.writer,
 
             /* Pipe errors */
@@ -63,7 +63,7 @@ object TabView {
 
             /* Update selected tab and tab names */
             deleteBus.stream.collectRight.mapTo(0) --> TabViewController.setSelectedTab,
-            deleteBus.stream.collectRight --> TabViewController.setFileNames,
+            deleteBus.stream.tapEach(_ => println("Setting file names")).collectRight --> TabViewController.setFileNames,
         )
     }
 
@@ -75,9 +75,9 @@ object TabView {
             className:= "tab-bar",
             
             /* Update tree on new tab selected */  
-            selectedTab.collectSuccess
+            selectedTab.collectSuccess.tapEach(tab => println(s"Tab: $tab"))
                 .flatMapMerge(TabViewController.loadSavedTree) 
-                .collectLeft --> controller.errors.ErrorController.setError,
+                .collectLeft --> controller.errors.ErrorController.setError, 
 
             /* If no tab can be found, unload tree from frontend */  
             selectedTab.collectFailure.mapToUnit --> TreeViewController.unloadTree,

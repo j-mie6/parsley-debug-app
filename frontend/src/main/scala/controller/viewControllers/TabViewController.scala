@@ -21,16 +21,24 @@ object TabViewController {
     private val fileNames: Var[List[String]] = Var(Nil)
 
     /** Get file name associated with tab at index */
-    def getFileName(index: Int): Signal[String] = fileNames.signal.map(_(index))
+    def getFileName(index: Int): Signal[String] = {
+        println(s"Inside getFileName for index: $index")
+        fileNames.signal.map(_(index))
+    }
 
     /** Get list of file names */
-    val getFileNames: Signal[List[String]] = fileNames.signal
+    val getFileNames: Signal[List[String]] = {
+        fileNames.signal
+    }
 
     /** Set file names */
     val setFileNames: Observer[List[String]] = fileNames.writer
     
     /** Add name to file names */
     val addFileName: Observer[String] = fileNames.updater((names, name) => names :+ name)
+
+    /** Remove name from file names */
+    val removeFileName: Observer[String] = fileNames.updater((names, name) => names.filter(_ != name))
     
     /** Fetches all tree names saved by the user from the backend */
     def loadFileNames: EventStream[Either[DillException, List[String]]] = Tauri.invoke(Command.FetchSavedTreeNames, ())
@@ -43,16 +51,25 @@ object TabViewController {
     private lazy val selectedTab: Var[Int] = Var(0)
 
     /** Set current selected tab index */
-    val setSelectedTab: Observer[Int] = selectedTab.writer
+    val setSelectedTab: Observer[Int] = {
+        println("In set selected tab")
+        selectedTab.writer
+    }
 
     /** Get index of tab with associated name */
     def getFileNameIndex(name: String): Signal[Int] = getFileNames.map(_.indexOf(name))
             
     /** Get selected tab index */
-    val getSelectedTab: Signal[Int] = selectedTab.signal
+    val getSelectedTab: Signal[Int] = {
+        println(s"Inside getSelectedTab for tab # ${selectedTab.now()}")
+        selectedTab.signal
+    }
     
     /** Get name of tree associated with selected tab */
-    def getSelectedFileName: Signal[String] = getSelectedTab.flatMapSwitch(getFileName)
+    def getSelectedFileName: Signal[String] = {
+        println("Inside getSelectedFileName")
+        getSelectedTab.flatMapSwitch(getFileName)
+    }
 
     /** Checks if tab is currently selected */
     def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)
@@ -65,6 +82,9 @@ object TabViewController {
     def loadSavedTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.LoadSavedTree, name)
 
     /** Delete tree loaded within tab, returning updated list of names */
-    def deleteSavedTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DeleteTree, name)
+    def deleteSavedTree(name: String): EventStream[Either[DillException, Unit]] = {
+        Tauri.invoke(Command.DeleteTree, name)
+        // loadFileNames --> setFileNames
+    }
 
 }

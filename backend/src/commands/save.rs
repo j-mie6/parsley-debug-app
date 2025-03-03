@@ -71,14 +71,22 @@ pub fn fetch_saved_tree_names() -> Result<String, FetchTreeNameError>  {
     /* Get all path names inside the saved_trees folder */
     let paths: fs::ReadDir = fs::read_dir(SAVED_TREE_DIR).map_err(|_| FetchTreeNameError::ReadDirFailed)?;
 
+    println!("getting namesa");
     /* Strip off the extension and add only the name to names */
     let names: Vec<String> = paths.into_iter()
         .map(|path| {
-            let path: fs::DirEntry = path.map_err(|_| FetchTreeNameError::ReadPathFailed)?;
-            let file_name: String = path.file_name().into_string().map_err(|_| FetchTreeNameError::StringContainsInvalidUnicode)?;
+            // let path: fs::DirEntry = path.map_err(|_| FetchTreeNameError::ReadPathFailed)?;
+            let path: Result<fs::DirEntry, FetchTreeNameError> = path.map_err(|_| FetchTreeNameError::ReadPathFailed);
+            if let Err(ref bad) = path {
+                println!("uh oh");
+                println!("{:#?}", bad);
+            }
+
+            let file_name: String = path.unwrap().file_name().into_string().map_err(|_| FetchTreeNameError::StringContainsInvalidUnicode)?;
             let name: &str = file_name.strip_suffix(".json").ok_or(FetchTreeNameError::SuffixNotFound)?;
             Ok(name.to_string())
         }).collect::<Result<Vec<String>, FetchTreeNameError>>()?;
+        println!("got names");
 
     /* Serialise names */
     serde_json::to_string_pretty(&names)
@@ -98,19 +106,30 @@ pub enum FetchTreeNameError {
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
 pub fn load_saved_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), LoadTreeError>  {
+
     /* Get the file path of the tree to be reloaded */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
-
+    
+    println!("getting     {}", &tree_name);
     /* Read the contents of the file as a string */
     let contents: String = fs::read_to_string(file_path)
         .map_err(|_| LoadTreeError::ReadFileFailed)?;
 
+    println!("still getting  {}", &tree_name);
+
     /* Deserialize the tree into SavedTree, then convert to DebugTree */
     let saved_tree: SavedTree = serde_json::from_str(&contents).map_err(|_| LoadTreeError::DeserialiseFailed)?;
+
+    println!("still still getting  {}", &tree_name);
+
     let tree: DebugTree = DebugTree::from(saved_tree);
 
     /* Update the global tauri state with the reloaded tree */
     state.set_tree(tree)?;
+
+    println!("returning ok");
+    println!("");
+    println!("");
 
     Ok(())
 }
