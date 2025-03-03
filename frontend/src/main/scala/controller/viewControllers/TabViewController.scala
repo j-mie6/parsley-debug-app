@@ -7,6 +7,7 @@ import com.raquo.laminar.api.L.*
 
 import controller.tauri.{Tauri, Command}
 import controller.viewControllers.TreeViewController
+import view.DebugTreeDisplay
 import model.DebugTree
 import model.errors.DillException
 
@@ -53,6 +54,11 @@ object TabViewController {
     
     /** Get name of tree associated with selected tab */
     def getSelectedFileName: Signal[String] = getSelectedTab.flatMapSwitch(getFileName)
+
+    // If selected filename changes then resetZoom is called
+    getSelectedFileName.changes.foreach { _ =>
+        DebugTreeDisplay.resetZoom()
+    }(unsafeWindowOwner)
 
     /** Checks if tab is currently selected */
     def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)

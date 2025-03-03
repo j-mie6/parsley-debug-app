@@ -5,6 +5,7 @@ import com.raquo.laminar.api.L.*
 import model.{DebugTree, DebugNode, ReactiveNode}
 
 import controller.viewControllers.MainViewController
+import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}
 
 /**
@@ -31,6 +32,9 @@ object DebugTreeDisplay {
         e.preventDefault() /* Prevent default zooming */
         e.deltaY           /* Get the vertical delta of the wheel */
     } --> zoomUpdate
+
+    // Resets the zoomFactor to 1
+    def resetZoom(): Unit = zoomFactor.set(1.0)
     
     /**
     * Render the entire tree from the root node downwards.
