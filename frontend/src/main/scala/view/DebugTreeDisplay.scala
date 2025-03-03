@@ -35,7 +35,7 @@ object DebugTreeDisplay {
     } --> zoomUpdate
 
     /* Resets the zoomFactor to 1 */
-    val resetZoom = Observer((unit: Unit) => zoomFactor.set(defaultZoom))
+    val resetZoom = Observer(_ => zoomFactor.set(defaultZoom))
 
 
     /**
