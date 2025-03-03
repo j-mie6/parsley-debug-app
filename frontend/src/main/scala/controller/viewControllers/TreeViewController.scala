@@ -34,7 +34,7 @@ object TreeViewController {
         /* Default tree view when no tree is loaded */
         case None => div(
             className := "tree-view-error",
-            "No tree found!"
+            "Nothing to show"
         )
 
         /* Render as DebugTreeDisplay */
