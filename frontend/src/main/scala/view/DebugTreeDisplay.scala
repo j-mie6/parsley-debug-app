@@ -153,7 +153,7 @@ private object ReactiveNodeDisplay {
                 justifyContent.center,
                 
                 child(singleArrow(isRight)) <-- showIterativeOneByOne,
-                child(singleArrow(isRight)) <-- showIterativeOneByOne
+                child(doubleArrow(isRight)) <-- showIterativeOneByOne
                     .combineWithFn(moreThanTenChildren)(_ && _),
             )
         }
