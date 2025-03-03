@@ -98,8 +98,6 @@ private object ReactiveNodeDisplay {
         val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
         def iterativeArrowButton(isRight: Boolean): HtmlElement = {
-            // val singleDirection: String = if isRight then "end" else "start"
-
             val singleHoverVar: Var[Boolean] = Var(false)
             button(                    
                     className := "debug-node-iterative-buttons",
@@ -120,7 +118,6 @@ private object ReactiveNodeDisplay {
         }
 
         def iterativeDoubleArrowButton(isRight: Boolean): HtmlElement = {
-            // val doubleDirection: String = if isRight then "forward" else "backward"
             val doubleHoverVar: Var[Boolean] = Var(false)
 
             button(
