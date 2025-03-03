@@ -105,7 +105,7 @@ private object ReactiveNodeDisplay {
                     className := "debug-node-iterative-buttons",
                     marginBottom.px := 2, 
                     i(
-                        styleAttr <-- Signal.fromValue(if !isRight then "transform: scaleX(-1)" else ""),
+                        styleAttr := (if !isRight then "transform: scaleX(-1)" else ""),
                         cls(s"bi bi-play-fill") <-- singleHoverVar.signal,
                         cls(s"bi bi-play") <-- singleHoverVar.signal.not,
                         onMouseOver.mapTo(true) --> singleHoverVar,
@@ -126,7 +126,7 @@ private object ReactiveNodeDisplay {
             button(
                     className := "debug-node-iterative-buttons",
                     i(
-                        styleAttr <-- Signal.fromValue(if !isRight then "transform: scaleX(-1)" else ""),
+                        styleAttr := (if !isRight then "transform: scaleX(-1)" else ""),
                         cls(s"bi bi-fast-forward-fill") <-- doubleHoverVar.signal,
                         cls(s"bi bi-fast-forward") <-- doubleHoverVar.signal.not,
                         onMouseOver.mapTo(true) --> doubleHoverVar,
