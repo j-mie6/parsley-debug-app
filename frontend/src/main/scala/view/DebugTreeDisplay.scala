@@ -7,6 +7,7 @@ import model.{DebugTree, DebugNode, ReactiveNode}
 import controller.viewControllers.MainViewController
 import controller.tauri.{Tauri, Command}
 
+
 /**
 * Object containing rendering methods for the Debug Tree Display, which is
 * used to display the debug tree in the UI.
@@ -97,49 +98,65 @@ private object ReactiveNodeDisplay {
         /* Signal for if a node has more than 10 children */
         val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
-        def iterativeArrowButton(isRight: Boolean): HtmlElement = {
-            val singleHoverVar: Var[Boolean] = Var(false)
-            button(                    
-                    className := "debug-node-iterative-buttons",
-                    marginBottom.px := 2, 
-                    i(
-                        styleAttr := (if !isRight then "transform: scaleX(-1)" else ""),
-                        cls(s"bi bi-play-fill") <-- singleHoverVar.signal,
-                        cls(s"bi bi-play") <-- singleHoverVar.signal.not,
-                        onMouseOver.mapTo(true) --> singleHoverVar,
-                        onMouseOut.mapTo(false) --> singleHoverVar,
-                        height.px := 16,
-                        margin.auto,
-                    ),
-                    onClick.mapTo(if isRight then 1 else -1) --> moveIndex,
-                    onMouseOver.mapTo(true) --> singleHoverVar,
-                    onMouseOut.mapTo(false) --> singleHoverVar
+        /* Button to increment selected iterative child */
+        def iterativeArrowButton(icon: String, increment: Int, isRight: Boolean): HtmlElement = {
+            val hoverVar: Var[Boolean] = Var(false)
+            
+            button(
+                className := "debug-node-iterative-buttons",
+                marginBottom.px := 2,
+
+                i(
+                    cls(s"bi bi-$icon", s"bi bi-$icon-fill") <-- hoverVar.signal,
+                    
+                    height.px := 16,
+                    margin.auto,
+
+                    when(isRight) {
+                        styleAttr := "transform: scaleX(-1)"
+                    },
+                    
+                    onMouseOver.mapTo(true) --> hoverVar,
+                    onMouseOut.mapTo(false) --> hoverVar,
+                ),
+
+                onClick.mapTo(if isRight then increment else -increment) --> moveIndex,
+                
+                onMouseOver.mapTo(true) --> hoverVar,
+                onMouseOut.mapTo(false) --> hoverVar
             )
         }
 
-        def iterativeDoubleArrowButton(isRight: Boolean): HtmlElement = {
-            val doubleHoverVar: Var[Boolean] = Var(false)
+        def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal
+            .combineWith(node.children.signal)
+            .map((index, ns) => ((index.toDouble + 1.0) / ns.length) * 100)
 
-            button(
-                    className := "debug-node-iterative-buttons",
-                    i(
-                        styleAttr := (if !isRight then "transform: scaleX(-1)" else ""),
-                        cls(s"bi bi-fast-forward-fill") <-- doubleHoverVar.signal,
-                        cls(s"bi bi-fast-forward") <-- doubleHoverVar.signal.not,
-                        onMouseOver.mapTo(true) --> doubleHoverVar,
-                        onMouseOut.mapTo(false) --> doubleHoverVar,
-                        height.px := 16,
-                        margin.auto,
-                    ),
-                    onClick.mapTo(if isRight then 5 else -5) --> moveIndex,
-                    onMouseOver.mapTo(true) --> doubleHoverVar,
-                    onMouseOut.mapTo(false) --> doubleHoverVar
-            )                    
+        def iterativeProgress = {
+            div(
+                cls("iterative-progress-container"),
+                div(
+                    cls("iterative-progress-fill"),
+                    width <-- iterativeChildrenPercentage.map(p => s"${p}%")
+                )
+            )
         }
 
-        def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal.combineWith(node.children.signal).map { (index, ns) =>
-            ((index.toDouble + 1.0) / (ns.length)) * 100
+        def singleArrow(isRight: Boolean) = iterativeArrowButton(icon = "play", 1, isRight)
+        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", 5, isRight)
+
+        def arrows(isRight: Boolean) = {
+            div(
+                display.flex,
+                flexDirection.column,
+                alignItems.flexStart,
+                justifyContent.center,
+                
+                child(singleArrow(isRight = true)) <-- showIterativeOneByOne,
+                child(singleArrow(isRight = true)) <-- showIterativeOneByOne
+                    .combineWithFn(moreThanTenChildren)(_ && _),
+            )
         }
+
 
         div(
             className := "debug-node-container",
@@ -158,17 +175,7 @@ private object ReactiveNodeDisplay {
                 flexDirection.row,
                 alignItems.stretch,
 
-                div (
-                    display.flex,
-                    flexDirection.column,
-                    alignContent.end,
-                    justifyContent.center,
-
-                    child(iterativeArrowButton(isRight = false)) <-- showIterativeOneByOne,
-                    child(iterativeDoubleArrowButton(isRight = false)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
-
-                ),
-
+                arrows(isRight = false),
 
                 div(
                     className := "debug-node",
@@ -185,14 +192,7 @@ private object ReactiveNodeDisplay {
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
                         child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
-                        child(
-                            div(cls("iterative-progress-container"),
-                                div(
-                                cls("iterative-progress-fill"),
-                                width <-- iterativeChildrenPercentage.map(p => s"${p}%")
-                                )
-                            )
-                        ) <-- showIterativeOneByOne
+                        child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
                     /* Expand/compress node with (with arrows for iterative) on click */
@@ -220,16 +220,7 @@ private object ReactiveNodeDisplay {
 
                 ),
                 
-                div(
-                    display.flex,
-                    flexDirection.column,
-                    alignItems.flexStart,
-                    justifyContent.center,
-                    child(iterativeArrowButton(isRight = true)) <-- showIterativeOneByOne,
-                    child(iterativeDoubleArrowButton(isRight = true)) <-- showIterativeOneByOne.combineWithFn(moreThanTenChildren)(_ && _),
-                ),
-                
-
+                arrows(isRight = true),
             ),
 
 
@@ -239,6 +230,7 @@ private object ReactiveNodeDisplay {
             } else {
                 child(p(className := "compress-ellipsis", "...")) <-- compressed
             },
+
             /* Flex container for rendering children */
             div(
                 className := "debug-node-children-container",
