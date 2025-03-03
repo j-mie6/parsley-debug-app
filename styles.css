@@ -24,8 +24,6 @@
     --font-color-tertiary: #96DEC4;         /* Parsley green. */
     --font-color-quaternary: #242526;       /* Parsley green. */
     --font-color-error: #D2042D;            /* Red error. */
-    --iterative-progress-empty: #334641;
-    --iterative-progress-fill: #d0e4dd;
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
 }
 
@@ -42,8 +40,6 @@
     --font-color-tertiary: #7EB9A6;     /* Lighter green. */
     --font-color-quaternary: #1F3D34;   /* Parsley green. */
     --font-color-error: #fd4659;        /* Red error. */
-    --iterative-progress-empty: #6ab69f;
-    --iterative-progress-fill: #1F3D34;
 }
 
 body {

@@ -183,9 +183,9 @@
 .iterative-progress {
     font-size: 24px;
     line-height: 6px;
-    color: var(--iterative-progress-empty);
+    color: var(--font-color-secondary);
 }
 
 .iterative-progress.fill {
-    color: var(--iterative-progress-fill);
+    color: var(--font-color-primary);
 }
