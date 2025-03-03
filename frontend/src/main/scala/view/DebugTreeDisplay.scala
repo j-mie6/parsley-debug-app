@@ -107,8 +107,9 @@ private object ReactiveNodeDisplay {
                 marginBottom.px := 2,
 
                 i(
-                    cls(s"bi bi-$icon", s"bi bi-$icon-fill") <-- hoverVar.signal,
-                    
+                    cls(s"bi bi-$icon") <-- hoverVar.signal.not,
+                    cls(s"bi bi-$icon-fill") <-- hoverVar.signal,
+                                        
                     height.px := 16,
                     margin.auto,
 
