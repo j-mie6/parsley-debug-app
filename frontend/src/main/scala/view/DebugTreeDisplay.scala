@@ -142,7 +142,7 @@ private object ReactiveNodeDisplay {
                 className := "iterative-progress-container",
 
                 children <-- iterativeNodeIndex.signal
-                    .combineWith(node.children.signal.map(0 to _.length))
+                    .combineWith(node.children.signal.map(0 until _.length))
                     .map((index, range) => range.map(i => 
                         div(
                             className := "iterative-progress", 
