@@ -48,20 +48,14 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
 
 /* Imports JSON file to display a tree */
 #[tauri::command]
-pub fn import_tree(state: tauri::State<AppState>, _external_path: String) -> Result<(), SaveTreeError> {
-    let mut external_path = state.get_download_path().unwrap();
-    println!("External path: {}", external_path.display());
-    external_path.push(format!("{}/input-tree.json", external_path.display()));
-    println!("External path: {}", external_path.display());
-
-    let external_file_name = external_path.clone().into_os_string().into_string().unwrap().replace("/", "");
+pub fn import_tree(state: tauri::State<AppState>, name: String, contents: String) -> Result<(), SaveTreeError> {
 
     /* Path to the json file used to store the tree */
-    let app_path: String = format!("{}{}", SAVED_TREE_DIR, external_file_name);
+    let app_path: String = format!("{}{}", SAVED_TREE_DIR, &name);
 
-    /* Creates a file in apps local saved tree folders and copies data from external json it */
-    let _ = File::create(&app_path).map_err(|err| {println!("{}", err); SaveTreeError::ImportFailed})?;
-    fs::copy(&external_path, &app_path).map_err(|err| {println!("{}", err); SaveTreeError::ImportFailed})?;
+    /* Creates a file in apps local saved tree folders and writes data from external json it */
+    let mut imported_tree: File = File::create(&app_path).map_err(|err| {println!("{}", err); SaveTreeError::ImportFailed})?;
+    imported_tree.write(contents.as_bytes()).map_err(|_| SaveTreeError::ImportFailed)?;
 
     let _ = load_path(app_path, state).map_err(|err| {println!("{:?}", err); SaveTreeError::ImportFailed})?;
 

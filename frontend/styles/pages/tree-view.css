@@ -52,16 +52,10 @@
 }
 
 .tree-view-upload-button {
-    position: absolute;
     z-index: 1;
-    padding: inherit;
-    right: 120px; 
     background: transparent;
-    color: inherit;
     border: none;
-    font: inherit;
     border: red 1px !important;
-    outline: inherit; 
     cursor: pointer;   
 }
 

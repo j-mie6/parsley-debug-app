@@ -39,6 +39,41 @@ abstract class DebugViewPage extends Page {
         h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
+    val uploadButton: HtmlElement = label(
+        className := "tree-view-upload-button",
+        i(className := "bi bi-upload", fontSize.px := 35),
+        input(
+            forId := "file-id",
+            typ := "file",
+            display := "none",
+
+            /* Triggers the file input */
+            // onChange.map((ev: dom.Event) => ev.target.asInstanceOf[dom.html.Input].files(0).fileName) --> (fn => println(fn))
+            onChange --> { ev =>
+                val input = ev.target.asInstanceOf[dom.html.Input]
+                val files = input.files
+                val name = files(0).name
+                val sb = new StringBuilder()
+                if (files.length > 0) {
+                    val file = files(0)
+                    val reader = new dom.FileReader()
+                    
+                    reader.onload = _ => {
+                        val content = reader.result.asInstanceOf[String]
+                        sb ++= content
+                        println("Going to pass into importTree")
+                        println(sb.toString)
+                        println(sb.toString.length())
+                        TreeViewController.importTree.tupled((name, sb.toString)) --> Observer.empty
+                    }
+
+                    reader.readAsText(file)
+                }
+            }
+                
+        )
+    )
+                
     /* Overview information tab. */
     private lazy val infoButton: HtmlElement = button(
         // TODO
@@ -124,6 +159,7 @@ abstract class DebugViewPage extends Page {
             display.flex,
             alignItems.center,
 
+            uploadButton,
             infoButton,
         )
     )   

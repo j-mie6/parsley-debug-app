@@ -28,15 +28,7 @@ object TreeView {
         ) --> Observer.empty,
     )
 
-    val uploadButton: HtmlElement = label(
-        className := "tree-view-upload-button",
-        forId := "file-upload",
-        
-        i(className := "bi bi-upload", fontSize.px := 35),
-
-        /* Triggers the file input */
-        onClick --> (_ => TreeViewController.importTree("This String does not matter"))
-    )
+    
 
     /* Fast forward icon for skipping */
     private lazy val skipIcon: Element = i(className := "bi bi-fast-forward-fill", fontSize.px := 33)
@@ -59,7 +51,7 @@ object TreeView {
         child(downloadButton) <-- TreeViewController.treeExists,
 
         /* Render upload button */
-        uploadButton,
+        // uploadButton,
 
         /* Render skip button */
         child(skipButton) <-- TreeViewController.isDebuggingSession,
