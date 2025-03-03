@@ -34,8 +34,9 @@ object DebugTreeDisplay {
     } --> zoomUpdate
 
     // Resets the zoomFactor to 1
-    def resetZoom(): Unit = zoomFactor.set(1.0)
-    
+    val resetZoom = Observer((_: Any) => zoomFactor.set(1.0))
+
+
     /**
     * Render the entire tree from the root node downwards.
     *
