@@ -113,8 +113,8 @@ private object ReactiveNodeDisplay {
                     height.px := 16,
                     margin.auto,
 
-                    when(isRight) {
-                        styleAttr := "transform: scaleX(-1)"
+                    whenNot (isRight) {
+                        transform := "scaleX(-1)"
                     },
                     
                     onMouseOver.mapTo(true) --> hoverVar,
@@ -152,8 +152,8 @@ private object ReactiveNodeDisplay {
                 alignItems.flexStart,
                 justifyContent.center,
                 
-                child(singleArrow(isRight = true)) <-- showIterativeOneByOne,
-                child(singleArrow(isRight = true)) <-- showIterativeOneByOne
+                child(singleArrow(isRight)) <-- showIterativeOneByOne,
+                child(singleArrow(isRight)) <-- showIterativeOneByOne
                     .combineWithFn(moreThanTenChildren)(_ && _),
             )
         }
