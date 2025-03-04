@@ -96,6 +96,37 @@
     margin-left: 5px;
 }
 
+.debug-view-download-button {
+    z-index: 1;
+    background: transparent;
+    border: none;
+    border: red 1px !important;
+    cursor: pointer;  
+    margin-right: 5px; 
+}
+
+@media (max-width: 450px) {
+    .debug-view-download-button {
+        display: none;
+    }
+}
+
+.debug-view-upload-button {
+    z-index: 1;
+    background: transparent;
+    border: none;
+    border: red 1px !important;
+    cursor: pointer;   
+    margin-right: 5px;
+}
+
+@media (max-width: 450px) {
+    .debug-view-upload-button {
+        display: none;
+    }
+}
+
+
 .debug-view-button {
     cursor: pointer;
     color: var(--font-color-tertiary);
