@@ -2,6 +2,7 @@ package view
 
 import com.raquo.laminar.api.L.*
 import com.raquo.laminar.codecs.*
+import com.raquo.laminar.api.features.unitArrows
 
 import org.scalajs.dom
 
@@ -48,7 +49,11 @@ abstract class DebugViewPage extends Page {
             display := "none",
 
             /* Triggers the file input */
-            // onChange.map((ev: dom.Event) => ev.target.asInstanceOf[dom.html.Input].files(0).fileName) --> (fn => println(fn))
+            // onChange.mapToFiles.collect {
+            //     case (l@List(file)) => l(0).name
+            // } --> { fileName => println(fileName.toString()) }
+
+            // onChange --> { (ev: EventProp[dom.Event]) => ev.mapToFiles.collect { case List(f) => f.name } --> {(file: String) => println(file)} }
             onChange --> { ev =>
                 val input = ev.target.asInstanceOf[dom.html.Input]
                 val files = input.files
@@ -61,10 +66,10 @@ abstract class DebugViewPage extends Page {
                     reader.onload = _ => {
                         val content = reader.result.asInstanceOf[String]
                         sb ++= content
-                        println("Going to pass into importTree")
-                        println(sb.toString)
-                        println(sb.toString.length())
                         TreeViewController.importTree.tupled((name, sb.toString)) --> Observer.empty
+
+                        // Reset input field to allow re-uploading the same file
+                        input.value = ""
                     }
 
                     reader.readAsText(file)

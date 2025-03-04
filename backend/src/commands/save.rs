@@ -3,6 +3,7 @@ use std::io::Write;
 use std::path::PathBuf;
 
 use crate::AppState;
+use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, SavedTree};
 use crate::files::SAVED_TREE_DIR;
@@ -57,7 +58,7 @@ pub fn import_tree(state: tauri::State<AppState>, name: String, contents: String
     let mut imported_tree: File = File::create(&app_path).map_err(|err| {println!("{}", err); SaveTreeError::ImportFailed})?;
     imported_tree.write(contents.as_bytes()).map_err(|_| SaveTreeError::ImportFailed)?;
 
-    let _ = load_path(app_path, state).map_err(|err| {println!("{:?}", err); SaveTreeError::ImportFailed})?;
+    let _ = load_path(app_path, state.clone()).map_err(|err| {println!("{:?}", err); SaveTreeError::ImportFailed}).and(Ok(state.emit(Event::NewTree)))?;
 
     Ok(())
 }
