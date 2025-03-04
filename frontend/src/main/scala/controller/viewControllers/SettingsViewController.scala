@@ -9,19 +9,35 @@ import model.settings.*
 
 object SettingsViewController {
 
+    private val settingsOpen: Var[Boolean] = Var(false)
+
+    /* Store of global values for user settings */
     private val numSkipIterativeChildren: Var[Int] = Var(5)
     private val numSkipBreakpoints: Var[Int] = Var(1)
     private val colorBlindMode: Var[Boolean] = Var(false)
 
+    def isSettingsOpen: Signal[Boolean] = settingsOpen.signal
+
+    def toggleOpenSettings(): Unit = settingsOpen.set(!settingsOpen.now())
+    
     def getNumSkipIterativeChildren: Var[Int] = numSkipIterativeChildren
 
     def getNumSkipBreakpoints: Var[Int] = numSkipBreakpoints
 
     def getColorBlindMode: Var[Boolean] = colorBlindMode
 
-    def setNumSkipIterativeChildren(num: Int): Unit = numSkipIterativeChildren.set(num)
+    def setNumSkipIterativeChildren(newNumSkipIterativeChildren: Int): Unit = 
+        numSkipIterativeChildren.set(newNumSkipIterativeChildren)
 
-    def setNumSkipBreakpoints(num: Int): Unit = numSkipBreakpoints.set(num)
+    def setNumSkipBreakpoints(newNumSkipBreakpoints: Int): Unit = 
+        numSkipBreakpoints.set(newNumSkipBreakpoints)
 
-    def setColorBlindMode(isColorBlind: Boolean): Unit = colorBlindMode.set(isColorBlind)
+    def setColorBlindMode(newColorBlindMode: Boolean): Unit = 
+        colorBlindMode.set(newColorBlindMode)
+
+    def applySettings(newNumSkipIterativeChildren: Int, newNumSkipBreakpoints: Int, newColorBlindMode: Boolean): Unit = {
+        setNumSkipIterativeChildren(newNumSkipIterativeChildren)
+        setNumSkipBreakpoints(newNumSkipBreakpoints)
+        setColorBlindMode(newColorBlindMode)
+    }
 }
