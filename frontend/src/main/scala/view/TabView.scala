@@ -67,7 +67,6 @@ object TabView {
             /* Set new selected tab after a deletion */
             deleteBus.stream.collectRight
                 .filter(_.nonEmpty)
-                /* TODO: Fix new index just being reliant on the tab being closed (ignoring current) */
                 .mapTo({
                     val currentIndex = TabViewController.selectedTab.now()
                     if currentIndex >= index then 
