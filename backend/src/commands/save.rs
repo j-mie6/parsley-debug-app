@@ -41,7 +41,7 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
     download_path.push(format!("{}.json", tree_name));
 
     /* Creates a file in Downloads and copies data into it */
-    let _ = File::create(&download_path).map_err(|_| SaveTreeError::DownloadFailed)?;
+    let _ = File::create(&download_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
     fs::copy(file_path, download_path).map_err(|_| SaveTreeError::DownloadFailed)?;
     
     Ok(())
@@ -55,10 +55,12 @@ pub fn import_tree(state: tauri::State<AppState>, name: String, contents: String
     let app_path: String = format!("{}{}", SAVED_TREE_DIR, &name);
 
     /* Creates a file in apps local saved tree folders and writes data from external json it */
-    let mut imported_tree: File = File::create(&app_path).map_err(|err| {println!("{}", err); SaveTreeError::ImportFailed})?;
+    let mut imported_tree: File = File::create(&app_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
     imported_tree.write(contents.as_bytes()).map_err(|_| SaveTreeError::ImportFailed)?;
 
-    let _ = load_path(app_path, state.clone()).map_err(|err| {println!("{:?}", err); SaveTreeError::ImportFailed}).and(Ok(state.emit(Event::NewTree)))?;
+    /* Load tree in the state and emit an event to frontend, passing the new tree */
+    let _ = load_path(app_path, state.clone()).map_err(|_| SaveTreeError::ImportFailed)?;
+    state.emit(Event::NewTree).map_err(|_| SaveTreeError::ImportFailed)?;
 
     Ok(())
 }
