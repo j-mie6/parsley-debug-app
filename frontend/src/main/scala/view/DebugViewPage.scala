@@ -59,38 +59,22 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-upload-button",
         i(className := "bi bi-upload", fontSize.px := 30),
         input(
-            forId := "file-id",
             typ := "file",
             display := "none",
+            multiple := true,
 
             /* Triggers the file input */
-            // onChange.mapToFiles.collect {
-            //     case (l@List(file)) => l(0).name
-            // } --> { fileName => println(fileName.toString()) }
+            onChange.mapToFiles.collect { case files if files.nonEmpty => files } --> {_.foreach(file => {
+                val name = file.name
+                val reader = new dom.FileReader()
 
-            // onChange --> { (ev: EventProp[dom.Event]) => ev.mapToFiles.collect { case List(f) => f.name } --> {(file: String) => println(file)} }
-            onChange --> { ev =>
-                val input = ev.target.asInstanceOf[dom.html.Input]
-                val files = input.files
-                val name = files(0).name
-                val sb = new StringBuilder()
-                if (files.length > 0) {
-                    val file = files(0)
-                    val reader = new dom.FileReader()
-                    
-                    reader.onload = _ => {
-                        val content = reader.result.asInstanceOf[String]
-                        sb ++= content
-                        TreeViewController.importTree.tupled((name, sb.toString)) --> Observer.empty
-
-                        // Reset input field to allow re-uploading the same file
-                        input.value = ""
-                    }
-
-                    reader.readAsText(file)
+                reader.onload = _ => {
+                    val content = reader.result.asInstanceOf[String]
+                    TreeViewController.importTree.tupled((name, content)) --> Observer.empty
                 }
-            }
-                
+
+                reader.readAsText(file)
+            })} 
         )
     )
                 
