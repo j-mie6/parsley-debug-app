@@ -24,6 +24,9 @@ pub struct ParsleyTree {
     
     /* If this tree was produced by a currently-running parser */
     #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool, 
+
+    /* State references to be modified */
+    #[serde(default = "Vec::new")] refs: Vec<(i32, String)>, 
 }
 
 impl ParsleyTree {
@@ -104,6 +107,7 @@ pub mod test {
                 "isIterative": false
             },
             "isDebuggable": false
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -166,6 +170,7 @@ pub mod test {
                 "isIterative": false
             },
             "isDebuggable": false
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -185,6 +190,7 @@ pub mod test {
                 is_iterative: false
             },
             is_debuggable: false,
+            refs: vec![]
         }
     }
 
@@ -245,6 +251,7 @@ pub mod test {
                 is_iterative: false,
             },
             is_debuggable: false,
+            refs: vec![]
         }
     }
 
