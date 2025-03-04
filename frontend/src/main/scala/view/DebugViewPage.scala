@@ -40,9 +40,24 @@ abstract class DebugViewPage extends Page {
         h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
+    /* Export tree button */
+    val downloadButton: HtmlElement = button(
+        className := "tree-view-download-button",
+
+        /* Save button icon */
+        i(className := "bi bi-download", fontSize.px := 30),
+
+        /* Exports current tree */
+        onClick(_
+            .compose(event => event.sample(TabViewController.getSelectedFileName))
+            .flatMapMerge(TreeViewController.downloadTree)
+        ) --> Observer.empty,
+    )
+
+    /* Uploading json element */
     val uploadButton: HtmlElement = label(
         className := "tree-view-upload-button",
-        i(className := "bi bi-upload", fontSize.px := 35),
+        i(className := "bi bi-upload", fontSize.px := 30),
         input(
             forId := "file-id",
             typ := "file",
@@ -89,7 +104,7 @@ abstract class DebugViewPage extends Page {
     /* Opener for the settings tab. */
     private lazy val settingsTabButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-settings",
-        i(className := "bi bi-gear-wide-connected")
+        i(className := "bi bi-gear-wide-connected", fontSize.px := 30)
     )
 
     /**
@@ -164,6 +179,8 @@ abstract class DebugViewPage extends Page {
             display.flex,
             alignItems.center,
 
+            /* Render download button */
+            child(downloadButton) <-- TreeViewController.treeExists,
             uploadButton,
             infoButton,
         )

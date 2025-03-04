@@ -12,23 +12,7 @@ import controller.viewControllers.TreeViewController
 import controller.viewControllers.TabViewController
 
 /* Object containing rendering functions for the TreeView */
-object TreeView {
-
-    /* Export tree button */
-    val downloadButton: HtmlElement = button(
-        className := "tree-view-download-button",
-
-        /* Save button icon */
-        i(className := "bi bi-download", fontSize.px := 35),
-
-        /* Exports current tree */
-        onClick(_
-            .compose(event => event.sample(TabViewController.getSelectedFileName))
-            .flatMapMerge(TreeViewController.downloadTree)
-        ) --> Observer.empty,
-    )
-
-    
+object TreeView {    
 
     /* Fast forward icon for skipping */
     private lazy val skipIcon: Element = i(className := "bi bi-fast-forward-fill", fontSize.px := 33)
@@ -47,12 +31,6 @@ object TreeView {
 
     /* Render tree as HtmlElement */
     def apply(): HtmlElement = div(
-        /* Render download button */
-        child(downloadButton) <-- TreeViewController.treeExists,
-
-        /* Render upload button */
-        // uploadButton,
-
         /* Render skip button */
         child(skipButton) <-- TreeViewController.isDebuggingSession,
 
