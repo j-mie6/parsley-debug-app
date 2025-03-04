@@ -34,7 +34,7 @@ object TabViewController {
 
 
     /* Index of tab that is currented selected */
-    private lazy val selectedTab: Var[Int] = Var(0)
+    lazy val selectedTab: Var[Int] = Var(0)
 
     /** Set current selected tab index */
     val setSelectedTab: Observer[Int] = selectedTab.writer

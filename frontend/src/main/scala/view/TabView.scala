@@ -68,11 +68,20 @@ object TabView {
             deleteBus.stream.collectRight
                 .filter(_.nonEmpty)
                 /* TODO: Fix new index just being reliant on the tab being closed (ignoring current) */
-                .mapTo(if index == 0 then 0 else index - 1) --> TabViewController.setSelectedTab,
+                .mapTo({
+                    val currentIndex = TabViewController.selectedTab.now()
+                    if currentIndex >= index then 
+                        if currentIndex == 0 then 
+                            0 
+                        else
+                            currentIndex - 1 
+                    else
+                        currentIndex
+                }) --> TabViewController.setSelectedTab,
         )
     }
 
-    /* Get selected file name as possible error */
+    /* Get selected file index as possible error */
     val selectedTab: EventStream[Try[Int]] = TabViewController.getSelectedTab.changes.recoverToTry
 
     def apply(): HtmlElement = {
