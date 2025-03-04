@@ -146,7 +146,11 @@ abstract class DebugViewPage extends Page {
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,
-            TabView(),
+            div(
+                className := "tab-view-container",
+                cls("compressed") <-- SettingsViewController.isSettingsOpen,
+                TabView()
+            ),
             div(
                 className := "tree-view-page",
                 buttonBar,

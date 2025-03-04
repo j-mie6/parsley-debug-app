@@ -76,6 +76,15 @@
     margin-left: 25vw;
 }
 
+.tab-view-container {
+    margin-left: 0;
+}
+
+.tab-view-container.compressed {
+    margin-left: 25vw;
+    transition: margin-left 1s ease-in-out;
+}
+
 .debug-view-button-bar {
     background-color: var(--background-secondary);
     z-index: 1;
