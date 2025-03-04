@@ -4,6 +4,7 @@ import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
 import controller.viewControllers.MainViewController
+import controller.viewControllers.SettingsViewController
 import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}
 
@@ -91,25 +92,26 @@ private object ReactiveNodeDisplay {
         /* Incrementing iterative node index with wrapping and early stopping when hitting the first and last nodes */
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
             val childrenLen = node.children.now().length
+            val skipAmount = SettingsViewController.getNumSkipIterativeChildren.now()
 
             if (childrenLen == 0) then
                 currIndex
             else
                 val absDelta = math.abs(delta)
                 
-                if (absDelta == 5) then
+                if (absDelta == skipAmount) then
                     val isForward = delta > 0
-                    val nearLast = currIndex + 5 >= childrenLen
-                    val nearFirst = currIndex - 5 < 0
+                    val nearLast = currIndex + skipAmount >= childrenLen
+                    val nearFirst = currIndex - skipAmount < 0
 
                     if (isForward) then
                         if (nearLast) then
-                            if (currIndex != childrenLen - 1) then childrenLen - 1 else (currIndex + 5) % childrenLen
-                        else currIndex + 5
+                            if (currIndex != childrenLen - 1) then childrenLen - 1 else (currIndex + skipAmount) % childrenLen
+                        else currIndex + skipAmount
                     else
                         if (nearFirst) then
-                            if (currIndex != 0) then 0 else (currIndex - 5 + childrenLen) % childrenLen
-                        else currIndex - 5
+                            if (currIndex != 0) then 0 else (currIndex - skipAmount + childrenLen) % childrenLen
+                        else currIndex - skipAmount
                 else
                     /* Normal increment or decrement with wrapping */
                     val newIndex = (currIndex + delta) % childrenLen
@@ -175,7 +177,7 @@ private object ReactiveNodeDisplay {
         }
 
         def singleArrow(isRight: Boolean) = iterativeArrowButton(icon = "play", 1, isRight)
-        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", 5, isRight)
+        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", SettingsViewController.getNumSkipIterativeChildren.now(), isRight)
 
         def arrows(isRight: Boolean) = {
             div(
