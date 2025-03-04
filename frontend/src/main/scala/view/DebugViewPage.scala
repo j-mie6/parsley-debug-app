@@ -14,6 +14,8 @@ import scala.util.{Try, Success, Failure}
 
 import model.Page
 
+import view.SettingsView
+
 import controller.AppStateController
 import controller.tauri.Tauri
 import controller.viewControllers.MainViewController.View
@@ -21,14 +23,14 @@ import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.InputViewController
+import controller.viewControllers.SettingsViewController
 
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
 /**
   * The DebugViewPage class represents the main page of the application, 
-  * containing both the tree and source view tabs, title and github / 
-  * light & dark mode buttons.
+  * containing both the title and github / light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {
     private lazy val gitIcon: HtmlElement = i(className := "bi bi-github", fontSize.px := 40)
@@ -49,7 +51,10 @@ abstract class DebugViewPage extends Page {
     /* Opener for the settings tab. */
     private lazy val settingsTabButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-settings",
-        i(className := "bi bi-gear-wide-connected")
+        i(className := "bi bi-gear-wide-connected"),
+        onClick --> (_ => 
+            println("Opening settings")
+            SettingsViewController.toggleOpenSettings())
     )
 
     /**
@@ -124,6 +129,7 @@ abstract class DebugViewPage extends Page {
             display.flex,
             alignItems.center,
 
+            child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
             infoButton,
         )
     )   
@@ -145,6 +151,7 @@ abstract class DebugViewPage extends Page {
                 className := "tree-view-page",
                 buttonBar,
                 cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
+                cls("compressed") <-- SettingsViewController.isSettingsOpen,
                 child.getOrElse(div())
             )
         )))
