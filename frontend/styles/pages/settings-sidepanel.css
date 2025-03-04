@@ -1,0 +1,103 @@
+.settings-sidepanel-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 25vw;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transform: translateX(-25vw); /* Completely hidden initially */
+    transition: transform 0.5s ease-in-out;
+}
+
+.settings-sidepanel-container.open {
+    transform: translateX(0);
+}
+
+.settings-sidepanel {
+    background: var(--background-secondary);
+    padding: 3vh 3vw;
+    border-radius: 12px;
+    width: 50vw;
+    height: 100vh;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.settings-header {
+    width: 100%;
+    text-align: center;
+    position: relative;
+    margin-bottom: 1.5vh;
+}
+
+.settings-header h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0 auto;
+}
+
+.settings-content {
+    display: grid;
+    columns: 3;
+    width: 100%;
+    padding: 1vh 0;
+}
+
+.single-setting-top-container {
+    display: flex;
+    flex-direction: row;
+    overflow-y: auto;
+    justify-content: spaceBetween;
+    margin-bottom: 5;
+}
+
+.single-setting-name-container {
+    padding: 5px;
+}
+
+
+.single-setting-name-container.underlined {
+    text-decoration: underline;
+}
+
+.single-setting-modify-container {
+    border-radius: 5px;
+    background-color: transparent;
+    padding: 2px 5px;
+}
+
+.single-setting-info-text {
+    padding: 15px;
+    background-color: var(--background-tertiary);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 10px;
+    position: relative;
+}
+
+.settings-footer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 2vh;
+}
+
+.apply-settings-button {
+    width: 20%;
+    background: var(--font-color-primary);
+    color: var(--background-primary);
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.apply-settings-button:hover {
+    background: var(--font-color-secondary);
+}

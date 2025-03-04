@@ -69,6 +69,11 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: margin-left 1s ease-in-out;
+}
+
+.debug-view-page.compressed {
+    margin-left: 25vw;
 }
 
 .debug-view-button-bar {
