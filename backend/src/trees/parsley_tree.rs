@@ -80,7 +80,7 @@ impl From<ParsleyTree> for DebugTree {
 
         /* Convert the root node and return DebugTree */
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, tree.is_debuggable)
+        DebugTree::new(tree.input, node, tree.is_debuggable, tree.refs)
     }
 }
 
@@ -106,7 +106,7 @@ pub mod test {
                 "children": [],
                 "isIterative": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
             "refs": []
         }"#
         .split_whitespace()
@@ -169,7 +169,7 @@ pub mod test {
                 ],
                 "isIterative": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
             "refs": []
         }"#
         .split_whitespace()
