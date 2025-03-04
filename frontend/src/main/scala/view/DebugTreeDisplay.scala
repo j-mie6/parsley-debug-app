@@ -88,14 +88,35 @@ private object ReactiveNodeDisplay {
         /* The index of the current child rendered for iterative nodes */
         val iterativeNodeIndex: Var[Int] = Var(0)
 
-        /* Incrementing iterative node index */
+        /* Incrementing iterative node index with wrapping and early stopping when hitting the first and last nodes */
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
-            /* Wrap indices of children around */
-            val childrenLen: Int = node.children.now().length
-            val indexSum: Int = (currIndex + delta) % childrenLen
-            
-            if (indexSum < 0) then indexSum + childrenLen else indexSum
+            val childrenLen = node.children.now().length
+
+            if (childrenLen == 0) then
+                currIndex
+            else
+                val absDelta = math.abs(delta)
+                
+                if (absDelta == 5) then
+                    val isForward = delta > 0
+                    val nearLast = currIndex + 5 >= childrenLen
+                    val nearFirst = currIndex - 5 < 0
+
+                    if (isForward) then
+                        if (nearLast) then
+                            if (currIndex != childrenLen - 1) then childrenLen - 1 else (currIndex + 5) % childrenLen
+                        else currIndex + 5
+                    else
+                        if (nearFirst) then
+                            if (currIndex != 0) then 0 else (currIndex - 5 + childrenLen) % childrenLen
+                        else currIndex - 5
+                else
+                    /* Normal increment or decrement with wrapping */
+                    val newIndex = (currIndex + delta) % childrenLen
+                    if (newIndex < 0) then newIndex + childrenLen else newIndex
         })
+
+
 
         /* Signal for when to show arrow buttons */
         val showIterativeOneByOne: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
@@ -203,8 +224,7 @@ private object ReactiveNodeDisplay {
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
-
-                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
+                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
