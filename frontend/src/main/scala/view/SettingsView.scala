@@ -12,7 +12,7 @@ object SettingsView {
 
     def renderUserSetting(setting: UserSetting): HtmlElement = {
         val titleHoverVar: Var[Boolean] = Var(false)
-
+        
         div(
             className := "single-setting-container",
             div(
@@ -22,8 +22,8 @@ object SettingsView {
                         className := "single-setting-name-container",
                         cls("underlined") <-- titleHoverVar,
     
-                        onMouseOver.mapTo(true) --> titleHoverVar,
-                        onMouseOut.mapTo(false) --> titleHoverVar,
+                        onMouseEnter.mapTo(true) --> titleHoverVar,
+                        onMouseLeave.mapTo(false) --> titleHoverVar,
 
                         setting.settingName,
                     ),
@@ -35,8 +35,21 @@ object SettingsView {
                                     value <-- setting.value.signal.map(_.toString()),
                                     typ := "number",
                                     minAttr := "0",
-                                    /* If user has entered a non-int value into the input then do not change the setting */
-                                    onInput.mapToValue.map(_.toIntOption.getOrElse(setting.value.now())) --> setting.value.writer
+                                    /* Update setting only when a valid number is entered */
+                                    onInput.mapToValue --> { newValue =>
+                                        if (newValue.isEmpty) {
+                                            setting.value.set(false) // Allow empty temporarily
+                                        } else {
+                                            newValue.toIntOption.foreach(setting.value.set)
+                                        }
+                                    },
+
+                                    /* Restore default value if empty when input loses focus */
+                                    onBlur --> { _ =>
+                                        if (setting.value.now() == false) {
+                                            setting.value.set(setting.default)
+                                        }
+                                    }
                                 )
                             case "boolean" =>
                                 input(
@@ -49,14 +62,13 @@ object SettingsView {
                         
                     )
                 ),
-                child(
-                    div(
-                        className := "single-setting-info-text",
-                        setting.infoText
-                    )
-                ) <-- titleHoverVar,
+                child(div(
+                    className := "single-setting-info-text",
+                    setting.infoText,
+                )) <-- titleHoverVar
             )
     }   
+
 
     def apply(): HtmlElement = {
         div(
@@ -72,7 +84,7 @@ object SettingsView {
                 
                 div(
                     cls("settings-content"),
-                    allUserSettings.map((thisSetting: UserSetting ) => renderUserSetting(thisSetting))
+                    allUserSettings.map(renderUserSetting(_))
                 ),
 
                 div(

@@ -83,12 +83,17 @@
 }
 
 .single-setting-info-text {
+    position: relative;
     padding: 15px;
+    margin-bottom: 10px;
+
     background-color: var(--background-tertiary);
     border-radius: 5px;
-    margin-bottom: 10px;
     font-size: 10px;
-    position: sticky;
+}
+
+.single-setting-info-text[hidden] {
+    pointer-events: none;
 }
 
 .settings-footer {
