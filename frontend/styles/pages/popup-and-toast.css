@@ -27,11 +27,14 @@
 }
 
 .popup-icon-container {
-    align-items: center;
+    /* align-items: center;
     margin:auto;
     margin-right: 20px;
     padding: 10px;
-    border-radius: 50%;
+    border-radius: 50%; */
+    font-size: 3vw;
+    box-shadow: none !important;
+    /* padding-left: 1vw; */
 }
 
 .popup-header {
@@ -41,6 +44,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 90%;
+    padding-left: 2vw;
 }
 
 .popup-text {
@@ -48,6 +52,7 @@
     max-height: 12vh;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-left: 2vw;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     line-clamp: 3;
@@ -93,18 +98,15 @@
     background-color: var(--background-primary);
 
     border-style: solid;
+    border-width: 0.2cap;
     border-radius: 8px;
     
-    animation: fadeIn 0.3s ease-out, fadeOut 0.3s ease-in 5s forwards;
+    /* animation: fadeIn 0.3s ease-out, fadeOut 0.3s ease-in 5s forwards; */
 }
 
 .toast-icon-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 4vw;
-    height: 4vw;
-    border-radius: 50%;
+    font-size: 1.5vw;
+    box-shadow: none !important;
 }
 
 .toast-header {
@@ -113,6 +115,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-left: 0.75vw;
 }
 
 .toast-text {
@@ -120,6 +123,7 @@
     font-size: 1vw;
     line-height: 1.4;
     max-height: 8vh;
+    padding-left: 0.75vw;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
