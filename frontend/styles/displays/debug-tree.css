@@ -94,10 +94,10 @@
     border-width: 2px;
     border-style: solid;
     border-bottom-width: 4px;
-    border-color: var(--font-color-primary);
-
-    color: var(--font-color-quaternary);
-    background-color: var(--background-tertiary-60);
+    
+    color: var(--node-font-color);
+    border-color: var(--node-font-color);
+    background-color: var(--node-color);
     
     text-align: center;
     width: auto;
@@ -111,17 +111,32 @@
     margin-bottom: 5px;
 }
 
-/* Darken failed nodes */
-.debug-node.fail {
-    background-color: var(--background-tertiary-20);
-    color: var(--font-color-primary);
-}
-
 /* On hover of expandable (i.e., not leaf) nodes, darken */
 .debug-node:hover:not(.leaf) {
-    background-color: var(--background-tertiary-40);
+    background-color: color-mix(in srgb, var(--node-color) 60%, transparent);
 }
 
+/* Failed nodes are red */
+.debug-node.fail {
+    color: var(--node-font-color-fail);
+    border-color: var(--node-font-color-fail);
+    background-color: var(--node-color-fail);
+}
+
+.debug-node.fail:hover {
+    background-color: color-mix(in srgb, var(--node-color-fail) 60%, transparent);
+}
+
+/* Iterative nodes are blue */
+.debug-node.iterative {
+    color: var(--node-font-color-iterative);
+    border-color: var(--node-font-color-iterative);
+    background-color: var(--node-color-iterative);
+}
+
+.debug-node.iterative:hover {
+    background-color: color-mix(in srgb, var(--node-color-iterative) 60%, transparent);
+}
 
 /* Set bottom border of leaf equal to other borders */
 .debug-node.leaf  {
