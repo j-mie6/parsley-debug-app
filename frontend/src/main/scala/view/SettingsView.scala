@@ -1,7 +1,11 @@
 package view
 
 import com.raquo.laminar.api.L.*
+
 import model.settings.*
+import model.toast.SettingsApplied
+import model.toast.DefaultSettingsApplied
+import controller.ToastController
 import controller.viewControllers.SettingsViewController
 
 object SettingsView {
@@ -58,7 +62,6 @@ object SettingsView {
         div(
             className := "settings-sidepanel-container",
             cls("open") <-- SettingsViewController.isSettingsOpen,
-            hidden <-- SettingsViewController.isSettingsOpen,
 
             div(
                 className := ("settings-sidepanel"),
@@ -106,6 +109,8 @@ object SettingsView {
                             newNumSkipBreakpoints = appliedNumSkipBreakpoints,
                             newColorBlindMode = appliedColorBlindMode
                         )
+
+                        ToastController.setToast(SettingsApplied)
                     )),
                     button(className:= "default-settings-button", "Restore Defaults", onClick --> {_ =>
                         SettingsViewController.applySettings(
@@ -113,6 +118,9 @@ object SettingsView {
                             newNumSkipBreakpoints = NumSkipBreakpoints.default.asInstanceOf[Int],
                             newColorBlindMode = ColorBlindMode.default.asInstanceOf[Boolean]
                         )
+
+                        ToastController.setToast(DefaultSettingsApplied)
+
                     })
                 ),
             )

@@ -7,6 +7,7 @@ import scala.scalajs.js.internal.UnitOps.unitOrOps
 
 import model.settings.*
 
+
 /**
  * Controller for managing the visibility and values of user settings.
  * This object provides methods to toggle the settings panel, retrieve and update user settings,
