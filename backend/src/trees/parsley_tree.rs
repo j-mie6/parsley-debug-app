@@ -186,11 +186,11 @@ pub mod test {
                 child_id: 0,
                 from_offset: 0,
                 to_offset: 4,
-                children: vec![],
+                children: Vec::new(),
                 is_iterative: false
             },
             is_debuggable: false,
-            refs: vec![]
+            refs: Vec::new()
         }
     }
 
@@ -220,7 +220,7 @@ pub mod test {
                                 child_id: 2,
                                 from_offset: 2,
                                 to_offset: 3,
-                                children: vec![],
+                                children: Vec::new(),
                                 is_iterative: false
                             }
                         ],
@@ -241,7 +241,7 @@ pub mod test {
                                 child_id: 4,
                                 from_offset: 4,
                                 to_offset: 5,
-                                children: vec![],
+                                children: Vec::new(),
                                 is_iterative: false
                             }
                         ],
@@ -251,7 +251,7 @@ pub mod test {
                 is_iterative: false,
             },
             is_debuggable: false,
-            refs: vec![]
+            refs: Vec::new()
         }
     }
 

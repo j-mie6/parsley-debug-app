@@ -236,7 +236,7 @@ pub mod test {
                                 true,
                                 Some(2),
                                 String::from("2"),
-                                vec![],
+                                Vec::new(),
                                 false
                             )
                         ],
@@ -257,7 +257,7 @@ pub mod test {
                                 true,
                                 Some(4),
                                 String::from("4"),
-                                vec![],
+                                Vec::new(),
                                 false
                             )
                         ],
