@@ -7,11 +7,6 @@
     box-sizing: border-box;
     padding-bottom: 20px;
     flex: 1;
-    transition: margin-left 0.5s ease-in-out;
-}
-
-.tree-view-page.compressed {
-    margin-left: 25vw;
 }
 
 .tree-view-error {

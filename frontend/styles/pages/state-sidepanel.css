@@ -1,7 +1,7 @@
-.settings-sidepanel-container {
+.state-sidepanel-container {
     width: 25vw;
     padding-top: 10px;
-    padding-left: 20px;
+    padding-right: 20px;
 
     display: flex;
     position: fixed;
@@ -13,15 +13,15 @@
 
 
     z-index: 1000;
-    transform: translateX(-25vw); /* Completely hidden initially */
+    transform: translateX(100vw); /* Completely hidden initially */
     transition: transform 0.75s ease-in-out;
 }
 
-.settings-sidepanel-container.open {
-    transform: translateX(0);
+.state-sidepanel-container.open {
+    transform: translateX(75vw);
 }
 
-.settings-sidepanel {
+.state-sidepanel {
     width: 50vw;
     max-width: 600px;
     height: 80vh;
@@ -40,63 +40,27 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.settings-header {
+.state-header {
     width: 100%;
     text-align: center;
     position: relative;
     margin-bottom: 1.5vh;
 }
 
-.settings-header h2 {
+.state-header h2 {
     font-size: 1.8rem;
     font-weight: bold;
     margin: 0 auto;
 }
 
-.settings-content {
+.state-contents {
     display: grid;
     columns: 3;
     width: 100%;
     padding: 1vh 0;
 }
 
-.single-setting-top-container {
-    display: flex;
-    flex-direction: row;
-    overflow-y: auto;
-    justify-content: space-between;
-    margin-bottom: 5px;
-}
-
-.single-setting-name-container {
-    padding: 5px;
-}
-
-.single-setting-name-container.underlined {
-    text-decoration: underline;
-}
-
-.single-setting-modify-container {
-    border-radius: 5px;
-    background-color: transparent;
-    padding: 2px 5px;
-}
-
-.single-setting-info-text {
-    position: relative;
-    padding: 15px;
-    margin-bottom: 10px;
-
-    background-color: var(--background-tertiary);
-    border-radius: 5px;
-    font-size: 10px;
-}
-
-.single-setting-info-text[hidden] {
-    pointer-events: none;
-}
-
-.settings-footer {
+.state-footer {
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -104,11 +68,9 @@
     gap: 20px;
 }
 
-.apply-settings-button,
-.default-settings-button {
-    width: 50%;
+.apply-state-button {
+    width: 100%;
     height: 20px;
-    overflow: auto;
     background: var(--font-color-primary);
     padding: 12px;
 
@@ -128,7 +90,6 @@
     text-align: center;
 }
 
-.apply-settings-button:hover,
-.default-settings-button:hover {
+.apply-state-button:hover {
     background: var(--font-color-secondary);
 }

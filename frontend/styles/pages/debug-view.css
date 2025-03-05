@@ -77,12 +77,34 @@
     display: flex;
     flex-direction: column;
     height: inherit;
+    transition: margin 0.75s ease-in-out !important;
 }
 
-.tab-and-tree-view-container.compressed {
+/* When left side is open, shift content to the right */
+.tab-and-tree-view-container.left-compressed {
+    margin-left: 25vw;
+}
+
+/* When right side is open, shift content to the left */
+.tab-and-tree-view-container.right-compressed {
+    margin-right: 25vw;
+}
+
+/* If both left & right are open, center it back (or do any combined offset you want) */
+.tab-and-tree-view-container.left-compressed.right-compressed {
+    margin-left: 25vw;
+    margin-right: 25vw;
+}
+
+/* .tab-and-tree-view-container.left-compressed {
     margin-left: 25vw;
     transition: margin-left 0.75s ease-in-out !important;
 }
+
+.tab-and-tree-view-container.right-compressed {
+    margin-right: 25vw;
+    transition: margin-right 0.75s ease-in-out !important;
+} */
 
 .debug-view-page {
     box-sizing: border-box;
@@ -94,7 +116,7 @@
     flex-direction: column;
 }
 
-.debug-view-button-bar {
+.debug-view-left-button-bar {
     background-color: var(--background-secondary);
     z-index: 1;
     position: sticky;
@@ -107,6 +129,12 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+}
+
+.debug-view-right-button-bar {
+    display: flex;
+    align-items: center;
+    gap: 30px;
 }
 
 .debug-view-button-info {

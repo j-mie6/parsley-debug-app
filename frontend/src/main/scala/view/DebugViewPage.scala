@@ -15,11 +15,13 @@ import scala.util.{Try, Success, Failure}
 import model.Page
 
 import view.SettingsView
+import view.StateManagementView
 
 import controller.AppStateController
 import controller.tauri.Tauri
 import controller.viewControllers.MainViewController.View
 import controller.viewControllers.MainViewController
+import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.InputViewController
@@ -46,6 +48,12 @@ abstract class DebugViewPage extends Page {
         // TODO
         className := "debug-view-button debug-view-button-info",
         i(className := "bi bi-info-circle-fill"),
+    )
+
+    private lazy val stateButton: HtmlElement = button(
+        className := "debug-view-button debug-view-button-state",
+        i(className:= "bi bi-sliders"),
+        onClick --> (_ => StateManagementViewController.toggleOpenState())
     )
 
     /* Opener for the settings tab. */
@@ -108,7 +116,7 @@ abstract class DebugViewPage extends Page {
 
     /* Button bar internal to the view. */
     private lazy val buttonBar: HtmlElement = div(
-        className := "debug-view-button-bar",
+        className := "debug-view-left-button-bar",
         /* Button bar left. */
         div(
             display.flex,
@@ -125,9 +133,9 @@ abstract class DebugViewPage extends Page {
         ),
         /* Button bar right. */
         div(
-            display.flex,
-            alignItems.center,
+            className := "debug-view-right-button-bar",
 
+            stateButton,
             infoButton,
         )
     )   
@@ -147,9 +155,12 @@ abstract class DebugViewPage extends Page {
             div(
                 className := "debug-view-body", 
                 SettingsView(),
+                StateManagementView(),
                 div(
                     className := "tab-and-tree-view-container",
-                    cls("compressed") <-- SettingsViewController.isSettingsOpen,
+                    cls("left-compressed") <-- SettingsViewController.isSettingsOpen,
+                    cls("right-compressed") <-- StateManagementViewController.isStateOpen,
+
                     div(
                         className := "tab-view-container",
                         TabView()

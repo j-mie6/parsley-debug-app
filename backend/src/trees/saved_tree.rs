@@ -6,6 +6,7 @@ pub struct SavedTree {
     input: String,
     root: SavedNode,
     is_debuggable: bool,
+    refs: Vec<(i32, String)>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -46,17 +47,17 @@ impl From<DebugTree> for SavedTree {
         }
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
-  
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable(), debug_tree.refs())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, is_debuggable: bool) -> Self {
+    pub fn new(input: String, root: SavedNode, is_debuggable: bool, refs: Vec<(i32, String)>) -> Self {
         SavedTree { 
             input,
             root,
             is_debuggable,
+            refs,
         }
     }
 
@@ -70,6 +71,10 @@ impl SavedTree {
 
     pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
+    }
+
+    pub fn refs(&self) -> Vec<(i32, String)> {
+        self.refs.clone()
     }
 }
 
@@ -121,7 +126,8 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
-            "is_debuggable": false
+            "is_debuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -188,7 +194,8 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
-            "is_debuggable": false
+            "is_debuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -208,7 +215,8 @@ pub mod test {
                 false,
                 false
             ),
-            false
+            false,
+            Vec::new()
         )
     }
     
@@ -273,7 +281,8 @@ pub mod test {
                 false,
                 false
             ),
-            false
+            false,
+            Vec::new()
         )
     }
 
