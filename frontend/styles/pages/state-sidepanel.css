@@ -13,7 +13,7 @@
 
 
     z-index: 1000;
-    transform: translateX(125vw); /* Completely hidden initially */
+    transform: translateX(100vw); /* Completely hidden initially */
     transition: transform 0.75s ease-in-out;
 }
 
