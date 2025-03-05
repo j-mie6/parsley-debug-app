@@ -79,9 +79,14 @@
     height: inherit;
 }
 
-.tab-and-tree-view-container.compressed {
+.tab-and-tree-view-container.left-compressed {
     margin-left: 25vw;
     transition: margin-left 0.75s ease-in-out !important;
+}
+
+.tab-and-tree-view-container.right-compressed {
+    margin-right: 25vw;
+    transition: margin-right 0.75s ease-in-out !important;
 }
 
 .debug-view-page {
@@ -94,7 +99,7 @@
     flex-direction: column;
 }
 
-.debug-view-button-bar {
+.debug-view-left-button-bar {
     background-color: var(--background-secondary);
     z-index: 1;
     position: sticky;
@@ -107,6 +112,12 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+}
+
+.debug-view-right-button-bar {
+    display: flex;
+    align-items: center;
+    gap: 30px;
 }
 
 .debug-view-button-info {
