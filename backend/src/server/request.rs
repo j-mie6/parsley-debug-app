@@ -14,6 +14,7 @@ pub fn routes() -> Vec<rocket::Route> {
 }
 
 #[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 struct PostTreeResponse {
     message: String,
     #[serde(skip_serializing_if = "Option::is_none")] skip_breakpoint: Option<i32>,

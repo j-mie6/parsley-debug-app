@@ -49,8 +49,8 @@ abstract class DebugViewPage extends Page {
 
         /* Exports current tree */
         onClick(_
-            .compose(event => event.sample(TabViewController.getSelectedFileName))
-            .flatMapMerge(TreeViewController.downloadTree)
+            .compose(event => event.sample(TabViewController.getSelectedTab))
+            .flatMapSwitch(TabViewController.getFileName).flatMapMerge(TreeViewController.downloadTree)
         ) --> Observer.empty,
     )
 

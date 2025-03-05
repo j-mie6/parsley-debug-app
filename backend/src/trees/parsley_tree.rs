@@ -11,21 +11,28 @@ pub struct ParsleyNode {
     from_offset: i32,           /* Offset into the input in which this node's parse attempt starts */
     to_offset: i32,             /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
-    is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
+
+    /* Whether this node needs bubbling (iterative and transparent) */
+    #[serde(default = "ParsleyTree::default_bool")] is_iterative: bool, 
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ParsleyTree {
-    input: String,       /* The input string being parsed */
-    root: ParsleyNode,   /* Root node of the debug tree */
-    is_debuggable: bool, /* If this tree was produced by a currently-running parser */
+    input: String,              /* The input string being parsed */
+    root: ParsleyNode,          /* Root node of the debug tree */
+    
+    /* If this tree was produced by a currently-running parser */
+    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool, 
 }
 
 impl ParsleyTree {
     pub fn is_debugging(&self) -> bool {
         self.is_debuggable
     }
+
+    /* Function used by serde to parse default boolean values as false */
+    fn default_bool() -> bool { false } 
 }
 
 /* Convert from ParsleyTree to DebugTree */

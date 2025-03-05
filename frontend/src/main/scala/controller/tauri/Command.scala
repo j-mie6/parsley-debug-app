@@ -83,34 +83,27 @@ object Command {
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
-        type Out = Unit
-    }
-
-    case object FetchSavedTreeNames extends Command("fetch_saved_tree_names") {
-        type In = Unit
-        given args: Args[In] = Args.noArgs 
-
         type Out = List[String]
     }
 
     case object LoadSavedTree extends Command("load_saved_tree") {
-        type In = String
-        given args: Args[String] {
-            extension (treeName: String)
-                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
+        type In = Int
+        given args: Args[Int] {
+            extension (index: Int)
+                def namedArgs: Map[String, Any] = Map("index" -> index)
         }
 
         type Out = Unit
     }
 
     case object DeleteTree extends Command("delete_tree") {
-        type In = String
-        given args: Args[String] {
-            extension (treeName: String)
-                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
+        type In = Int
+        given args: Args[Int] {
+            extension (index: Int)
+                def namedArgs: Map[String, Any] = Map("index" -> index)
         }
 
-        type Out = Unit
+        type Out = List[String]
     }
 
     case object DownloadTree extends Command("download_tree") {

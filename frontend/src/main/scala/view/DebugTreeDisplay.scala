@@ -3,8 +3,8 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
-
 import controller.viewControllers.MainViewController
+import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}
 
 /**
@@ -19,7 +19,7 @@ object DebugTreeDisplay {
     val zoomSpeed: Float = -0.002   /* Speed of zooming in and out */
     val maxZoomFactor: Double = 0.5 /* Maximum zoom factor */
     val minZoomFactor: Double = 3.0 /* Minimum zoom factor */
-    
+
     /* Updater for the zoom factor */
     val zoomUpdate: Observer[Double] = zoomFactor.updater[Double]((prev, delta) => 
         val zoomChange: Double = 1.0 + (delta * zoomSpeed)
@@ -31,7 +31,11 @@ object DebugTreeDisplay {
         e.preventDefault() /* Prevent default zooming */
         e.deltaY           /* Get the vertical delta of the wheel */
     } --> zoomUpdate
-    
+
+    /* Resets the zoomFactor to 1 */
+    val resetZoom = Observer(_ => zoomFactor.set(1.0))
+
+
     /**
     * Render the entire tree from the root node downwards.
     *
@@ -103,7 +107,9 @@ private object ReactiveNodeDisplay {
                         cls(s"bi bi-caret-${direction}-fill") <-- directionSignal.signal,
                         cls(s"bi bi-caret-${direction}") <-- directionSignal.signal.not,
                         onMouseOver.mapTo(true) --> directionSignal,
-                        onMouseOut.mapTo(false) --> directionSignal
+                        onMouseOut.mapTo(false) --> directionSignal,
+                        height.px := 16,
+                        margin.auto,
                     ),
                     onClick.mapTo(if isRight then 1 else -1) --> moveIndex,
                     onMouseOver.mapTo(true) --> directionSignal,
@@ -143,9 +149,9 @@ private object ReactiveNodeDisplay {
                     /* Render debug node information */
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
-                        child(p("Child #", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal
+                        p(fontStyle := "italic", node.debugNode.input),
+                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal
                             .combineWithFn(compressed.not, expandAllChildren.signal.not)(_ && _ && _),
-                        p(fontStyle := "italic", node.debugNode.input)
                     ),
 
                     /* Expand/compress node with (with arrows for iterative) on click */
@@ -193,8 +199,8 @@ private object ReactiveNodeDisplay {
                         if node.debugNode.isIterative && notCompressed && !expandAllCs then
                             List(ReactiveNodeDisplay(ReactiveNode(nodes(index))))
                         else
-                            nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply))
-                )
+                            nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply)),
+            )
         )
     }
 }

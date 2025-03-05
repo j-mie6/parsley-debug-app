@@ -16,6 +16,7 @@ struct AppStateInternal {
     tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
     skips_tx: TokioMutex<SkipsSender>, /* Transmitter how many breakpoints to skip, sent to parsley */
+    tab_names: Vec<String>,
 }
 
 
@@ -32,6 +33,7 @@ impl AppState {
                     tree: None,
                     map: HashMap::new(),
                     skips_tx,
+                    tab_names: Vec::new(),
                 }
             )
         )
@@ -41,6 +43,39 @@ impl AppState {
     fn inner(&self) -> Result<MutexGuard<AppStateInternal>, StateError> {
         self.0.lock()
             .map_err(|_| StateError::LockFailed)
+    }
+
+    /* Add tree name to tab_names */
+    pub fn add_tree(&self, new_tab: String) -> Result<Vec<String>, StateError> {
+        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+
+        /* Add new tree name and return all saved tree names */
+        state.tab_names.push(new_tab);
+
+        Ok(state.tab_names.clone())
+    }
+
+    // Possible overflow?
+    /* Remove tree name from tab_names */
+    pub fn rem_tree(&self, index: usize) -> Result<Vec<String>, StateError> {
+        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+
+        /* Remove tree name at index */
+        state.tab_names.remove(index);
+
+        /* If this was the final tree then we need to remove the loaded tree in state */
+        if state.tab_names.len() == 0 {
+            state.tree = None
+        }
+
+        Ok(state.tab_names.clone())
+    }
+
+    /* Given an index returns the tree name */
+    pub fn get_tree_name(&self, index: usize) -> Result<String, StateError> {
+        let state: MutexGuard<AppStateInternal> = self.inner()?;
+
+        Ok(state.tab_names[index].clone()) 
     }
 
     /* Finds path to Downloads folder (OS agnostic) */

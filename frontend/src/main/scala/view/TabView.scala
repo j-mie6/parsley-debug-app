@@ -53,23 +53,28 @@ object TabView {
             /* Close 'X' icon */
             i(className := "bi bi-x"),
 
-            /* Deletes the respective tab */
-            onClick(event => event.sample(TabViewController.getFileName(index))
-                .flatMapMerge(TabViewController.deleteSavedTree(_).flatMapTo(TabViewController.loadFileNames))
-            ) --> deleteBus.writer,
+            /* Deletes the respective tab not allowing selecting a tab */
+            onClick
+                .map(_.stopPropagation())
+                .flatMapTo(TabViewController.deleteSavedTree(index)) --> deleteBus.writer,
 
             /* Pipe errors */
             deleteBus.stream.collectLeft --> ErrorController.setError,
 
             /* Update selected tab and tab names */
-            deleteBus.stream.collectRight.mapTo(0) --> TabViewController.setSelectedTab,
             deleteBus.stream.collectRight --> TabViewController.setFileNames,
+
+            /* Set new selected tab after a deletion */
+            deleteBus.stream.collectRight
+                .filter(_.nonEmpty)
+                /* TODO: Fix new index just being reliant on the tab being closed (ignoring current) */
+                .mapTo(if index == 0 then 0 else index - 1) --> TabViewController.setSelectedTab,
         )
     }
 
     /* Get selected file name as possible error */
-    val selectedTab: EventStream[Try[String]] = TabViewController.getSelectedFileName.changes.recoverToTry
-    
+    val selectedTab: EventStream[Try[Int]] = TabViewController.getSelectedTab.changes.recoverToTry
+
     def apply(): HtmlElement = {
         div(
             className:= "tab-bar",
@@ -77,15 +82,18 @@ object TabView {
             /* Update tree on new tab selected */  
             selectedTab.collectSuccess
                 .flatMapMerge(TabViewController.loadSavedTree) 
-                .collectLeft --> controller.errors.ErrorController.setError,
+                .collectLeft --> controller.errors.ErrorController.setError, 
 
-            /* If no tab can be found, unload tree from frontend */  
-            selectedTab.collectFailure.mapToUnit --> TreeViewController.unloadTree,
+
+            /* If there are no tabs, unload tree from frontend */
+            TabViewController.noSavedTrees.changes
+                .filter(identity)
+                .mapToUnit --> TreeViewController.unloadTree,
 
             /* Renders tabs */ 
-            children <-- TabViewController.getFileNames.signal.map(
-                _.indices.map(tabButton(_))
-            )
+            children <-- TabViewController
+                .getFileNames
+                .map(_.indices.map(tabButton(_)))
         )
     }
 }
