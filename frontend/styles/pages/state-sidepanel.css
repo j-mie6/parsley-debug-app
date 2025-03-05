@@ -53,6 +53,13 @@
     margin: 0 auto;
 }
 
+.state-contents {
+    display: grid;
+    columns: 3;
+    width: 100%;
+    padding: 1vh 0;
+}
+
 .state-footer {
     display: flex;
     justify-content: space-between;

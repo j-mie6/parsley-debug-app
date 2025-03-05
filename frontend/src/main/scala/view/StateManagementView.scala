@@ -16,7 +16,11 @@ object StateManagementView {
                 className := ("state-sidepanel"),
                 
                 div(cls("state-header"),
-                    h2("State Management")
+                    h2("References")
+                ),
+
+                div(cls("state-contents"),
+                    div()
                 ),
 
                 div(
