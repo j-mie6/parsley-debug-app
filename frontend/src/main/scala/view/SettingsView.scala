@@ -75,29 +75,37 @@ object SettingsView {
                 div(
                     cls("settings-footer"),
                     button(className := "apply-settings-button", "Apply", onClick --> (_ => 
-                        SettingsViewController.applySettings(
-                            newNumSkipIterativeChildren = 
-                                allUserSettings
+                        /* Get all user setting values from local storage */
+                        val appliedNumSkipIterativeChildren: Int =
+                            allUserSettings
                                 .find(_ == NumSkipIterativeChildren)
                                 .flatMap(_.value.now() match {
                                     case i: Int => Some(i) 
                                     case _      => None
-                                }).getOrElse(5),
-                            newNumSkipBreakpoints =
-                                allUserSettings
+                                }).getOrElse(5)
+
+                        val appliedNumSkipBreakpoints: Int =
+                            allUserSettings
                                 .find(_ == NumSkipBreakpoints)
                                 .flatMap(_.value.now() match {
                                     case i: Int => Some(i) 
                                     case _      => None
-                                }).getOrElse(1),
-                            newColorBlindMode = 
-                                allUserSettings
+                                }).getOrElse(1)
+
+                        val appliedColorBlindMode: Boolean =
+                            allUserSettings
                                 .find(_ == ColorBlindMode)
                                 .flatMap(_.value.now() match {
                                     case b: Boolean => Some(b) 
                                     case _      => None
-                                }).getOrElse(false),
-                        ),  
+                                }).getOrElse(false)
+
+                        /* Apply settings globally */
+                        SettingsViewController.applySettings(
+                            newNumSkipIterativeChildren = appliedNumSkipIterativeChildren,
+                            newNumSkipBreakpoints = appliedNumSkipBreakpoints,
+                            newColorBlindMode = appliedColorBlindMode
+                        )
                     )),
                     button(className:= "default-settings-button", "Restore Defaults", onClick --> {_ =>
                         SettingsViewController.applySettings(
