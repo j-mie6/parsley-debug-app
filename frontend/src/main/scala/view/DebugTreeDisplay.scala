@@ -146,6 +146,7 @@ private object ReactiveNodeDisplay {
                     cls("fail") := !node.debugNode.success,
                     cls("leaf") := node.debugNode.isLeaf,
                     cls("iterative") := node.debugNode.isIterative,
+                    cls("debug") := node.debugNode.name == "remoteBreak",
 
                     /* Render debug node information */
                     div(

@@ -138,6 +138,17 @@
     background-color: color-mix(in srgb, var(--node-color-iterative) 60%, transparent);
 }
 
+/* Iterative nodes are blue */
+.debug-node.debug {
+    color: var(--node-font-color-debug);
+    border-color: var(--node-font-color-debug);
+    background-color: var(--node-color-debug);
+}
+
+.debug-node.debug:hover {
+    background-color: color-mix(in srgb, var(--node-color-debug) 60%, transparent);
+}
+
 /* Set bottom border of leaf equal to other borders */
 .debug-node.leaf  {
     border-bottom-width: 2px !important;
