@@ -89,36 +89,59 @@ private object ReactiveNodeDisplay {
         /* The index of the current child rendered for iterative nodes */
         val iterativeNodeIndex: Var[Int] = Var(0)
 
-        /* Incrementing iterative node index with wrapping and early stopping when hitting the first and last nodes */
+        /**
+         * An observer that updates the current node index (iterativeNodeIndex) when a delta is received.
+         * If there are no children (childrenLen == 0), we simply return the current index.
+         * If the incoming delta's absolute value matches the skipAmount (default 5),
+         * we perform a skip forward or backward in larger steps, with checks to avoid
+         * going out of range. If we're already near the last or first index, we clamp
+         * the index to the boundary (or wrap if already at that boundary).
+         * Otherwise, we do a normal increment or decrement (with wrapping) of the current index.
+         */
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
+            /* Number of child nodes available */
             val childrenLen = node.children.now().length
+
+            /* Skip size set by the user */
             val skipAmount = SettingsViewController.getNumSkipIterativeChildren.now()
 
-            if (childrenLen == 0) then
-                currIndex
-            else
+            def getNearWrap(wrapCondition: Boolean, clampValue: Int, wrapIncr: Int, notWrapValue: Int): Int = {
+                if (wrapCondition) then
+                    /* If we're not already on the clamp value, snap to it; otherwise, wrap */
+                    if (currIndex != clampValue) then clampValue else (currIndex + wrapIncr) % childrenLen
+                else
+                    /* If not near the clampValue then move to notWrapValue */
+                    notWrapValue
+            }
+
+            /* If there are children */
+            if (childrenLen != 0) then
+                /* Check how large the move is (absolute value) */
                 val absDelta = math.abs(delta)
                 
+                /* If this delta is exactly the "skip amount" */
                 if (absDelta == skipAmount) then
-                    val isForward = delta > 0
-                    val nearLast = currIndex + skipAmount >= childrenLen
-                    val nearFirst = currIndex - skipAmount < 0
+                    val isForward: Boolean = delta > 0
+                    /* nearLast: if adding skipAmount goes beyond or right at the last index */
+                    val nearLast: Boolean = currIndex + skipAmount >= childrenLen
+
+                    /* nearFirst: if subtracting skipAmount goes below 0 */
+                    val nearFirst: Boolean = currIndex - skipAmount < 0
 
                     if (isForward) then
-                        if (nearLast) then
-                            if (currIndex != childrenLen - 1) then childrenLen - 1 else (currIndex + skipAmount) % childrenLen
-                        else currIndex + skipAmount
+                        /* Skip forward */
+                        getNearWrap(nearLast, childrenLen - 1, skipAmount, currIndex + skipAmount)
                     else
-                        if (nearFirst) then
-                            if (currIndex != 0) then 0 else (currIndex - skipAmount + childrenLen) % childrenLen
-                        else currIndex - skipAmount
+                        /* Skip backward */
+                        getNearWrap(nearFirst, 0, childrenLen - skipAmount, currIndex - skipAmount)
                 else
-                    /* Normal increment or decrement with wrapping */
+                    /* If delta is not a large skip, do a normal +/- 1 move (wrapped) */
                     val newIndex = (currIndex + delta) % childrenLen
                     if (newIndex < 0) then newIndex + childrenLen else newIndex
+            else
+                /* If there are no children, no update; remain at currIndex */
+                currIndex
         })
-
-
 
         /* Signal for when to show arrow buttons */
         val showIterativeOneByOne: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
@@ -132,21 +155,13 @@ private object ReactiveNodeDisplay {
             
             button(
                 className := "debug-node-iterative-buttons",
-                marginBottom.px := 2,
-
                 i(
-                    cls(s"bi bi-$icon") <-- hoverVar.signal.not,
-                    cls(s"bi bi-$icon-fill") <-- hoverVar.signal,
-                                        
-                    height.px := 16,
-                    margin.auto,
+                    cls(s"bi bi-$icon-fill"),
+
 
                     whenNot (isRight) {
                         transform := "scaleX(-1)"
                     },
-                    
-                    onMouseOver.mapTo(true) --> hoverVar,
-                    onMouseOut.mapTo(false) --> hoverVar,
                 ),
 
                 onClick(event => event.sample(increment).map(incr => if isRight then incr else -incr)) --> moveIndex,
@@ -156,9 +171,6 @@ private object ReactiveNodeDisplay {
             )
         }
 
-        def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal
-            .combineWith(node.children.signal)
-            .map((index, ns) => ((index.toDouble + 1.0) / ns.length) * 100)
 
         def iterativeProgress = {
             div(
@@ -181,10 +193,7 @@ private object ReactiveNodeDisplay {
 
         def arrows(isRight: Boolean) = {
             div(
-                display.flex,
-                flexDirection.column,
-                alignItems.flexStart,
-                justifyContent.center,
+                className := "iterative-arrows",
                 
                 child(singleArrow(isRight)) <-- showIterativeOneByOne,
                 child(doubleArrow(isRight)) <-- showIterativeOneByOne
@@ -206,10 +215,7 @@ private object ReactiveNodeDisplay {
             /* Line connecting node to parent */
             div(className := "debug-node-line"),
             div(
-                display.flex,
-                flexDirection.row,
-                alignItems.stretch,
-
+                cls("iterative-debug-node-container") := node.debugNode.isIterative,
                 arrows(isRight = false),
 
                 div(
@@ -226,7 +232,7 @@ private object ReactiveNodeDisplay {
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
-                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
+                        child(p(className := "iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
