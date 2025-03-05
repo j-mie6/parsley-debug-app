@@ -50,6 +50,24 @@
 
     border-style: dashed;
     border-radius: 10px;
+    border-color: var(--node-font-color);
+    
+    color: var(--node-font-color);
+}
+
+.debug-node-container.fail.type-box {
+    color: var(--node-font-color-fail) !important;
+    border-color: var(--node-font-color-fail) !important;
+}
+
+.debug-node-container.iterative.type-box {
+    color: var(--node-font-color-iterative);
+    border-color: var(--node-font-color-iterative);
+}
+
+.debug-node-container.debug.type-box {
+    color: var(--node-font-color-debug);
+    border-color: var(--node-font-color-debug);
 }
 
 .debug-node-container.type-box > .type-box-name {
@@ -61,6 +79,7 @@
     font-weight: bold;
     background-color: var(--background-secondary);
 }
+
 
 
 /* Line connecting node child to parent */
