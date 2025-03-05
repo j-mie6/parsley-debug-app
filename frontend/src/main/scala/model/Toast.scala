@@ -58,14 +58,18 @@ sealed trait SuccessToast extends Toast  {
 }
 
 case object TreeDownloaded extends SuccessToast {
-    override def message: String = "Tree downloaded successfully"
+    override def message: String = "Tree downloaded"
 }
 
 case object SettingsApplied extends SuccessToast {
-    override def message: String = "Settings applied successfully"
+    override def message: String = "Settings applied"
 }
 
 case object DefaultSettingsApplied extends SuccessToast {
-    override def message: String = "Default settings restored successfully"
+    override def message: String = "Default settings restored"
+}
+
+case object StateApplied extends SuccessToast {
+    override def message: String = "State applied"
 }
 
