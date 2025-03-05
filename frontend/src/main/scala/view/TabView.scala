@@ -77,15 +77,12 @@ object TabView {
         )
     }
 
-    /* Get selected file index as possible error */
-    val selectedTab: EventStream[Try[Int]] = TabViewController.getSelectedTab.changes.recoverToTry
-
     def apply(): HtmlElement = {
         div(
             className:= "tab-bar",
             
             /* Update tree on new tab selected */  
-            selectedTab.collectSuccess
+            TabViewController.getSelectedTab.changes
                 .flatMapMerge(TabViewController.loadSavedTree) 
                 .collectLeft --> controller.errors.ErrorController.setError, 
 
