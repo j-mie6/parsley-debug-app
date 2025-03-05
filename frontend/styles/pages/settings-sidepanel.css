@@ -1,13 +1,17 @@
 .settings-sidepanel-container {
-    box-sizing: border-box;
-    position: fixed;
     width: 25vw;
     padding-top: 10px;
     padding-left: 20px;
-    background: transparent;
+
     display: flex;
+    position: fixed;
     justify-content: center;
     align-items: center;
+
+    box-sizing: border-box;
+    background: transparent;
+
+
     z-index: 1000;
     transform: translateX(-25vw); /* Completely hidden initially */
     transition: transform 0.75s ease-in-out;
@@ -18,19 +22,22 @@
 }
 
 .settings-sidepanel {
-    background: var(--background-secondary);
-    padding: 3vh 3vw;
-    border-radius: 12px;
     width: 50vw;
-    height: 80vh;
     max-width: 600px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    height: 80vh;
+    padding: 3vh 3vw;
+
     display: flex;
     flex-direction: column;
-    align-items: center;
     position: relative;
+    align-items: center;
+
+    background: var(--background-secondary);
+
     border: 2px solid var(--font-color-tertiary);
     border-radius: 20px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .settings-header {
@@ -57,14 +64,13 @@
     display: flex;
     flex-direction: row;
     overflow-y: auto;
-    justify-content: spaceBetween;
-    margin-bottom: 5;
+    justify-content: space-between;
+    margin-bottom: 5px;
 }
 
 .single-setting-name-container {
     padding: 5px;
 }
-
 
 .single-setting-name-container.underlined {
     text-decoration: underline;
@@ -89,31 +95,33 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 2vh;
+    margin-top: auto;
+    gap: 20px;
 }
 
-.apply-settings-button {
-    width: 20%;
-    background: var(--font-color-primary);
-    color: var(--background-primary);
-    padding: 15px;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.apply-settings-button:hover {
-    background: var(--font-color-secondary);
-}
-
+.apply-settings-button,
 .default-settings-button {
-    width: 25%;
+    width: 50%;
     background: var(--font-color-primary);
+    padding: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     color: var(--background-primary);
-    padding: 15px;
-    border-radius: 10px;
+
+    border: none;
+    border-radius: 8px;
+
     cursor: pointer;
+
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
 }
 
+.apply-settings-button:hover,
 .default-settings-button:hover {
     background: var(--font-color-secondary);
 }
