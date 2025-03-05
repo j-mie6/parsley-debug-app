@@ -168,19 +168,16 @@ private object ReactiveNodeDisplay {
         val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
         /* Button to increment selected iterative child */
-        def iterativeArrowButton(icon: String, increment: Int, isRight: Boolean): HtmlElement = {
+        def iterativeArrowButton(isRight: Boolean, isFastForward: Boolean): HtmlElement = {
             val hoverVar: Var[Boolean] = Var(false)
-            
+            val increment: Int = if isFastForward then 5 else 1
+
             button(
-                className := "debug-node-iterative-buttons",
-                i(
-                    cls(s"bi bi-$icon-fill"),
+                className := "iterative-button",
+                cls("fast-forward") := isFastForward,
+                cls("facing-right") := isRight,
 
-
-                    whenNot (isRight) {
-                        transform := "scaleX(-1)"
-                    },
-                ),
+                i(cls(s"bi bi-${if isFastForward then "fast-forward" else "play"}-fill")),
 
                 onClick.mapTo(if isRight then increment else -increment) --> moveIndex,
             )
@@ -203,12 +200,12 @@ private object ReactiveNodeDisplay {
             )
         }
 
-        def singleArrow(isRight: Boolean) = iterativeArrowButton(icon = "play", 1, isRight)
-        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", 5, isRight)
+        def singleArrow(isRight: Boolean) = iterativeArrowButton(isRight, isFastForward = false)
+        def doubleArrow(isRight: Boolean) = iterativeArrowButton(isRight, isFastForward = true)
 
         def arrows(isRight: Boolean) = {
             div(
-                className := "iterative-arrows",
+                className := "iterative-button-container",
                 
                 child(singleArrow(isRight)) <-- showIterativeOneByOne,
                 child(doubleArrow(isRight)) <-- showIterativeOneByOne
@@ -220,15 +217,22 @@ private object ReactiveNodeDisplay {
         div(
             className := "debug-node-container",
 
+            /* Set reactive class names */
+            cls("compress") <-- compressed,
+            cls("fail") := !node.debugNode.success,
+            cls("leaf") := node.debugNode.isLeaf,
+            cls("iterative") := node.debugNode.isIterative,
+            cls("debug") := node.debugNode.name == "remoteBreak",
+
             /* Render a box for user-defined parser types */
             cls("type-box") := hasUserType,
             when (hasUserType) { 
                 p(className := "type-box-name", node.debugNode.name)
             },
-
                 
             /* Line connecting node to parent */
             div(className := "debug-node-line"),
+
             div(
                 cls("iterative-debug-node-container") := node.debugNode.isIterative,
                 arrows(isRight = false),
@@ -236,18 +240,12 @@ private object ReactiveNodeDisplay {
                 div(
                     className := "debug-node",
                     flexGrow := 1,
-                    
-                    /* Set reactive class names */
-                    cls("compress") <-- compressed,
-                    cls("fail") := !node.debugNode.success,
-                    cls("leaf") := node.debugNode.isLeaf,
-                    cls("iterative") := node.debugNode.isIterative,
 
                     /* Render debug node information */
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
-                        child(p(className := "iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
+                        child(p(className := "debug-node-iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
