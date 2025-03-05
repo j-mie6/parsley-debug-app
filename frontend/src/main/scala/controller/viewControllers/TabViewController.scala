@@ -40,10 +40,7 @@ object TabViewController {
     val setSelectedTab: Observer[Int] = selectedTab.writer
 
     /** Get selected tab index */
-    val getSelectedTab: Signal[Int] = {
-        println(s"Inside getSelectedTab for tab # ${selectedTab.now()}")
-        selectedTab.signal
-    }
+    val getSelectedTab: Signal[Int] = selectedTab.signal
     
     /** Checks if tab is currently selected */
     def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)

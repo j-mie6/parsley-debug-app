@@ -66,7 +66,7 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
 
     /* Returns a list of the tree names that are left */
-    let tree_names: Vec<String> = state.rem_tree(index).map_err(|_| DeleteTreeError::TreeRemovalFail)?;
+    let tree_names: Vec<String> = state.rmv(index).map_err(|_| DeleteTreeError::TreeRemovalFail)?;
 
     serde_json::to_string_pretty(&tree_names)
         .map_err(|_| DeleteTreeError::SerialiseFailed)

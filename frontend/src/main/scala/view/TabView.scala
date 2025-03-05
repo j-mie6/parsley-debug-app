@@ -53,7 +53,7 @@ object TabView {
             /* Close 'X' icon */
             i(className := "bi bi-x"),
 
-            /* Deletes the respective tab not allowing selecting a tab */
+            /* Deletes the respective tab, not allowing propogation for the tab select onClick */
             onClick
                 .map(_.stopPropagation())
                 .flatMapTo(TabViewController.deleteSavedTree(index)) --> deleteBus.writer,
@@ -69,11 +69,9 @@ object TabView {
                 .filter(_.nonEmpty)
                 .mapTo({
                     val currentIndex = TabViewController.selectedTab.now()
-                    if currentIndex >= index then 
-                        if currentIndex == 0 then 
-                            0 
-                        else
-                            currentIndex - 1 
+                    /* If tab being removed is less then the current tab, then current tab needs to be shifted, ensuring its greater than 0 */
+                    if currentIndex >= index then
+                        Math.max(0, currentIndex - 1) 
                     else
                         currentIndex
                 }) --> TabViewController.setSelectedTab,
