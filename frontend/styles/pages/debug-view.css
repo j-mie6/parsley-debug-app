@@ -60,29 +60,38 @@
     margin-block: auto;
 }
 
+.debug-view-body {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    height: 100vh;
+}
+
+.tab-and-tree-view-container {
+    box-sizing: border-box;
+    padding: 20px;
+    padding-top: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: inherit;
+}
+
+.tab-and-tree-view-container.compressed {
+    margin-left: 25vw;
+    transition: margin-left 0.75s ease-in-out !important;
+}
+
 .debug-view-page {
     box-sizing: border-box;
-    padding: 30px;
     padding-top: 10px;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: margin-left 1s ease-in-out;
-}
-
-.debug-view-page.compressed {
-    margin-left: 25vw;
-}
-
-.tab-view-container {
-    margin-left: 0;
-}
-
-.tab-view-container.compressed {
-    margin-left: 25vw;
-    transition: margin-left 1s ease-in-out;
 }
 
 .debug-view-button-bar {

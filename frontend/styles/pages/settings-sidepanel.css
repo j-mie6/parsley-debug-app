@@ -1,15 +1,16 @@
 .settings-sidepanel-container {
+    box-sizing: border-box;
     position: fixed;
-    top: 0;
-    left: 0;
     width: 25vw;
+    padding-top: 10px;
+    padding-left: 20px;
     background: transparent;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     transform: translateX(-25vw); /* Completely hidden initially */
-    transition: transform 0.5s ease-in-out;
+    transition: transform 0.75s ease-in-out;
 }
 
 .settings-sidepanel-container.open {
@@ -21,13 +22,15 @@
     padding: 3vh 3vw;
     border-radius: 12px;
     width: 50vw;
-    height: 100vh;
+    height: 80vh;
     max-width: 600px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
+    border: 2px solid var(--font-color-tertiary);
+    border-radius: 20px;
 }
 
 .settings-header {
@@ -99,5 +102,18 @@
 }
 
 .apply-settings-button:hover {
+    background: var(--font-color-secondary);
+}
+
+.default-settings-button {
+    width: 25%;
+    background: var(--font-color-primary);
+    color: var(--background-primary);
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.default-settings-button:hover {
     background: var(--font-color-secondary);
 }
