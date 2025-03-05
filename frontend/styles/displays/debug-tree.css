@@ -125,13 +125,13 @@
 
 /* Failed nodes are red */
 .debug-node-container.fail > div > .debug-node {
-    color: var(--node-font-color-fail);
-    border-color: var(--node-font-color-fail);
-    background-color: var(--node-color-fail);
+    color: var(--node-font-color-fail) !important;
+    border-color: var(--node-font-color-fail) !important;
+    background-color: var(--node-color-fail) !important;
 }
 
 .debug-node-container.fail > div > .debug-node:hover {
-    background-color: var(--node-hover-color-fail);
+    background-color: var(--node-hover-color-fail) !important;
 }
 
 /* Iterative nodes are blue */
