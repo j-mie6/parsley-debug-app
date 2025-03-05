@@ -89,6 +89,26 @@ private object ReactiveNodeDisplay {
         val iterativeNodeIndex: Var[Int] = Var(0)
 
         /**
+          * The various states of expansion for a reactive node
+          */
+        enum ExpansionState:
+            case NoChildren      /* Compressed */
+            case OneIterativeChild /* Iterative single-child */
+            case AllChildren     /* Either non-iterative or iterative fully expanded */
+
+        /* Tracker for the expansion state of the current reactive node */
+        val expansionState: Signal[ExpansionState] = 
+            compressed.combineWith(expandAllChildren, treatIteratively.signal).map {
+                (isCompressed: Boolean, expandAll: Boolean, isIter: Boolean) =>
+                    if (isCompressed) 
+                        ExpansionState.NoChildren
+                    else if (isIter && !expandAll) 
+                        ExpansionState.OneIterativeChild
+                    else 
+                        ExpansionState.AllChildren
+         }
+
+        /**
          * An observer that updates the current node index (iterativeNodeIndex) when a delta is received.
          * If there are no children (childrenLen == 0), we simply return the current index.
          * If the incoming delta's absolute value matches the skipAmount (default 5),
@@ -167,7 +187,7 @@ private object ReactiveNodeDisplay {
             )
         }
 
-
+        /** Tracker for how many iterative children we have scrolled through */
         def iterativeProgress = {
             div(
                 className := "iterative-progress-container",
@@ -232,29 +252,23 @@ private object ReactiveNodeDisplay {
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
-                    /* Expand/compress node with (with arrows for iterative) on click */
                     onClick(_
-                        .sample(compressed)
                         .filter(_ => !node.debugNode.isLeaf)
-                        .flatMapMerge(
-                            if (_) { 
-                                /* If no children, load them in */
-                                Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
-                            } else {
-                                /* Otherwise set them to empty list */
-                                expandAllChildren.set(false)
-                                EventStream.fromValue(Nil)
-                            }
-                        )
-                    ) --> node.children.writer,
-
-                    /* Expand/compress iterative nodes to all children on double click */
-                    onDblClick(_
-                        .filter(_ => node.debugNode.isIterative)
-                        .sample(compressed)
-                        .flatMapMerge(EventStream.fromValue(_))
-                    ) --> expandAllChildren
-
+                        .sample(expansionState)
+                        .flatMapMerge {
+                            _ match
+                                case ExpansionState.AllChildren => 
+                                    EventStream.fromValue(Nil)
+                                case ExpansionState.OneIterativeChild => 
+                                    expandAllChildren.set(true)
+                                    Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                                case ExpansionState.NoChildren => 
+                                    if (node.debugNode.isIterative) {
+                                        expandAllChildren.set(false)
+                                    }
+                                    Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                        }
+                    ) --> node.children.writer
                 ),
                 
                 arrows(isRight = true),
