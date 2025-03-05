@@ -14,6 +14,9 @@ pub struct ParsleyNode {
 
     /* Whether this node needs bubbling (iterative and transparent) */
     #[serde(default = "ParsleyTree::default_bool")] is_iterative: bool, 
+
+    /* Whether this node was generated since the previous breakpoint */
+    #[serde(default = "ParsleyTree::default_bool")] newly_generated: bool, 
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
@@ -68,7 +71,8 @@ impl From<ParsleyTree> for DebugTree {
                 child_id,
                 input_slice,
                 children,
-                node.is_iterative
+                node.is_iterative,
+                node.newly_generated,
             )
         }
 
@@ -182,7 +186,8 @@ pub mod test {
                 from_offset: 0,
                 to_offset: 4,
                 children: vec![],
-                is_iterative: false
+                is_iterative: false,
+                newly_generated: false,
             },
             is_debuggable: false,
         }
@@ -215,10 +220,12 @@ pub mod test {
                                 from_offset: 2,
                                 to_offset: 3,
                                 children: vec![],
-                                is_iterative: false
+                                is_iterative: false,
+                                newly_generated: false,
                             }
                         ],
-                        is_iterative: false
+                        is_iterative: false,
+                        newly_generated: false,
                     },
                     ParsleyNode {
                         name: String::from("3"),
@@ -236,13 +243,16 @@ pub mod test {
                                 from_offset: 4,
                                 to_offset: 5,
                                 children: vec![],
-                                is_iterative: false
+                                is_iterative: false,
+                                newly_generated: false,
                             }
                         ],
-                        is_iterative: false
+                        is_iterative: false,
+                        newly_generated: false,
                     }
                 ],
                 is_iterative: false,
+                newly_generated: false,
             },
             is_debuggable: false,
         }
