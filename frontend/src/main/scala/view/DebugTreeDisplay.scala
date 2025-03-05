@@ -223,6 +223,7 @@ private object ReactiveNodeDisplay {
             cls("leaf") := node.debugNode.isLeaf,
             cls("iterative") := node.debugNode.isIterative,
             cls("debug") := node.debugNode.name == "remoteBreak",
+            cls("recent") := node.debugNode.newlyGenerated,
 
             /* Render a box for user-defined parser types */
             cls("type-box") := hasUserType,

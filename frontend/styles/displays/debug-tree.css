@@ -281,3 +281,7 @@
 .iterative-progress.fill {
     color: var(--font-color-iterative);
 }
+
+.debug-node.recent {
+    border: 3px solid var(--border-color-recent);
+}

@@ -25,6 +25,7 @@
     --font-color-quaternary: #242526;       /* Parsley green. */
     --font-color-error: #D2042D;            /* Red error. */
     --font-color-no-tree: #3c4b46a3;        /* Dark green. */
+    --border-color-recent: #c17f24;
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
 
     --node-color: #242526;
@@ -72,6 +73,7 @@
     --node-font-color-fail: var(--node-font-color);
     --node-font-color-iterative: var(--node-font-color);
     --node-font-color-debug: var(--node-font-color);
+    --border-color-recent: #ff00bb;
 }
 
 body {
