@@ -22,8 +22,6 @@ object MainView extends DebugViewPage {
         
         /* Generate name: tree-{num} for file */
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
-        /* Get current index */
-        def currentNum = num.signal
     }
 
 
@@ -60,6 +58,10 @@ object MainView extends DebugViewPage {
 
                 /* Pipe errors */
                 tabBus.stream.collectLeft --> ErrorController.setError,
+
+                /* Set selected tab to newest tree */
+                tabBus.stream.collectRight
+                    .map((fileNames: List[String]) => fileNames.length - 1) --> TabViewController.setSelectedTab,
 
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,
