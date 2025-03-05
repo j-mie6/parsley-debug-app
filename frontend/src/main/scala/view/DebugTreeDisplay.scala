@@ -4,8 +4,10 @@ import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
 import controller.viewControllers.MainViewController
+import controller.viewControllers.SettingsViewController
 import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}
+
 
 /**
 * Object containing rendering methods for the Debug Tree Display, which is
@@ -87,36 +89,109 @@ private object ReactiveNodeDisplay {
         /* The index of the current child rendered for iterative nodes */
         val iterativeNodeIndex: Var[Int] = Var(0)
 
-        /* Incrementing iterative node index */
+        /* Incrementing iterative node index with wrapping and early stopping when hitting the first and last nodes */
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
-            /* Wrap indices of children around */
-            val childrenLen: Int = node.children.now().length
-            val indexSum: Int = (currIndex + delta) % childrenLen
-            
-            if (indexSum < 0) then indexSum + childrenLen else indexSum
+            val childrenLen = node.children.now().length
+            val skipAmount = SettingsViewController.getNumSkipIterativeChildren.now()
+
+            if (childrenLen == 0) then
+                currIndex
+            else
+                val absDelta = math.abs(delta)
+                
+                if (absDelta == skipAmount) then
+                    val isForward = delta > 0
+                    val nearLast = currIndex + skipAmount >= childrenLen
+                    val nearFirst = currIndex - skipAmount < 0
+
+                    if (isForward) then
+                        if (nearLast) then
+                            if (currIndex != childrenLen - 1) then childrenLen - 1 else (currIndex + skipAmount) % childrenLen
+                        else currIndex + skipAmount
+                    else
+                        if (nearFirst) then
+                            if (currIndex != 0) then 0 else (currIndex - skipAmount + childrenLen) % childrenLen
+                        else currIndex - skipAmount
+                else
+                    /* Normal increment or decrement with wrapping */
+                    val newIndex = (currIndex + delta) % childrenLen
+                    if (newIndex < 0) then newIndex + childrenLen else newIndex
         })
 
-        /* Signal for when to show arrow buttons */
-        val showIterativeButtons: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
 
-        def iterativeArrowButton(isRight: Boolean): HtmlElement = {
-            val direction: String = if isRight then "right" else "left"
-            val directionSignal: Var[Boolean] = Var(false)
+
+        /* Signal for when to show arrow buttons */
+        val showIterativeOneByOne: Signal[Boolean] = compressed.not.combineWithFn(hasOneChild.not, expandAllChildren.signal.not)(_ && _ && _ && node.debugNode.isIterative)
+
+        /* Signal for if a node has more than 10 children */
+        val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
+
+        /* Button to increment selected iterative child */
+        def iterativeArrowButton(icon: String, increment: Signal[Int], isRight: Boolean): HtmlElement = {
+            val hoverVar: Var[Boolean] = Var(false)
+            
             button(
-                    className := "debug-node-iterative-buttons",
-                    i(
-                        cls(s"bi bi-caret-${direction}-fill") <-- directionSignal.signal,
-                        cls(s"bi bi-caret-${direction}") <-- directionSignal.signal.not,
-                        onMouseOver.mapTo(true) --> directionSignal,
-                        onMouseOut.mapTo(false) --> directionSignal,
-                        height.px := 16,
-                        margin.auto,
-                    ),
-                    onClick.mapTo(if isRight then 1 else -1) --> moveIndex,
-                    onMouseOver.mapTo(true) --> directionSignal,
-                    onMouseOut.mapTo(false) --> directionSignal
+                className := "debug-node-iterative-buttons",
+                marginBottom.px := 2,
+
+                i(
+                    cls(s"bi bi-$icon") <-- hoverVar.signal.not,
+                    cls(s"bi bi-$icon-fill") <-- hoverVar.signal,
+                                        
+                    height.px := 16,
+                    margin.auto,
+
+                    whenNot (isRight) {
+                        transform := "scaleX(-1)"
+                    },
+                    
+                    onMouseOver.mapTo(true) --> hoverVar,
+                    onMouseOut.mapTo(false) --> hoverVar,
+                ),
+
+                onClick(event => event.sample(increment).map(incr => if isRight then incr else -incr)) --> moveIndex,
+                
+                onMouseOver.mapTo(true) --> hoverVar,
+                onMouseOut.mapTo(false) --> hoverVar
             )
         }
+
+        def iterativeChildrenPercentage: Signal[Double] = iterativeNodeIndex.signal
+            .combineWith(node.children.signal)
+            .map((index, ns) => ((index.toDouble + 1.0) / ns.length) * 100)
+
+        def iterativeProgress = {
+            div(
+                className := "iterative-progress-container",
+
+                children <-- iterativeNodeIndex.signal
+                    .combineWith(node.children.signal.map(0 until _.length))
+                    .map((index, range) => range.map(i => 
+                        div(
+                            className := "iterative-progress", 
+                            ".",
+                            cls("fill") := i <= index,
+                        )
+                    )),
+            )
+        }
+
+        def singleArrow(isRight: Boolean) = iterativeArrowButton(icon = "play", Signal.fromValue(1), isRight)
+        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", SettingsViewController.getNumSkipIterativeChildren.signal, isRight)
+
+        def arrows(isRight: Boolean) = {
+            div(
+                display.flex,
+                flexDirection.column,
+                alignItems.flexStart,
+                justifyContent.center,
+                
+                child(singleArrow(isRight)) <-- showIterativeOneByOne,
+                child(doubleArrow(isRight)) <-- showIterativeOneByOne
+                    .combineWithFn(moreThanTenChildren)(_ && _),
+            )
+        }
+
 
         div(
             className := "debug-node-container",
@@ -135,7 +210,7 @@ private object ReactiveNodeDisplay {
                 flexDirection.row,
                 alignItems.stretch,
 
-                child(iterativeArrowButton(isRight = false)) <-- showIterativeButtons,
+                arrows(isRight = false),
 
                 div(
                     className := "debug-node",
@@ -151,8 +226,8 @@ private object ReactiveNodeDisplay {
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
-                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "Child ", text <-- iterativeNodeIndex.signal)) <-- treatIteratively.signal
-                            .combineWithFn(compressed.not, expandAllChildren.signal.not)(_ && _ && _),
+                        child(p(fontSize.px := 10, marginBottom.px := -5, marginTop.px := 5, "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
+                        child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
                     /* Expand/compress node with (with arrows for iterative) on click */
@@ -179,10 +254,8 @@ private object ReactiveNodeDisplay {
                     ) --> expandAllChildren
 
                 ),
-
-                child(iterativeArrowButton(isRight = true)) <-- showIterativeButtons,
                 
-
+                arrows(isRight = true),
             ),
 
 
@@ -192,6 +265,7 @@ private object ReactiveNodeDisplay {
             } else {
                 child(p(className := "compress-ellipsis", "...")) <-- compressed
             },
+
             /* Flex container for rendering children */
             div(
                 className := "debug-node-children-container",
