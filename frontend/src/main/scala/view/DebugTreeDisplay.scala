@@ -127,7 +127,7 @@ private object ReactiveNodeDisplay {
         val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
         /* Button to increment selected iterative child */
-        def iterativeArrowButton(icon: String, increment: Int, isRight: Boolean): HtmlElement = {
+        def iterativeArrowButton(icon: String, increment: Signal[Int], isRight: Boolean): HtmlElement = {
             val hoverVar: Var[Boolean] = Var(false)
             
             button(
@@ -149,7 +149,7 @@ private object ReactiveNodeDisplay {
                     onMouseOut.mapTo(false) --> hoverVar,
                 ),
 
-                onClick.mapTo(if isRight then increment else -increment) --> moveIndex,
+                onClick(event => event.sample(increment).map(incr => if isRight then incr else -incr)) --> moveIndex,
                 
                 onMouseOver.mapTo(true) --> hoverVar,
                 onMouseOut.mapTo(false) --> hoverVar
@@ -176,8 +176,8 @@ private object ReactiveNodeDisplay {
             )
         }
 
-        def singleArrow(isRight: Boolean) = iterativeArrowButton(icon = "play", 1, isRight)
-        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", SettingsViewController.getNumSkipIterativeChildren.now(), isRight)
+        def singleArrow(isRight: Boolean) = iterativeArrowButton(icon = "play", Signal.fromValue(1), isRight)
+        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", SettingsViewController.getNumSkipIterativeChildren.signal, isRight)
 
         def arrows(isRight: Boolean) = {
             div(
