@@ -68,7 +68,7 @@
     align-self: center;
     width: 4px;
     height: 15px;
-    background-color: var(--font-color-primary);    
+    background-color: var(--node-font-color);
 }
 
 /* No node-line displayed on the first node */
@@ -83,6 +83,7 @@
     height: 18px !important;
     z-index: -1;
 }
+
 
 
 /* Debug tree node information */
@@ -123,54 +124,60 @@
 }
 
 /* Failed nodes are red */
-.debug-node.fail {
+.debug-node-container.fail > div > .debug-node {
     color: var(--node-font-color-fail);
     border-color: var(--node-font-color-fail);
     background-color: var(--node-color-fail);
 }
 
-.debug-node.fail:hover {
+.debug-node-container.fail > div > .debug-node:hover {
     background-color: var(--node-hover-color-fail);
 }
 
 /* Iterative nodes are blue */
-.debug-node.iterative {
+.debug-node-container.iterative > div > .debug-node {
     color: var(--node-font-color-iterative);
     border-color: var(--node-font-color-iterative);
     background-color: var(--node-color-iterative);
 }
 
-.debug-node.iterative:hover {
+.debug-node-container.iterative > div > .debug-node:hover {
     background-color: var(--node-hover-color-iterative);
 }
 
 /* Iterative nodes are blue */
-.debug-node.debug {
+.debug-node-container.debug > div > .debug-node {
     color: var(--node-font-color-debug);
     border-color: var(--node-font-color-debug);
     background-color: var(--node-color-debug);
 }
 
-.debug-node.debug:hover {
+.debug-node-container.debug > div > .debug-node:hover {
     background-color: var(--node-hover-color-debug);
 }
 
 /* Set bottom border of leaf equal to other borders */
-.debug-node.leaf  {
+.debug-node-container.leaf > div > .debug-node {
     border-bottom-width: 2px !important;
     cursor: default !important;
 }
 
 /* Bar rendered below leaf nodes to indicate no more nodes */
-.leaf-line {
+.debug-node-container.leaf > .leaf-line {
     width: inherit;
     height: 2px;
-
-    border-radius: 10px;
-    
     margin: 3px 10px 0px 10px;
     
-    background-color: var(--font-color-primary);
+    border-radius: 10px;
+    background-color: var(--node-font-color);
+}
+
+.debug-node-container.fail.leaf > .leaf-line {
+    background-color: var(--node-font-color-fail);
+}
+
+.debug-node-container.debug.leaf > .leaf-line {
+    background-color: var(--node-font-color-debug);
 }
 
 

@@ -198,15 +198,22 @@ private object ReactiveNodeDisplay {
         div(
             className := "debug-node-container",
 
+            /* Set reactive class names */
+            cls("compress") <-- compressed,
+            cls("fail") := !node.debugNode.success,
+            cls("leaf") := node.debugNode.isLeaf,
+            cls("iterative") := node.debugNode.isIterative,
+            cls("debug") := node.debugNode.name == "remoteBreak",
+
             /* Render a box for user-defined parser types */
             cls("type-box") := hasUserType,
             when (hasUserType) { 
                 p(className := "type-box-name", node.debugNode.name)
             },
-
                 
             /* Line connecting node to parent */
             div(className := "debug-node-line"),
+
             div(
                 cls("iterative-debug-node-container") := node.debugNode.isIterative,
                 arrows(isRight = false),
@@ -214,13 +221,6 @@ private object ReactiveNodeDisplay {
                 div(
                     className := "debug-node",
                     flexGrow := 1,
-                    
-                    /* Set reactive class names */
-                    cls("compress") <-- compressed,
-                    cls("fail") := !node.debugNode.success,
-                    cls("leaf") := node.debugNode.isLeaf,
-                    cls("iterative") := node.debugNode.isIterative,
-                    cls("debug") := node.debugNode.name == "remoteBreak",
 
                     /* Render debug node information */
                     div(
