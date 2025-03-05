@@ -23,17 +23,23 @@ class Test extends AnyFlatSpec with should.Matchers {
             "isLeaf": false,
             "isIterative": false
         },
-        "isDebuggable": false
+        "isDebuggable": false,
+        "refs": []
     }"""
 
     
     "The tree" should "be deserialised" in {
         val parsed: Either[DillException, DebugTree] = Reader[DebugTree].read(jsonTree)
-        val tree: DebugTree = parsed.toOption.get /* Throws exception if JsonError is returned */
+        val tree: DebugTree = parsed match {
+            case Left(e) => throw new Exception(s"Failed to serialise tree, got DillException: $e")
+            case Right(tree) => tree
+        }
 
         /* Check that the root tree has been deserialised correctly */
         tree.input should be ("Test")
         tree.isDebuggable should be (false)
+        tree.refs should be (Nil)
+
         tree.root.nodeId should be (0)
         tree.root.name should be ("Test")
         tree.root.internal should be ("Test")

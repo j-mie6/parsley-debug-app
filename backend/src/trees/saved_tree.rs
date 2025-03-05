@@ -6,6 +6,7 @@ pub struct SavedTree {
     input: String,
     root: SavedNode,
     is_debuggable: bool,
+    refs: Vec<(i32, String)>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -18,7 +19,7 @@ pub struct SavedNode {
     pub input: String,              /* Offset into the input in which this node's parse attempt finished */
     pub children: Vec<SavedNode>,   /* The children of this node */
     pub is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
-} 
+}
 
 impl From<DebugTree> for SavedTree {
     fn from(debug_tree: DebugTree) -> Self {
@@ -44,17 +45,17 @@ impl From<DebugTree> for SavedTree {
         }
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
-  
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable(), debug_tree.refs())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, is_debuggable: bool) -> Self {
+    pub fn new(input: String, root: SavedNode, is_debuggable: bool, refs: Vec<(i32, String)>) -> Self {
         SavedTree { 
             input,
             root,
             is_debuggable,
+            refs,
         }
     }
 
@@ -68,6 +69,10 @@ impl SavedTree {
 
     pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
+    }
+
+    pub fn refs(&self) -> Vec<(i32, String)> {
+        self.refs.clone()
     }
 }
 
@@ -117,7 +122,8 @@ pub mod test {
                 "children": [],
                 "is_iterative": false
             },
-            "is_debuggable": false
+            "is_debuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -179,7 +185,8 @@ pub mod test {
                 ],
                 "is_iterative": false
             },
-            "is_debuggable": false
+            "is_debuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -198,7 +205,8 @@ pub mod test {
                 Vec::new(),
                 false
             ),
-            false
+            false,
+            Vec::new()
         )
     }
     
@@ -258,7 +266,8 @@ pub mod test {
                 ],
                 false
             ),
-            false
+            false,
+            Vec::new()
         )
     }
 

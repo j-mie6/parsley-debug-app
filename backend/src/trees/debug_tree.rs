@@ -7,11 +7,12 @@ pub struct DebugTree {
     input: String,
     root: DebugNode,
     is_debuggable: bool,
+    refs: Vec<(i32, String)>, 
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, is_debuggable: bool) -> Self {
-        DebugTree { input, root, is_debuggable }
+    pub fn new(input: String, root: DebugNode, is_debuggable: bool, refs: Vec<(i32, String)>) -> Self {
+        DebugTree { input, root, is_debuggable, refs }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -25,10 +26,14 @@ impl DebugTree {
     pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
     }
+    
+    pub fn refs(&self) -> Vec<(i32, String)> {
+        self.refs.clone()
+    }
 }
 
 impl From<SavedTree> for DebugTree {
-    fn from(debug_tree: SavedTree) -> Self {
+    fn from(saved_tree: SavedTree) -> Self {
         /* Recursively convert children into SavedNodes */
         fn convert_node(node: SavedNode) -> DebugNode {
             let children: Vec<DebugNode> = node.children
@@ -49,8 +54,8 @@ impl From<SavedTree> for DebugTree {
             )
         }
 
-        let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        let node: DebugNode = convert_node(saved_tree.get_root().clone());
+        DebugTree::new(saved_tree.get_input().clone(), node, saved_tree.is_debuggable(), saved_tree.refs())
     }
 }
 
@@ -110,7 +115,8 @@ pub mod test {
                 "isLeaf": true,
                 "isIterative": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect::<String>()
@@ -129,7 +135,8 @@ pub mod test {
                 "isLeaf": false,
                 "isIterative": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -148,7 +155,8 @@ pub mod test {
                 Vec::new(),
                 false
             ),
-            false
+            false,
+            Vec::new()
         )
     }
 
@@ -208,7 +216,8 @@ pub mod test {
                 ],
                 false
             ),
-            false
+            false,
+            Vec::new()
         )
     }
  
