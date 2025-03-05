@@ -3,7 +3,8 @@ use crate::AppState;
 
 #[tauri::command]
 pub fn skip_breakpoints(state: tauri::State<'_, AppState>, skips: i32) -> Result<(), SkipBreakpointError> {
-    state.transmit_breakpoint_skips(skips).map_err(SkipBreakpointError::from)
+    let dummy: Vec<(i32, String)> = Vec::new(); // TODO: Get as a parameter
+    state.transmit_breakpoint_skips(skips, dummy).map_err(SkipBreakpointError::from)
 }
 
 #[derive(Debug, serde::Serialize)]
