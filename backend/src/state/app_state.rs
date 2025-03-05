@@ -16,7 +16,7 @@ struct AppStateInternal {
     tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
     skips_tx: TokioMutex<SkipsSender>, /* Transmitter how many breakpoints to skip, sent to parsley */
-    tab_names: Vec<String>,
+    tab_names: Vec<String>,         /* List of saved tree names */
 }
 
 
@@ -55,16 +55,15 @@ impl AppState {
         Ok(state.tab_names.clone())
     }
 
-    // Possible overflow?
     /* Remove tree name from tab_names */
-    pub fn rem_tree(&self, index: usize) -> Result<Vec<String>, StateError> {
+    pub fn rmv_tree(&self, index: usize) -> Result<Vec<String>, StateError> {
         let mut state: MutexGuard<AppStateInternal> = self.inner()?;
 
         /* Remove tree name at index */
         state.tab_names.remove(index);
 
-        /* If this was the final tree then we need to remove the loaded tree in state */
-        if state.tab_names.len() == 0 {
+        /* If this was the final tree then the loaded tree needs to be removed */
+        if state.tab_names.is_empty() {
             state.tree = None
         }
 
@@ -75,6 +74,7 @@ impl AppState {
     pub fn get_tree_name(&self, index: usize) -> Result<String, StateError> {
         let state: MutexGuard<AppStateInternal> = self.inner()?;
 
+        /* Index will never be out of range as the frontend representation and the backend will be in sync */
         Ok(state.tab_names[index].clone()) 
     }
 

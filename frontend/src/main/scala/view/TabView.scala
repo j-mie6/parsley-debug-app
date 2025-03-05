@@ -53,7 +53,7 @@ object TabView {
             /* Close 'X' icon */
             i(className := "bi bi-x"),
 
-            /* Deletes the respective tab not allowing selecting a tab */
+            /* Deletes the respective tab, not allowing propogation for the tab select onClick */
             onClick
                 .map(_.stopPropagation())
                 .flatMapTo(TabViewController.deleteSavedTree(index)) --> deleteBus.writer,
@@ -67,12 +67,18 @@ object TabView {
             /* Set new selected tab after a deletion */
             deleteBus.stream.collectRight
                 .filter(_.nonEmpty)
-                /* TODO: Fix new index just being reliant on the tab being closed (ignoring current) */
-                .mapTo(if index == 0 then 0 else index - 1) --> TabViewController.setSelectedTab,
+                .mapTo({
+                    val currentIndex = TabViewController.selectedTab.now()
+                    /* If tab being removed is less then the current tab, then current tab needs to be shifted, ensuring its greater than 0 */
+                    if currentIndex >= index then
+                        Math.max(0, currentIndex - 1) 
+                    else
+                        currentIndex
+                }) --> TabViewController.setSelectedTab,
         )
     }
 
-    /* Get selected file name as possible error */
+    /* Get selected file index as possible error */
     val selectedTab: EventStream[Try[Int]] = TabViewController.getSelectedTab.changes.recoverToTry
 
     def apply(): HtmlElement = {

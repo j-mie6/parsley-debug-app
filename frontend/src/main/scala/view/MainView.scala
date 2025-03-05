@@ -58,6 +58,8 @@ object MainView extends DebugViewPage {
                 /* Pipe errors */
                 tabBus.stream.collectLeft --> ErrorController.setError,
 
+                tabBus.stream.collectRight.map(names => names.length - 1) --> TabViewController.setSelectedTab,
+
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,
 

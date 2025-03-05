@@ -86,7 +86,7 @@ object Command {
         type Out = List[String]
     }
 
-    case object LoadSavedTree extends Command("load_saved_tree") {
+    case object LoadSavedTree extends Command("load_saved_tree") { 
         type In = Int
         given args: Args[Int] {
             extension (index: Int)
