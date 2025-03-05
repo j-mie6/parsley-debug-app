@@ -1,5 +1,4 @@
 .tab-bar {
-    min-height: 30px;
     max-width: 100%;
     
     display: flex;
@@ -8,8 +7,6 @@
     align-items: flex-end;
     justify-content: flex-start;
 
-    gap: 2px;
-    
     margin-left: 20px;
     margin-right: 20px;
     
@@ -21,51 +18,47 @@
 }
 
 .tab-button {
-    position: relative;
-    
-    height: 21px;
-    min-width: 80px;
-
-    padding: 0 20px;
     margin: 0;
+    margin-bottom: -2px;
+    padding-left: 15px;
+    padding-right: 12px;
+    padding-block: 2px;
+    font-size: 15px;
 
-    border: none;
+    border: 2px solid var(--font-color-tertiary);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 
-    color: var(--font-color-secondary);
-    background-color: var(--tab); 
-    transition: all 0.2s;
+    color: var(--font-color-tertiary);
+    background-color: var(--background-secondary); 
 
     box-shadow: none;
     white-space: nowrap;
     justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
 }
 
 .tab-button:hover {
-    background-color: var(--tab-hover); 
+    background-color: var(--background-secondary-hover); 
+    cursor: pointer;
 }
 
 .tab-button.selected {
-    background-color: var(--tab-selected);
-    font-weight: bold;
-    margin: 0 1px; /* Small extra margin if selected */
+    background-color: var(--font-color-tertiary);
+    color: var(--background-secondary)
 }
 
 .close-tab-button {
-    border-color: transparent;
-    background-color: transparent;
-    color: var(--font-color-secondary);
-    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
-    border-radius: 50%;
-    position: relative;
-    align-self: center;
-    width: 16px;
-    height: 16px;
     margin-left: 8px;
     padding: 0;
+    border: none;
+    border-radius: 0;
+    height: 20px;
+    margin-bottom: -1px;
+    transition: background-color 0s;
 }
 
 .close-tab-button:hover {
-    transform: scale(1.25);
+    transform: scale(1.75);
 }

@@ -21,7 +21,8 @@ class Test extends AnyFlatSpec with should.Matchers {
             "childId": 0,
             "input": "Test",
             "isLeaf": false,
-            "isIterative": false
+            "isIterative": false,
+            "newlyGenerated": false
         },
         "isDebuggable": false
     }"""
@@ -42,6 +43,7 @@ class Test extends AnyFlatSpec with should.Matchers {
         tree.root.input should be ("Test")
         tree.root.isLeaf should be (false)
         tree.root.isIterative should be (false)
+        tree.root.newlyGenerated should be (false)
     }
 
     it should "not be deserialised if the JSON is not properly formatted" in {

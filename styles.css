@@ -12,35 +12,36 @@
 }
 
 :root {
-    --background-primary: #242526;	        /* Dark grey. */
-    --background-secondary: #2e2f30;	    /* Grey. */
-    --background-tertiary: #96dec4;	    /* Parsley green 60% transparency. */
-    --background-tertiary-60: #96dec499;	/* Parsley green 60% transparency. */
-    --background-tertiary-40: #96dec466;	/* Parsley green 20% transparency. */
-    --background-tertiary-20: #96dec433;	/* Parsley green 20% transparency. */
-    --tab: #8fe4c5;                        /* Tab green */
-    --tab-hover: #6DAD96;                  /* 5% lighter tab */
-    --tab-selected: #64E3B4;               /* 10% lighter tab */
-    --font-color-primary: #96DEC4;	        /* Parsley green. */
-    --font-color-secondary: #242526;	    /* Dark grey. */
-    --font-color-error: #d2042d;	        /* Red error. */
-    --font-color-warning: #ffcc00;	        /* Yellow warning colour. */
-    --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif;
+    --background-primary: #242526;          /* Dark grey. */
+    --background-secondary: #2E2F30;        /* Grey. */
+    --background-secondary-hover: #525252;  /* Lighter Grey. */
+    --background-tertiary: #96DEC4;         /* Parsley green 60% transparency. */
+    --background-tertiary-60: color-mix(in srgb, var(--background-tertiary) 60%, transparent);    /* Parsley green 60% transparency. */
+    --background-tertiary-40: color-mix(in srgb, var(--background-tertiary) 40%, transparent);    /* Parsley green 40% transparency. */
+    --background-tertiary-20: color-mix(in srgb, var(--background-tertiary) 20%, transparent);    /* Parsley green 20% transparency. */
+    --font-color-primary: #96DEC4;          /* Parsley green. */
+    --font-color-secondary: #242526;        /* Dark grey. */
+    --font-color-tertiary: #96DEC4;         /* Parsley green. */
+    --font-color-quaternary: #242526;       /* Parsley green. */
+    --font-color-error: #D2042D;            /* Red error. */
+    --font-color-no-tree: #3c4b46a3;        /* Dark green. */
+    --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
 }
 
 [data-theme="light"] {
-    --background-primary: #d9eae3;	        /* Greenish white. */
-    --background-secondary: #F3F3F3;	    /* Light grey. */
-    --background-tertiary: #242526;	    /* Grey 60% transparency. */
-    --background-tertiary-60: #24252699;	/* Grey 60% transparency. */
-    --background-tertiary-40: #4a4c4f66;	/* Grey 60% transparency. */
-    --background-tertiary-20: #24252633;	/* Grey 20% transparancy. */
-    --tab: #669883;                        /* Tab green */
-    --tab-hover: #547266;                  /* 5% lighter tab */
-    --tab-selected: #2b815d;               /* 10% lighter tab */
-    --font-color-primary: #0d4416;	        /* Dark green. */
-    --font-color-secondary: #d3ffda;	    /* Lighter green. */
-    --font-color-error: #fd4659;	        /* Red error. */
+    --background-primary: #F3F3F3;          /* Light grey. */
+    --background-secondary: #FFFFFF;        /* White. */
+    --background-secondary-hover: #e1e1e1;  /* White. */
+    --background-tertiary: #7eb9a6;         /* Light green. */
+    --background-tertiary-60: color-mix(in srgb, var(--background-tertiary) 60%, transparent); /* Light green 60% transparency. */
+    --background-tertiary-40: color-mix(in srgb, var(--background-tertiary) 40%, transparent); /* Light green 40% transparency. */
+    --background-tertiary-20: color-mix(in srgb, var(--background-tertiary) 20%, transparent); /* Light green 20% transparency. */
+    --font-color-primary: #1F3D34;      /* Dark green. */
+    --font-color-secondary: #7EB9A6;    /* Lighter green. */
+    --font-color-tertiary: #7EB9A6;     /* Lighter green. */
+    --font-color-quaternary: #1F3D34;   /* Parsley green. */
+    --font-color-error: #fd4659;        /* Red error. */
+    --font-color-no-tree: #bde3d8;      /* Light green. */
 }
 
 body {
@@ -56,8 +57,14 @@ body {
 * {
     margin: 0;
     padding: 0;
+    transition: color 0.5s;
+    transition: background-color 0.5s;
 }
 
 a {
     color: inherit;
+}
+
+button {
+    all: inherit;
 }

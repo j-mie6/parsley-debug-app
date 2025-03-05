@@ -11,21 +11,31 @@ pub struct ParsleyNode {
     from_offset: i32,           /* Offset into the input in which this node's parse attempt starts */
     to_offset: i32,             /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
-    is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
+
+    /* Whether this node needs bubbling (iterative and transparent) */
+    #[serde(default = "ParsleyTree::default_bool")] is_iterative: bool, 
+
+    /* Whether this node was generated since the previous breakpoint */
+    #[serde(default = "ParsleyTree::default_bool")] newly_generated: bool, 
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ParsleyTree {
-    input: String,       /* The input string being parsed */
-    root: ParsleyNode,   /* Root node of the debug tree */
-    is_debuggable: bool, /* If this tree was produced by a currently-running parser */
+    input: String,              /* The input string being parsed */
+    root: ParsleyNode,          /* Root node of the debug tree */
+    
+    /* If this tree was produced by a currently-running parser */
+    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool, 
 }
 
 impl ParsleyTree {
     pub fn is_debugging(&self) -> bool {
         self.is_debuggable
     }
+
+    /* Function used by serde to parse default boolean values as false */
+    fn default_bool() -> bool { false } 
 }
 
 /* Convert from ParsleyTree to DebugTree */
@@ -61,7 +71,8 @@ impl From<ParsleyTree> for DebugTree {
                 child_id,
                 input_slice,
                 children,
-                node.is_iterative
+                node.is_iterative,
+                node.newly_generated,
             )
         }
 
@@ -175,7 +186,8 @@ pub mod test {
                 from_offset: 0,
                 to_offset: 4,
                 children: vec![],
-                is_iterative: false
+                is_iterative: false,
+                newly_generated: false,
             },
             is_debuggable: false,
         }
@@ -208,10 +220,12 @@ pub mod test {
                                 from_offset: 2,
                                 to_offset: 3,
                                 children: vec![],
-                                is_iterative: false
+                                is_iterative: false,
+                                newly_generated: false,
                             }
                         ],
-                        is_iterative: false
+                        is_iterative: false,
+                        newly_generated: false,
                     },
                     ParsleyNode {
                         name: String::from("3"),
@@ -229,13 +243,16 @@ pub mod test {
                                 from_offset: 4,
                                 to_offset: 5,
                                 children: vec![],
-                                is_iterative: false
+                                is_iterative: false,
+                                newly_generated: false,
                             }
                         ],
-                        is_iterative: false
+                        is_iterative: false,
+                        newly_generated: false,
                     }
                 ],
                 is_iterative: false,
+                newly_generated: false,
             },
             is_debuggable: false,
         }

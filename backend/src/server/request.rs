@@ -14,24 +14,39 @@ pub fn routes() -> Vec<rocket::Route> {
 }
 
 #[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 struct PostTreeResponse {
     message: String,
     #[serde(skip_serializing_if = "Option::is_none")] skip_breakpoint: Option<i32>,
 }
 
 impl PostTreeResponse {
-    fn new(msg: impl Into<String>, skips: i32) -> Json<PostTreeResponse> {
+    fn new(message: &str, skips: Option<i32>) -> Json<PostTreeResponse> {     
         Json(PostTreeResponse {
-            message: msg.into(),
-            skip_breakpoint: Some(skips),
+            message: message.to_string(),
+            skip_breakpoint: skips,
         })
     }
 
-    fn no_skips(msg: impl Into<String>) -> Json<PostTreeResponse> {
-        Json(PostTreeResponse {
-            message: msg.into(),
-            skip_breakpoint: None,
-        })
+    fn success_msg(input: &str) -> String {
+        format!(
+            "Posted parser tree handling input: \"{}{}\" to Dill",
+            /* Include first few chars of input */
+            &input[..std::cmp::min(input.len(), RESPONSE_INPUT_LEN)],
+            if input.len() > RESPONSE_INPUT_LEN {
+                "..."
+            } else {
+                ""
+            }
+        )
+    }
+
+    fn no_skips(message: &str) -> Json<PostTreeResponse> {
+        PostTreeResponse::new(message, None)
+    }
+
+    fn with_skips(message: &str, skips: i32) -> Json<PostTreeResponse> {
+        PostTreeResponse::new(message, Some(skips))
     }
 }
 
@@ -50,38 +65,23 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     let debug_tree: DebugTree = parsley_tree.into();
 
     /* Format informative response for RemoteView */
-    let input: &str = debug_tree.get_input();
-    let message: String = format!(
-        "Posted parser tree handling input: \"{}{}\" to Dill",
-        /* Include first few chars of input */
-        &input[..std::cmp::min(input.len(), RESPONSE_INPUT_LEN)],
-        if input.len() > RESPONSE_INPUT_LEN {
-            "..."
-        } else {
-            ""
-        },
-    );
+    let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
 
     /* Update state with new debug_tree and return response */
     match state.set_tree(debug_tree).and(state.emit(Event::NewTree)) {
-        Ok(()) => {
-            if !is_debugging {
-                return (http::Status::Ok, PostTreeResponse::no_skips(message))
-            };
+        Ok(()) if !is_debugging => (http::Status::Ok, PostTreeResponse::no_skips(&msg)),
 
-            match state.receive_breakpoint_skips().await {
-                Some(skips) => (http::Status::Ok, PostTreeResponse::new(message, skips)),
-                None => (http::Status::InternalServerError, PostTreeResponse::no_skips(message)),
-            }
-
+        Ok(()) => match state.receive_breakpoint_skips().await {
+            Some(skips) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, skips)),
+            None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg)),
         },
-        
+
         Err(StateError::LockFailed) => 
             (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again")),
 
         Err(StateError::ChannelError) =>
             (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again")),
-            
+
         Err(_) => panic!("Unexpected error on post_tree"),
     }
 
