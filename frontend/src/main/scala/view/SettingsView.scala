@@ -20,10 +20,6 @@ object SettingsView {
                     className := "single-setting-top-container",
                     div(
                         className := "single-setting-name-container",
-                        cls("underlined") <-- titleHoverVar,
-    
-                        onMouseEnter.mapTo(true) --> titleHoverVar,
-                        onMouseLeave.mapTo(false) --> titleHoverVar,
 
                         setting.settingName,
                     ),
@@ -62,10 +58,6 @@ object SettingsView {
                         
                     )
                 ),
-                child(div(
-                    className := "single-setting-info-text",
-                    setting.infoText,
-                )) <-- titleHoverVar
             )
     }   
 
