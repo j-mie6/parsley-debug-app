@@ -112,8 +112,8 @@
 }
 
 /* On hover of expandable (i.e., not leaf) nodes, darken */
-.debug-node:hover:not(.leaf) {
-    background-color: color-mix(in srgb, var(--node-color) 60%, transparent);
+.debug-node:hover {
+    background-color: var(--node-hover-color);
 }
 
 /* Failed nodes are red */
@@ -124,7 +124,7 @@
 }
 
 .debug-node.fail:hover {
-    background-color: color-mix(in srgb, var(--node-color-fail) 60%, transparent);
+    background-color: var(--node-hover-color-fail);
 }
 
 /* Iterative nodes are blue */
@@ -135,7 +135,7 @@
 }
 
 .debug-node.iterative:hover {
-    background-color: color-mix(in srgb, var(--node-color-iterative) 60%, transparent);
+    background-color: var(--node-hover-color-iterative);
 }
 
 /* Iterative nodes are blue */
@@ -146,12 +146,13 @@
 }
 
 .debug-node.debug:hover {
-    background-color: color-mix(in srgb, var(--node-color-debug) 60%, transparent);
+    background-color: var(--node-hover-color-debug);
 }
 
 /* Set bottom border of leaf equal to other borders */
 .debug-node.leaf  {
     border-bottom-width: 2px !important;
+    cursor: default !important;
 }
 
 /* Bar rendered below leaf nodes to indicate no more nodes */
