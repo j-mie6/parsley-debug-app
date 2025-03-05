@@ -196,17 +196,16 @@
     cursor: pointer;
 }
 
-.debug-node-iterative-buttons > i {                          
+.debug-node-iterative-buttons > i {
     aspect-ratio: 1;
     height: 25px;
     margin: auto;
-    
-    color: var(--background-tertiary-60);
+
+    color: color-mix(in srgb, var(--node-color-iterative), var(--font-color-primary) 30%);
 }
 
-.debug-node-iterative-buttons > i:hover {                          
-    color: var(--background-tertiary);
-
+.debug-node-iterative-buttons > i:hover {
+    color: var(--font-color-iterative);
 }
 
 /* The container for the iterative progress bar */
@@ -215,9 +214,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    
+
     gap: 1px;
-    
+
     margin: 10px;
     margin-bottom: 6px;
 }
@@ -226,12 +225,12 @@
 .iterative-progress {
     font-size: 24px;
     line-height: 6px;
-    color: var(--font-color-secondary);
+    color: color-mix(in srgb, var(--node-color-iterative), var(--font-color-primary) 30%);
 }
 
 /* Additional effects on the bar (dots) when progress is being made */
 .iterative-progress.fill {
-    color: var(--font-color-primary);
+    color: var(--font-color-iterative);
 }
 
 .iterative-arrows {
