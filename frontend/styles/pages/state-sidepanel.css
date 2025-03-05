@@ -60,6 +60,14 @@
     padding: 1vh 0;
 }
 
+.single-ref-title-container {
+    display: flex;
+    flex-direction: row;
+    overflow-y: auto;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
 .state-footer {
     display: flex;
     justify-content: space-between;

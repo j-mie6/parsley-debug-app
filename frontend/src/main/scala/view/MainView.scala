@@ -9,7 +9,7 @@ import com.raquo.laminar.api.L.*
 import controller.tauri.{Tauri, Event}
 import controller.errors.ErrorController
 import controller.AppStateController
-import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController}
+import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController, StateManagementViewController}
 import controller.ToastController
 
 object MainView extends DebugViewPage {
@@ -38,6 +38,7 @@ object MainView extends DebugViewPage {
                 
                 /* Update tree and input with TreeReady response */
                 treeStream.collectRight --> TreeViewController.setTree,
+                treeStream.collectRight --> StateManagementViewController.setCurrTree,
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
 
                 /* Notify of any errors caught by treeStream */

@@ -7,6 +7,7 @@ import controller.viewControllers.MainViewController
 import controller.viewControllers.SettingsViewController
 import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}
+import controller.viewControllers.StateManagementViewController
 
 
 /**
@@ -46,7 +47,11 @@ object DebugTreeDisplay {
     * 
     * @return HTML element representing the whole tree.
     */
-    def apply(tree: DebugTree): HtmlElement = div(
+    def apply(tree: DebugTree): HtmlElement = 
+        StateManagementViewController.setRefs(tree.refs)
+        StateManagementViewController.setLocalRefs(tree.refs)
+
+        div(
         className := "debug-tree-container zoom-container",
         
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),

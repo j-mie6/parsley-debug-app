@@ -53,7 +53,8 @@ abstract class DebugViewPage extends Page {
     private lazy val stateButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-state",
         i(className:= "bi bi-sliders"),
-        onClick --> (_ => StateManagementViewController.toggleOpenState())
+        onClick --> (_ => 
+            StateManagementViewController.toggleOpenState())
     )
 
     /* Opener for the settings tab. */
@@ -136,7 +137,7 @@ abstract class DebugViewPage extends Page {
         div(
             className := "debug-view-right-button-bar",
 
-            stateButton,
+            child(stateButton) <-- TreeViewController.treeExists,
             infoButton,
         )
     )   
