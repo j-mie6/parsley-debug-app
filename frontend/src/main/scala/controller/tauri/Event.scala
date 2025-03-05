@@ -7,7 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import com.raquo.laminar.api.L.*
 import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent}
 
-import model.DebugTree
+import model.{DebugTree, CodeFileInformation}
 import model.json.Reader
 import controller.tauri.Event.UnlistenFn
 import model.errors.DillException
@@ -63,6 +63,13 @@ object Event {
         override val isUnit = true
     }
 
+    case object UploadCodeFile extends Event("upload-code-file") {
+        type Out = String
+    }
+
+    case object UploadFiles extends Event("upload-code-files") {
+        type Out = CodeFileInformation
+    }
 }
 
 

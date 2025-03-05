@@ -10,6 +10,7 @@ import controller.tauri.{Tauri, Event}
 import controller.errors.ErrorController
 import controller.AppStateController
 import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController}
+import controller.viewControllers.CodeViewController
 
 object MainView extends DebugViewPage {
     
@@ -26,6 +27,9 @@ object MainView extends DebugViewPage {
     /* Listen for posted tree */
     val (treeStream, unlistenTree) = Tauri.listen(Event.TreeReady)
     val (newTreeStream, unlistenNewTree) = Tauri.listen(Event.NewTree)
+
+    val (fileNameStream, unlistenFileName) = Tauri.listen(Event.UploadFiles)
+    val (codeStream, unlistenCode) = Tauri.listen(Event.UploadCodeFile)
     
     /* Render main viewing page */
     def apply(): HtmlElement = {
@@ -34,7 +38,14 @@ object MainView extends DebugViewPage {
                 /* Update DOM theme with theme value */
                 AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
 
+                /* Update any code view streams */
+                codeStream.collectRight.map(Some(_)) --> CodeViewController.setCurrentFile,
+                fileNameStream.collectRight.map(Some(_)) --> CodeViewController.setFileInformation,
                 
+                codeStream.collectLeft --> ErrorController.setError,
+                fileNameStream.collectLeft --> ErrorController.setError,
+
+
                 /* Update tree and input with TreeReady response */
                 treeStream.collectRight --> TreeViewController.setTree,
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
@@ -74,7 +85,9 @@ object MainView extends DebugViewPage {
 
                 /* Unlisten to TreeReady event */
                 onUnmountCallback(_ => unlistenTree.get),
-                onUnmountCallback(_ => unlistenNewTree.get)
+                onUnmountCallback(_ => unlistenNewTree.get),
+                onUnmountCallback(_ => unlistenCode.get),
+                onUnmountCallback(_ => unlistenFileName.get),
             )
         ))
     }

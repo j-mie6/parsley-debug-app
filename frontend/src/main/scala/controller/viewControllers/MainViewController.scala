@@ -7,6 +7,7 @@ import org.scalajs.dom
 import view.DebugViewPage
 import view.InputView
 import view.TreeView
+import view.CodeView
 
 /**
  * Object containing functions and variables for the main view,cconditionally
@@ -18,11 +19,11 @@ object MainViewController {
     enum View(val elem: HtmlElement) {
         case Tree extends View(TreeView())
         case Input extends View(InputView())
-        case Code extends View(InputView()) // TODO
+        case Code extends View(CodeView())
     }
 
     /* Current view selected */
-    private val view: Var[View] = Var(View.Tree)
+    private val view: Var[View] = Var(View.Code)
 
     private def renderButton(buttonType: String, icon: String, text: String, view: View, openSemaphore: Var[Int]): HtmlElement = button(
         className := f"debug-view-select-button debug-view-${buttonType}-button",
