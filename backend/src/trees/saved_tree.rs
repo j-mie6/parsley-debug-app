@@ -5,7 +5,7 @@ use super::{DebugNode, DebugTree};
 pub struct SavedTree {
     input: String,
     root: SavedNode,
-    is_debuggable: bool,
+    session_id: i32,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -47,16 +47,16 @@ impl From<DebugTree> for SavedTree {
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
   
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_session_id())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, is_debuggable: bool) -> Self {
+    pub fn new(input: String, root: SavedNode, session_id: i32) -> Self {
         SavedTree { 
             input,
             root,
-            is_debuggable,
+            session_id,
         }
     }
 
@@ -68,8 +68,8 @@ impl SavedTree {
         &self.input
     }
 
-    pub fn is_debuggable(&self) -> bool {
-        self.is_debuggable
+    pub fn get_session_id(&self) -> i32 {
+        self.session_id
     }
 }
 
@@ -121,7 +121,7 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
-            "is_debuggable": false
+            "session_id": -1
         }"#
         .split_whitespace()
         .collect()
@@ -188,7 +188,7 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
-            "is_debuggable": false
+            "session_id": -1
         }"#
         .split_whitespace()
         .collect()
@@ -208,7 +208,7 @@ pub mod test {
                 false,
                 false
             ),
-            false
+            -1
         )
     }
     
@@ -273,7 +273,7 @@ pub mod test {
                 false,
                 false
             ),
-            false
+            -1
         )
     }
 

@@ -8,9 +8,9 @@ import model.json.Reader
   *
   * @param input the input string the tree node has to parse
   * @param root the debug tree root node
-  * @param isDebuggable if this tree is using live debugging operations like breakpoint skipping
+  * @param sessionId Some(_) if the tree is using live debugging operations like breakpoint skipping, None otherwise
   */
-case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean) derives Reader.upickle
+case class DebugTree(input: String, root: DebugNode, sessionId: Int) derives Reader.upickle
 
 
 /**

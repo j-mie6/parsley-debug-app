@@ -6,12 +6,12 @@ use super::{SavedTree, SavedNode};
 pub struct DebugTree {
     input: String,
     root: DebugNode,
-    is_debuggable: bool,
+    session_id: i32,
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, is_debuggable: bool) -> Self {
-        DebugTree { input, root, is_debuggable }
+    pub fn new(input: String, root: DebugNode, session_id: i32) -> Self {
+        DebugTree { input, root, session_id: session_id }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -22,8 +22,8 @@ impl DebugTree {
         &self.input
     }
 
-    pub fn is_debuggable(&self) -> bool {
-        self.is_debuggable
+    pub fn get_session_id(&self) -> i32 {
+        self.session_id
     }
 }
 
@@ -51,7 +51,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.get_session_id())
     }
 }
 
@@ -114,7 +114,7 @@ pub mod test {
                 "isIterative": false,
                 "newlyGenerated": false
             },
-            "isDebuggable": false
+            "sessionId": -1
         }"#
         .split_whitespace()
         .collect::<String>()
@@ -134,7 +134,7 @@ pub mod test {
                 "isIterative": false,
                 "newlyGenerated": false
             },
-            "isDebuggable": false
+            "sessionId": -1
         }"#
         .split_whitespace()
         .collect()
@@ -154,7 +154,7 @@ pub mod test {
                 false,
                 false
             ),
-            false
+            -1
         )
     }
 
@@ -219,7 +219,7 @@ pub mod test {
                 false,
                 false
             ),
-            false
+            -1
         )
     }
  
