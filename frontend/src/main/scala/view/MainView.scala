@@ -19,8 +19,11 @@ object MainView extends DebugViewPage {
         private val num: Var[Int] = Var(0)
         val increment: Observer[Unit] = num.updater((x, unit) => x + 1)
 
-        /* Generate random name for file */
+        
+        /* Generate name: tree-{num} for file */
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
+        /* Get current index */
+        def currentNum = num.signal
     }
 
 
@@ -57,6 +60,9 @@ object MainView extends DebugViewPage {
 
                 /* Pipe errors */
                 tabBus.stream.collectLeft --> ErrorController.setError,
+
+                /* Load newest tree automatically */
+                newTreeStream.collectRight.sample(Counter.currentNum) --> TabViewController.setSelectedTab,
 
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,
