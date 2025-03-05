@@ -130,7 +130,6 @@ private object ReactiveNodeDisplay {
                     if (isForward) then
                         /* Skip forward */
                         getNearWrap(nearLast, childrenLen - 1, skipAmount, currIndex + skipAmount)
-
                     else
                         /* Skip backward */
                         getNearWrap(nearFirst, 0, childrenLen - skipAmount, currIndex - skipAmount)
