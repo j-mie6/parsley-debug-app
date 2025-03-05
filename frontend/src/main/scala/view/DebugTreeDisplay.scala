@@ -104,37 +104,36 @@ private object ReactiveNodeDisplay {
             /* Default skip size */
             val skipAmount: Int = 5
 
+            def getNearWrap(wrapCondition: Boolean, clampValue: Int, wrapIncr: Int, notWrapValue: Int): Int = {
+                if (wrapCondition) then
+                    /* If we're not already on the clamp value, snap to it; otherwise, wrap */
+                    if (currIndex != clampValue) then clampValue else (currIndex + wrapIncr) % childrenLen
+                else
+                    /* If not near the clampValue then move to notWrapValue */
+                    notWrapValue
+            }
+
             /* If there are children */
             if (childrenLen != 0) then
-
                 /* Check how large the move is (absolute value) */
                 val absDelta = math.abs(delta)
                 
                 /* If this delta is exactly the "skip amount" */
                 if (absDelta == skipAmount) then
-                    val isForward = delta > 0
+                    val isForward: Boolean = delta > 0
                     /* nearLast: if adding skipAmount goes beyond or right at the last index */
-                    val nearLast = currIndex + skipAmount >= childrenLen
+                    val nearLast: Boolean = currIndex + skipAmount >= childrenLen
 
                     /* nearFirst: if subtracting skipAmount goes below 0 */
-                    val nearFirst = currIndex - skipAmount < 0
+                    val nearFirst: Boolean = currIndex - skipAmount < 0
 
                     if (isForward) then
                         /* Skip forward */
-                        if (nearLast) then
-                            /* If we're not already on the last index, snap to it; otherwise, wrap */
-                            if (currIndex != childrenLen - 1) then childrenLen - 1 else (currIndex + skipAmount) % childrenLen
-                        else 
-                            /* If not near the last element, just move ahead by skipAmount */
-                            currIndex + skipAmount
+                        getNearWrap(nearLast, childrenLen - 1, skipAmount, currIndex + skipAmount)
+
                     else
                         /* Skip backward */
-                        if (nearFirst) then
-                            /* If we're not already on the first index, snap to it; otherwise, wrap */
-                            if (currIndex != 0) then 0 else (currIndex - skipAmount + childrenLen) % childrenLen
-                        else 
-                            /* If not near the first element, just move back by skipAmount */
-                            currIndex - skipAmount
+                        getNearWrap(nearFirst, 0, childrenLen - skipAmount, currIndex - skipAmount)
                 else
                     /* If delta is not a large skip, do a normal +/- 1 move (wrapped) */
                     val newIndex = (currIndex + delta) % childrenLen
