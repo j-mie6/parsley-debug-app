@@ -65,9 +65,6 @@
 
 /* Line connecting node child to parent */
 .debug-node-line {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
     align-self: center;
     width: 4px;
     height: 15px;
@@ -172,6 +169,19 @@
     cursor: pointer;
 }
 
+.debug-node-iterative-buttons > i {                          
+    aspect-ratio: 1;
+    height: 25px;
+    margin: auto;
+    
+    color: var(--background-tertiary-60);
+}
+
+.debug-node-iterative-buttons > i:hover {                          
+    color: var(--background-tertiary);
+
+}
+
 /* The container for the iterative progress bar */
 .iterative-progress-container {
     display: flex;
@@ -208,4 +218,10 @@
     font-size: 10px;
     margin-bottom: -5px;
     margin-top: 5px;
+}
+
+.iterative-debug-node-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
 }

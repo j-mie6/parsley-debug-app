@@ -155,24 +155,15 @@ private object ReactiveNodeDisplay {
             button(
                 className := "debug-node-iterative-buttons",
                 i(
-                    cls(s"bi bi-$icon") <-- hoverVar.signal.not,
-                    cls(s"bi bi-$icon-fill") <-- hoverVar.signal,
-                                        
-                    height.px := 16,
-                    margin.auto,
+                    cls(s"bi bi-$icon-fill"),
+
 
                     whenNot (isRight) {
                         transform := "scaleX(-1)"
                     },
-                    
-                    onMouseOver.mapTo(true) --> hoverVar,
-                    onMouseOut.mapTo(false) --> hoverVar,
                 ),
 
                 onClick.mapTo(if isRight then increment else -increment) --> moveIndex,
-                
-                onMouseOver.mapTo(true) --> hoverVar,
-                onMouseOut.mapTo(false) --> hoverVar
             )
         }
 
@@ -220,6 +211,7 @@ private object ReactiveNodeDisplay {
             /* Line connecting node to parent */
             div(className := "debug-node-line"),
             div(
+                cls("iterative-debug-node-container") := node.debugNode.isIterative,
                 arrows(isRight = false),
 
                 div(
@@ -236,7 +228,7 @@ private object ReactiveNodeDisplay {
                     div(
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
-                        child(p(className := "iterative-child-text", "child", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
+                        child(p(className := "iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
