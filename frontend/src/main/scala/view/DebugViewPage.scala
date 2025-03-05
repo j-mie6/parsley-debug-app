@@ -129,7 +129,6 @@ abstract class DebugViewPage extends Page {
             display.flex,
             alignItems.center,
 
-            child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
             infoButton,
         )
     )   
@@ -147,16 +146,22 @@ abstract class DebugViewPage extends Page {
             className := "debug-view-page",
             headerView,
             div(
-                className := "tab-view-container",
-                cls("compressed") <-- SettingsViewController.isSettingsOpen,
-                TabView()
-            ),
-            div(
-                className := "tree-view-page",
-                buttonBar,
-                cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
-                cls("compressed") <-- SettingsViewController.isSettingsOpen,
-                child.getOrElse(div())
+                className := "debug-view-body", 
+                SettingsView(),
+                div(
+                    className := "tab-and-tree-view-container",
+                    cls("compressed") <-- SettingsViewController.isSettingsOpen,
+                    div(
+                        className := "tab-view-container",
+                        TabView()
+                    ),
+                    div(
+                        className := "tree-view-page",
+                        buttonBar,
+                        cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
+                        child.getOrElse(div())
+                    )
+                )
             )
         )))
     } 
