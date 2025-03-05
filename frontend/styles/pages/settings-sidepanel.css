@@ -107,6 +107,7 @@
 .apply-settings-button,
 .default-settings-button {
     width: 50%;
+    height: 40px;
     background: var(--font-color-primary);
     padding: 12px;
 
