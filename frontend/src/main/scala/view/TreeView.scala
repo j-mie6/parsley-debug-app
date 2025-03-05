@@ -7,6 +7,7 @@ import org.scalajs.dom
 import com.raquo.laminar.api.L.*
 
 import model.DebugTree
+
 import controller.viewControllers.TreeViewController
 
 /**
@@ -24,7 +25,7 @@ object TreeView {
         skipIcon, /* Fast forward icon */
 
         onClick --> { _ => {
-            TreeViewController.skipBreakpoints(0)
+            TreeViewController.skipBreakpoints()
         }}
     )
 

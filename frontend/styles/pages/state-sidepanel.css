@@ -1,0 +1,95 @@
+.state-sidepanel-container {
+    width: 25vw;
+    padding-top: 10px;
+    padding-right: 20px;
+
+    display: flex;
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+
+    box-sizing: border-box;
+    background: transparent;
+
+
+    z-index: 1000;
+    transform: translateX(100vw); /* Completely hidden initially */
+    transition: transform 0.75s ease-in-out;
+}
+
+.state-sidepanel-container.open {
+    transform: translateX(75vw);
+}
+
+.state-sidepanel {
+    width: 50vw;
+    max-width: 600px;
+    height: 80vh;
+    padding: 3vh 3vw;
+
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+
+    background: var(--background-secondary);
+
+    border: 2px solid var(--font-color-tertiary);
+    border-radius: 20px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.state-header {
+    width: 100%;
+    text-align: center;
+    position: relative;
+    margin-bottom: 1.5vh;
+}
+
+.state-header h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0 auto;
+}
+
+.state-contents {
+    display: grid;
+    columns: 3;
+    width: 100%;
+    padding: 1vh 0;
+}
+
+.state-footer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: auto;
+    gap: 20px;
+}
+
+.apply-state-button {
+    width: 100%;
+    height: 20px;
+    background: var(--font-color-primary);
+    padding: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--background-primary);
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.apply-state-button:hover {
+    background: var(--font-color-secondary);
+}
