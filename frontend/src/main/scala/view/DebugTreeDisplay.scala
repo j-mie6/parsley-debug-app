@@ -15,10 +15,9 @@ import controller.tauri.{Tauri, Command}
 object DebugTreeDisplay {
     
     /* Variable that keeps track of how much the tree has been zoomed into */
-    val zoomFactor: Var[Double] = Var(defaultZoom)
+    val zoomFactor: Var[Double] = Var(1.0)
     
     val zoomSpeed: Float = -0.002   /* Speed of zooming in and out */
-    val defaultZoom: Double = 1.0   /* Default zoom factor */
     val maxZoomFactor: Double = 0.5 /* Maximum zoom factor */
     val minZoomFactor: Double = 3.0 /* Minimum zoom factor */
 
@@ -35,7 +34,7 @@ object DebugTreeDisplay {
     } --> zoomUpdate
 
     /* Resets the zoomFactor to 1 */
-    val resetZoom = Observer(_ => zoomFactor.set(defaultZoom))
+    val resetZoom = Observer(_ => zoomFactor.set(1.0))
 
 
     /**
