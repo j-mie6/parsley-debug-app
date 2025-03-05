@@ -25,4 +25,5 @@ pub enum StateError {
     NodeNotFound(u32),
     EventEmitFailed,
     ChannelError,
+    DebugSessionNotFound,
 }
