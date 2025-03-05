@@ -61,9 +61,6 @@ object MainView extends DebugViewPage {
                 /* Pipe errors */
                 tabBus.stream.collectLeft --> ErrorController.setError,
 
-                /* Load newest tree automatically */
-                newTreeStream.collectRight.sample(Counter.currentNum) --> TabViewController.setSelectedTab,
-
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,
 
