@@ -167,3 +167,7 @@
     box-shadow: none;
     cursor: pointer;
 }
+
+.debug-node.recent {
+    border: 3px solid var(--border-color-recent);
+}
