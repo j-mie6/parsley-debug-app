@@ -6,8 +6,6 @@ import controller.viewControllers.SettingsViewController
 
 object SettingsView {
 
-    val settingsModified: Var[Boolean] = Var(true)
-
     def renderUserSetting(setting: UserSetting): HtmlElement = {
         val titleHoverVar: Var[Boolean] = Var(false)
 
@@ -30,8 +28,7 @@ object SettingsView {
                         setting.style match
                             case "number" =>
                                 input(
-                                    /* Would be nice to set this reactively but I guess it doesn't matter? */
-                                    defaultValue := setting.value.now().toString(),
+                                    value <-- setting.value.signal.map(_.toString()),
                                     typ := "number",
                                     minAttr := "0",
                                     /* If user has entered a non-int value into the input then do not change the setting */
@@ -61,6 +58,7 @@ object SettingsView {
         div(
             className := "settings-sidepanel-container",
             cls("open") <-- SettingsViewController.isSettingsOpen,
+            hidden <-- SettingsViewController.isSettingsOpen,
 
             div(
                 className := ("settings-sidepanel"),
@@ -76,7 +74,7 @@ object SettingsView {
 
                 div(
                     cls("settings-footer"),
-                    child(button(className := "apply-settings-button", "Apply", onClick --> (_ => 
+                    button(className := "apply-settings-button", "Apply", onClick --> (_ => 
                         SettingsViewController.applySettings(
                             newNumSkipIterativeChildren = 
                                 allUserSettings
@@ -99,7 +97,15 @@ object SettingsView {
                                     case b: Boolean => Some(b) 
                                     case _      => None
                                 }).getOrElse(false),
-                        )))) <-- settingsModified,
+                        ),  
+                    )),
+                    button(className:= "default-settings-button", "Restore Defaults", onClick --> {_ =>
+                        SettingsViewController.applySettings(
+                            newNumSkipIterativeChildren = NumSkipIterativeChildren.default.asInstanceOf[Int],
+                            newNumSkipBreakpoints = NumSkipBreakpoints.default.asInstanceOf[Int],
+                            newColorBlindMode = ColorBlindMode.default.asInstanceOf[Boolean]
+                        )
+                    })
                 ),
             )
         )
