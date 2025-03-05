@@ -81,6 +81,9 @@ object TabView {
 
             /* If no tab can be found, unload tree from frontend */  
             selectedTab.collectFailure.mapToUnit --> TreeViewController.unloadTree,
+            
+            /* If selected filename changes then resetZoom is called */
+            selectedTab.collectSuccess.mapToUnit --> DebugTreeDisplay.resetZoom,
 
             /* Renders tabs */ 
             children <-- TabViewController.getFileNames.signal.map(

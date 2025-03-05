@@ -1,17 +1,23 @@
-/* Render parser input */
-.debug-input-title {
-    text-align: center;
-    margin-bottom: 10px;
+.debug-tree-display {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
 }
 
-.debug-input-description {
-    margin: 0px; 
-    
-    font-size: 15px; 
-    font-style: italic;
-    font-weight: lighter;
+.debug-input-main-view {
+    text-align: left;
+    width: 100%;
+    padding-inline: 10px;
+    font-size: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
 }
 
+.code-text {
+    width: fit-content;
+}
 
 /* Container of debug tree */
 .debug-tree-container {
@@ -90,7 +96,7 @@
     border-bottom-width: 4px;
     border-color: var(--font-color-primary);
 
-    color: var(--font-color-secondary);
+    color: var(--font-color-quaternary);
     background-color: var(--background-tertiary-60);
     
     text-align: center;
@@ -155,15 +161,67 @@
 
 /* Arrow buttons for iterative nodes */
 .debug-node-iterative-buttons {
-    width: 20px;
-
     background: none;
-    background-color: none;
     color: var(--font-color-primary);
-    
-    box-shadow: none;
+    margin-bottom: 2px;
 
-    border-style: solid;
-    border-color: var(--font-color-primary);
-    border-radius: 8px;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.debug-node-iterative-buttons > i {                          
+    aspect-ratio: 1;
+    height: 25px;
+    margin: auto;
+    
+    color: var(--background-tertiary-60);
+}
+
+.debug-node-iterative-buttons > i:hover {                          
+    color: var(--background-tertiary);
+
+}
+
+/* The container for the iterative progress bar */
+.iterative-progress-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    
+    gap: 1px;
+    
+    margin: 10px;
+    margin-bottom: 6px;
+}
+
+/* The iterative progress bar (dots) itself */
+.iterative-progress {
+    font-size: 24px;
+    line-height: 6px;
+    color: var(--font-color-secondary);
+}
+
+/* Additional effects on the bar (dots) when progress is being made */
+.iterative-progress.fill {
+    color: var(--font-color-primary);
+}
+
+.iterative-arrows {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.iterative-child-text {
+    font-size: 10px;
+    margin-bottom: -5px;
+    margin-top: 5px;
+}
+
+.iterative-debug-node-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
 }
