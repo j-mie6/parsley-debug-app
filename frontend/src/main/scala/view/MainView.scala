@@ -34,12 +34,10 @@ object MainView extends DebugViewPage {
 
         val tabBus: EventBus[Either[DillException, List[String]]] = EventBus()
 
-        /* if debugging you have sessionID
+        /* if debugging you have sessionID from tree
            if you have session id of -1, do normal stuff
            else you have some session id: (if you have session id it SHOULD be current tab (getSelectedTab))
-                search for the tree to update with sessionid (map in backend of running debugging sessions (int) to name)
-                    with the search, if not found its a new session, make tab etc
-                update tree (Set tree) (new function, takes index and current state then updates saved tree with current loaded tree)
+                update tree (Set tree)
                 update input
          */
         super.render(Some(

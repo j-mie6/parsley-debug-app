@@ -66,7 +66,7 @@ object Command {
 
     case object FetchNodeChildren extends Command("fetch_node_children") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (id: Int) 
                 def namedArgs: Map[String, Any] = Map("nodeId" -> id)
         }
@@ -78,7 +78,7 @@ object Command {
     /* Save commands */
     case object SaveTree extends Command("save_tree") {
         type In = String
-        given args: Args[String] {
+        given args: Args[In] {
             extension (treeName: String)
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
@@ -88,7 +88,7 @@ object Command {
 
     case object LoadSavedTree extends Command("load_saved_tree") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (index: Int)
                 def namedArgs: Map[String, Any] = Map("index" -> index)
         }
@@ -98,12 +98,21 @@ object Command {
 
     case object DeleteTree extends Command("delete_tree") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (index: Int)
                 def namedArgs: Map[String, Any] = Map("index" -> index)
         }
 
         type Out = List[String]
+    }
+
+    case object UpdateTree extends Command("update_tree") {
+        type In = Int
+        given args: Args[In] {
+            extension (index: Int) 
+                def namedArgs: Map[String, Any] = Map("index" -> index)
+        }
+        type Out = Unit
     }
 
     case object SkipBreakpoints extends Command("skip_breakpoints") {
