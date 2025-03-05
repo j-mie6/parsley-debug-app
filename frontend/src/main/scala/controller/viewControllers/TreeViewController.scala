@@ -29,6 +29,9 @@ object TreeViewController {
     /** Return true signal if tree is loaded into frontend */
     def treeExists: Signal[Boolean] = tree.signal.map(_.isDefined)
 
+    /** Get sessionId from loaded tree, -1 for non-debuggable */
+    def getSessionId: Signal[Int] = tree.signal.map(_.get.sessionId)
+
     /** Get debug tree element or warning if no tree found */
     def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
         /* Default tree view when no tree is loaded */
