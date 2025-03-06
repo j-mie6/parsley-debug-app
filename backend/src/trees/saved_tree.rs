@@ -20,7 +20,7 @@ pub struct SavedNode {
     pub children: Vec<SavedNode>,   /* The children of this node */
     pub is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
     pub newly_generated: bool,      /* Whether this node was generated since the previous breakpoint */
-} 
+}
 
 impl From<DebugTree> for SavedTree {
     fn from(debug_tree: DebugTree) -> Self {
@@ -246,7 +246,7 @@ pub mod test {
                                 true,
                                 Some(2),
                                 String::from("2"),
-                                vec![],
+                                Vec::new(),
                                 false,
                                 false
                             )
@@ -269,7 +269,7 @@ pub mod test {
                                 true,
                                 Some(4),
                                 String::from("4"),
-                                vec![],
+                                Vec::new(),
                                 false,
                                 false
                             )

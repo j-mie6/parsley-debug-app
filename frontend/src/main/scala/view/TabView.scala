@@ -53,42 +53,49 @@ object TabView {
             /* Close 'X' icon */
             i(className := "bi bi-x"),
 
-            /* Deletes the respective tab */
-            onClick(event => event.sample(TabViewController.getFileName(index))
-                .flatMapMerge(TabViewController.deleteSavedTree(_).flatMapTo(TabViewController.loadFileNames))
-            ) --> deleteBus.writer,
+            /* Deletes the respective tab, not allowing propogation for the tab select onClick */
+            onClick
+                .map(_.stopPropagation())
+                .flatMapTo(TabViewController.deleteSavedTree(index)) --> deleteBus.writer,
 
             /* Pipe errors */
             deleteBus.stream.collectLeft --> ErrorController.setError,
 
             /* Update selected tab and tab names */
-            deleteBus.stream.collectRight.mapTo(0) --> TabViewController.setSelectedTab,
             deleteBus.stream.collectRight --> TabViewController.setFileNames,
+
+            /* Set new selected tab after a deletion */
+            deleteBus.stream.collectRight
+                .filter(_.nonEmpty)
+                .sample(TabViewController.getSelectedTab)
+                .map((currIndex: Int) =>
+                    if currIndex >= index then 
+                        Math.max(0, currIndex - 1) 
+                    else 
+                        currIndex
+                ) --> TabViewController.setSelectedTab
         )
     }
 
-    /* Get selected file name as possible error */
-    val selectedTab: EventStream[Try[String]] = TabViewController.getSelectedFileName.changes.recoverToTry
-    
     def apply(): HtmlElement = {
         div(
             className:= "tab-bar",
             
             /* Update tree on new tab selected */  
-            selectedTab.collectSuccess
+            TabViewController.getSelectedTab.changes
                 .flatMapMerge(TabViewController.loadSavedTree) 
-                .collectLeft --> controller.errors.ErrorController.setError,
+                .collectLeft --> controller.errors.ErrorController.setError, 
 
-            /* If no tab can be found, unload tree from frontend */  
-            selectedTab.collectFailure.mapToUnit --> TreeViewController.unloadTree,
-            
-            /* If selected filename changes then resetZoom is called */
-            selectedTab.collectSuccess.mapToUnit --> DebugTreeDisplay.resetZoom,
+
+            /* If there are no tabs, unload tree from frontend */
+            TabViewController.noSavedTrees.changes
+                .filter(identity)
+                .mapToUnit --> TreeViewController.unloadTree,
 
             /* Renders tabs */ 
-            children <-- TabViewController.getFileNames.signal.map(
-                _.indices.map(tabButton(_))
-            )
+            children <-- TabViewController
+                .getFileNames
+                .map(_.indices.map(tabButton(_)))
         )
     }
 }
