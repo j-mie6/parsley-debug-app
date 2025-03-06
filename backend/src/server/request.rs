@@ -17,13 +17,15 @@ pub fn routes() -> Vec<rocket::Route> {
 #[serde(rename_all = "camelCase")]
 struct PostTreeResponse {
     message: String,
+    session_id: i32,
     #[serde(skip_serializing_if = "Option::is_none")] skip_breakpoint: Option<i32>,
 }
 
 impl PostTreeResponse {
-    fn new(message: &str, skips: Option<i32>) -> Json<PostTreeResponse> {     
+    fn new(message: &str, session_id: i32, skips: Option<i32>) -> Json<PostTreeResponse> {     
         Json(PostTreeResponse {
             message: message.to_string(),
+            session_id,
             skip_breakpoint: skips,
         })
     }
@@ -41,12 +43,12 @@ impl PostTreeResponse {
         )
     }
 
-    fn no_skips(message: &str) -> Json<PostTreeResponse> {
-        PostTreeResponse::new(message, None)
+    fn no_skips(message: &str, session_id: i32) -> Json<PostTreeResponse> {
+        PostTreeResponse::new(message, session_id, None)
     }
 
-    fn with_skips(message: &str, skips: i32) -> Json<PostTreeResponse> {
-        PostTreeResponse::new(message, Some(skips))
+    fn with_skips(message: &str, session_id: i32, skips: i32) -> Json<PostTreeResponse> {
+        PostTreeResponse::new(message, session_id, Some(skips))
     }
 }
 
@@ -68,14 +70,14 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
 
     /* Get session_id and check for previous debugging session */
-    let session_id: i32 = debug_tree.get_session_id();
+    let mut session_id: i32 = debug_tree.get_session_id();
 
     let session_exists: bool = state.session_id_exists(session_id).expect("State error checking if session_id exists");
 
     /* Set new session id if session is beginning */
     if is_debugging && session_id == -1 {
         let new_session_id: i32 = state.inner().next_session_id().expect("Pretty please");
-
+        session_id = new_session_id;
         debug_tree.set_session_id(new_session_id);
     }
 
@@ -84,18 +86,18 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
 
     match state.set_tree(debug_tree).and(if new_tree { state.emit(Event::NewTree) } else { Ok(()) }) {
-        Ok(()) if !is_debugging => (http::Status::Ok, PostTreeResponse::no_skips(&msg)),
+        Ok(()) if !is_debugging => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
 
         Ok(()) => match state.receive_breakpoint_skips().await {
-            Some((_session_id, skips)) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, skips)),
-            None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg)),
+            Some((prev_id, skips)) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, prev_id, skips)),
+            None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
         },
 
         Err(StateError::LockFailed) => 
-            (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again")),
+            (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again", session_id)),
 
         Err(StateError::ChannelError) =>
-            (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again")),
+            (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again", session_id)),
 
         Err(_) => panic!("Unexpected error on post_tree"),
     }
