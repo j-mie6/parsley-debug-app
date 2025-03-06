@@ -151,10 +151,8 @@ object CodeView {
     )
 
     val exampleFs: List[String] = List(
-        "/dir/root/file.scala",
-        "/dir/root2/file2.scala",
-        "/dir/root2/file3.scala",
-        "/dir/root/file3.scala"
+        "/Users/rileyhorrix/Downloads/robot.ino",
+        "/Users/rileyhorrix/Downloads/robot.h",
     )
 
     def apply(): HtmlElement = {

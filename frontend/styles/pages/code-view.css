@@ -1,72 +1,76 @@
 .code-view-main-view {
-  display: flex;
-  flex-direction: row;
-  padding: 10px;
-  padding-top: 0px;
-  font-size: 16px;
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    padding-top: 0px;
+    font-size: 16px;
 }
 
 .code-view-file-view {
-  flex: 1;
-  margin-left: 20px;
-  padding-top: 7px;
+    flex: 1;
+    margin-left: 20px;
+    padding-top: 7px;
+    overflow: scroll;
+    border: 1px solid var(--background-tertiary-40);
 }
 
+.code-view-file-explorer {}
+
 .code-view-file {
-  border-radius: 10px;
-  padding-block: 2px;
-  margin-block: 3px;
-  padding-inline: 4px;
-  cursor: pointer;
-  border: 1px solid #ffffff00;
-  transition: border 0.5s;
+    border-radius: 10px;
+    padding-block: 2px;
+    margin-block: 3px;
+    padding-inline: 4px;
+    cursor: pointer;
+    border: 1px solid #ffffff00;
+    transition: border 0.5s;
 }
 
 .code-view-file:hover {
-  background-color: var(--background-tertiary-20);
-  border: 1px solid var(--background-tertiary-60);
-  cursor: pointer;
+    background-color: var(--background-tertiary-20);
+    border: 1px solid var(--background-tertiary-60);
+    cursor: pointer;
 }
 
 .code-view-directory {
-  border-radius: 10px;
-  padding-block: 3px;
-  padding-right: 3px;
-  margin-block: 4px;
-  display: flex;
-  flex-direction: column;
+    border-radius: 10px;
+    padding-block: 3px;
+    padding-right: 3px;
+    margin-block: 4px;
+    display: flex;
+    flex-direction: column;
 }
 
 .code-view-directory-header {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  cursor: pointer;
-  margin-left: 5px;
-  border-radius: 10px;
-  padding-left: 5px;
-  padding-right: 10px;
-  padding-bottom: 1px;
-  align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 10px;
+    padding-left: 5px;
+    padding-right: 10px;
+    padding-bottom: 1px;
+    align-items: center;
 }
 
 .code-view-directory-header:hover {
-  background-color: var(--background-tertiary-20);
-  cursor: pointer;
+    background-color: var(--background-tertiary-20);
+    cursor: pointer;
 }
 
 .code-view-directory-contents {
-  padding-left: 20px;
+    padding-left: 20px;
+    overflow: hidden;
+    height: 0;
 }
 
 .code-view-directory-contents.expanded {
-  height: 0;
-  display: none;
-  overflow: hidden;
+    height: fit-content;
 }
 
 .code-view-root-directory {
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
