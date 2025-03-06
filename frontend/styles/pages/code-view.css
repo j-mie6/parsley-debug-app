@@ -16,7 +16,7 @@
     margin-right: 12px;
     background-color: #bdbdbd1f;
     border: 1px solid var(--background-tertiary-40);
-    height: calc(100vh - 230px);
+    height: calc(100vh - 260px);
     overflow-y: auto;
 }
 
