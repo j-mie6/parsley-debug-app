@@ -139,7 +139,7 @@ impl StateManager for AppState {
         self.inner()?
             .skips_tx
             .blocking_lock()
-            .blocking_send(skips)
+            .try_send(skips)
             .map_err(|_| StateError::ChannelError)
     }
     
