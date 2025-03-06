@@ -13,6 +13,8 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
     /* Get DebugTree from current state */
     let debug_tree: DebugTree = state.get_tree()?;
 
+    let is_debugging: bool = debug_tree.is_debugging();
+
     /* Get the session_id of the current DebugTree */
     let session_id: i32 = debug_tree.get_session_id();
 
@@ -32,7 +34,7 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
     data_file.write(tree_json.as_bytes()).map_err(|_| SaveTreeError::WriteTreeFailed)?;
 
     /* Add new debugging session if the tree has a valid session_id */
-    if session_id != -1 {
+    if is_debugging {
         state.add_session_id(tree_name.clone(), session_id).map_err(|_| SaveTreeError::AddSessionFailed)?;
     }
     

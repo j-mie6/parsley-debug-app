@@ -26,12 +26,15 @@ pub struct ParsleyTree {
     root: ParsleyNode,          /* Root node of the debug tree */
     
     /* If this tree was produced by a currently-running parser */
-    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool, 
+    #[serde(default = "ParsleyTree::default_bool")] is_debugging: bool, 
+
+    /* If this tree was produced by a currently-running parser */
+    #[serde(default = "ParsleyTree::default_session_id")] session_id: i32, 
 }
 
 impl ParsleyTree {
     pub fn is_debugging(&self) -> bool {
-        self.is_debuggable
+        self.is_debugging
     }
 
     /* Function used by serde to parse default boolean values as false */
@@ -40,10 +43,17 @@ impl ParsleyTree {
     /* 
         Currently uses 1 for true and -1 for false
         NOTE this is temporary while remoteView sends isDebuggable
+        TODO remove
     */
+    // fn get_session_id(&self) -> i32 {
+    //     2 * (self.is_debugging as i32) - 1
+    // }
+
     fn get_session_id(&self) -> i32 {
-        2 * (self.is_debuggable as i32) - 1
+        self.session_id
     }
+
+    fn default_session_id() -> i32 { -1 }
 }
 
 /* Convert from ParsleyTree to DebugTree */
@@ -89,8 +99,9 @@ impl From<ParsleyTree> for DebugTree {
 
         /* Convert the root node and return DebugTree */
         let session_id = tree.get_session_id();
+        let is_debugging = tree.is_debugging();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, session_id)
+        DebugTree::new(tree.input, node, is_debugging, session_id)
     }
 }
 
@@ -178,7 +189,8 @@ pub mod test {
                 ],
                 "isIterative": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "sessionId": "-1"
         }"#
         .split_whitespace()
         .collect()
@@ -198,7 +210,8 @@ pub mod test {
                 is_iterative: false,
                 newly_generated: false,
             },
-            is_debuggable: false,
+            is_debugging: false,
+            session_id: -1,
         }
     }
 
@@ -263,7 +276,8 @@ pub mod test {
                 is_iterative: false,
                 newly_generated: false,
             },
-            is_debuggable: false,
+            is_debugging: false,
+            session_id: -1,
         }
     }
 

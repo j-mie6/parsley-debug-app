@@ -5,6 +5,7 @@ use super::{DebugNode, DebugTree};
 pub struct SavedTree {
     input: String,
     root: SavedNode,
+    is_debugging: bool,
     session_id: i32,
 }
 
@@ -47,15 +48,16 @@ impl From<DebugTree> for SavedTree {
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
   
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_session_id())
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debugging(), debug_tree.get_session_id())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, session_id: i32) -> Self {
+    pub fn new(input: String, root: SavedNode, is_debugging: bool, session_id: i32) -> Self {
         SavedTree { 
             input,
             root,
+            is_debugging,
             session_id,
         }
     }
@@ -66,6 +68,10 @@ impl SavedTree {
 
     pub fn get_input(&self) -> &String {
         &self.input
+    }
+
+    pub fn is_debugging(&self) -> bool {
+        self.is_debugging
     }
 
     pub fn get_session_id(&self) -> i32 {
@@ -121,6 +127,7 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
+            "is_debugging": false,
             "session_id": -1
         }"#
         .split_whitespace()
@@ -188,6 +195,7 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
+            "is_debugging": false,
             "session_id": -1
         }"#
         .split_whitespace()
@@ -208,6 +216,7 @@ pub mod test {
                 false,
                 false
             ),
+            false,
             -1
         )
     }
@@ -273,6 +282,7 @@ pub mod test {
                 false,
                 false
             ),
+            false,
             -1
         )
     }
