@@ -29,6 +29,6 @@ case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean) deri
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
         childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean, newlyGenerated: Boolean) derives Reader.upickle {
   
-    def isDebugNode: Boolean = internal == "remoteBreak"
+    def isBreakpoint: Boolean = internal == "remoteBreak"
 }
 
