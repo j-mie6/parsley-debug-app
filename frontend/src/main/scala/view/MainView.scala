@@ -52,6 +52,16 @@ object MainView extends DebugViewPage {
                     .collectRight
                     .sample(Counter.genName)
                     .flatMapMerge(TabViewController.saveTree) --> tabBus.writer,
+                /* slight sad thing is updating straight after a save
+                    ACTUAL CRASHING issue is treestream comes before newtree?
+                 */
+                treeStream.collectRight
+                    .flatMapTo(TreeViewController.getSessionId)
+                    .filter(id => id != -1)
+                    .sample(TabViewController.getSelectedTab) 
+                    .flatMapMerge(TabViewController.updateTree)
+                    .collectLeft
+                    --> ErrorController.setError,
 
                 /* Update file names */
                 tabBus.stream.collectRight --> TabViewController.setFileNames,
