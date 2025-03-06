@@ -63,7 +63,6 @@ fn get_index() -> String {
 async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, Json<PostTreeResponse>) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
-    dbg!(&parsley_tree);
     let is_debuggable: bool = parsley_tree.is_debuggable();
     let mut debug_tree: DebugTree = parsley_tree.into();
 
@@ -75,6 +74,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
     let session_exists: bool = state.session_id_exists(session_id).expect("State error checking if session_id exists");
 
+    println!("IN REQUEST. session id is {}, debugging is {} and session exists is {}", session_id, is_debuggable, session_exists);
     /* Only get a new tree if not debugging and no session_id */
     let mut new_tree: bool = !(is_debuggable || session_exists);
 
@@ -86,13 +86,15 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         debug_tree.set_session_id(new_session_id);
     }
 
+    println!("given is {}", session_id);
+
 
 
     match state.set_tree(debug_tree).and(if new_tree { state.emit(Event::NewTree) } else { Ok(()) }) {
         Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
 
         Ok(()) => match state.receive_breakpoint_skips().await {
-            Some((prev_id, skips)) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, prev_id, skips)),
+            Some((_, skips)) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, session_id, skips)),
             None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
         },
 

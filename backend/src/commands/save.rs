@@ -35,6 +35,7 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
 
     /* Add new debugging session if the tree has a valid session_id */
     if is_debuggable {
+        println!("saving with sessionid of {}", session_id);
         state.add_session_id(tree_name.clone(), session_id).map_err(|_| SaveTreeError::AddSessionFailed)?;
     }
     
@@ -63,19 +64,23 @@ pub fn update_tree(state: tauri::State<AppState>, index: usize) -> Result<(), Up
     /* Access the `tree` field from the locked state */
     let cur_tree: DebugTree = state.get_tree().map_err(|_| UpdateTreeError::LoadTreeFailed)?;
 
+    let new_tree: SavedTree = SavedTree::from(cur_tree);
     /* Get the serialised JSON */
-    let tree_json: String = serde_json::to_string_pretty(&cur_tree)
+    let tree_json: String = serde_json::to_string_pretty(&new_tree)
         .map_err(|_| UpdateTreeError::SerialiseFailed)?;
 
-    let tree_name: String = state.get_tree_name(index).map_err(|_| UpdateTreeError::NameRetrievalFail)?;
 
-    /* Open the json file to update the tree */
-    /* TODO: look into only updating the extra bits rather than replacing the tree */
-    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
-    let mut data_file: File = File::open(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+    let tree_name_lol = state.get_tree_name(index).map_err(|_| UpdateTreeError::NameRetrievalFail);
 
-    /* Write tree json to the json file */
-    data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;
+    if let Ok(tree_name) = tree_name_lol {
+        /* Open the json file to update the tree */
+        /* TODO: look into only updating the extra bits rather than replacing the tree */
+        let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+        let mut data_file: File = File::create(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+    
+        /* Write tree json to the json file */
+        data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;
+    }
 
     Ok(())
 }

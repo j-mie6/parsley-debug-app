@@ -78,6 +78,10 @@ impl AppState {
     pub fn get_tree_name(&self, index: usize) -> Result<String, StateError> {
         let state: MutexGuard<AppStateInternal> = self.inner()?;
 
+        if state.tab_names.is_empty() {
+            return Err(StateError::ChannelError)
+        }
+
         /* Index will never be out of range as the frontend representation and the backend will be in sync */
         Ok(state.tab_names[index].clone()) 
     }
