@@ -53,7 +53,7 @@ object StateManagementView {
 
 
                 div(cls("state-contents"),
-                    children <-- StateManagementViewController.getRefs.map(_.map(renderReference))
+                    children <-- StateManagementViewController.getRefs.signal.map(_.map(renderReference))
                 ),
 
                 div(

@@ -99,7 +99,7 @@ object StateManagementViewController {
     *
     * @return A signal emitting the sequence of references.
     */
-    def getRefs: Signal[Seq[(Int, String)]] = refs.signal
+    def getRefs: Var[Seq[(Int, String)]] = refs
     
     /**
     * Produces a signal that calculates the "reference number" (1-based index)

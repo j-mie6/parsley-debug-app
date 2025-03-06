@@ -24,7 +24,10 @@ object TreeView {
 
         skipIcon, /* Fast forward icon */
 
-        onClick(_ => TreeViewController.skipBreakpoints.collectLeft) --> ErrorController.setError,
+        onClick --> { _ => {
+                TreeViewController.skipBreakpoints()
+            }
+        }
     )
 
 
