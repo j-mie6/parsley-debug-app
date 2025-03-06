@@ -50,9 +50,32 @@ object DebugTreeDisplay {
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
         wheelHandler,
         
+        tree.refs.map(StateRef(_)),
+
         ReactiveNodeDisplay(ReactiveNode(tree.root)),
     )
+
 }
+
+
+/** Render a Ref passed as to a breakpoint */
+private object StateRef {
+    def apply(codedRef: (Int, String)): HtmlElement = {
+        p(
+            className := "debug-tree-ref",
+            s"R${subscriptInt(codedRef._1)}: ${codedRef._2}"
+        )
+    }
+
+    private def subscriptInt(x: Int): String = {
+        val subscriptInts = "\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089"
+
+        x.toString
+            .map(i => subscriptInts.charAt(i.asDigit))
+            .mkString
+    }
+}
+
 
 /**
 * Object containing rendering methods for a reactive node (and children).
@@ -222,7 +245,7 @@ private object ReactiveNodeDisplay {
             cls("fail") := !node.debugNode.success,
             cls("leaf") := node.debugNode.isLeaf,
             cls("iterative") := node.debugNode.isIterative,
-            cls("debug") := node.debugNode.name == "remoteBreak",
+            cls("debug") := node.debugNode.isBreakpoint,
 
             /* Render a box for user-defined parser types */
             cls("type-box") := hasUserType,
