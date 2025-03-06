@@ -27,5 +27,5 @@ case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean) deri
   * @param isIterative if a node is iterative (and opaque)
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean) derives Reader.upickle
+    childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean, newlyGenerated: Boolean) derives Reader.upickle
 

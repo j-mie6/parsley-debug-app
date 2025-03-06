@@ -10,25 +10,21 @@
 }
 
 .tree-view-error {
-    color: var(--font-color-error); 
-    background-color: var(--background-tertiary);
-    border: 2px solid var(--font-color-error);
+    color: var(--font-color-no-tree); 
     
     font-weight: bold;
     text-align: center;
+    font-size: 28px;
     
-    width: 30%;
+    width: 40%;
     
     margin: auto;
-    margin-top: 1em;
+    margin-top: 2em;
     margin-bottom: 1em;
     
     padding: 1.5em;
     padding-right: 2em;
     padding-left: 2em;
-    
-    border-radius: 20px;
-    box-sizing: border-box;
 }
 
 .zoom-container {
