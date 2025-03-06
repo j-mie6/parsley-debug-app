@@ -10,9 +10,7 @@ import controller.viewControllers.SettingsViewController
 
 object SettingsView {
 
-    def renderUserSetting(setting: UserSetting): HtmlElement = {
-        val titleHoverVar: Var[Boolean] = Var(false)
-        
+    def renderUserSetting(setting: UserSetting): HtmlElement = {        
         div(
             className := "single-setting-container",
             div(
@@ -20,11 +18,6 @@ object SettingsView {
                     className := "single-setting-top-container",
                     div(
                         className := "single-setting-name-container",
-                        cls("underlined") <-- titleHoverVar,
-    
-                        onMouseEnter.mapTo(true) --> titleHoverVar,
-                        onMouseLeave.mapTo(false) --> titleHoverVar,
-
                         setting.settingName,
                     ),
                     div(
@@ -62,10 +55,6 @@ object SettingsView {
                         
                     )
                 ),
-                child(div(
-                    className := "single-setting-info-text",
-                    setting.infoText,
-                )) <-- titleHoverVar
             )
     }   
 

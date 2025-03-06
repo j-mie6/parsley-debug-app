@@ -22,15 +22,14 @@ type UserSettingType = Int | Boolean
  * specifies a unique type of setting, such as numerical values or boolean flags.
  *
  * @param settingName The display name of the setting.
- * @param infoText A brief description explaining the purpose of the setting.
  * @param style A string identifier specifying the type of input (e.g., "number", "boolean").
+ * @param default The default value that the user setting has
  * @param value A reactive variable (`Var`) that temporarily stores the user's selected value
  *              before it is applied globally. The type of this variable is defined
  *              by `UserSettingType`.
  */
 sealed trait UserSetting {
     def settingName: String
-    def infoText: String
     def style: String
     def default: UserSettingType
 
@@ -78,8 +77,6 @@ def updateAllUserSettings(newNumSkipIterativeChildren: Int, newNumSkipBreakpoint
 case object NumSkipIterativeChildren extends UserSetting {
     override def settingName: String = "Iterative children to skip"
 
-    override def infoText: String = "The number of iterative children to skip with double arrows"
-
     override def style: String = "number"
 
     override def default: UserSettingType = 5
@@ -96,8 +93,6 @@ case object NumSkipIterativeChildren extends UserSetting {
 case object NumSkipBreakpoints extends UserSetting {
     override def settingName: String = "Breakpoints to skip"
 
-    override def infoText: String = "The number of breakpoints to skip forwards when in debug mode"
-
     override def style: String = "number"
 
     override def default: UserSettingType = 1
@@ -113,8 +108,6 @@ case object NumSkipBreakpoints extends UserSetting {
  */
 case object ColorBlindMode extends UserSetting {
     override def settingName: String = "Colour Blind Mode"
-
-    override def infoText: String = "Set Dill's theme to a more accessible viewing experience"
 
     override def style: String = "boolean"
 
