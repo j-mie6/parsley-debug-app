@@ -39,8 +39,8 @@ impl StateManager for ServerState {
         self.inner().emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(),StateError> {
-        self.0.as_ref().transmit_breakpoint_skips(skips)
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(),StateError> {
+        self.0.as_ref().transmit_breakpoint_skips(session_id, skips)
     }
 }
 

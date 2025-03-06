@@ -14,7 +14,7 @@ pub trait StateManager: Send + Sync + 'static {
 
     fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError>;
 
-    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(), StateError>;
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError>;
 }
 
 

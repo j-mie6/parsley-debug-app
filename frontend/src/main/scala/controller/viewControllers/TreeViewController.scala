@@ -50,9 +50,10 @@ object TreeViewController {
     /** Skips the current breakpoint 'skips' times
       *
       * @param skips The amount of times to skip a breakpoint
+      * @param sessionId The sessionId of the current debugging session
       */
-    def skipBreakpoints(skips: Int): Unit =
-        Tauri.invoke(Command.SkipBreakpoints, skips)
+    def skipBreakpoints(skips: Int)(sessionId: Int): Unit =
+        Tauri.invoke(Command.SkipBreakpoints, (sessionId, skips))
     
     /* Toggle whether the button to skip through breakpoints is visible */
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.sessionId != -1))
