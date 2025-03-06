@@ -1,6 +1,6 @@
 @import url('frontend/styles/pages/debug-view.css');
 @import url('frontend/styles/pages/tree-view.css');
-@import url('frontend/styles/pages/error-popup.css');
+@import url('frontend/styles/pages/popup-and-toast.css');
 @import url('frontend/styles/pages/tab-bar.css');
 @import url('frontend/styles/displays/debug-tree.css');
 @import url('frontend/styles/icons/bootstrap-icons.min.css');
@@ -24,8 +24,26 @@
     --font-color-tertiary: #96DEC4;         /* Parsley green. */
     --font-color-quaternary: #242526;       /* Parsley green. */
     --font-color-error: #D2042D;            /* Red error. */
+    --font-color-warning: #FF8C00;          /* Yellow Warning */
+    --font-color-success: #4BB543;          /* Success green */
+    --font-color-info: #6495ED;             /* Info blue */
     --font-color-no-tree: #3c4b46a3;        /* Dark green. */
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
+
+    --node-color: #242526;
+    --node-color-fail: var(--node-color);
+    --node-color-iterative: var(--node-color);
+    --node-color-debug: var(--node-color);
+    
+    --node-hover-color: #3d3f41;
+    --node-hover-color-fail: var(--node-hover-color);
+    --node-hover-color-iterative: var(--node-hover-color);
+    --node-hover-color-debug: var(--node-hover-color);
+
+    --node-font-color: #96DEC4;
+    --node-font-color-fail: #FFA3A3;
+    --node-font-color-iterative: #a3d6ff;
+    --node-font-color-debug: #ffa65e;
 }
 
 [data-theme="light"] {
@@ -41,7 +59,25 @@
     --font-color-tertiary: #7EB9A6;     /* Lighter green. */
     --font-color-quaternary: #1F3D34;   /* Parsley green. */
     --font-color-error: #fd4659;        /* Red error. */
+    --font-color-warning: #FF8C00;      /* Yellow Warning */
+    --font-color-success: #4BB543;      /* Success green */
+    --font-color-info: #6495ED;         /* Info blue */
     --font-color-no-tree: #bde3d8;      /* Light green. */
+    
+    --node-color: #96DEC4;
+    --node-color-fail: #ffa3a3;
+    --node-color-iterative: #a3d6ff;
+    --node-color-debug: #ffa65e;
+
+    --node-hover-color: #93cfba;
+    --node-hover-color-fail: #f29a9a;
+    --node-hover-color-iterative: #95c2e7;
+    --node-hover-color-debug: #ea9956;
+
+    --node-font-color: #2E2F30;
+    --node-font-color-fail: var(--node-font-color);
+    --node-font-color-iterative: var(--node-font-color);
+    --node-font-color-debug: var(--node-font-color);
 }
 
 body {
