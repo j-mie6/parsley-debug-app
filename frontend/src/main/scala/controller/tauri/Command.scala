@@ -106,15 +106,6 @@ object Command {
         type Out = List[String]
     }
 
-    case object UpdateTree extends Command("update_tree") {
-        type In = Int
-        given args: Args[In] {
-            extension (index: Int) 
-                def namedArgs: Map[String, Any] = Map("index" -> index)
-        }
-        type Out = Unit
-    }
-
     case object SkipBreakpoints extends Command("skip_breakpoints") {
         type In = (Int, Int)
         given args: Args[In] {

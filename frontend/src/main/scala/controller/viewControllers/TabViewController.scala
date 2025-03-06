@@ -54,7 +54,4 @@ object TabViewController {
 
     /** Delete tree loaded within tab, returning updated list of names */
     def deleteSavedTree(index: Int): EventStream[Either[DillException, List[String]]] = Tauri.invoke(Command.DeleteTree, index)
-
-    /** Update tree loaded in current tab */
-    def updateTree(index: Int): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.UpdateTree, index)
 }

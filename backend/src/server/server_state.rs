@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
@@ -56,6 +58,10 @@ impl StateManager for ServerState {
         self.inner().session_id_exists(session_id)
     }
     
+    fn get_session_ids(&self) -> Result<HashMap<String,i32>,StateError> {
+        self.inner().get_session_ids()
+    }
+
     fn next_session_id(&self) -> Result<i32,StateError> {
         self.inner().next_session_id()
     }

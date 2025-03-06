@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use tauri::{Emitter, Manager};
 
 use crate::events::Event;
@@ -54,6 +56,10 @@ impl StateManager for tauri::AppHandle {
     
     fn session_id_exists(&self, session_id:i32) -> Result<bool,StateError> {
         self.state::<AppState>().session_id_exists(session_id)
+    }
+
+    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError> {
+        self.state::<AppState>().get_session_ids()
     }
 
     fn next_session_id(&self) -> Result<i32, StateError> {

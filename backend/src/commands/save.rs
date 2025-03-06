@@ -10,6 +10,7 @@ use crate::files::SAVED_TREE_DIR;
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
 pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<String, SaveTreeError> {
+    println!("saving tree with name {}", tree_name);
     /* Get DebugTree from current state */
     let debug_tree: DebugTree = state.get_tree()?;
 
@@ -59,37 +60,27 @@ pub enum SaveTreeError {
 
 /* SHOULD be current tree */
 /* Updates a saved tree with new breakpoint skips */
-#[tauri::command]
-pub fn update_tree(state: tauri::State<AppState>, index: usize) -> Result<(), UpdateTreeError> {
-    /* Access the `tree` field from the locked state */
-    let cur_tree: DebugTree = state.get_tree().map_err(|_| UpdateTreeError::LoadTreeFailed)?;
-
-    let new_tree: SavedTree = SavedTree::from(cur_tree);
+pub fn update_tree(tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+    let new_tree: SavedTree = SavedTree::from(tree.clone());
     /* Get the serialised JSON */
     let tree_json: String = serde_json::to_string_pretty(&new_tree)
         .map_err(|_| UpdateTreeError::SerialiseFailed)?;
 
+    /* Open the json file to update the tree */
+    /* TODO: look into only updating the extra bits rather than replacing the tree */
+    println!("updating tree with name {}", tree_name);
+    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+    let mut data_file: File = File::create(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
 
-    let tree_name_lol = state.get_tree_name(index).map_err(|_| UpdateTreeError::NameRetrievalFail);
-
-    if let Ok(tree_name) = tree_name_lol {
-        /* Open the json file to update the tree */
-        /* TODO: look into only updating the extra bits rather than replacing the tree */
-        let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
-        let mut data_file: File = File::create(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
-    
-        /* Write tree json to the json file */
-        data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;
-    }
+    /* Write tree json to the json file */
+    data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;
 
     Ok(())
 }
 
 #[derive(Debug, serde::Serialize)]
 pub enum UpdateTreeError {
-    LoadTreeFailed,
     SerialiseFailed,
-    NameRetrievalFail,
     OpenFileFailed,
     WriteTreeFailed,
 }
@@ -140,6 +131,7 @@ pub enum DeleteTreeError {
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
 pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<(), LoadTreeError>  {
+    println!("loading tree with index {}", index);
     /* Get the tree name given the index */
     let tree_name: String = state.get_tree_name(index).map_err(|_| LoadTreeError::NameRetrievalFail)?;
 

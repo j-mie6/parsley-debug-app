@@ -2,8 +2,9 @@ use rocket::{get, post, http, serde::json::Json};
 
 use super::ServerState;
 use crate::events::Event;
-use crate::trees::{parsley_tree, DebugTree, ParsleyTree};
+use crate::trees::{DebugTree, ParsleyTree};
 use crate::state::{StateError, StateManager};
+use crate::commands::save;
 
 /* Length of input slice returned in post response */
 const RESPONSE_INPUT_LEN: usize = 16;
@@ -65,6 +66,8 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     let mut parsley_tree: ParsleyTree = data.into_inner();
     let new_tree: bool = parsley_tree.get_session_id() == -1;
 
+    println!("session id before is {}", parsley_tree.get_session_id());
+
     /* SETUP: Allocate id if tree doesn't have one */
     if new_tree {
         let allocated_id: i32 = state.inner().next_session_id().expect("Pretty please");
@@ -78,8 +81,25 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
     /* Format informative response for RemoteView */
     let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
+    println!("session id is {}", session_id);
+    println!("newtree is {}", new_tree);
 
-    match state.set_tree(debug_tree).and(if new_tree { state.emit(Event::NewTree) } else { Ok(()) }) {
+    /* Check if tree is needing to be updated or is a new tree */
+    let set_tree_result: Result<(), StateError> = if new_tree {
+        state.set_tree(debug_tree).and(state.emit(Event::NewTree))
+    } else {
+        /* Get the tree_name from the session_id */
+        let tree_name: String = {
+            let res: std::collections::HashMap<String, i32> = state.get_session_ids().expect("oopsies");
+            res.into_iter().find(|(_, v)| *v == session_id).expect("handle value not not found").0
+        };
+
+        /* Update the saved tree and set the updated tree into state */
+        save::update_tree(&debug_tree, tree_name).expect("Please");
+        state.set_tree(debug_tree)
+    };
+
+    match set_tree_result {
         Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
 
         Ok(()) => match state.receive_breakpoint_skips().await {

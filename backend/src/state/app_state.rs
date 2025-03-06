@@ -172,6 +172,12 @@ impl StateManager for AppState {
         Ok(state.debug_sessions.values().any(|&id| id == session_id))
     }
 
+    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError> {
+        let state: MutexGuard<AppStateInternal> = self.inner()?;
+        
+        Ok(state.debug_sessions.clone())
+    }
+
     fn next_session_id(&self) -> Result<i32, StateError> {
         let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
         

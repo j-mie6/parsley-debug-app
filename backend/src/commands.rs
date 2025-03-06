@@ -1,5 +1,5 @@
 mod fetch;
-mod save;
+pub(crate) mod save;
 mod breakpoint;
 
 /* Expose command handlers for Tauri setup */
@@ -10,7 +10,6 @@ pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         save::save_tree, 
         save::load_saved_tree,
         save::delete_tree,
-        save::update_tree,
         breakpoint::skip_breakpoints,
     ]
 }

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[cfg(test)] use mockall::automock;
 
 use crate::events::Event;
@@ -21,6 +23,8 @@ pub trait StateManager: Send + Sync + 'static {
     fn rmv_session_id(&self, tree_name: String) -> Result<(),StateError>;
 
     fn session_id_exists(&self, session_id: i32) -> Result<bool,StateError>;
+    
+    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError>;
 
     fn next_session_id(&self) -> Result<i32, StateError>;
 }
