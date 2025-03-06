@@ -49,7 +49,7 @@ object StateManagementView {
                     h2("References")
                 ),
 
-                child(StateManagementViewController.noReferencesError) <-- StateManagementViewController.refsEmptySignal,
+                child(div(className := "nothing-shown", "Nothing to show")) <-- StateManagementViewController.refsEmptySignal,
 
 
                 div(cls("state-contents"),

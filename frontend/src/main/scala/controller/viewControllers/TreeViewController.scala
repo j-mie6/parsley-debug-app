@@ -37,7 +37,7 @@ object TreeViewController {
         case None => 
           StateManagementViewController.clearRefs()
           div(
-            className := "tree-view-error",
+            className := "nothing-shown",
             "Nothing to show"
           )
 
@@ -52,8 +52,11 @@ object TreeViewController {
       *
       * @param skips The amount of times to skip a breakpoint
       */
-    def skipBreakpoints(): Unit =
-        Tauri.invoke(Command.SkipBreakpoints, (SettingsViewController.getNumSkipBreakpoints.now() - 1, Nil))
+    def skipBreakpoints: EventStream[Either[DillException, Unit]] =
+        EventStream.fromValue(())
+            .sample(SettingsViewController.getNumSkipBreakpoints.signal.combineWith(StateManagementViewController.getRefs))
+            .map((skips, refs) => (skips - 1 , refs))
+            .flatMapMerge((args: (Int, Seq[(Int, String)])) => Tauri.invoke(Command.SkipBreakpoints, args))
     
     /* Toggle whether the button to skip through breakpoints is visible */
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
