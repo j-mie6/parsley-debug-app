@@ -24,7 +24,7 @@ class Test extends AnyFlatSpec with should.Matchers {
             "isIterative": false,
             "newlyGenerated": false
         },
-        "isDebuggable": false
+        "sessionId": -1
     }"""
 
     
@@ -34,7 +34,7 @@ class Test extends AnyFlatSpec with should.Matchers {
 
         /* Check that the root tree has been deserialised correctly */
         tree.input should be ("Test")
-        tree.isDebuggable should be (false)
+        tree.sessionId should be (-1)
         tree.root.nodeId should be (0)
         tree.root.name should be ("Test")
         tree.root.internal should be ("Test")
