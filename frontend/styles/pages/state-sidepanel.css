@@ -14,7 +14,6 @@
 
     z-index: 1000;
     transform: translateX(100vw); /* Completely hidden initially */
-    transition: transform 0.75s ease-in-out;
 }
 
 .state-sidepanel-container.open {
