@@ -223,7 +223,6 @@ private object ReactiveNodeDisplay {
             cls("leaf") := node.debugNode.isLeaf,
             cls("iterative") := node.debugNode.isIterative,
             cls("debug") := node.debugNode.name == "remoteBreak",
-            cls("recent") := node.debugNode.newlyGenerated,
 
             /* Render a box for user-defined parser types */
             cls("type-box") := hasUserType,
@@ -244,6 +243,7 @@ private object ReactiveNodeDisplay {
 
                     /* Render debug node information */
                     div(
+                        child(i(className := "bi bi-patch-exclamation-fill", alignContent := "right")) := node.debugNode.newlyGenerated,
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
                         child(p(className := "debug-node-iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,

@@ -31,7 +31,6 @@
     --node-color-fail: var(--node-color);
     --node-color-iterative: var(--node-color);
     --node-color-debug: var(--node-color);
-    --border-color-recent: #ddd64e;
     
     --node-hover-color: #3d3f41;
     --node-hover-color-fail: var(--node-hover-color);
@@ -63,7 +62,6 @@
     --node-color-fail: #ffa3a3;
     --node-color-iterative: #a3d6ff;
     --node-color-debug: #ffa65e;
-    --border-color-recent: #f78808;
 
     --node-hover-color: #93cfba;
     --node-hover-color-fail: #f29a9a;
