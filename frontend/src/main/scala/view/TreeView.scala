@@ -3,11 +3,10 @@ package view
 import scala.util.Failure
 import scala.util.Success
 
-import org.scalajs.dom
 import com.raquo.laminar.api.L.*
+import org.scalajs.dom
 
 import model.DebugTree
-
 import controller.viewControllers.TreeViewController
 
 /**

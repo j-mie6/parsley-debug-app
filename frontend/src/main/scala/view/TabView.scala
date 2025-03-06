@@ -7,9 +7,9 @@ import org.scalajs.dom
 
 import model.DebugTree
 import model.errors.DillException
-import controller.tauri.{Tauri, Command}
 import controller.errors.ErrorController
-import controller.viewControllers.{TabViewController, TreeViewController, InputViewController}
+import controller.tauri.{Tauri, Command}
+import controller.viewControllers.{InputViewController, TabViewController, TreeViewController}
 
 
 object TabView {

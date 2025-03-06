@@ -8,10 +8,10 @@ import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import model.json.Reader
 import model.errors.DillException
-import controller.tauri.Args
+import model.json.Reader
 import controller.errors.ErrorController
+import controller.tauri.Args
 
 
 /* Argument trait implemented for types passed to Command invoke call */ 

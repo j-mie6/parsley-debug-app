@@ -5,9 +5,9 @@ import com.raquo.laminar.api.L.*
 import model.{DebugTree, DebugNode, ReactiveNode}
 import controller.viewControllers.MainViewController
 import controller.viewControllers.SettingsViewController
+import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}
-import controller.viewControllers.StateManagementViewController
 
 
 /**

@@ -5,10 +5,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.raquo.laminar.api.L.*
 
-import controller.tauri.{Tauri, Command}
-import controller.viewControllers.TreeViewController
 import model.DebugTree
 import model.errors.DillException
+import controller.tauri.{Tauri, Command}
+import controller.viewControllers.TreeViewController
+
 
 
 /**

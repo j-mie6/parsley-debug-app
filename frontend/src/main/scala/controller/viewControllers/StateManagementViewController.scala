@@ -1,9 +1,10 @@
 package controller.viewControllers
 
 import scala.scalajs.js
+import scala.scalajs.js.internal.UnitOps.unitOrOps
 
 import com.raquo.laminar.api.L._
-import scala.scalajs.js.internal.UnitOps.unitOrOps
+
 import model.DebugTree
 
 /**
