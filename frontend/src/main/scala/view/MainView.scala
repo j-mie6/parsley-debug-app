@@ -34,14 +34,6 @@ object MainView extends DebugViewPage {
 
         val tabBus: EventBus[Either[DillException, List[String]]] = EventBus()
 
-        /* if debugging you have sessionID from tree
-           if you have session id of -1, do normal stuff
-           else you have some session id: (if you have session id it SHOULD be current tab (getSelectedTab))
-                update tree (Set tree)
-                update input
-            NOTE for calling skip breakpoints (getSessionId) signal SHOULD NOT be -1 (you cannot call skip break on non debuggable)
-            TODO add param (sessionId) for skip breakpoints call
-         */
         super.render(Some(
             div(
                 /* Update DOM theme with theme value */
