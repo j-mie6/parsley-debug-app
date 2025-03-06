@@ -9,7 +9,6 @@ pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         fetch::fetch_debug_tree, 
         fetch::fetch_node_children, 
         save::save_tree, 
-        save::fetch_saved_tree_names, 
         save::load_saved_tree,
         save::delete_tree,
         breakpoint::skip_breakpoints,

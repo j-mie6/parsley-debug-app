@@ -13,6 +13,7 @@ import controller.viewControllers.{MainViewController, TreeViewController, Input
 import controller.viewControllers.CodeViewController
 import model.CodeFileInformation
 import model.DebugTree
+import model.errors.DillException
 
 object MainView extends DebugViewPage {
     
@@ -21,7 +22,8 @@ object MainView extends DebugViewPage {
         private val num: Var[Int] = Var(0)
         val increment: Observer[Unit] = num.updater((x, unit) => x + 1)
 
-        /* Generate random name for file */
+        
+        /* Generate name: tree-{num} for file */
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
     }
 
@@ -35,6 +37,9 @@ object MainView extends DebugViewPage {
     
     /* Render main viewing page */
     def apply(): HtmlElement = {
+
+        val tabBus: EventBus[Either[DillException, List[String]]] = EventBus()
+
         super.render(Some(
             div(
                 /* Update DOM theme with theme value */
@@ -56,22 +61,22 @@ object MainView extends DebugViewPage {
                 /* Notify of any errors caught by treeStream */
                 treeStream.collectLeft --> ErrorController.setError,
 
-                
                 /* Save any new trees when received */
-                newTreeStream.collectRight.sample(Counter.genName)
-                    .flatMapMerge(TabViewController.saveTree)
-                    .collectLeft --> ErrorController.setError,
-
-                /* Add new tab when new tree saved */ 
-                newTreeStream.collectRight
-                    .sample(Counter.genName) --> TabViewController.addFileName,
-
-                /* Update tab index */
-                newTreeStream.collectRight
+                newTreeStream
+                    .collectRight
                     .sample(Counter.genName)
-                    .flatMapSwitch(TabViewController.getFileNameIndex)
-                    --> TabViewController.setSelectedTab,
-                
+                    .flatMapMerge(TabViewController.saveTree) --> tabBus.writer,
+
+                /* Update file names */
+                tabBus.stream.collectRight --> TabViewController.setFileNames,
+
+                /* Pipe errors */
+                tabBus.stream.collectLeft --> ErrorController.setError,
+
+                /* Set selected tab to newest tree */
+                tabBus.stream.collectRight
+                    .map((fileNames: List[String]) => fileNames.length - 1) --> TabViewController.setSelectedTab,
+
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,
 
