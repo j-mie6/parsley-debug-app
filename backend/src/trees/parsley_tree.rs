@@ -49,11 +49,15 @@ impl ParsleyTree {
     //     2 * (self.is_debuggable as i32) - 1
     // }
 
-    fn get_session_id(&self) -> i32 {
+    pub fn get_session_id(&self) -> i32 {
         self.session_id
     }
 
     fn default_session_id() -> i32 { -1 }
+
+    pub fn set_session_id(&mut self, session_id: i32) {
+        self.session_id = session_id
+    }
 }
 
 /* Convert from ParsleyTree to DebugTree */
