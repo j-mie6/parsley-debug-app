@@ -15,6 +15,7 @@ import model.Page
 import view.SettingsView
 import view.StateManagementView
 import controller.AppStateController
+import controller.errors.ErrorController
 import controller.viewControllers.InputViewController
 import controller.viewControllers.MainViewController
 import controller.viewControllers.MainViewController.View
@@ -61,6 +62,18 @@ abstract class DebugViewPage extends Page {
         onClick --> (_ => 
             println("Opening settings")
             SettingsViewController.toggleOpenSettings())
+    )
+
+
+    /* Fast forward icon for skipping */
+    private lazy val breakpointSkipIcon: Element = i(className := "bi bi-fast-forward-fill")
+
+    /* Adds ability to skip the current breakpoint. */
+    private lazy val breakpointSkipButton: Element = button(
+        className := "debug-view-button debug-view-button-breakpoint-skip-button",
+        breakpointSkipIcon, /* Fast forward icon */
+
+        onClick.mapToUnit.compose(TreeViewController.skipBreakpoints(_).collectLeft) --> ErrorController.setError
     )
 
     /**
@@ -133,7 +146,11 @@ abstract class DebugViewPage extends Page {
         /* Button bar right. */
         div(
             className := "debug-view-right-button-bar",
-
+            child(
+                div(
+                    breakpointSkipButton
+                )
+            ) <-- TreeViewController.isDebuggingSession,
             stateButton,
             infoButton,
         )

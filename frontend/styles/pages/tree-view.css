@@ -18,16 +18,6 @@
     justify-content: flex-start;
 }
 
-.skip-button {
-    margin-right: 20px;
-    background: transparent;
-    color: inherit;
-    border: none;
-    font: inherit;
-    outline: inherit;
-    cursor: pointer;
-}
-
 .tree-view-page.highlight-debug-session {
     animation: borderPulseRed 1.8s infinite alternate ease-in !important;
 }
