@@ -33,7 +33,6 @@
     align-items: center;
 
     background: var(--background-secondary);
-
     border: 2px solid var(--font-color-tertiary);
     border-radius: 20px;
 
@@ -54,19 +53,73 @@
 }
 
 .state-contents {
-    display: grid;
-    columns: 3;
     width: 100%;
+
+    flex: 1;
     padding: 1vh 0;
+    
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    overflow-y: auto;
+}
+
+.single-ref-top-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    /* Subtle background and border around each reference item */
+    /* background-color: var(--background-tertiary); */
+    border: 1px solid var(--font-color-tertiary);
+    border-radius: 6px;
+
+    padding: 8px 12px;
 }
 
 .single-ref-title-container {
+    font-weight: 600;
+    color: var(--font-color-primary);
+
     display: flex;
-    flex-direction: row;
-    overflow-y: auto;
     justify-content: space-between;
-    margin-bottom: 5px;
+    align-items: center;
+    margin-bottom: 2px;
 }
+
+.single-ref-top-container div:nth-of-type(2) {
+    font-size: 0.9rem;
+}
+
+.single-ref-modify-container input {
+    width: 120px;
+    padding: 6px 8px;
+    font-size: 0.9rem;
+  
+    border: 1px solid var(--font-color-tertiary);
+    border-radius: 5px;
+  
+    outline: none;
+
+    color: var(--font-color-primary);
+    background-color: var(--background-secondary);
+}
+  
+  /* .single-ref-modify-container input:focus {
+    border-color: var(--font-color-secondary);
+  } */
+  
+  .single-ref-modify-container input::-webkit-outer-spin-button,
+  .single-ref-modify-container input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .single-ref-modify-container input {
+    appearance: textfield;
+    -moz-appearance: textfield; 
+  }
 
 .state-footer {
     display: flex;
@@ -100,4 +153,22 @@
 
 .apply-state-button:hover {
     background: var(--font-color-secondary);
+}
+
+.state-view-error {
+    color: var(--font-color-no-tree); 
+    flex: 1;
+    font-weight: bold;
+    text-align: center;
+    font-size: 28px;
+    
+    width: 40%;
+    
+    margin: auto;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    
+    padding: 1.5em;
+    padding-right: 2em;
+    padding-left: 2em;
 }
