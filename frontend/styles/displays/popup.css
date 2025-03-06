@@ -27,11 +27,8 @@
 }
 
 .popup-icon-container {
-    align-items: center;
-    margin:auto;
-    margin-right: 20px;
-    padding: 10px;
-    border-radius: 50%;
+    font-size: 3vw;
+    box-shadow: none !important;
 }
 
 .popup-header {
@@ -41,6 +38,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 90%;
+    padding-left: 2vw;
 }
 
 .popup-text {
@@ -48,6 +46,7 @@
     max-height: 12vh;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-left: 2vw;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     line-clamp: 3;
