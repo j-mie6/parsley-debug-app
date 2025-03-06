@@ -6,13 +6,13 @@ use super::{SavedTree, SavedNode};
 pub struct DebugTree {
     input: String,
     root: DebugNode,
-    is_debugging: bool,
+    is_debuggable: bool,
     session_id: i32,
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, is_debugging: bool,  session_id: i32) -> Self {
-        DebugTree { input, root, is_debugging, session_id }
+    pub fn new(input: String, root: DebugNode, is_debuggable: bool,  session_id: i32) -> Self {
+        DebugTree { input, root, is_debuggable, session_id }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -23,8 +23,8 @@ impl DebugTree {
         &self.input
     }
 
-    pub fn is_debugging(&self) -> bool {
-        self.is_debugging
+    pub fn is_debuggable(&self) -> bool {
+        self.is_debuggable
     }
 
     pub fn get_session_id(&self) -> i32 {
@@ -60,7 +60,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debugging(), debug_tree.get_session_id())
+        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable(), debug_tree.get_session_id())
     }
 }
 

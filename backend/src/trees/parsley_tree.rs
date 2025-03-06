@@ -26,15 +26,15 @@ pub struct ParsleyTree {
     root: ParsleyNode,          /* Root node of the debug tree */
     
     /* If this tree was produced by a currently-running parser */
-    #[serde(default = "ParsleyTree::default_bool")] is_debugging: bool, 
+    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool, 
 
     /* If this tree was produced by a currently-running parser */
     #[serde(default = "ParsleyTree::default_session_id")] session_id: i32, 
 }
 
 impl ParsleyTree {
-    pub fn is_debugging(&self) -> bool {
-        self.is_debugging
+    pub fn is_debuggable(&self) -> bool {
+        self.is_debuggable
     }
 
     /* Function used by serde to parse default boolean values as false */
@@ -46,7 +46,7 @@ impl ParsleyTree {
         TODO remove
     */
     // fn get_session_id(&self) -> i32 {
-    //     2 * (self.is_debugging as i32) - 1
+    //     2 * (self.is_debuggable as i32) - 1
     // }
 
     fn get_session_id(&self) -> i32 {
@@ -99,9 +99,9 @@ impl From<ParsleyTree> for DebugTree {
 
         /* Convert the root node and return DebugTree */
         let session_id = tree.get_session_id();
-        let is_debugging = tree.is_debugging();
+        let is_debuggable = tree.is_debuggable();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, is_debugging, session_id)
+        DebugTree::new(tree.input, node, is_debuggable, session_id)
     }
 }
 
@@ -210,7 +210,7 @@ pub mod test {
                 is_iterative: false,
                 newly_generated: false,
             },
-            is_debugging: false,
+            is_debuggable: false,
             session_id: -1,
         }
     }
@@ -276,7 +276,7 @@ pub mod test {
                 is_iterative: false,
                 newly_generated: false,
             },
-            is_debugging: false,
+            is_debuggable: false,
             session_id: -1,
         }
     }
