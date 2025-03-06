@@ -249,23 +249,25 @@ private object ReactiveNodeDisplay {
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
-                    onClick(_
-                        .filter(_ => !node.debugNode.isLeaf)
-                        .sample(expansionState)
-                        .flatMapMerge {
-                            _ match
-                                case ExpansionState.AllChildren => 
-                                    EventStream.fromValue(Nil)
-                                case ExpansionState.OneIterativeChild => 
-                                    expandAllChildren.set(true)
-                                    Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
-                                case ExpansionState.NoChildren => 
-                                    if (node.debugNode.isIterative) {
-                                        expandAllChildren.set(false)
-                                    }
-                                    Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
-                        }
-                    ) --> node.children.writer
+                    // onClick(_
+                    //     .filter(_ => !node.debugNode.isLeaf)
+                    //     .sample(expansionState)
+                    //     .flatMapMerge {
+                    //         _ match
+                    //             case ExpansionState.AllChildren => 
+                    //                 EventStream.fromValue(Nil)
+                    //             case ExpansionState.OneIterativeChild => 
+                    //                 expandAllChildren.set(true)
+                    //                 Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                    //             case ExpansionState.NoChildren => 
+                    //                 if (node.debugNode.isIterative) {
+                    //                     expandAllChildren.set(false)
+                    //                 }
+                    //                 Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                    //     }
+                    // ) --> node.children.writer,
+
+                    onClick(event => getNamedChildren(node.debugNode)) --> node.children.writer
                 ),
                 
                 arrows(isRight = true),
@@ -290,5 +292,36 @@ private object ReactiveNodeDisplay {
                             nodes.map(ReactiveNode.apply andThen ReactiveNodeDisplay.apply)),
             )
         )
+
+    }
+    
+    def getNamedChildren(node: DebugNode): EventStream[List[DebugNode]] = {
+        println("Here")
+        Tauri.invoke(Command.FetchNodeChildren, node.nodeId)
+            .tapEach(tree => println(s"Tree: ${tree.toString}"))
+            .collectRight
+            .filter(_ != null)
+            .map {children => 
+                children.foreach(child => recursivelyGetNamedChildren(child))
+                println(s"Updating node.children with: ${children.map(_.name)}") 
+                children
+            } 
+    }
+
+    def recursivelyGetNamedChildren(node: DebugNode): EventStream[List[DebugNode]] = {
+        if (!node.isLeaf && node.name == node.internal) {
+            println("Recursing")
+            Tauri.invoke(Command.FetchNodeChildren, node.nodeId)
+                .tapEach(tree => println(s"Tree: ${tree.toString}"))
+                .collectRight
+                .filter(_ != null)
+                .map {children => 
+                    children.foreach(child => recursivelyGetNamedChildren(child))
+                    children
+                } 
+        } else {
+            EventStream.empty
+        }
+
     }
 }
