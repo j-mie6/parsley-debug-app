@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{SavedTree, SavedNode};
 
 /* Placeholder ParserInfo structures for state management */
@@ -6,12 +8,13 @@ use super::{SavedTree, SavedNode};
 pub struct DebugTree {
     input: String,
     root: DebugNode,
+    parser_info: HashMap<String, Vec<(i32, i32)>>,
     is_debuggable: bool,
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, is_debuggable: bool) -> Self {
-        DebugTree { input, root, is_debuggable }
+    pub fn new(input: String, root: DebugNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool) -> Self {
+        DebugTree { input, root, parser_info, is_debuggable }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -20,6 +23,10 @@ impl DebugTree {
 
     pub fn get_input(&self) -> &String {
         &self.input
+    }
+
+    pub fn get_parser_info(&self) -> &HashMap<String, Vec<(i32, i32)>> {
+        &self.parser_info
     }
 
     pub fn is_debuggable(&self) -> bool {
@@ -51,7 +58,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        DebugTree::new(debug_tree.get_input().clone(), node, HashMap::new(), debug_tree.is_debuggable())
     }
 }
 
@@ -97,6 +104,8 @@ impl DebugNode {
 pub mod test {
 
     /* Debug Tree unit testing */
+
+    use std::{collections::HashMap, hash::Hash};
 
     use super::{DebugNode, DebugTree};
 
@@ -154,6 +163,7 @@ pub mod test {
                 false,
                 false
             ),
+            HashMap::new(),
             false
         )
     }
@@ -219,6 +229,7 @@ pub mod test {
                 false,
                 false
             ),
+            HashMap::new(),
             false
         )
     }

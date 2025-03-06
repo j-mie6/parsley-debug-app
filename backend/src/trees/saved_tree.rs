@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{DebugNode, DebugTree};
 
 /* Struct identical to DebugTree that allows serialized saving */
@@ -5,6 +7,7 @@ use super::{DebugNode, DebugTree};
 pub struct SavedTree {
     input: String,
     root: SavedNode,
+    parser_info: HashMap<String, Vec<(i32, i32)>>,
     is_debuggable: bool,
 }
 
@@ -47,15 +50,16 @@ impl From<DebugTree> for SavedTree {
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
   
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_parser_info().clone(), debug_tree.is_debuggable())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, is_debuggable: bool) -> Self {
+    pub fn new(input: String, root: SavedNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool) -> Self {
         SavedTree { 
             input,
             root,
+            parser_info,
             is_debuggable,
         }
     }
@@ -66,6 +70,10 @@ impl SavedTree {
 
     pub fn get_input(&self) -> &String {
         &self.input
+    }
+
+    pub fn get_parser_info(&self) -> &HashMap<String, Vec<(i32, i32)>> {
+        &self.parser_info
     }
 
     pub fn is_debuggable(&self) -> bool {
@@ -100,6 +108,8 @@ pub mod test {
 
     /* Saved Tree unit testing */
 
+    use std::collections::HashMap;
+    use std::hash::Hash;
     use std::io::Write;
     use std::fs::{self, File};
 
@@ -208,6 +218,7 @@ pub mod test {
                 false,
                 false
             ),
+            HashMap::new(),
             false
         )
     }
@@ -273,6 +284,7 @@ pub mod test {
                 false,
                 false
             ),
+            HashMap::new(),
             false
         )
     }

@@ -22,7 +22,7 @@ case class File(name: String, fullPath: String) extends FileObject {
 case class Directory(name: String, contents: List[FileObject], expanded: Var[Boolean]) extends FileObject {
     lazy val render: Element = div(
         className := "code-view-directory",
-        cls("expanded") <-- expanded.signal.invert,
+        cls("expanded") <-- expanded.signal,
         div(
             className := "code-view-directory-header",
             child <-- expanded.signal.splitBoolean(_ => i(className := "bi bi-caret-right-fill"), _ => i(className := "bi bi-caret-down-fill")),
@@ -58,7 +58,7 @@ case object FileObject {
       */
     def fromPaths(input: List[String]): FileObject = RootDirectory(input match
         case Nil => Nil
-        case head :: Nil => List(File(head.drop(head.lastIndexWhere(charIsSlash)), head))
+        case head :: Nil => List(File(head.drop(head.lastIndexWhere(charIsSlash) + 1), head))
         case files@(head :: next) => shortestFilePrefix(head, next) match {
             case ("", _) => fromPathsList(files, "")
             case (prefix, prefixFiles) => {
@@ -154,22 +154,11 @@ object CodeView {
     }
 
     lazy val defaultFileExplorer: Element = div(
-        className := "code-view-file-explorer",
-        "No File Explorer"
+        className := "tree-view-error",
+        "Nothing to show"
     )
 
-    lazy val defaultFile: Element = div(
-        className := "code-view-file-view",
-        "No File"
-    )
-
-    val exampleFs: List[String] = List(
-        "/Users/rileyhorrix/Downloads/robot.ino",
-        "/Users/rileyhorrix/Downloads/robot.h",
-        "/Users/rileyhorrix1/Downloads2/robot.h",
-        "/Users/rileyhorrix/Downloads2/robot.h",
-        "/Users/rileyhorrix/Downloads/robot.h",
-    )
+    lazy val defaultFile: Element = div()
 
     def apply(): HtmlElement = {
         val maybeFileContents: Signal[Option[Element]] = CodeViewController.getCurrentFile.splitOption((_, signal) => renderFile(signal))
@@ -178,8 +167,7 @@ object CodeView {
         div(
             className := "code-view-main-view",
 
-            renderFileExplorer(exampleFs),
-            // child <-- maybeFileExplorer.map(_.getOrElse(defaultFileExplorer)),
+            child <-- maybeFileExplorer.map(_.getOrElse(defaultFileExplorer)),
             child <-- maybeFileContents.map(_.getOrElse(defaultFile)),
         )
     }
