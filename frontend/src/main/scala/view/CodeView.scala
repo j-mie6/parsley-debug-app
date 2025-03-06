@@ -62,7 +62,6 @@ case object FileObject {
         case files@(head :: next) => shortestFilePrefix(head, next) match {
             case ("", _) => fromPathsList(files, "")
             case (prefix, prefixFiles) => {
-                println("fromPaths prefix : " + prefix + " files : " + prefixFiles)
                 // We still want the parent directory
                 val splitIndex: Int = prefix.init.lastIndexWhere(charIsSlash(_))
                 val parentDir: String = prefix.drop(splitIndex).tail
@@ -88,7 +87,7 @@ case object FileObject {
      *  files = ["root/dir1/test2.scala", "root/dir2/test.scala"]
      * 
      * returns
-     *  ("root", ["dir1/test.scala", "dir1/test2.scala", "dir2/test.scala"]) 
+     *  ("root", ["dir1/test.scala", "dir1/test2.scala", "dir2/test.scala"])
      * 
      * This function is functional programming at it's finest (don't ask how it works)
      * 
@@ -100,8 +99,6 @@ case object FileObject {
         case -1 => ("", file :: files)
         case index =>
             val prefix: String = file.take(index + 1)
-            println("shrFilePth prefix : " + prefix)
-            println("shrFilePth files : " + (file :: files))
             files.filter(_.startsWith(prefix)) match
                 case Nil => ("", file :: files)
                 case prefixFiles =>
@@ -117,14 +114,15 @@ case object FileObject {
       * @param input The file paths
       * @return
       */
-    private def fromPathsList(input: List[String], prefix: String): List[FileObject] = {println("fromPathsList with input : " + input + " and prefix : " + prefix);input match
+    private def fromPathsList(input: List[String], prefix: String): List[FileObject] = input match
         case Nil => Nil
         case head :: Nil => File(head, prefix + head) :: Nil
         case head :: next => shortestFilePrefix(head, next) match {
             case ("", _) => File(head, prefix + head) :: fromPathsList(next, prefix)
             case (thisPrefix, files) => Directory(thisPrefix, fromPathsList(files, prefix + thisPrefix), Var(true)) :: fromPathsList(input.filter(!_.startsWith(thisPrefix)), prefix)
-        }    }
+        }    
 }
+
 
 object CodeView {
     def renderFile(contents: Signal[String]): Element = {
@@ -135,7 +133,6 @@ object CodeView {
     }
 
     def renderFileExplorer(fileInfo: List[String]): Element = {
-        println("From strings!")
         val fileSystem: FileObject = FileObject.fromPaths(fileInfo)
         div(
             className := "code-view-file-explorer",
