@@ -21,6 +21,8 @@
 
 /* Container of debug tree */
 .debug-tree-container {
+    height: calc(100vh - 215px);
+    overflow: auto;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;

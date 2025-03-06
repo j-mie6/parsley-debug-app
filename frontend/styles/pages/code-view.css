@@ -7,14 +7,22 @@
 }
 
 .code-view-file-view {
-    flex: 1;
-    margin-left: 20px;
-    padding-top: 7px;
-    overflow: scroll;
-    border: 1px solid var(--background-tertiary-40);
 }
 
-.code-view-file-explorer {}
+.code-view-file-view-wrapper {
+    flex: 1;
+    margin-left: 20px;
+    padding: 7px;
+    margin-right: 12px;
+    background-color: #bdbdbd1f;
+    border: 1px solid var(--background-tertiary-40);
+    height: calc(100vh - 230px);
+    overflow-y: auto;
+}
+
+.code-view-file-explorer {
+    height: fit-content;
+}
 
 .code-view-file {
     border-radius: 10px;

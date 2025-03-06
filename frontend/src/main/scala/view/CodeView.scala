@@ -125,10 +125,23 @@ case object FileObject {
 
 
 object CodeView {
+    def transformFileString(file: String): Element = {
+        div(
+            file.split("\n").map(line => 
+                div(
+                    p(line),
+                    if line.strip() == "" then br() else div()
+                ))
+        )
+    }
+
     def renderFile(contents: Signal[String]): Element = {
         div(
-            className := "code-view-file-view",
-            text <-- contents
+            className := "code-view-file-view-wrapper",
+            div(
+                className := "code-view-file-view",
+                child <-- contents.map(transformFileString)
+            )
         )
     }
 
@@ -152,6 +165,9 @@ object CodeView {
 
     val exampleFs: List[String] = List(
         "/Users/rileyhorrix/Downloads/robot.ino",
+        "/Users/rileyhorrix/Downloads/robot.h",
+        "/Users/rileyhorrix1/Downloads2/robot.h",
+        "/Users/rileyhorrix/Downloads2/robot.h",
         "/Users/rileyhorrix/Downloads/robot.h",
     )
 

@@ -1,7 +1,7 @@
 .tree-view-page {
     background-color: var(--background-secondary);
-    height: 85%;
-    overflow: auto;
+    /* height: 85%; */
+    overflow: hidden;
     border: 2px solid var(--font-color-tertiary);
     border-radius: 20px;
     box-sizing: border-box;
