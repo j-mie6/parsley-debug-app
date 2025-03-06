@@ -8,6 +8,7 @@ import org.scalajs.dom
 
 import model.DebugTree
 import controller.viewControllers.TreeViewController
+import controller.errors.ErrorController
 
 /**
   * Object containing rendering functions for the TreeView
@@ -23,9 +24,7 @@ object TreeView {
 
         skipIcon, /* Fast forward icon */
 
-        onClick --> { _ => {
-            TreeViewController.skipBreakpoints()
-        }}
+        onClick(_ => TreeViewController.skipBreakpoints.collectLeft) --> ErrorController.setError,
     )
 
 
