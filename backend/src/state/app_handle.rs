@@ -44,12 +44,12 @@ impl StateManager for tauri::AppHandle {
         self.state::<AppState>().transmit_breakpoint_skips(session_id, skips)
     }
     
-    fn add_session_id(&self, session_id:i32) -> Result<(),StateError> {
-        self.state::<AppState>().add_session_id(session_id)
+    fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(),StateError> {
+        self.state::<AppState>().add_session_id(tree_name, session_id)
     }
     
-    fn rmv_session_id(&self, session_id:i32) -> Result<(),StateError> {
-        self.state::<AppState>().add_session_id(session_id)
+    fn rmv_session_id(&self, tree_name: String) -> Result<(),StateError> {
+        self.state::<AppState>().rmv_session_id(tree_name)
     }
     
     fn session_id_exists(&self, session_id:i32) -> Result<bool,StateError> {

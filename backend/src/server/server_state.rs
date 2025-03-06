@@ -43,12 +43,12 @@ impl StateManager for ServerState {
         self.0.as_ref().transmit_breakpoint_skips(session_id, skips)
     }
     
-    fn add_session_id(&self, session_id:i32) -> Result<(), StateError> {
-        self.inner().add_session_id(session_id)
+    fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
+        self.inner().add_session_id(tree_name, session_id)
     }
     
-    fn rmv_session_id(&self, session_id:i32) -> Result<(), StateError> {
-        self.inner().rmv_session_id(session_id)
+    fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
+        self.inner().rmv_session_id(tree_name)
 
     }
     

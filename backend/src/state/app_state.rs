@@ -16,7 +16,7 @@ struct AppStateInternal {
     map: HashMap<u32, DebugNode>,            /* Map from node_id to the respective node */
     skips_tx: TokioMutex<SkipsSender>,       /* Transmitter how many breakpoints to skip, sent to parsley */
     tab_names: Vec<String>,                  /* List of saved tree names */
-    debug_sessions: HashSet<i32>,            /* Set of sessionIds */
+    debug_sessions: HashMap<String, i32>,    /* Map of tree name to sessionId */
 }
 
 
@@ -34,7 +34,7 @@ impl AppState {
                     map: HashMap::new(),
                     skips_tx,
                     tab_names: Vec::new(),
-                    debug_sessions: HashSet::new(),
+                    debug_sessions: HashMap::new(),
                 }
             )
         )
@@ -143,27 +143,25 @@ impl StateManager for AppState {
             .map_err(|_| StateError::ChannelError)
     }
     
-    fn add_session_id(&self, session_id:i32) -> Result<(), StateError> {
+    fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
         self.inner()?
             .debug_sessions
-            .insert(session_id);
+            .insert(tree_name, session_id);
 
         Ok(())
     }
     
-    fn rmv_session_id(&self, session_id:i32) -> Result<(), StateError> {
+    fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
         self.inner()?
             .debug_sessions
-            .remove(&session_id);
+            .remove(&tree_name);
 
         Ok(())
     }
     
     fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
-        let session_found: bool = self.inner()?
-            .debug_sessions
-            .contains(&session_id);
+        let state: MutexGuard<'_, AppStateInternal> = self.inner()?;
 
-        Ok(session_found)
+        Ok(state.debug_sessions.values().any(|&id| id == session_id))
     }
 }
