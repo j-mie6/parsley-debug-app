@@ -222,7 +222,7 @@ private object ReactiveNodeDisplay {
             cls("fail") := !node.debugNode.success,
             cls("leaf") := node.debugNode.isLeaf,
             cls("iterative") := node.debugNode.isIterative,
-            cls("debug") := node.debugNode.isDebugNode,
+            cls("debug") := node.debugNode.isBreakpoint,
 
             /* Render a box for user-defined parser types */
             cls("type-box") := hasUserType,
