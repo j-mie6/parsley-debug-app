@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::sync::{Mutex, MutexGuard};
 
 use crate::events::Event;
@@ -16,7 +16,7 @@ struct AppStateInternal {
     map: HashMap<u32, DebugNode>,            /* Map from node_id to the respective node */
     skips_tx: TokioMutex<SkipsSender>,       /* Transmitter how many breakpoints to skip, sent to parsley */
     tab_names: Vec<String>,                  /* List of saved tree names */
-    debug_sessions: HashMap<i32, String>,    /* Map of sessionId to tree names */
+    debug_sessions: HashSet<i32>,            /* Set of sessionIds */
 }
 
 
@@ -34,7 +34,7 @@ impl AppState {
                     map: HashMap::new(),
                     skips_tx,
                     tab_names: Vec::new(),
-                    debug_sessions: HashMap::new(),
+                    debug_sessions: HashSet::new(),
                 }
             )
         )
@@ -77,28 +77,6 @@ impl AppState {
 
         /* Index will never be out of range as the frontend representation and the backend will be in sync */
         Ok(state.tab_names[index].clone()) 
-    }
-
-    pub fn add_debug_session(&self, index: usize, session_id: i32) -> Result<(), StateError> {
-        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
-
-        let tree_name: String = self.get_tree_name(index)?;
-
-        state.debug_sessions.insert(session_id, tree_name);
-
-        Ok(())
-    }
-
-    pub fn get_debug_session(&self, session_id: i32) -> Result<String, StateError> {
-        let state: MutexGuard<AppStateInternal> = self.inner()?;
-
-        let tree_name: Option<&String> = state.debug_sessions.get(&session_id);
-
-        match tree_name {
-            Some(name) => Ok(String::from(name)),
-            None => Err(StateError::DebugSessionNotFound)
-        }
-
     }
 }
 
@@ -163,5 +141,29 @@ impl StateManager for AppState {
             .blocking_lock()
             .blocking_send(skips)
             .map_err(|_| StateError::ChannelError)
+    }
+    
+    fn add_session_id(&self, session_id:i32) -> Result<(), StateError> {
+        self.inner()?
+            .debug_sessions
+            .insert(session_id);
+
+        Ok(())
+    }
+    
+    fn rmv_session_id(&self, session_id:i32) -> Result<(), StateError> {
+        self.inner()?
+            .debug_sessions
+            .remove(&session_id);
+
+        Ok(())
+    }
+    
+    fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
+        let session_found: bool = self.inner()?
+            .debug_sessions
+            .contains(&session_id);
+
+        Ok(session_found)
     }
 }

@@ -98,6 +98,8 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
 
+    /* TODO: Remove session id from debug_sessions in state */
+
     /* Returns a list of the tree names that are left */
     let tree_names: Vec<String> = state.rmv_tree(index).map_err(|_| DeleteTreeError::TreeRemovalFail)?;
 

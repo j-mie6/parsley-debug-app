@@ -55,8 +55,6 @@ object MainView extends DebugViewPage {
                 /* Notify of any errors caught by treeStream */
                 treeStream.collectLeft --> ErrorController.setError,
 
-                /* START */
-
                 /* Save any new trees when received */
                 newTreeStream
                     .collectRight
@@ -79,7 +77,6 @@ object MainView extends DebugViewPage {
                 /* Notify of any errors caught by newTreeStream */
                 newTreeStream.collectLeft --> ErrorController.setError,
 
-                /* END */
 
                 /* Load main page */
                 child <-- MainViewController.getViewElem,

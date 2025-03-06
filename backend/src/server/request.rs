@@ -67,6 +67,13 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     /* Format informative response for RemoteView */
     let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
 
+
+    /* TODO:
+        If session_id is -1 or not known, emit new tree
+        Store session_id's to know if its a new tab and if we need to emit
+    */
+
+
     /* Update state with new debug_tree and return response */
     match state.set_tree(debug_tree).and(state.emit(Event::NewTree)) {
         Ok(()) if !is_debugging => (http::Status::Ok, PostTreeResponse::no_skips(&msg)),

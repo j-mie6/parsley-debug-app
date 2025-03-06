@@ -36,6 +36,14 @@ impl ParsleyTree {
 
     /* Function used by serde to parse default boolean values as false */
     fn default_bool() -> bool { false } 
+
+    /* 
+        Currently uses 1 for true and -1 for false
+        NOTE this is temporary while remoteView sends isDebuggable
+    */
+    fn get_session_id(&self) -> i32 {
+        2 * (self.is_debuggable as i32) - 1
+    }
 }
 
 /* Convert from ParsleyTree to DebugTree */
@@ -80,9 +88,9 @@ impl From<ParsleyTree> for DebugTree {
         let mut current_id: u32 = 0;
 
         /* Convert the root node and return DebugTree */
+        let session_id = tree.get_session_id();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-       /* currently uses 1 for true and -1 for false */
-        DebugTree::new(tree.input, node, 2 * (tree.is_debuggable as i32) - 1)
+        DebugTree::new(tree.input, node, session_id)
     }
 }
 
