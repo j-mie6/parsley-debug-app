@@ -24,10 +24,8 @@ object TreeView {
 
         skipIcon, /* Fast forward icon */
 
-        onClick --> { _ => {
-                TreeViewController.skipBreakpoints()
-            }
-        }
+        onClick.mapToUnit.compose(TreeViewController.skipBreakpoints(_).collectLeft) --> ErrorController.setError,
+        
     )
 
 

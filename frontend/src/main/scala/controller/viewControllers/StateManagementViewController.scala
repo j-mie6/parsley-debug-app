@@ -99,7 +99,7 @@ object StateManagementViewController {
     *
     * @return A signal emitting the sequence of references.
     */
-    def getRefs: Var[Seq[(Int, String)]] = refs
+    def getRefs: Signal[Seq[(Int, String)]] = refs.signal
     
     /**
     * Produces a signal that calculates the "reference number" (1-based index)
@@ -108,9 +108,10 @@ object StateManagementViewController {
     * @param refAddr The integer address of the reference whose 1-based index is required.
     * @return A signal emitting the reference's 1-based index, or 0 if not found.
     */
-    def getRefNumber(refAddr: Int): Signal[Int] =
-    refs.signal.map { allRefs =>
-        allRefs.map(_._1).indexOf(refAddr) + 1
+    def getRefNumber(refAddr: Int): Signal[Int] = {
+        refs.signal.map { allRefs =>
+            allRefs.map(_._1).indexOf(refAddr) + 1
+        }
     }
     
     /**

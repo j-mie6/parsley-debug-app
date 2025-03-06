@@ -52,8 +52,11 @@ object TreeViewController {
       *
       * @param skips The amount of times to skip a breakpoint
       */
-    def skipBreakpoints(): Unit =
-        Tauri.invoke(Command.SkipBreakpoints, (SettingsViewController.getNumSkipBreakpoints.now() - 1, StateManagementViewController.getRefs.now()))
+    def skipBreakpoints(trigger: EventStream[Unit]): EventStream[Either[DillException, Unit]] = {
+        trigger.sample(SettingsViewController.getNumSkipBreakpoints.signal.combineWith(StateManagementViewController.getRefs))
+            .map((skips, refs) => (skips - 1, refs))
+            .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _))
+    }
         
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
 }
