@@ -117,7 +117,7 @@ object Command {
         type In = (Int, Seq[(Int, String)])
         given args: Args[In] {
             extension (args: (Int, Seq[(Int, String)])) 
-                def namedArgs: Map[String, Any] = Map("skips" -> args._1, "newRefs" -> js.Array(args._2*))
+                def namedArgs: Map[String, Any] = Map("skips" -> args._1, "newRefs" -> js.Array(args._2.map(js.Tuple2(_, _))*))
         }
         type Out = Unit
     }
