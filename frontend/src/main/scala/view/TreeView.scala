@@ -8,6 +8,7 @@ import com.raquo.laminar.api.L.*
 
 import model.DebugTree
 import controller.viewControllers.TreeViewController
+import controller.errors.ErrorController
 
 /**
   * Object containing rendering functions for the TreeView
@@ -23,7 +24,11 @@ object TreeView {
 
         skipIcon, /* Fast forward icon */
 
-        onClick(_ => TreeViewController.getSessionId) --> TreeViewController.skipBreakpoints(0),
+        onClick(_
+            .sample(TreeViewController.getSessionId)
+            .flatMapMerge(TreeViewController.skipBreakpoints(_, 0))
+            .collectLeft
+        ) --> ErrorController.setError,
     )
 
 
