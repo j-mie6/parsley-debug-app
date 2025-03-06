@@ -26,6 +26,7 @@ object StateManagementView {
                 text <-- StateManagementViewController.getRefValue(refAddr)
             ),
             div(
+                className := "single-ref-modify-container",
                 input(
                     placeholder := "New value",
                     // value <-- StateManagementViewController.getRefValue(refAddr),
@@ -41,13 +42,15 @@ object StateManagementView {
         div(
             className := "state-sidepanel-container",
             cls("open") <-- StateManagementViewController.isStateOpen,
-
+            
             div(
                 className := ("state-sidepanel"),
-                
                 div(cls("state-header"),
                     h2("References")
                 ),
+
+                child(StateManagementViewController.noReferencesError) <-- StateManagementViewController.refsEmptySignal,
+
 
                 div(cls("state-contents"),
                     children <-- StateManagementViewController.getRefs.map(_.map(renderReference))
@@ -55,11 +58,10 @@ object StateManagementView {
 
                 div(
                     cls("state-footer"),
-                    button(className := "apply-state-button", "Apply", onClick --> (_ => 
-                        StateManagementViewController.getRefs.map(println)
+                    child(button(className := "apply-state-button", "Apply", onClick --> (_ => 
                         StateManagementViewController.getLocalRefs.foreach(StateManagementViewController.updateNewRefValue)
                         ToastController.setToast(StateApplied)
-                    )),
+                    ))) <-- StateManagementViewController.refsEmptySignal.not,
                 ),
             )
         )

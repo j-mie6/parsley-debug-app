@@ -13,6 +13,12 @@ object StateManagementViewController {
     private val refs: Var[Seq[(Int, String)]] = Var(Nil)
     private var localRefs: Seq[(Int, String)] = Nil
 
+    val noReferencesError: HtmlElement = div(
+            className := "state-view-error",
+            "Nothing to show"
+    )
+
+    val refsEmptySignal: Signal[Boolean] = refs.signal.map(_.isEmpty)
     /**
      * Retrieves a signal indicating whether the state management panel is open.
      * 
@@ -66,5 +72,10 @@ object StateManagementViewController {
         localRefs = localRefs.map {
             case (addr, _) if addr == refAddr => (addr, newRefValue)
             case pair => pair
-        }
+    }
+
+    def clearRefs(): Unit = {
+        localRefs = Nil
+        refs.set(Nil)
+    }
 }
