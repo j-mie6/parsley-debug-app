@@ -150,14 +150,14 @@ abstract class DebugViewPage extends Page {
       * 
       * @return HTML element of the DebugView page.
       */
-    override def render(child: Option[HtmlElement]): HtmlElement = {
+    override def render(childElem: Option[HtmlElement]): HtmlElement = {
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,
             div(
                 className := "debug-view-body", 
-                SettingsView(),
-                StateManagementView(),
+                child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
+                child(StateManagementView()) <-- StateManagementViewController.isStateOpen,
                 div(
                     className := "tab-and-tree-view-container",
                     cls("left-compressed") <-- SettingsViewController.isSettingsOpen,
@@ -171,7 +171,7 @@ abstract class DebugViewPage extends Page {
                         className := "tree-view-page",
                         buttonBar,
                         cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
-                        child.getOrElse(div())
+                        childElem.getOrElse(div())
                     )
                 )
             )
