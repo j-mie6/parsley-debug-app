@@ -72,7 +72,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
     let session_exists: bool = state.session_id_exists(session_id).expect("State error checking if session_id exists");
 
-
+    /* Set new session id if session is beginning */
     if is_debugging && session_id == -1 {
         let new_session_id: i32 = state.inner().next_session_id().expect("Pretty please");
 
@@ -82,7 +82,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     /* Only get a new tree if not debugging and no session_id */
     let new_tree: bool = !(is_debugging || session_exists);
 
-    /* New tree will only be emitted for trees that have not already been seen (by session_id) */
+
     match state.set_tree(debug_tree).and(if new_tree { state.emit(Event::NewTree) } else { Ok(()) }) {
         Ok(()) if !is_debugging => (http::Status::Ok, PostTreeResponse::no_skips(&msg)),
 
