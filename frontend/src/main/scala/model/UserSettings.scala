@@ -48,7 +48,7 @@ sealed trait UserSetting {
 val allUserSettings = List(
     NumSkipIterativeChildren,
     NumSkipBreakpoints,
-    ColorBlindMode
+    // ColorBlindMode
 )
 
 /**
