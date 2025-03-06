@@ -282,6 +282,7 @@
     color: var(--font-color-iterative);
 }
 
-.debug-node.recent {
-    border: 3px solid var(--border-color-recent);
+.debug-node-container.recent > div > .debug-node {
+    position: relative;
+    outline: 1.5px solid var(--border-color-recent);
 }
