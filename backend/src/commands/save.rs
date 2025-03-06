@@ -36,7 +36,7 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
 
 /* Downloads the tree into Downloads folder */
 #[tauri::command]
-pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result<(), SaveTreeError> {
+pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), SaveTreeError> {
     /* Path to the json file used to store the tree */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
 
@@ -45,7 +45,7 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
     download_path.push(format!("{}.json", tree_name));
 
     /* Creates a file in Downloads and copies data into it */
-    let _ = File::create(&download_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
+    File::create(&download_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
     fs::copy(file_path, download_path).map_err(|_| SaveTreeError::DownloadFailed)?;
     
     Ok(())
@@ -53,8 +53,7 @@ pub fn download_tree(state: tauri::State<AppState>, tree_name: String) -> Result
 
 /* Imports JSON file to display a tree */
 #[tauri::command]
-pub fn import_tree(state: tauri::State<AppState>, name: String, contents: String) -> Result<(), SaveTreeError> {
-
+pub fn import_tree(name: String, contents: String, state: tauri::State<AppState>) -> Result<(), SaveTreeError> {
     /* Path to the json file used to store the tree */
     let app_path: String = format!("{}{}", SAVED_TREE_DIR, &name);
 
@@ -63,10 +62,8 @@ pub fn import_tree(state: tauri::State<AppState>, name: String, contents: String
     imported_tree.write(contents.as_bytes()).map_err(|_| SaveTreeError::ImportFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
-    let _ = load_path(app_path, state.clone()).map_err(|_| SaveTreeError::ImportFailed)?;
-    state.emit(Event::NewTree).map_err(|_| SaveTreeError::ImportFailed)?;
-
-    Ok(())
+    load_path(app_path, state.clone()).map_err(|_| SaveTreeError::ImportFailed)?;
+    state.emit(Event::NewTree).map_err(|_| SaveTreeError::ImportFailed)
 }
 
 #[derive(Debug, serde::Serialize)]

@@ -42,7 +42,7 @@ abstract class DebugViewPage extends Page {
 
     /* Export tree button */
     val downloadButton: HtmlElement = button(
-        className := "debug-view-download-button",
+        className := "debug-view-file-button",
 
         /* Save button icon */
         i(className := "bi bi-floppy", fontSize.px := 30),
@@ -56,7 +56,7 @@ abstract class DebugViewPage extends Page {
 
     /* Uploading json element */
     val uploadButton: HtmlElement = label(
-        className := "debug-view-upload-button",
+        className := "debug-view-file-button",
         i(className := "bi bi-cloud-download", fontSize.px := 30),
         input(
             typ := "file",
@@ -80,7 +80,6 @@ abstract class DebugViewPage extends Page {
                 
     /* Overview information tab. */
     private lazy val infoButton: HtmlElement = button(
-        // TODO
         className := "debug-view-button debug-view-button-info",
         i(className := "bi bi-info-circle-fill"),
     )

@@ -34,7 +34,6 @@ object MainView extends DebugViewPage {
 
         super.render(Some(
             div(
-
                 /* Update DOM theme with theme value */
                 AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
 
@@ -58,7 +57,9 @@ object MainView extends DebugViewPage {
                 /* Pipe errors */
                 tabBus.stream.collectLeft --> ErrorController.setError,
 
-                tabBus.stream.collectRight.map(names => names.length - 1) --> TabViewController.setSelectedTab,
+                /* Set selected tab to newest tree */
+                tabBus.stream.collectRight
+                    .map((fileNames: List[String]) => fileNames.length - 1) --> TabViewController.setSelectedTab,
 
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,

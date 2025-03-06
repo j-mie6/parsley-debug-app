@@ -96,32 +96,16 @@
     margin-left: 5px;
 }
 
-.debug-view-download-button {
-    z-index: 1;
+.debug-view-file-button {
     background: transparent;
     border: none;
-    border: red 1px !important;
-    cursor: pointer;  
-    margin-right: 15px; 
-}
-
-@media (max-width: 450px) {
-    .debug-view-download-button {
-        display: none;
-    }
-}
-
-.debug-view-upload-button {
-    z-index: 1;
-    background: transparent;
-    border: none;
-    border: red 1px !important;
     cursor: pointer;   
     margin-right: 15px;
 }
 
+/* Makes button disappear if screen size is too small */
 @media (max-width: 450px) {
-    .debug-view-upload-button {
+    .debug-view-file-button {
         display: none;
     }
 }

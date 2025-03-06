@@ -11,7 +11,7 @@ pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         save::load_saved_tree,
         save::delete_tree,
         save::download_tree,
+        save::import_tree,
         breakpoint::skip_breakpoints,
-        save::import_tree
     ]
 }
