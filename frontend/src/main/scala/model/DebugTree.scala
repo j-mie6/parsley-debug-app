@@ -28,5 +28,8 @@ case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean, refs
   * @param isIterative if a node is iterative (and opaque)
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean, newlyGenerated: Boolean) derives Reader.upickle
+        childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean, newlyGenerated: Boolean) derives Reader.upickle {
+  
+    def isBreakpoint: Boolean = internal == "remoteBreak"
+}
 
