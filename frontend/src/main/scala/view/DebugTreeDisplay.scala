@@ -3,10 +3,12 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
+import controller.errors.ErrorController
 import controller.viewControllers.MainViewController
 import controller.viewControllers.SettingsViewController
 import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
+import controller.viewControllers.TreeViewController
 import controller.tauri.{Tauri, Command}
 
 
@@ -38,7 +40,6 @@ object DebugTreeDisplay {
     /* Resets the zoomFactor to 1 */
     val resetZoom = Observer(_ => zoomFactor.set(1.0))
 
-
     /**
     * Render the entire tree from the root node downwards.
     *
@@ -49,17 +50,18 @@ object DebugTreeDisplay {
     def apply(tree: DebugTree): HtmlElement = 
         StateManagementViewController.setRefs(tree.refs)
         StateManagementViewController.setLocalRefs(tree.refs)
+        StateManagementViewController.setOrigRefs(tree.refs)
 
         div(
-        className := "debug-tree-container zoom-container",
-        
-        styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
-        wheelHandler,
-        
-        children <-- StateManagementViewController.getRefs.map(refs => refs.map(ref => StateRef)),
+            className := "debug-tree-container zoom-container",
+            
+            styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
+            wheelHandler,
 
-        ReactiveNodeDisplay(ReactiveNode(tree.root)),
-    )
+            children <-- StateManagementViewController.getRefs.map(refs => refs.map(ref => StateRef(ref))),
+
+            ReactiveNodeDisplay(ReactiveNode(tree.root)),
+        )
 
 }
 
@@ -120,9 +122,9 @@ private object ReactiveNodeDisplay {
           * The various states of expansion for a reactive node
           */
         enum ExpansionState:
-            case NoChildren      /* Compressed */
-            case OneIterativeChild /* Iterative single-child */
-            case AllChildren     /* Either non-iterative or iterative fully expanded */
+            case NoChildren           /* Compressed */
+            case OneIterativeChild    /* Iterative single-child */
+            case AllChildren          /* Either non-iterative or iterative fully expanded */
 
         /* Tracker for the expansion state of the current reactive node */
         val expansionState: Signal[ExpansionState] = 
