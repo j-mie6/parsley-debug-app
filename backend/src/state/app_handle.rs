@@ -55,4 +55,8 @@ impl StateManager for tauri::AppHandle {
     fn session_id_exists(&self, session_id:i32) -> Result<bool,StateError> {
         self.state::<AppState>().session_id_exists(session_id)
     }
+
+    fn next_session_id(&self) -> Result<i32, StateError> {
+        self.state::<AppState>().next_session_id()
+    }
 }

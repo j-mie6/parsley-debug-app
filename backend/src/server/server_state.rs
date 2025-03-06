@@ -55,6 +55,10 @@ impl StateManager for ServerState {
     fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
         self.inner().session_id_exists(session_id)
     }
+    
+    fn next_session_id(&self) -> Result<i32,StateError> {
+        self.inner().next_session_id()
+    }
 
     
 }

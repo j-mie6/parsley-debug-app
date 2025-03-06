@@ -21,6 +21,8 @@ pub trait StateManager: Send + Sync + 'static {
     fn rmv_session_id(&self, tree_name: String) -> Result<(),StateError>;
 
     fn session_id_exists(&self, session_id: i32) -> Result<bool,StateError>;
+
+    fn next_session_id(&self) -> Result<i32, StateError>;
 }
 
 

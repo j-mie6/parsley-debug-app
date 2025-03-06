@@ -7,6 +7,7 @@ use crate::trees::{DebugTree, DebugNode};
 
 pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<i32>;
 
+use super::session_counter::SessionCounter;
 use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
@@ -17,6 +18,7 @@ struct AppStateInternal {
     skips_tx: TokioMutex<SkipsSender>,       /* Transmitter how many breakpoints to skip, sent to parsley */
     tab_names: Vec<String>,                  /* List of saved tree names */
     debug_sessions: HashMap<String, i32>,    /* Map of tree name to sessionId */
+    counter: SessionCounter                  /* Counter to hold next sessionId */
 }
 
 
@@ -35,6 +37,7 @@ impl AppState {
                     skips_tx,
                     tab_names: Vec::new(),
                     debug_sessions: HashMap::new(),
+                    counter: SessionCounter::new(),
                 }
             )
         )
@@ -163,5 +166,11 @@ impl StateManager for AppState {
         let state: MutexGuard<'_, AppStateInternal> = self.inner()?;
 
         Ok(state.debug_sessions.values().any(|&id| id == session_id))
+    }
+
+    fn next_session_id(&self) -> Result<i32, StateError> {
+        let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
+        
+        Ok(state.counter.get_and_increment())
     }
 }
