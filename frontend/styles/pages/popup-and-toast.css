@@ -27,14 +27,8 @@
 }
 
 .popup-icon-container {
-    /* align-items: center;
-    margin:auto;
-    margin-right: 20px;
-    padding: 10px;
-    border-radius: 50%; */
     font-size: 3vw;
     box-shadow: none !important;
-    /* padding-left: 1vw; */
 }
 
 .popup-header {
@@ -101,7 +95,7 @@
     border-width: 0.2cap;
     border-radius: 8px;
     
-    /* animation: fadeIn 0.3s ease-out, fadeOut 0.3s ease-in 5s forwards; */
+    animation: fadeIn 0.3s ease-out, fadeOut 0.3s ease-in 5s forwards;
 }
 
 .toast-icon-container {
