@@ -137,7 +137,7 @@ abstract class DebugViewPage extends Page {
         div(
             className := "debug-view-right-button-bar",
 
-            child(stateButton) <-- TreeViewController.treeExists,
+            stateButton,
             infoButton,
         )
     )   
