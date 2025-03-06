@@ -67,15 +67,15 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     /* Format informative response for RemoteView */
     let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
 
+    let session_id: i32 = debug_tree.get_session_id();
 
-    /* TODO:
-        If session_id is -1 or not known, emit new tree
-        Store session_id's to know if its a new tab and if we need to emit
+    let session_exists: bool = state.session_id_exists(session_id).expect("State error checking if session_id exists");
+
+    /* 
+        Update state with new debug_tree and return response 
+        Will only call emit for newTree if its a new session_id or is -1
     */
-
-
-    /* Update state with new debug_tree and return response */
-    match state.set_tree(debug_tree).and(state.emit(Event::NewTree)) {
+    match state.set_tree(debug_tree).and(if !session_exists { state.emit(Event::NewTree) } else { Ok(()) }) {
         Ok(()) if !is_debugging => (http::Status::Ok, PostTreeResponse::no_skips(&msg)),
 
         Ok(()) => match state.receive_breakpoint_skips().await {
