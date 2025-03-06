@@ -56,7 +56,7 @@ object DebugTreeDisplay {
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
         wheelHandler,
         
-        tree.refs.map(StateRef(_)),
+        children <-- StateManagementViewController.getRefs.map(refs => refs.map(ref => StateRef)),
 
         ReactiveNodeDisplay(ReactiveNode(tree.root)),
     )
