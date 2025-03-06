@@ -128,7 +128,9 @@
     gap: 20px;
 }
 
-.apply-state-button {
+
+.apply-state-button,
+.restore-original-state-button {
     width: 100%;
     height: 20px;
     background: var(--font-color-primary);
@@ -150,7 +152,8 @@
     text-align: center;
 }
 
-.apply-state-button:hover {
+.apply-state-button:hover,
+.restore-original-state-button:hover {
     background: var(--font-color-secondary);
 }
 

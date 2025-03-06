@@ -38,6 +38,12 @@ object StateManagementViewController {
     * Modifications made here do not automatically propagate to the reactive `refs`.
     */
     private var localRefs: Seq[(Int, String)] = Nil
+
+    /**
+    * A private, local collection mirroring the sequence of references (`refs`).
+    * Modifications made here do not automatically propagate to the reactive `refs`.
+    */
+    private var origRefs: Seq[(Int, String)] = Nil
     
     /**
     * An HTML element indicating that there are no references available
@@ -161,6 +167,37 @@ object StateManagementViewController {
     def setLocalRefs(refs: Seq[(Int, String)]): Unit = {
         localRefs = refs
     }
+
+    /**
+    * Retrieves the previous sequence of reference pairs. This sequence
+    * is separate from the reactive `refs`.
+    *
+    * @return The current local sequence of (Int, String) pairs.
+    */
+    def getOrigRefs: Seq[(Int, String)] = origRefs
+    
+    /**
+    * Sets the original (non-reactive) sequence of references to a new collection
+    * of (address, value) pairs.
+    *
+    * @param refs The new sequence of references.
+    */
+    def setOrigRefs(refs: Seq[(Int, String)]): Unit = {
+        origRefs = refs
+    }
+
+     /**
+    * Looks up the original string value associated with the specified
+    * reference address. If no matching entry is found, an empty string is returned.
+    *
+    * @param refAddr The reference address for which to retrieve the stored string.
+    * @return A signal emitting the string value for the reference, or an empty string if not found.
+    */
+    def getOrigRefValue(refAddr: Int): String = {
+        origRefs.find { case (addr, _) => addr == refAddr }
+            .getOrElse((-1, ""))
+            ._2
+    }
     
     /**
     * Updates the local (non-reactive) references by changing the value
@@ -182,6 +219,7 @@ object StateManagementViewController {
     */
     def clearRefs(): Unit = {
         localRefs = Nil
+        origRefs = Nil
         refs.set(Nil)
     }
 }

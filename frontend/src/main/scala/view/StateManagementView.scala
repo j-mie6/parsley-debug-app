@@ -26,6 +26,10 @@ object StateManagementView {
                 text <-- StateManagementViewController.getRefValue(refAddr)
             ),
             div(
+                "Original Value: ",
+                StateManagementViewController.getOrigRefValue(refAddr)
+            ),
+            div(
                 className := "single-ref-modify-container",
                 input(
                     placeholder := "New value",
@@ -60,6 +64,10 @@ object StateManagementView {
                     cls("state-footer"),
                     child(button(className := "apply-state-button", "Apply", onClick --> (_ => 
                         StateManagementViewController.getLocalRefs.foreach(StateManagementViewController.updateNewRefValue)
+                        ToastController.setToast(StateApplied)
+                    ))) <-- StateManagementViewController.refsEmptySignal.not,
+                    child(button(className := "restore-original-state-button", "Restore Originals", onClick --> (_ => 
+                        StateManagementViewController.getOrigRefs.foreach(StateManagementViewController.updateNewRefValue)
                         ToastController.setToast(StateApplied)
                     ))) <-- StateManagementViewController.refsEmptySignal.not,
                 ),
