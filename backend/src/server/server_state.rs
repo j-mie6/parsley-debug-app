@@ -4,7 +4,7 @@ use crate::trees::{DebugTree, DebugNode};
 
 use super::TokioMutex;
 
-pub type SkipsReceiver = rocket::tokio::sync::mpsc::Receiver<i32>;
+pub type SkipsReceiver = rocket::tokio::sync::mpsc::Receiver<(i32, i32)>;
 
 
 /* Wrapper for StateManager implementation used for Rocket server state management */
@@ -39,13 +39,13 @@ impl StateManager for ServerState {
         self.inner().emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(),StateError> {
-        self.0.as_ref().transmit_breakpoint_skips(skips)
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(),StateError> {
+        self.0.as_ref().transmit_breakpoint_skips(session_id, skips)
     }
 }
 
 impl ServerState {
-    pub async fn receive_breakpoint_skips(&self) -> Option<i32> {
+    pub async fn receive_breakpoint_skips(&self) -> Option<(i32, i32)> {
         self.1.lock().await.recv().await
     }
 }
