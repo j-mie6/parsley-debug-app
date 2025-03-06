@@ -25,7 +25,7 @@ pub mod test {
     /* Start a blocking, tracked client for rocket
     The mock should already be set with expectations */
     pub fn tracked_client(mock: MockStateManager) -> blocking::Client {
-        let rx = empty_channel::<i32>();
+        let rx = empty_channel::<(i32, i32)>();
         let state = ServerState::new(mock, super::TokioMutex::new(rx));
         blocking::Client::tracked(launch::build(state)).expect("Could not launch rocket")
     }

@@ -5,7 +5,7 @@ use crate::events::Event;
 use crate::server::TokioMutex;
 use crate::trees::{DebugTree, DebugNode};
 
-pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<i32>;
+pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<(i32, i32)>;
 
 use super::session_counter::SessionCounter;
 use super::{StateError, StateManager, AppHandle};
@@ -142,7 +142,7 @@ impl StateManager for AppState {
         self.inner()?
             .skips_tx
             .blocking_lock()
-            .try_send(skips)
+            .try_send((session_id, skips))
             .map_err(|_| StateError::ChannelError)
     }
     

@@ -87,7 +87,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         Ok(()) if !is_debugging => (http::Status::Ok, PostTreeResponse::no_skips(&msg)),
 
         Ok(()) => match state.receive_breakpoint_skips().await {
-            Some(skips) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, skips)),
+            Some((_session_id, skips)) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, skips)),
             None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg)),
         },
 
