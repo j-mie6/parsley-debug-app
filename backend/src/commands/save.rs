@@ -34,9 +34,15 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
         .map_err(|_| SaveTreeError::SerialiseFailed)
 }
 
+#[derive(Debug, serde::Serialize)]
+pub enum DownloadTreeError {
+    CreateDirFailed,
+    WriteTreeFailed,
+}
+
 /* Downloads the tree into Downloads folder */
 #[tauri::command]
-pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), SaveTreeError> {
+pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), DownloadTreeError> {
     /* Path to the json file used to store the tree */
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
 
@@ -45,25 +51,33 @@ pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result
     download_path.push(format!("{}.json", tree_name));
 
     /* Creates a file in Downloads and copies data into it */
-    File::create(&download_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
-    fs::copy(file_path, download_path).map_err(|_| SaveTreeError::DownloadFailed)?;
-    
+    File::create(&download_path).map_err(|_| DownloadTreeError::CreateDirFailed)?;
+    fs::copy(file_path, download_path).map_err(|_| DownloadTreeError::WriteTreeFailed)?;
+
     Ok(())
+}
+
+#[derive(Debug, serde::Serialize)]
+pub enum ImportTreeError {
+    CreateDirFailed,
+    WriteTreeFailed,
+    SerialiseFailed,
+    EventEmitFailed,
 }
 
 /* Imports JSON file to display a tree */
 #[tauri::command]
-pub fn import_tree(name: String, contents: String, state: tauri::State<AppState>) -> Result<(), SaveTreeError> {
+pub fn import_tree(name: String, contents: String, state: tauri::State<AppState>) -> Result<(), ImportTreeError> {
     /* Path to the json file used to store the tree */
     let app_path: String = format!("{}{}", SAVED_TREE_DIR, &name);
 
     /* Creates a file in apps local saved tree folders and writes data from external json it */
-    let mut imported_tree: File = File::create(&app_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
-    imported_tree.write(contents.as_bytes()).map_err(|_| SaveTreeError::ImportFailed)?;
+    let mut imported_tree: File = File::create(&app_path).map_err(|_| ImportTreeError::CreateDirFailed)?;
+    imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteTreeFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
-    load_path(app_path, state.clone()).map_err(|_| SaveTreeError::ImportFailed)?;
-    state.emit(Event::NewTree).map_err(|_| SaveTreeError::ImportFailed)
+    load_path(app_path, state.clone()).map_err(|_| ImportTreeError::SerialiseFailed)?;
+    state.emit(Event::NewTree).map_err(|_| ImportTreeError::EventEmitFailed)
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -73,8 +87,6 @@ pub enum SaveTreeError {
     SerialiseFailed,
     CreateDirFailed,
     WriteTreeFailed,
-    DownloadFailed,
-    ImportFailed,
     AddTreeFailed,
 }
 

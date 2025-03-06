@@ -64,19 +64,21 @@ abstract class DebugViewPage extends Page {
             multiple := true,
 
             /* Triggers the file input */
-            onChange.mapToFiles.collect { case files if files.nonEmpty => files } --> {_.foreach(file => {
-                val name = file.name
-                val reader = new dom.FileReader()
-
-                reader.onload = _ => {
-                    val content = reader.result.asInstanceOf[String]
-                    TreeViewController.importTree.tupled((name, content)) --> Observer.empty
-                }
-
-                reader.readAsText(file)
-            })} 
+            onChange.mapToFiles --> {_.map(loadFile)}  
         )
     )
+
+    /* Reads contents of file and passes them to backend */
+    private def loadFile(file: dom.File): Unit = {
+        val reader = new dom.FileReader()
+
+        reader.onload = _ => {
+            val content = reader.result.asInstanceOf[String]
+            TreeViewController.importTree.tupled((file.name, content)) --> Observer.empty
+        }
+
+        reader.readAsText(file)
+    }
                 
     /* Overview information tab. */
     private lazy val infoButton: HtmlElement = button(
