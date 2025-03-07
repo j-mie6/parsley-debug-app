@@ -3,7 +3,6 @@ package model.errors
 import com.raquo.laminar.api.L.*
 
 import controller.errors.ErrorController
-import com.raquo.laminar.api.features.unitArrows
 
 /**
   * DillException is the generic frontend representation of an Exception

@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 #[cfg(test)] use mockall::automock;
 
 use crate::events::Event;
@@ -15,6 +17,8 @@ pub trait StateManager: Send + Sync + 'static {
     fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError>;
 
     fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(), StateError>;
+
+    fn get_download_path(&self) -> Result<PathBuf, StateError>;
 }
 
 

@@ -6,7 +6,6 @@ import model.{DebugTree, DebugNode, ReactiveNode}
 
 import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
-import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}
 
 /**

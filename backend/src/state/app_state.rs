@@ -77,11 +77,6 @@ impl AppState {
         /* Index will never be out of range as the frontend representation and the backend will be in sync */
         Ok(state.tab_names[index].clone()) 
     }
-
-    /* Finds path to Downloads folder (OS agnostic) */
-    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.inner().unwrap().app.get_download_path()
-    }
 }
 
 
@@ -145,5 +140,9 @@ impl StateManager for AppState {
             .blocking_lock()
             .blocking_send(skips)
             .map_err(|_| StateError::ChannelError)
+    }
+    
+    fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.inner()?.app.get_download_path()
     }
 }

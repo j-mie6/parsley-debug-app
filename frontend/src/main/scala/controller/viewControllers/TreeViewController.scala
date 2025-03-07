@@ -20,7 +20,7 @@ object TreeViewController {
     private val tree: Var[Option[DebugTree]] = Var(None) 
 
     /* DebugTree signal */
-    val treeSignal: Signal[Option[DebugTree]] = tree.signal
+    val getTree: Signal[Option[DebugTree]] = tree.signal
 
     /** Set debug tree */
     val setTree: Observer[DebugTree] = tree.someWriter
@@ -32,10 +32,10 @@ object TreeViewController {
     def unloadTree: Observer[Unit] = Observer(_ => tree.set(None))
     
     /** Return true signal if tree is loaded into frontend */
-    def treeExists: Signal[Boolean] = tree.signal.map(_.isDefined)
+    def treeExists: Signal[Boolean] = getTree.map(_.isDefined)
 
     /** Get debug tree element or warning if no tree found */
-    def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
+    def getTreeElem: Signal[HtmlElement] = getTree.map(_ match 
         /* Default tree view when no tree is loaded */
         case None => div(
             className := "tree-view-error",
@@ -51,10 +51,7 @@ object TreeViewController {
     def downloadTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, name)
 
     /* Imports JSON in path from users device */
-    def importTree(name: String, contents: String): EventStream[Either[DillException, Unit]] = {
-        println("In import tree")
-        Tauri.invoke(Command.ImportTree, (name, contents))
-    }
+    def importTree(name: String, contents: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.ImportTree, (name, contents))
     
     /** Fetch the debug tree root from the backend, return in EventStream */
     def reloadTree: EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.FetchDebugTree, ())
@@ -67,5 +64,5 @@ object TreeViewController {
         Tauri.invoke(Command.SkipBreakpoints, skips)
     
     /* Toggle whether the button to skip through breakpoints is visible */
-    val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
+    val isDebuggingSession: Signal[Boolean] = getTree.map(_.exists(_.isDebuggable))
 }

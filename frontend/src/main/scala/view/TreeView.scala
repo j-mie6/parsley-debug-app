@@ -5,7 +5,6 @@ import scala.util.Success
 
 import org.scalajs.dom
 import com.raquo.laminar.api.L.*
-import com.raquo.laminar.api.features.unitArrows
 
 import model.DebugTree
 import controller.viewControllers.TreeViewController

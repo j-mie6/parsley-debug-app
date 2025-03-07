@@ -99,8 +99,7 @@ pub fn import_tree(name: String, contents: String, state: tauri::State<AppState>
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
     load_path(app_path, &state).map_err(|_| ImportTreeError::SerialiseFailed)?;
-    state.emit(Event::NewTree)?;
-    Ok(())
+    state.emit(Event::NewTree).map_err(ImportTreeError::from)
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -151,7 +150,7 @@ pub enum DeleteTreeError {
 
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
-pub fn load_saved_tree(state: tauri::State<AppState>, index: usize) -> Result<(), LoadTreeError>  {
+pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<(), LoadTreeError>  {
     /* Get the tree name given the index */
     let tree_name: String = state.get_tree_name(index).map_err(|_| LoadTreeError::NameRetrievalFail)?;
 

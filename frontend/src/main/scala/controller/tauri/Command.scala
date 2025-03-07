@@ -86,7 +86,7 @@ object Command {
         type Out = List[String]
     }
 
-    case object LoadSavedTree extends Command("load_saved_tree") { 
+    case object LoadSavedTree extends Command("load_saved_tree") {
         type In = Int
         given args: Args[Int] {
             extension (index: Int)
@@ -118,11 +118,10 @@ object Command {
 
     case object ImportTree extends Command("import_tree") {
         type In = (String, String)
-        given args: Args[(String, String)] {
-            extension (fileInfo: (String, String))
+        given args: Args[In] {
+            extension (fileInfo: In)
                 def namedArgs: Map[String, Any] = Map("name" -> fileInfo._1, "contents" -> fileInfo._2)
         }
-
 
         type Out = Unit
     }
@@ -135,5 +134,4 @@ object Command {
         }
         type Out = Unit
     }
-
 }

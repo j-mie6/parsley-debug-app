@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
@@ -41,6 +43,10 @@ impl StateManager for ServerState {
 
     fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(),StateError> {
         self.0.as_ref().transmit_breakpoint_skips(skips)
+    }
+    
+    fn get_download_path(&self) -> Result<PathBuf,StateError> {
+        self.inner().get_download_path()
     }
 }
 

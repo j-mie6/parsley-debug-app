@@ -2,7 +2,6 @@ package view
 
 import com.raquo.laminar.api.L.*
 import com.raquo.laminar.codecs.*
-import com.raquo.laminar.api.features.unitArrows
 
 import org.scalajs.dom
 
@@ -22,6 +21,7 @@ import controller.viewControllers.MainViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.InputViewController
+import controller.errors.ErrorController
 
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -50,8 +50,10 @@ abstract class DebugViewPage extends Page {
         /* Exports current tree */
         onClick(_
             .compose(event => event.sample(TabViewController.getSelectedTab))
-            .flatMapSwitch(TabViewController.getFileName).flatMapMerge(TreeViewController.downloadTree)
-        ) --> Observer.empty,
+            .flatMapSwitch(TabViewController.getFileName)
+            .flatMapMerge(TreeViewController.downloadTree)
+            .collectLeft
+        ) --> ErrorController.setError,
     )
 
     /* Uploading json element */

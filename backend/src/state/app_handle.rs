@@ -17,11 +17,6 @@ impl AppHandle {
     pub fn emit(&self, event: Event) -> Result<(), StateError> {
         StateManager::emit(&self.0, event)
     }
-
-    /* Finds path to Downloads folder (OS agnostic) */
-    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.0.path().download_dir().map_err(|_| StateError::LockFailed)
-    }
 }
 
 
@@ -47,5 +42,10 @@ impl StateManager for tauri::AppHandle {
 
     fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(),StateError> {
         self.state::<AppState>().transmit_breakpoint_skips(skips)
+    }
+    
+    fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.path().download_dir()
+            .map_err(|_| StateError::LockFailed)
     }
 }
