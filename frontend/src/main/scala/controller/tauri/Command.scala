@@ -136,6 +136,16 @@ object Command {
         type Out = Seq[(Int, String)]
     }
 
+    case object ResetRefs extends Command("reset_refs") {
+        type In = Int
+        given args: Args[In] {
+            extension (sessionId: Int)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
+        }
+
+        type Out = Unit
+    }
+
     case object SetRefs extends Command("set_refs") {
         type In = (Int, Seq[(Int, String)])
         given args: Args[In] {

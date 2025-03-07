@@ -15,6 +15,7 @@ pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         save::import_tree,
         save::get_refs,
         save::update_refs,
+        save::reset_refs,
         breakpoint::skip_breakpoints,
         source::request_source_file
     ]

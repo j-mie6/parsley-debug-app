@@ -271,6 +271,14 @@ pub fn get_refs(session_id: i32, state: tauri::State<AppState>) -> Result<Vec<(i
     Ok(state.get_refs(session_id)?)
 }
 
+/* Resets local changes to default for a tree's refs */
+#[tauri::command]
+pub fn reset_refs(session_id: i32, state: tauri::State<AppState>) -> Result<(), RefError>  {
+    let default_refs: Vec<(i32, String)> = state.get_tree().expect("Please").refs();
+
+    Ok(state.reset_refs(session_id, default_refs)?)
+}
+
 #[derive(Debug, serde::Serialize)]
 #[allow(clippy::enum_variant_names)]
 pub enum RefError {
