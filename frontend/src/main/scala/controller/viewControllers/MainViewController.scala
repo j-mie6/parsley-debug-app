@@ -41,7 +41,7 @@ object MainViewController {
 
     def renderViewButton(view: View, openSemaphore: Var[Int]): HtmlElement = view match {
         case View.Tree =>   renderButton("tree", "tree-fill", "Tree View", View.Tree, openSemaphore)
-        case View.Input =>  renderButton("source", "file-earmark-text-fill", "Source View", View.Input, openSemaphore)
+        case View.Input =>  renderButton("input", "file-earmark-text-fill", "Input View", View.Input, openSemaphore)
         case View.Code =>   renderButton("code", "file-earmark-code-fill", "Code View", View.Code, openSemaphore)
     }
 
