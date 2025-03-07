@@ -24,7 +24,7 @@ object TreeView {
         skipIcon, /* Fast forward icon */
 
         onClick --> { _ => {
-            TreeViewController.skipBreakpoints(0)
+            TreeViewController.skipBreakpoints()
         }}
     )
 

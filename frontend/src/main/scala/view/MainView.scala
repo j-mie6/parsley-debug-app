@@ -10,6 +10,7 @@ import controller.tauri.{Tauri, Event}
 import controller.errors.ErrorController
 import controller.AppStateController
 import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController}
+import controller.ToastController
 import model.errors.DillException
 
 object MainView extends DebugViewPage {
@@ -75,6 +76,9 @@ object MainView extends DebugViewPage {
 
                 /* Displaying Dill Exceptions */
                 child.maybe <-- ErrorController.getErrorElem,
+
+                /* Displaying Dill Toasts */
+                child.maybe <-- ToastController.getToastElem,
 
 
                 /* Unlisten to TreeReady event */
