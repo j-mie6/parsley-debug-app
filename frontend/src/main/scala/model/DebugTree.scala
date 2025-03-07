@@ -12,7 +12,7 @@ import model.json.Reader
   * @param sessionId Id of a debugging session, This will be -1 for trees that cannot be debugged, whereas 
   *                  it will be some id for trees that are actively being debugged or have been debugged  
   */
-case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean, sessionId: Int) derives Reader.upickle
+case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean, sessionId: Int, refs: Seq[(Int, String)] = Nil) derives Reader.upickle
 
 
 /**
@@ -29,5 +29,8 @@ case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean, sess
   * @param isIterative if a node is iterative (and opaque)
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean, newlyGenerated: Boolean) derives Reader.upickle
+        childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean, newlyGenerated: Boolean) derives Reader.upickle {
+  
+    def isBreakpoint: Boolean = internal == "remoteBreak"
+}
 

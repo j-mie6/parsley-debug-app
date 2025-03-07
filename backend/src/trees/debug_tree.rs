@@ -7,12 +7,13 @@ pub struct DebugTree {
     input: String,
     root: DebugNode,
     is_debuggable: bool,
+    refs: Vec<(i32, String)>, 
     session_id: i32,
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, is_debuggable: bool,  session_id: i32) -> Self {
-        DebugTree { input, root, is_debuggable, session_id }
+    pub fn new(input: String, root: DebugNode, is_debuggable: bool, refs: Vec<(i32, String)>,  session_id: i32) -> Self {
+        DebugTree { input, root, is_debuggable, refs, session_id }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -26,6 +27,10 @@ impl DebugTree {
     pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
     }
+    
+    pub fn refs(&self) -> Vec<(i32, String)> {
+        self.refs.clone()
+    }
 
     pub fn get_session_id(&self) -> i32 {
         self.session_id
@@ -33,7 +38,7 @@ impl DebugTree {
 }
 
 impl From<SavedTree> for DebugTree {
-    fn from(debug_tree: SavedTree) -> Self {
+    fn from(saved_tree: SavedTree) -> Self {
         /* Recursively convert children into SavedNodes */
         fn convert_node(node: SavedNode) -> DebugNode {
             let children: Vec<DebugNode> = node.children
@@ -55,8 +60,8 @@ impl From<SavedTree> for DebugTree {
             )
         }
 
-        let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable(), debug_tree.get_session_id())
+        let node: DebugNode = convert_node(saved_tree.get_root().clone());
+        DebugTree::new(saved_tree.get_input().clone(), node, saved_tree.is_debuggable(), saved_tree.refs(), saved_tree.get_session_id())
     }
 }
 
@@ -120,6 +125,7 @@ pub mod test {
                 "newlyGenerated": false
             },
             "isDebuggable": false,
+            "refs": [],
             "sessionId": -1
         }"#
         .split_whitespace()
@@ -141,6 +147,7 @@ pub mod test {
                 "newlyGenerated": false
             },
             "isDebuggable": false,
+            "refs": [],
             "sessionId": -1
         }"#
         .split_whitespace()
@@ -162,6 +169,7 @@ pub mod test {
                 false
             ),
             false,
+            Vec::new(),
             -1
         )
     }
@@ -192,7 +200,7 @@ pub mod test {
                                 true,
                                 Some(2),
                                 String::from("2"),
-                                vec![],
+                                Vec::new(),
                                 false,
                                 false
                             )
@@ -215,7 +223,7 @@ pub mod test {
                                 true,
                                 Some(4),
                                 String::from("4"),
-                                vec![],
+                                Vec::new(),
                                 false,
                                 false
                             )
@@ -228,6 +236,7 @@ pub mod test {
                 false
             ),
             false,
+            Vec::new(),
             -1
         )
     }

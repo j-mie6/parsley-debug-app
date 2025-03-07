@@ -28,6 +28,9 @@ pub struct ParsleyTree {
     /* If this tree was produced by a currently-running parser */
     #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool, 
 
+    /* State references to be modified */
+    #[serde(default = "Vec::new")] refs: Vec<(i32, String)>, 
+
     /* If this tree was produced by a currently-running parser */
     #[serde(default = "ParsleyTree::default_session_id")] session_id: i32, 
 }
@@ -96,7 +99,7 @@ impl From<ParsleyTree> for DebugTree {
         let session_id = tree.get_session_id();
         let is_debuggable = tree.is_debuggable();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, is_debuggable, session_id)
+        DebugTree::new(tree.input, node, is_debuggable, tree.refs, session_id)
     }
 }
 
@@ -122,7 +125,8 @@ pub mod test {
                 "children": [],
                 "isIterative": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -184,7 +188,8 @@ pub mod test {
                 ],
                 "isIterative": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -200,11 +205,12 @@ pub mod test {
                 child_id: 0,
                 from_offset: 0,
                 to_offset: 4,
-                children: vec![],
+                children: Vec::new(),
                 is_iterative: false,
                 newly_generated: false,
             },
             is_debuggable: false,
+            refs: Vec::new(),
             session_id: -1,
         }
     }
@@ -235,7 +241,7 @@ pub mod test {
                                 child_id: 2,
                                 from_offset: 2,
                                 to_offset: 3,
-                                children: vec![],
+                                children: Vec::new(),
                                 is_iterative: false,
                                 newly_generated: false,
                             }
@@ -258,7 +264,7 @@ pub mod test {
                                 child_id: 4,
                                 from_offset: 4,
                                 to_offset: 5,
-                                children: vec![],
+                                children: Vec::new(),
                                 is_iterative: false,
                                 newly_generated: false,
                             }
@@ -271,6 +277,7 @@ pub mod test {
                 newly_generated: false,
             },
             is_debuggable: false,
+            refs: Vec::new(),
             session_id: -1,
         }
     }
