@@ -78,7 +78,7 @@ object SettingsView {
 
                 div(
                     cls("settings-footer"),
-                    button(className := "apply-settings-button", "Apply", onClick --> (_ => 
+                    button(className := "apply-settings-button", "Apply", onClick --> {_ => 
                         /* Get all user setting values from local storage */
                         val appliedNumSkipIterativeChildren: Int =
                             allUserSettings
@@ -112,7 +112,7 @@ object SettingsView {
                         )
 
                         ToastController.setToast(SettingsApplied)
-                    )),
+                    }),
                     button(className:= "default-settings-button", "Restore Defaults", onClick --> {_ =>
                         SettingsViewController.applySettings(
                             newNumSkipIterativeChildren = NumSkipIterativeChildren.default.asInstanceOf[Int],
