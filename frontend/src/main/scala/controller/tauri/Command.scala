@@ -109,8 +109,8 @@ object Command {
     case object SkipBreakpoints extends Command("skip_breakpoints") {
         type In = (Int, Int)
         given args: Args[In] {
-            extension (data: (Int, Int)) 
-                def namedArgs: Map[String, Any] = Map("sessionId" -> data._1, "skips" -> data._2)
+            extension (args: (Int, Int))
+                def namedArgs: Map[String, Any] = Map("sessionId" -> args._1, "skips" -> args._2)
         }
         type Out = Unit
     }
