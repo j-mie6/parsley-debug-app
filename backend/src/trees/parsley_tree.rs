@@ -40,15 +40,6 @@ impl ParsleyTree {
     /* Function used by serde to parse default boolean values as false */
     fn default_bool() -> bool { false } 
 
-    /* 
-        Currently uses 1 for true and -1 for false
-        NOTE this is temporary while remoteView sends isDebuggable
-        TODO remove
-    */
-    // fn get_session_id(&self) -> i32 {
-    //     2 * (self.is_debuggable as i32) - 1
-    // }
-
     pub fn get_session_id(&self) -> i32 {
         self.session_id
     }

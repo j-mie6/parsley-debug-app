@@ -77,7 +77,6 @@ impl AppState {
         let state: MutexGuard<AppStateInternal> = self.inner()?;
 
         if state.tab_names.is_empty() {
-            println!("IS EMPTY");
             return Err(StateError::ChannelError)
         }
 

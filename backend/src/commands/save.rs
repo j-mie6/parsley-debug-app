@@ -66,7 +66,6 @@ pub fn update_tree(tree: &DebugTree, tree_name: String) -> Result<(), UpdateTree
 
     /* Open the json file to update the tree */
     /* TODO: look into only updating the extra bits rather than replacing the tree */
-    println!("updating tree with name {}", tree_name);
     let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
     let mut data_file: File = File::create(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
 
@@ -129,7 +128,6 @@ pub enum DeleteTreeError {
 /* Fetches a tree from saved_trees and resets the tree in the tauri state */
 #[tauri::command]
 pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<(), LoadTreeError>  {
-    println!("loading tree with index {}", index);
     /* Get the tree name given the index */
     let tree_name: String = state.get_tree_name(index).map_err(|_| LoadTreeError::NameRetrievalFail)?;
 
