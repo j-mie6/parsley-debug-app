@@ -33,7 +33,6 @@ object StateManagementView {
                 className := "single-ref-modify-container",
                 input(
                     placeholder := "New value",
-                    // value <-- StateManagementViewController.getRefValue(refAddr),
                     onInput.mapToValue --> { newRefValue =>
                         StateManagementViewController.updateLocalRefValue(refAddr, newRefValue)
                     }
