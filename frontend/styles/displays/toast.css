@@ -87,7 +87,7 @@
 
 .toast-icon-container.success {
     color: var(--font-color-success);
-    /* box-shadow: 0 0 3px rgb(from var(--font-color-success) r g b); */
+    box-shadow: 0 0 3px rgb(from var(--font-color-success) r g b);
 }
 
 .toast.success {

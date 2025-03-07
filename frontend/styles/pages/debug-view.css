@@ -96,16 +96,6 @@
     margin-right: 25vw;
 }
 
-/* .tab-and-tree-view-container.left-compressed {
-    margin-left: 25vw;
-    transition: margin-left 0.75s ease-in-out !important;
-}
-
-.tab-and-tree-view-container.right-compressed {
-    margin-right: 25vw;
-    transition: margin-right 0.75s ease-in-out !important;
-} */
-
 .debug-view-page {
     box-sizing: border-box;
     padding-top: 10px;

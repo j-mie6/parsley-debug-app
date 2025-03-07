@@ -26,8 +26,6 @@ object StateManagementView {
                 div(
                     cls("state-footer"),
                     button(className := "apply-state-button", "Apply", onClick --> (_ => 
-                        
-
                         ToastController.setToast(StateApplied)
                     )),
                 ),

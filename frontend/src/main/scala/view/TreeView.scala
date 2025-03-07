@@ -7,7 +7,6 @@ import org.scalajs.dom
 import com.raquo.laminar.api.L.*
 
 import model.DebugTree
-
 import controller.viewControllers.TreeViewController
 
 /**

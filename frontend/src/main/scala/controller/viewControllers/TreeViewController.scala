@@ -4,9 +4,7 @@ import com.raquo.laminar.api.L.*
 
 import model.DebugTree
 import model.errors.DillException
-
 import view.DebugTreeDisplay
-
 import controller.tauri.Tauri
 import controller.tauri.Command
 import controller.viewControllers.SettingsViewController
