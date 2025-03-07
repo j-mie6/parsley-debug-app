@@ -86,7 +86,7 @@ object SettingsView {
                                 .flatMap(_.value.now() match {
                                     case i: Int => Some(i) 
                                     case _      => None
-                                }).getOrElse(5)
+                                }).getOrElse(SettingsViewController.numSkipIterativeChildrenDefault)
 
                         val appliedNumSkipBreakpoints: Int =
                             allUserSettings
@@ -94,7 +94,7 @@ object SettingsView {
                                 .flatMap(_.value.now() match {
                                     case i: Int => Some(i) 
                                     case _      => None
-                                }).getOrElse(1)
+                                }).getOrElse(SettingsViewController.numSkipBreakpointsDefault)
 
                         val appliedColorBlindMode: Boolean =
                             allUserSettings
@@ -102,7 +102,7 @@ object SettingsView {
                                 .flatMap(_.value.now() match {
                                     case b: Boolean => Some(b) 
                                     case _      => None
-                                }).getOrElse(false)
+                                }).getOrElse(SettingsViewController.colorBlindModeDefault)
 
                         /* Apply settings globally */
                         SettingsViewController.applySettings(

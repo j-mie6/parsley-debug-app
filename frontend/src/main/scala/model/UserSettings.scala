@@ -79,7 +79,7 @@ case object NumSkipIterativeChildren extends UserSetting {
 
     override def style: String = "number"
 
-    override def default: UserSettingType = 5
+    override def default: UserSettingType = SettingsViewController.numSkipIterativeChildrenDefault
 
     override def value: Var[UserSettingType] = SettingsViewController.getNumSkipIterativeChildren.asInstanceOf[Var[UserSettingType]]
 }
@@ -95,7 +95,7 @@ case object NumSkipBreakpoints extends UserSetting {
 
     override def style: String = "number"
 
-    override def default: UserSettingType = 1
+    override def default: UserSettingType = SettingsViewController.numSkipBreakpointsDefault
 
     override def value: Var[UserSettingType] = SettingsViewController.getNumSkipBreakpoints.asInstanceOf[Var[UserSettingType]]
 }
@@ -111,7 +111,7 @@ case object ColorBlindMode extends UserSetting {
 
     override def style: String = "boolean"
 
-    override def default: UserSettingType = false
+    override def default: UserSettingType = SettingsViewController.colorBlindModeDefault
 
     override def value: Var[UserSettingType] = SettingsViewController.getColorBlindMode.asInstanceOf[Var[UserSettingType]]
 }

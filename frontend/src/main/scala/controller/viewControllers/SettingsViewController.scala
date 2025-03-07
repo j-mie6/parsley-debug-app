@@ -20,12 +20,17 @@ object SettingsViewController {
      */
     private val settingsOpen: Var[Boolean] = Var(false)
 
+    /* Default Values */
+    val numSkipIterativeChildrenDefault: Int = 5
+    val numSkipBreakpointsDefault: Int = 1
+    val colorBlindModeDefault: Boolean = false
+
     /**
      * Global store of user-configurable settings.
      */
-    private val numSkipIterativeChildren: Var[Int] = Var(5) // Default: 5
-    private val numSkipBreakpoints: Var[Int] = Var(1)       // Default: 1
-    private val colorBlindMode: Var[Boolean] = Var(false)   // Default: false
+    private val numSkipIterativeChildren: Var[Int] = Var(numSkipIterativeChildrenDefault)
+    private val numSkipBreakpoints: Var[Int] = Var(numSkipBreakpointsDefault)
+    private val colorBlindMode: Var[Boolean] = Var(colorBlindModeDefault)
 
     /**
      * Retrieves a signal indicating whether the settings panel is open.
