@@ -11,6 +11,7 @@ import model.json.Reader
   * @param isDebuggable Used for if the tree is being actively used for debugging with breakpoints
   * @param sessionId Id of a debugging session, This will be -1 for trees that cannot be debugged, whereas 
   *                  it will be some id for trees that are actively being debugged or have been debugged  
+  * @param refs A list of pairs: `Address` and `Reference Value` from `Parsley`'s State
   */
 case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean, sessionId: Int, refs: Seq[(Int, String)] = Nil) derives Reader.upickle
 

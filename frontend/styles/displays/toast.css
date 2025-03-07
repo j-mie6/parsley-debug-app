@@ -23,13 +23,8 @@
 }
 
 .toast-icon-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 4vw;
-    height: 4vw;
-    border-radius: 50%;
-    flex-shrink: 0;
+    font-size: 1.5vw;
+    box-shadow: none !important;
 }
 
 .toast-header {
@@ -38,6 +33,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-left: 0.75vw;
 }
 
 .toast-text {

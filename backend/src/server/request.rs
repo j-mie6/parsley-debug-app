@@ -22,14 +22,16 @@ struct PostTreeResponse {
     message: String,
     session_id: i32,
     #[serde(skip_serializing_if = "Option::is_none")] skip_breakpoint: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")] new_refs: Option<Vec<(i32, String)>>,
 }
 
 impl PostTreeResponse {
-    fn new(message: &str, session_id: i32, skips: Option<i32>) -> Json<PostTreeResponse> {     
+    fn new(msg: impl Into<String>, session_id: i32, skips: Option<i32>, new_refs: Option<Vec<(i32, String)>>) -> Json<PostTreeResponse> {
         Json(PostTreeResponse {
-            message: message.to_string(),
+            message: msg.into(),
             session_id,
             skip_breakpoint: skips,
+            new_refs,
         })
     }
 
@@ -47,11 +49,11 @@ impl PostTreeResponse {
     }
 
     fn no_skips(message: &str, session_id: i32) -> Json<PostTreeResponse> {
-        PostTreeResponse::new(message, session_id, None)
+        PostTreeResponse::new(message, session_id, None, None)
     }
 
-    fn with_skips(message: &str, session_id: i32, skips: i32) -> Json<PostTreeResponse> {
-        PostTreeResponse::new(message, session_id, Some(skips))
+    fn with_refs(message: &str, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Json<PostTreeResponse> {
+        PostTreeResponse::new(message, session_id, Some(skips), Some(new_refs))
     }
 }
 
@@ -129,7 +131,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
 
         Ok(()) => match state.receive_breakpoint_skips(session_id).await {
-            Some(skips) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, session_id, skips)),
+            Some((skips, new_refs)) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, new_refs)),
             None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
         },
 
