@@ -7,6 +7,8 @@ import controller.ToastController
 import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.TreeViewController.treeExists
+import controller.tauri.{Tauri, Command}
+
 
 object StateManagementView {
 
@@ -63,10 +65,12 @@ object StateManagementView {
                     cls("state-footer"),
                     child(button(className := "apply-state-button", "Apply", onClick --> (_ => 
                         StateManagementViewController.getLocalRefs.foreach(StateManagementViewController.updateNewRefValue)
+                        TreeViewController.setRefs(StateManagementViewController.getLocalRefs)
                         ToastController.setToast(StateApplied)
                     ))) <-- StateManagementViewController.refsEmptySignal.not,
                     child(button(className := "restore-original-state-button", "Restore Originals", onClick --> (_ => 
-                        StateManagementViewController.getOrigRefs.foreach(StateManagementViewController.updateNewRefValue)
+                        StateManagementViewController.setRefs(TreeViewController.resetRefs())
+
                         ToastController.setToast(StateApplied)
                     ))) <-- StateManagementViewController.refsEmptySignal.not,
                 ),

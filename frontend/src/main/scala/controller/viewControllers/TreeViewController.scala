@@ -82,6 +82,6 @@ object TreeViewController {
     /** Get the references of a debugging tree */
     def setRefs(newRefs: Seq[(Int, String)]): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.SetRefs, newRefs)
 
-    /** Resets the references of a debugging tree */
+     /** Resets the references of a debugging tree */
     def resetRefs(): EventStream[Either[DillException, Seq[(Int, String)]]] = Tauri.invoke(Command.ResetRefs, ())
 }
