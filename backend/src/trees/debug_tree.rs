@@ -110,7 +110,7 @@ pub mod test {
 
     /* Debug Tree unit testing */
 
-    use std::{collections::HashMap, hash::Hash};
+    use std::collections::HashMap;
 
     use super::{DebugNode, DebugTree};
 
@@ -128,6 +128,7 @@ pub mod test {
                 "isIterative": false,
                 "newlyGenerated": false
             },
+            "parserInfo" : {},
             "isDebuggable": false,
             "refs": []
         }"#
@@ -149,6 +150,7 @@ pub mod test {
                 "isIterative": false,
                 "newlyGenerated": false
             },
+            "parserInfo" : {},
             "isDebuggable": false,
             "refs": []
         }"#

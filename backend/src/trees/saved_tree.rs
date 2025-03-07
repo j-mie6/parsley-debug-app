@@ -136,6 +136,7 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
+            "parser_info" : {},
             "is_debuggable": false,
             "refs": []
         }"#
@@ -204,6 +205,7 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
+            "parser_info" : {},
             "is_debuggable": false,
             "refs": []
         }"#

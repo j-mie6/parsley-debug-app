@@ -116,6 +116,7 @@ pub mod test {
                 "children": [],
                 "isIterative": false
             },
+            "parserInfo" : {},
             "isDebuggable": false,
             "refs": []
         }"#
@@ -179,6 +180,7 @@ pub mod test {
                 ],
                 "isIterative": false
             },
+            "parserInfo" : {},
             "isDebuggable": false,
             "refs": []
         }"#
