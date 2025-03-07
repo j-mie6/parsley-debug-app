@@ -52,7 +52,8 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-button debug-view-button-state",
         i(className:= "bi bi-sliders"),
         onClick --> (_ => 
-            StateManagementViewController.toggleOpenState())
+            StateManagementViewController.toggleOpenState()
+        )
     )
 
     /* Opener for the settings tab. */
@@ -61,7 +62,8 @@ abstract class DebugViewPage extends Page {
         i(className := "bi bi-gear-wide-connected"),
         onClick --> (_ => 
             println("Opening settings")
-            SettingsViewController.toggleOpenSettings())
+            SettingsViewController.toggleOpenSettings()
+        )
     )
 
 
