@@ -131,6 +131,11 @@
     margin-left: 5px;
 }
 
+.debug-view-button-breakpoint-skip {
+    font-size: 22px;
+    margin-right: 2px;
+}
+
 .debug-view-button-download {
     font-size: 22px;
     margin-right: 2px;

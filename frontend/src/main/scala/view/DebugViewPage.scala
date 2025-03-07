@@ -120,7 +120,7 @@ abstract class DebugViewPage extends Page {
 
     /* Adds ability to skip the current breakpoint. */
     private lazy val breakpointSkipButton: Element = button(
-        className := "debug-view-button debug-view-button-breakpoint-skip-button",
+        className := "debug-view-button debug-view-button-breakpoint-skip",
         breakpointSkipIcon, /* Fast forward icon */
 
         onClick.compose(_
