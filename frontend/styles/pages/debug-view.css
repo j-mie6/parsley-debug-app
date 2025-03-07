@@ -101,7 +101,7 @@
     border: none;
     cursor: pointer;   
     margin-right: 15px;
-    color: var(--font-color-secondary);
+    color: var(--font-color-tertiary);
 }
 
 /* Makes button disappear if screen size is too small */
