@@ -14,7 +14,7 @@ struct AppStateInternal {
     app: AppHandle,                          /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,                 /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,            /* Map from node_id to the respective node */
-    skips_tx: TokioMutex<HashMap<i32, SkipsSender>>,       /* Transmitter how many breakpoints to skip, sent to parsley */
+    skips_tx: HashMap<i32, SkipsSender>,       /* Transmitter how many breakpoints to skip, sent to parsley */
     tab_names: Vec<String>,                  /* List of saved tree names */
     debug_sessions: HashMap<String, i32>,    /* Map of tree name to sessionId */
     counter: SessionCounter                  /* Counter to hold next sessionId */
@@ -33,7 +33,7 @@ impl AppState {
                     app: AppHandle::new(app_handle),
                     tree: None,
                     map: HashMap::new(),
-                    skips_tx: TokioMutex::new(HashMap::new()),
+                    skips_tx: HashMap::new(),
                     tab_names: Vec::new(),
                     debug_sessions: HashMap::new(),
                     counter: SessionCounter::new(),
@@ -143,9 +143,10 @@ impl StateManager for AppState {
     }
 
     fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
+        println!("transmit_breakpoint_skips{session_id}, {skips})");
+        // dbg!(self.inner().expect("mrrr").skips_tx.blocking_lock());
         self.inner()?
             .skips_tx
-            .blocking_lock()
             .remove(&session_id)
             .ok_or({println!("BAD 1"); StateError::ChannelError})?
             .send(skips)
@@ -191,8 +192,6 @@ impl StateManager for AppState {
     fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
         match self.inner()?
             .skips_tx
-            .try_lock()
-            .map_err(|_| StateError::ChannelError)?
             .insert(session_id, tx) {
                 Some(_) => Err(StateError::ChannelError),
                 None => Ok(())
