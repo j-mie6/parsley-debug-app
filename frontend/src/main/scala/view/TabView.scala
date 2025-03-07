@@ -67,26 +67,22 @@ object TabView {
             /* Set new selected tab after a deletion */
             deleteBus.stream.collectRight
                 .filter(_.nonEmpty)
-                .mapTo({
-                    val currentIndex = TabViewController.selectedTab.now()
-                    /* If tab being removed is less then the current tab, then current tab needs to be shifted, ensuring its greater than 0 */
-                    if currentIndex >= index then
-                        Math.max(0, currentIndex - 1) 
-                    else
-                        currentIndex
-                }) --> TabViewController.setSelectedTab,
+                .sample(TabViewController.getSelectedTab)
+                .map((currIndex: Int) =>
+                    if currIndex >= index then 
+                        Math.max(0, currIndex - 1) 
+                    else 
+                        currIndex
+                ) --> TabViewController.setSelectedTab
         )
     }
-
-    /* Get selected file index as possible error */
-    val selectedTab: EventStream[Try[Int]] = TabViewController.getSelectedTab.changes.recoverToTry
 
     def apply(): HtmlElement = {
         div(
             className:= "tab-bar",
             
             /* Update tree on new tab selected */  
-            selectedTab.collectSuccess
+            TabViewController.getSelectedTab.changes
                 .flatMapMerge(TabViewController.loadSavedTree) 
                 .collectLeft --> controller.errors.ErrorController.setError, 
 

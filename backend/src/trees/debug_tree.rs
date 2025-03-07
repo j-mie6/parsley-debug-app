@@ -7,11 +7,12 @@ pub struct DebugTree {
     input: String,
     root: DebugNode,
     is_debuggable: bool,
+    refs: Vec<(i32, String)>, 
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, is_debuggable: bool) -> Self {
-        DebugTree { input, root, is_debuggable }
+    pub fn new(input: String, root: DebugNode, is_debuggable: bool, refs: Vec<(i32, String)>) -> Self {
+        DebugTree { input, root, is_debuggable, refs }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -25,10 +26,14 @@ impl DebugTree {
     pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
     }
+    
+    pub fn refs(&self) -> Vec<(i32, String)> {
+        self.refs.clone()
+    }
 }
 
 impl From<SavedTree> for DebugTree {
-    fn from(debug_tree: SavedTree) -> Self {
+    fn from(saved_tree: SavedTree) -> Self {
         /* Recursively convert children into SavedNodes */
         fn convert_node(node: SavedNode) -> DebugNode {
             let children: Vec<DebugNode> = node.children
@@ -45,12 +50,13 @@ impl From<SavedTree> for DebugTree {
                 node.child_id,
                 node.input,
                 children,
-                node.is_iterative
+                node.is_iterative,
+                node.newly_generated
             )
         }
 
-        let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        let node: DebugNode = convert_node(saved_tree.get_root().clone());
+        DebugTree::new(saved_tree.get_input().clone(), node, saved_tree.is_debuggable(), saved_tree.refs())
     }
 }
 
@@ -68,12 +74,13 @@ pub struct DebugNode {
     #[serde(skip_serializing)] pub children: Vec<DebugNode>, /* The children of this node */
     pub is_leaf: bool,         /* Whether this node is a leaf node */
     pub is_iterative: bool,    /* Whether this node needs bubbling (iterative and transparent) */
+    pub newly_generated: bool, /* Whether this node was generated since the previous breakpoint */
 }
 
 impl DebugNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
             child_id: Option<u32>, input: String, children: Vec<DebugNode>,
-            is_iterative: bool) -> Self {
+            is_iterative: bool, newly_generated: bool) -> Self {
 
         DebugNode {
             node_id,
@@ -84,7 +91,8 @@ impl DebugNode {
             input,
             is_leaf: children.is_empty(),
             children,
-            is_iterative
+            is_iterative,
+            newly_generated
         }
     }
 }
@@ -108,9 +116,11 @@ pub mod test {
                 "childId": 0,
                 "input": "Test",
                 "isLeaf": true,
-                "isIterative": false
+                "isIterative": false,
+                "newlyGenerated": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect::<String>()
@@ -127,9 +137,11 @@ pub mod test {
                 "childId": 0,
                 "input": "0",
                 "isLeaf": false,
-                "isIterative": false
+                "isIterative": false,
+                "newlyGenerated": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -146,9 +158,11 @@ pub mod test {
                 Some(0),
                 String::from("Test"),
                 Vec::new(),
+                false,
                 false
             ),
-            false
+            false,
+            Vec::new()
         )
     }
 
@@ -178,10 +192,12 @@ pub mod test {
                                 true,
                                 Some(2),
                                 String::from("2"),
-                                vec![],
+                                Vec::new(),
+                                false,
                                 false
                             )
                         ],
+                        false,
                         false
                     ),
                     DebugNode::new(
@@ -199,16 +215,20 @@ pub mod test {
                                 true,
                                 Some(4),
                                 String::from("4"),
-                                vec![],
+                                Vec::new(),
+                                false,
                                 false
                             )
                         ],
+                        false,
                         false
                     )
                 ],
+                false,
                 false
             ),
-            false
+            false,
+            Vec::new()
         )
     }
  
