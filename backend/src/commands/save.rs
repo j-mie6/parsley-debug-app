@@ -21,11 +21,11 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
 
 
     /* Create the json file to store the tree */
-    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+    let file_path: String = format_filepath(tree_name.clone());
     let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
 
     /* Write tree json to the json file */
-    data_file.write(tree_json.as_bytes()).map_err(|_| SaveTreeError::WriteTreeFailed)?;
+    data_file.write(tree_json.as_bytes()).map_err(|_| SaveTreeError::WriteToFileFailed)?;
     
     /* Get a list of all saved tree names */
     let tree_names: Vec<String> = state.add_tree(tree_name)?;
@@ -40,7 +40,7 @@ pub enum SaveTreeError {
     TreeNotFound,
     SerialiseFailed,
     CreateDirFailed,
-    WriteTreeFailed,
+    WriteToFileFailed,
 }
 
 impl From<StateError> for SaveTreeError {
@@ -53,11 +53,12 @@ impl From<StateError> for SaveTreeError {
     }
 }
 
+
 /* Downloads the tree into Downloads folder */
 #[tauri::command]
 pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), DownloadTreeError> {
     /* Path to the json file used to store the tree */
-    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+    let file_path: String = format_filepath(tree_name.clone());
 
     /* Get path to Downloads folder */
     let mut download_path: PathBuf = state.get_download_path()?;
@@ -65,7 +66,7 @@ pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result
 
     /* Creates a file in Downloads and copies data into it */
     File::create(&download_path).map_err(|_| DownloadTreeError::CreateDirFailed)?;
-    fs::copy(file_path, download_path).map_err(|_| DownloadTreeError::WriteTreeFailed)?;
+    fs::copy(file_path, download_path).map_err(|_| DownloadTreeError::WriteToFileFailed)?;
 
     Ok(())
 }
@@ -74,18 +75,19 @@ pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result
 pub enum DownloadTreeError {
     DownloadPathNotFound,
     CreateDirFailed,
-    WriteTreeFailed,
+    WriteToFileFailed,
 }
 
 impl From<StateError> for DownloadTreeError {
     fn from(state_error: StateError) -> Self {
         match state_error {
             StateError::LockFailed => DownloadTreeError::DownloadPathNotFound,
-            StateError::TreeNotFound => DownloadTreeError::WriteTreeFailed,
+            StateError::TreeNotFound => DownloadTreeError::WriteToFileFailed,
             _ => panic!("Unexpected error on save_tree"),
         }
     }
 }
+
 
 /* Imports JSON file to display a tree */
 #[tauri::command]
@@ -95,7 +97,7 @@ pub fn import_tree(name: String, contents: String, state: tauri::State<AppState>
 
     /* Creates a file in apps local saved tree folders and writes data from external json it */
     let mut imported_tree: File = File::create(&app_path).map_err(|_| ImportTreeError::CreateDirFailed)?;
-    imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteTreeFailed)?;
+    imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteToFileFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
     load_path(app_path, &state).map_err(|_| ImportTreeError::SerialiseFailed)?;
@@ -105,16 +107,18 @@ pub fn import_tree(name: String, contents: String, state: tauri::State<AppState>
 #[derive(Debug, serde::Serialize)]
 pub enum ImportTreeError {
     CreateDirFailed,
-    WriteTreeFailed,
+    WriteToFileFailed,
     SerialiseFailed,
     EventEmitFailed,
+    LockFailed,
 }
 
 impl From<StateError> for ImportTreeError {
     fn from(state_error: StateError) -> Self {
         match state_error {
-            StateError::LockFailed | StateError::EventEmitFailed => ImportTreeError::EventEmitFailed,
-            StateError::TreeNotFound => ImportTreeError::WriteTreeFailed,
+            StateError::LockFailed => ImportTreeError::LockFailed,
+            StateError::EventEmitFailed => ImportTreeError::EventEmitFailed,
+            StateError::TreeNotFound => ImportTreeError::WriteToFileFailed,
             _ => panic!("Unexpected error on save_tree"),
         }
     }
@@ -127,7 +131,7 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     let tree_name: String = state.get_tree_name(index).map_err(|_| DeleteTreeError::NameRetrievalFail)?;
 
     /* Path to the json file used to store the tree */
-    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+    let file_path: String = format_filepath(tree_name);
 
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
@@ -152,10 +156,10 @@ pub enum DeleteTreeError {
 #[tauri::command]
 pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<(), LoadTreeError>  {
     /* Get the tree name given the index */
-    let tree_name: String = state.get_tree_name(index).map_err(|_| LoadTreeError::NameRetrievalFail)?;
+    let tree_name: String = state.get_tree_name(index)?;
 
     /* Get the file path of the tree to be reloaded */
-    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+    let file_path: String = format_filepath(tree_name);
     load_path(file_path, &state)
 }
     
@@ -195,4 +199,8 @@ impl From<StateError> for LoadTreeError {
             _ => panic!("Unexpected error on load_saved_tree"),
         }
     }
+}
+
+fn format_filepath(tree_name: String) -> String {
+    format!("{}{}.json", SAVED_TREE_DIR, tree_name)
 }

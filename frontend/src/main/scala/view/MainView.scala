@@ -59,7 +59,8 @@ object MainView extends DebugViewPage {
 
                 /* Set selected tab to newest tree */
                 tabBus.stream.collectRight
-                    .map((fileNames: List[String]) => fileNames.length - 1) --> TabViewController.setSelectedTab,
+                    .map((fileNames: List[String]) => fileNames.length - 1) 
+                    --> TabViewController.setSelectedTab,
 
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,

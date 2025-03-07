@@ -4,12 +4,12 @@ import com.raquo.laminar.api.L.*
 
 import model.DebugTree
 import model.errors.DillException
-
 import view.DebugTreeDisplay
 
 import controller.tauri.Tauri
 import controller.tauri.Command
 import model.errors.DillException
+
 
 /**
   * Object containing methods for manipulating the DebugTree.
