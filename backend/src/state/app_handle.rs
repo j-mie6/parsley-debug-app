@@ -17,6 +17,10 @@ impl AppHandle {
     pub fn emit(&self, event: Event) -> Result<(), StateError> {
         StateManager::emit(&self.0, event)
     }
+
+    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.0.get_download_path()
+    }
 }
 
 
