@@ -288,6 +288,7 @@ private object ReactiveNodeDisplay {
 
                     /* Render debug node information */
                     div(
+                        child(i(className := "bi bi-patch-exclamation-fill", alignContent := "right")) := node.debugNode.newlyGenerated,
                         p(className := "debug-node-name", node.debugNode.internal),
                         p(fontStyle := "italic", node.debugNode.input),
                         child(p(className := "debug-node-iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
