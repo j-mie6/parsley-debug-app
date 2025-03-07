@@ -4,7 +4,7 @@ use std::sync::{Mutex, MutexGuard};
 use crate::events::Event;
 use crate::trees::{DebugTree, DebugNode};
 
-pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<(i32, Vec<(i32, String)>)>;
+pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<(i32, Vec<(i32, String)>)>;
 
 use super::session_counter::SessionCounter;
 use super::{StateError, StateManager, AppHandle};
