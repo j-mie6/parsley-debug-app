@@ -66,7 +66,7 @@ object Command {
 
     case object FetchNodeChildren extends Command("fetch_node_children") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (id: Int) 
                 def namedArgs: Map[String, Any] = Map("nodeId" -> id)
         }
@@ -78,7 +78,7 @@ object Command {
     /* Save commands */
     case object SaveTree extends Command("save_tree") {
         type In = String
-        given args: Args[String] {
+        given args: Args[In] {
             extension (treeName: String)
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
@@ -88,7 +88,7 @@ object Command {
 
     case object LoadSavedTree extends Command("load_saved_tree") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (index: Int)
                 def namedArgs: Map[String, Any] = Map("index" -> index)
         }
@@ -98,7 +98,7 @@ object Command {
 
     case object DeleteTree extends Command("delete_tree") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (index: Int)
                 def namedArgs: Map[String, Any] = Map("index" -> index)
         }
@@ -127,10 +127,10 @@ object Command {
     }
 
     case object SkipBreakpoints extends Command("skip_breakpoints") {
-        type In = (Int, Seq[(Int, String)])
+        type In = (Int, Int, Seq[(Int, String)])
         given args: Args[In] {
-            extension (args: (Int, Seq[(Int, String)])) 
-                def namedArgs: Map[String, Any] = Map("skips" -> args._1, "newRefs" -> js.Array(args._2.map(js.Tuple2(_, _))*))
+            extension (args: (Int, Int, Seq[(Int, String)]))
+                def namedArgs: Map[String, Any] = Map("sessionId" -> args._1, "skips" -> args._2, "newRefs" -> js.Array(args._3.map(js.Tuple2(_, _))*))
         }
         type Out = Unit
     }

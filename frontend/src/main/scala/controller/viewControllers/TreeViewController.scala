@@ -35,6 +35,9 @@ object TreeViewController {
     /** Return true signal if tree is loaded into frontend */
     def treeExists: Signal[Boolean] = getTree.map(_.isDefined)
 
+    /** Get sessionId from loaded tree, -1 for non-debuggable */
+    def getSessionId: Signal[Int] = tree.signal.map(_.get.sessionId)
+
     /** Get debug tree element or warning if no tree found */
     def getTreeElem: Signal[HtmlElement] = getTree.map(_ match 
         /* Default tree view when no tree is loaded */
@@ -62,10 +65,12 @@ object TreeViewController {
     /** Skips the current breakpoint 'skips' times
       *
       * @param skips The amount of times to skip a breakpoint
+      * @param sessionId The sessionId of the current debugging session
       */
-    def skipBreakpoints(trigger: EventStream[Unit]): EventStream[Either[DillException, Unit]] = {
-        trigger.sample(SettingsViewController.getNumSkipBreakpoints.signal.combineWith(StateManagementViewController.getRefs))
-            .map((skips, refs) => (skips - 1, refs))
+    def skipBreakpoints(sessionId: EventStream[Int]): EventStream[Either[DillException, Unit]] = {
+        sessionId
+            .withCurrentValueOf(SettingsViewController.getNumSkipBreakpoints.signal, StateManagementViewController.getRefs)
+            .map((sessionId, skips, refs) => (sessionId, skips - 1, refs))
             .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _))
     }
         

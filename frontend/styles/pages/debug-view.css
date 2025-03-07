@@ -183,7 +183,7 @@
     padding-block: 4px;
 }
 
-.debug-view-source-button {
+.debug-view-input-button {
     font-size: 25px;
     padding-inline: 7px;
     padding-block: 4px;
@@ -203,8 +203,8 @@
     width: 105px;
 }
 
-.debug-view-expand-source.expanded {
-    width: 132px;
+.debug-view-expand-input.expanded {
+    width: 118px;
 }
 
 .debug-view-expand-code.expanded {

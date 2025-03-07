@@ -25,7 +25,8 @@ class Test extends AnyFlatSpec with should.Matchers {
             "newlyGenerated": false
         },
         "isDebuggable": false,
-        "refs": []
+        "refs": [],
+        "sessionId": -1
     }"""
 
     
@@ -38,6 +39,7 @@ class Test extends AnyFlatSpec with should.Matchers {
 
         /* Check that the root tree has been deserialised correctly */
         tree.input should be ("Test")
+        tree.sessionId should be (-1)
         tree.isDebuggable should be (false)
         tree.refs should be (Nil)
 

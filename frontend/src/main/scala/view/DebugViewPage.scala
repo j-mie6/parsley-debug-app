@@ -31,7 +31,8 @@ val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
 /**
   * The DebugViewPage class represents the main page of the application, 
-  * containing both the title and github / light & dark mode buttons.
+  * containing both the tree and input view tabs, title and github / 
+  * light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {
     private lazy val gitIcon: HtmlElement = i(className := "bi bi-github", fontSize.px := 40)
@@ -122,7 +123,10 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-button debug-view-button-breakpoint-skip-button",
         breakpointSkipIcon, /* Fast forward icon */
 
-        onClick.mapToUnit.compose(TreeViewController.skipBreakpoints(_).collectLeft) --> ErrorController.setError
+        onClick.compose(_
+            .sample(TreeViewController.getSessionId)
+            .compose(TreeViewController.skipBreakpoints)
+            .collectLeft) --> ErrorController.setError
     )
 
     /**
