@@ -48,7 +48,7 @@ object SettingsView {
                                 input(
                                     typ := "checkbox",
                                     checked <-- SettingsViewController.getColorBlindMode.signal,
-                                    onInput.mapToChecked --> setting.value.writer.contramap[Boolean](b => b)
+                                    onInput.mapToChecked --> setting.value.writer.contramap[Boolean](identity)
                                 )
 
                         )
