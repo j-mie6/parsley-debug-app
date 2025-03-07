@@ -136,6 +136,22 @@
     margin-left: 5px;
 }
 
+.debug-view-file-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;   
+    margin-right: 15px;
+    color: var(--font-color-tertiary);
+}
+
+/* Makes button disappear if screen size is too small */
+@media (max-width: 450px) {
+    .debug-view-file-button {
+        display: none;
+    }
+}
+
+
 .debug-view-button {
     cursor: pointer;
     color: var(--font-color-tertiary);

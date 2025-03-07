@@ -106,6 +106,26 @@ object Command {
         type Out = List[String]
     }
 
+    case object DownloadTree extends Command("download_tree") {
+        type In = String
+        given args: Args[String] {
+            extension (treeName: String)
+                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
+        }
+
+        type Out = Unit
+    }
+
+    case object ImportTree extends Command("import_tree") {
+        type In = (String, String)
+        given args: Args[In] {
+            extension (fileInfo: (String, String))
+                def namedArgs: Map[String, Any] = Map("treeName" -> fileInfo._1, "contents" -> fileInfo._2)
+        }
+
+        type Out = Unit
+    }
+
     case object SkipBreakpoints extends Command("skip_breakpoints") {
         type In = (Int, Int, Seq[(Int, String)])
         given args: Args[In] {

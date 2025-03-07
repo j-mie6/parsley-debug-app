@@ -24,6 +24,7 @@ import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.tauri.Tauri
+import controller.errors.ErrorController
 
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -42,9 +43,56 @@ abstract class DebugViewPage extends Page {
         h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
+    /* Export tree button */
+    val downloadButton: HtmlElement = button(
+        className := "debug-view-file-button",
+
+        /* Save button icon */
+        i(className := "bi bi-floppy", fontSize.px := 22),
+
+        /* Exports current tree */
+        onClick(_
+            .compose(event => event.sample(TabViewController.getSelectedTab))
+            .flatMapSwitch(TabViewController.getFileName)
+            .flatMapMerge(TreeViewController.downloadTree)
+            .collectLeft
+        ) --> ErrorController.setError,
+    )
+
+    /* Uploading json element */
+    val uploadButton: HtmlElement = label(
+        className := "debug-view-file-button",
+        i(className := "bi bi-cloud-download", fontSize.px := 25),
+        input(
+            typ := "file",
+            display := "none",
+            multiple := true,
+
+            /* Triggers the file input */
+            onChange.map(ev => loadFile(ev.target.asInstanceOf[dom.html.Input])) --> Observer.empty
+            
+        )
+    )
+
+    /* Reads contents of file and passes them to backend */
+    private def loadFile(input: dom.html.Input): Unit = {
+        val files = input.files
+        for (i <- 0 until files.length) {
+            val file = files(i)
+            val reader = new dom.FileReader()
+            reader.onload = _ => {
+                val content = reader.result.asInstanceOf[String]
+                TreeViewController.importTree.tupled((file.name, content)) --> Observer.empty
+            }
+            
+            reader.readAsText(file)
+        }
+        /* Resets value so we can import the same file multiple times */
+        input.value = ""
+    }
+                
     /* Overview information tab. */
     private lazy val infoButton: HtmlElement = button(
-        // TODO
         className := "debug-view-button debug-view-button-info",
         i(className := "bi bi-info-circle-fill"),
     )
@@ -156,6 +204,9 @@ abstract class DebugViewPage extends Page {
                     breakpointSkipButton
                 )
             ) <-- TreeViewController.isDebuggingSession,
+            /* Render download button */
+            child(downloadButton) <-- TreeViewController.treeExists,
+            uploadButton,
             stateButton,
             infoButton,
         )

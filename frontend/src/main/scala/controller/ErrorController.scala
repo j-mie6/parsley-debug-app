@@ -61,6 +61,13 @@ object ErrorController {
             case "StringContainsInvalidUnicode" => StringContainsInvalidUnicode
             case "SuffixNotFound" => SuffixNotFound
             case "EventEmitFailed" => EventEmitFailed
+            case "DownloadFailed" => DownloadFailed
+            case "CreateDirFailed" => CreateDirFailed
+            case "WriteToFileFailed" => WriteToFileFailed
+            case "DownloadPathNotFound" => DownloadPathNotFound
+            case "TreeFileRemoveFail" => TreeFileRemoveFail
+            case "NameRetrievalFail" => NameRetrievalFail
+            case "DeserialiseFailed" => DeserialiseFailed
             case _ => new UnknownError(s"Unknown backend error: ${errorName}")
     }
     

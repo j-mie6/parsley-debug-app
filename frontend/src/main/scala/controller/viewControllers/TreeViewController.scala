@@ -4,6 +4,7 @@ import com.raquo.laminar.api.L.*
 
 import model.DebugTree
 import model.errors.DillException
+import model.errors.DillException
 import view.DebugTreeDisplay
 import controller.tauri.Tauri
 import controller.tauri.Command
@@ -19,6 +20,9 @@ object TreeViewController {
     /* Reactive DebugTree */
     private val tree: Var[Option[DebugTree]] = Var(None) 
 
+    /* DebugTree signal */
+    val getTree: Signal[Option[DebugTree]] = tree.signal
+
     /** Set debug tree */
     val setTree: Observer[DebugTree] = tree.someWriter
 
@@ -29,13 +33,13 @@ object TreeViewController {
     def unloadTree: Observer[Unit] = Observer(_ => tree.set(None))
     
     /** Return true signal if tree is loaded into frontend */
-    def treeExists: Signal[Boolean] = tree.signal.map(_.isDefined)
+    def treeExists: Signal[Boolean] = getTree.map(_.isDefined)
 
     /** Get sessionId from loaded tree, -1 for non-debuggable */
     def getSessionId: Signal[Int] = tree.signal.map(_.get.sessionId)
 
     /** Get debug tree element or warning if no tree found */
-    def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
+    def getTreeElem: Signal[HtmlElement] = getTree.map(_ match 
         /* Default tree view when no tree is loaded */
         case None => 
           StateManagementViewController.clearRefs()
@@ -48,6 +52,13 @@ object TreeViewController {
         case Some(tree) => DebugTreeDisplay(tree)
     )
 
+
+    /* Downloads tree to users device */
+    def downloadTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, name)
+
+    /* Imports JSON in path from users device */
+    def importTree(name: String, contents: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.ImportTree, (name, contents))
+    
     /** Fetch the debug tree root from the backend, return in EventStream */
     def reloadTree: EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.FetchDebugTree, ())
     

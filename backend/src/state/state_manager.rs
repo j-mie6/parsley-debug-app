@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use std::collections::HashMap;
 
 #[cfg(test)] use mockall::automock;
@@ -19,6 +21,8 @@ pub trait StateManager: Send + Sync + 'static {
 
     fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError>;
 
+    fn get_download_path(&self) -> Result<PathBuf, StateError>;
+
     fn add_session_id(&self, tree_name: String, session_id: i32) -> Result<(), StateError>;
 
     fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError>;
@@ -39,5 +43,6 @@ pub enum StateError {
     TreeNotFound,
     NodeNotFound(u32),
     EventEmitFailed,
+    GetDownloadPathFail,
     ChannelError, /* Non-fatal error: The receiver from Parsley is no longer listening */
 }

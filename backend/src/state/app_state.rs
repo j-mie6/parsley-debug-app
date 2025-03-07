@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
+use std::path::PathBuf;
 
 use crate::events::Event;
 use crate::trees::{DebugTree, DebugNode};
@@ -144,6 +145,10 @@ impl StateManager for AppState {
             .ok_or(StateError::ChannelError)?
             .send((skips, new_refs))
             .map_err(|_| StateError::ChannelError)
+    }
+    
+    fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.inner()?.app.get_download_path()
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {

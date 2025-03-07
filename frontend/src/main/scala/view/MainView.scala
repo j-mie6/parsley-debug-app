@@ -29,7 +29,6 @@ object MainView extends DebugViewPage {
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
     }
 
-
     /* Listen for posted tree */
     val (treeStream, unlistenTree) = Tauri.listen(Event.TreeReady)
     val (newTreeStream, unlistenNewTree) = Tauri.listen(Event.NewTree)
@@ -74,7 +73,8 @@ object MainView extends DebugViewPage {
 
                 /* Set selected tab to newest tree */
                 tabBus.stream.collectRight
-                    .map((fileNames: List[String]) => fileNames.length - 1) --> TabViewController.setSelectedTab,
+                    .map((fileNames: List[String]) => fileNames.length - 1) 
+                    --> TabViewController.setSelectedTab,
 
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,

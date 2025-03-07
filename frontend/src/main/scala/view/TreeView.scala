@@ -8,6 +8,7 @@ import org.scalajs.dom
 
 import model.DebugTree
 import controller.viewControllers.TreeViewController
+import controller.viewControllers.TabViewController
 import controller.errors.ErrorController
 
 /**

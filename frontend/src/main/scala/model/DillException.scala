@@ -3,7 +3,6 @@ package model.errors
 import com.raquo.laminar.api.L.*
 
 import controller.errors.ErrorController
-import com.raquo.laminar.api.features.unitArrows
 
 
 /**
@@ -88,6 +87,13 @@ def embedGithubIssue(msg: String): HtmlElement = {
 
 /* List of DILL Exceptions */
 
+case object DownloadFailed extends Warning {
+    override def name: String = "Download Failed"
+    override def message: String = 
+        "Downloading Debug Tree failed, please try again. If this problem" +
+        "persists, please report this on GitHub Issues"
+}
+
 case object TreeNotFound extends Error {
     override def name: String = "Tree Not Found"
     override def message: String = 
@@ -143,6 +149,36 @@ case object SuffixNotFound extends Error {
 case object EventEmitFailed extends Error {
     override def name: String = "Event Emitting Failed"
     override def message: String = "An event could not be emitted from the backend. Try again."
+}
+
+case object CreateDirFailed extends Error {
+    override def name: String = "Creating directory failed"
+    override def message: String = "The saved tree file could not be made."
+}
+
+case object WriteToFileFailed extends Error {
+    override def name: String = "Writing to a file failed"
+    override def message: String = "An error occured during writing to the saved tree file."
+}
+
+case object DownloadPathNotFound extends Error {
+    override def name: String = "Download path was not found"
+    override def message: String = "Could not find the path for downloading files."
+}
+
+case object TreeFileRemoveFail extends Error {
+    override def name: String = "Removing a tree file failed"
+    override def message: String = "An error occured while attempting to remove a saved tree file."
+}
+
+case object NameRetrievalFail extends Error {
+    override def name: String = "Name retrieval failed"
+    override def message: String = "Tree name could not be found."
+}
+
+case object DeserialiseFailed extends Error {
+    override def name: String = "Deserialising the tree failed"
+    override def message: String = "An error occured creating the tree from the saved file."
 }
 
 case object MalformedJSON extends Error {

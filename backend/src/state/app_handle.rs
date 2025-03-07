@@ -6,7 +6,7 @@ use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 use crate::state::state_manager::SkipsSender;
 use super::{AppState, StateManager, StateError};
-
+use std::path::PathBuf;
 
 /* Wrapper for Tauri AppHandle */
 pub struct AppHandle(tauri::AppHandle);
@@ -19,6 +19,10 @@ impl AppHandle {
     /* Delegate emit to wrapped Tauri AppHandle */
     pub fn emit(&self, event: Event) -> Result<(), StateError> {
         StateManager::emit(&self.0, event)
+    }
+
+    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.0.get_download_path()
     }
 }
 
@@ -69,5 +73,10 @@ impl StateManager for tauri::AppHandle {
     
     fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
         self.state::<AppState>().new_transmitter(session_id, tx)
+    }
+    
+    fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.path().download_dir()
+            .map_err(|_| StateError::GetDownloadPathFail)
     }
 }

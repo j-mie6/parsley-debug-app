@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use std::collections::HashMap;
 
 use crate::events::Event;
@@ -67,6 +69,10 @@ impl StateManager for ServerState {
     
     fn new_transmitter(&self, session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<(i32, Vec<(i32, String)>)>) -> Result<(), StateError> {
         self.inner().new_transmitter(session_id, tx)
+    }
+    
+    fn get_download_path(&self) -> Result<PathBuf,StateError> {
+        self.inner().get_download_path()
     }
 }
 
