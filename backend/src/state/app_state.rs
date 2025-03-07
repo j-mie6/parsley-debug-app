@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
 use crate::events::Event;
-use crate::server::TokioMutex;
 use crate::trees::{DebugTree, DebugNode};
 
 use super::session_counter::SessionCounter;

@@ -79,14 +79,10 @@ impl ServerState {
     }
 
     pub async fn receive_breakpoint_skips(&self, session_id: i32) -> Option<i32> {
-        println!("receive_breakpoint_skips({session_id})");
-        dbg!(self.1.lock().await);
-        match self.1
-            .lock()
-            .await
-            .remove(&session_id) {
-                Some(rx) => rx.await.ok(),
-                None => None,
-            }
+        let rx = self.1.lock().await.remove(&session_id);
+        match rx {
+            Some(rx) => rx.await.ok(),
+            None => None,
+        }
     }
 }
