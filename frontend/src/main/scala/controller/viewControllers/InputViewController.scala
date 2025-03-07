@@ -9,12 +9,24 @@ import com.raquo.laminar.api.L.*
 object InputViewController {
 
     /* The input element to be render by InputView */
-    private val input: Var[String] = Var("Please attach a parser to DillRemoteView")
-
-    /** Get input string */
-    val getInput: Signal[String] = input.signal
+    private val input: Var[Option[String]] = Var(None)
 
     /** Set input string */
-    val setInput: Observer[String] = input.writer
+    val setInput: Observer[String] = input.someWriter
+
+    /** Set input to None to stop rendering */
+    def unloadInput: Observer[Unit] = Observer(_ => input.set(None))
+
+    def getInputElem: Signal[HtmlElement] = input.signal.map(_ match 
+        /* Default tree view when no tree is loaded */
+        case None => 
+          div(
+            className := "tree-view-error",
+            "Nothing to show"
+          )
+
+        /* Render as DebugTreeDisplay */
+        case Some(inputString) => div(className:= "debug-input-main-view", inputString)
+    )
 
 }

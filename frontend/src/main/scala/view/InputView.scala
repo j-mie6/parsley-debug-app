@@ -20,10 +20,8 @@ import controller.viewControllers.TreeViewController
 
 object InputView {
     def apply(): HtmlElement = {
-        h1(
-            className := "debug-input-main-view",
-
-            text <-- InputViewController.getInput,
-        )
+        div(
+            child <-- InputViewController.getInputElem, /* Renders the input */
+        ) 
     }
 }

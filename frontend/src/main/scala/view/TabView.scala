@@ -87,10 +87,15 @@ object TabView {
                 .collectLeft --> controller.errors.ErrorController.setError, 
 
 
-            /* If there are no tabs, unload tree from frontend */
+            /* If there are no tabs, unload tree and input from frontend */
             TabViewController.noSavedTrees.changes
                 .filter(identity)
                 .mapToUnit --> TreeViewController.unloadTree,
+
+            TabViewController.noSavedTrees.changes
+                .filter(identity)
+                .mapToUnit --> InputViewController.unloadInput,
+
 
             /* Renders tabs */ 
             children <-- TabViewController
