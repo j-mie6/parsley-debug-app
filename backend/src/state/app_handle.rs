@@ -50,6 +50,6 @@ impl StateManager for tauri::AppHandle {
     
     fn get_download_path(&self) -> Result<PathBuf, StateError> {
         self.path().download_dir()
-            .map_err(|_| StateError::LockFailed)
+            .map_err(|_| StateError::GetDownloadPathFail)
     }
 }

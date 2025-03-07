@@ -66,7 +66,7 @@ abstract class DebugViewPage extends Page {
             multiple := true,
 
             /* Triggers the file input */
-            onChange.mapTo(loadFile) --> Observer.empty 
+            onChange.mapToFiles.map(_.map(loadFile)) --> Observer.empty,
         )
     )
 

@@ -21,7 +21,7 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
 
 
     /* Create the json file to store the tree */
-    let file_path: String = format_filepath(tree_name.clone());
+    let file_path: String = format_filepath(&tree_name);
     let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
 
     /* Write tree json to the json file */
@@ -58,7 +58,7 @@ impl From<StateError> for SaveTreeError {
 #[tauri::command]
 pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), DownloadTreeError> {
     /* Path to the json file used to store the tree */
-    let file_path: String = format_filepath(tree_name.clone());
+    let file_path: String = format_filepath(&tree_name);
 
     /* Get path to Downloads folder */
     let mut download_path: PathBuf = state.get_download_path()?;
@@ -91,16 +91,16 @@ impl From<StateError> for DownloadTreeError {
 
 /* Imports JSON file to display a tree */
 #[tauri::command]
-pub fn import_tree(name: String, contents: String, state: tauri::State<AppState>) -> Result<(), ImportTreeError> {
+pub fn import_tree(tree_name: String, contents: String, state: tauri::State<AppState>) -> Result<(), ImportTreeError> {
     /* Path to the json file used to store the tree */
-    let app_path: String = format!("{}{}", SAVED_TREE_DIR, &name);
+    let app_path: String = format!("{}{}", SAVED_TREE_DIR, &tree_name);
 
     /* Creates a file in apps local saved tree folders and writes data from external json it */
     let mut imported_tree: File = File::create(&app_path).map_err(|_| ImportTreeError::CreateDirFailed)?;
     imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteToFileFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
-    load_path(app_path, &state).map_err(|_| ImportTreeError::SerialiseFailed)?;
+    load_path(app_path, &state)?;
     state.emit(Event::NewTree).map_err(ImportTreeError::from)
 }
 
@@ -108,9 +108,10 @@ pub fn import_tree(name: String, contents: String, state: tauri::State<AppState>
 pub enum ImportTreeError {
     CreateDirFailed,
     WriteToFileFailed,
-    SerialiseFailed,
+    DeserialiseFailed,
     EventEmitFailed,
     LockFailed,
+    ReadFileFailed,
 }
 
 impl From<StateError> for ImportTreeError {
@@ -124,6 +125,17 @@ impl From<StateError> for ImportTreeError {
     }
 }
 
+impl From<LoadTreeError> for ImportTreeError {
+    fn from(load_error: LoadTreeError) -> Self {
+        match load_error {
+            LoadTreeError::LockFailed => ImportTreeError::LockFailed,
+            LoadTreeError::ReadFileFailed => ImportTreeError::ReadFileFailed,
+            LoadTreeError::DeserialiseFailed => ImportTreeError::DeserialiseFailed,
+            LoadTreeError::EventEmitFailed => ImportTreeError::EventEmitFailed,
+        }
+    }
+}
+
 /* Delete file associated with where tree is saved */
 #[tauri::command]
 pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String, DeleteTreeError> {
@@ -131,7 +143,7 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     let tree_name: String = state.get_tree_name(index).map_err(|_| DeleteTreeError::NameRetrievalFail)?;
 
     /* Path to the json file used to store the tree */
-    let file_path: String = format_filepath(tree_name);
+    let file_path: String = format_filepath(&tree_name);
 
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
@@ -159,7 +171,7 @@ pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<()
     let tree_name: String = state.get_tree_name(index)?;
 
     /* Get the file path of the tree to be reloaded */
-    let file_path: String = format_filepath(tree_name);
+    let file_path: String = format_filepath(&tree_name);
     load_path(file_path, &state)
 }
     
@@ -200,6 +212,6 @@ impl From<StateError> for LoadTreeError {
     }
 }
 
-fn format_filepath(tree_name: String) -> String {
+fn format_filepath(tree_name: &str) -> String {
     format!("{}{}.json", SAVED_TREE_DIR, tree_name)
 }

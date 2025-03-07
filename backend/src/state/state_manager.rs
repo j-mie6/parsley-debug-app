@@ -28,5 +28,6 @@ pub enum StateError {
     TreeNotFound,
     NodeNotFound(u32),
     EventEmitFailed,
+    GetDownloadPathFail,
     ChannelError, /* Non-fatal error: The receiver from Parsley is no longer listening */
 }
