@@ -66,10 +66,6 @@ object Event {
     case object UploadCodeFile extends Event("upload-code-file") {
         type Out = String
     }
-
-    case object UploadFiles extends Event("upload-code-files") {
-        type Out = CodeFileInformation
-    }
 }
 
 

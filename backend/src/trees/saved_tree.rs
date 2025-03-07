@@ -115,7 +115,6 @@ pub mod test {
     /* Saved Tree unit testing */
 
     use std::collections::HashMap;
-    use std::hash::Hash;
     use std::io::Write;
     use std::fs::{self, File};
 

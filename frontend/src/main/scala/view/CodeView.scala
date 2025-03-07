@@ -25,7 +25,7 @@ case class Directory(name: String, contents: List[FileObject], expanded: Var[Boo
         cls("expanded") <-- expanded.signal,
         div(
             className := "code-view-directory-header",
-            child <-- expanded.signal.splitBoolean(_ => i(className := "bi bi-caret-right-fill"), _ => i(className := "bi bi-caret-down-fill")),
+            child <-- expanded.signal.foldBoolean(i(className := "bi bi-caret-right-fill"), i(className := "bi bi-caret-down-fill")),
             i(marginRight.px := 5, marginLeft.px := 5, className := "bi bi-folder-fill"),
             name.init,
             onClick --> expanded.invert()
@@ -62,7 +62,7 @@ case object FileObject {
         case files@(head :: next) => shortestFilePrefix(head, next) match {
             case ("", _) => fromPathsList(files, "")
             case (prefix, prefixFiles) => {
-                // We still want the parent directory
+                /* We still want the parent directory */
                 val splitIndex: Int = prefix.init.lastIndexWhere(charIsSlash(_))
                 val parentDir: String = prefix.drop(splitIndex).tail
                 val restOfPath: String = prefix.take(splitIndex + 1)
@@ -70,12 +70,6 @@ case object FileObject {
             }
         }
     )
-
-    // def splitWhere(str: String, cond: Char => Boolean): List[String] = str.indexWhere(cond) match
-    //     case -1: Int => List(str)
-    //     case n: Int => str.take(n) :: splitWhere(str.drop(n), cond)
-        
-    // def fromPaths(input: List[String]): FileObject = input.map(splitWhere(_, charIsSlash))
 
     def charIsSlash(chr: Char): Boolean = chr == '/' || chr == '\\'
 
@@ -154,7 +148,7 @@ object CodeView {
     }
 
     lazy val defaultFileExplorer: Element = div(
-        className := "tree-view-error",
+        className := "nothing-shown",
         "Nothing to show"
     )
 

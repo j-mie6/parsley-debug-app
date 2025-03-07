@@ -4,17 +4,18 @@ import scala.util.Random
 
 import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
+
 import org.scalajs.dom
 
 import model.errors.DillException
 import controller.AppStateController
 import controller.errors.ErrorController
 import controller.viewControllers.CodeViewController
-import model.CodeFileInformation
-import model.DebugTree
 import controller.ToastController
 import controller.tauri.{Tauri, Event}
 import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController, StateManagementViewController}
+
+import model.{CodeFileInformation, DebugTree}
 
 object MainView extends DebugViewPage {
     
@@ -33,7 +34,6 @@ object MainView extends DebugViewPage {
     val (treeStream, unlistenTree) = Tauri.listen(Event.TreeReady)
     val (newTreeStream, unlistenNewTree) = Tauri.listen(Event.NewTree)
 
-    val (fileNameStream, unlistenFileName) = Tauri.listen(Event.UploadFiles)
     val (codeStream, unlistenCode) = Tauri.listen(Event.UploadCodeFile)
     
     /* Render main viewing page */
@@ -48,10 +48,7 @@ object MainView extends DebugViewPage {
 
                 /* Update any code view streams */
                 codeStream.collectRight.map(Some(_)) --> CodeViewController.setCurrentFile,
-                fileNameStream.collectRight.map(Some(_)) --> CodeViewController.setFileInformation,
-                
                 codeStream.collectLeft --> ErrorController.setError,
-                fileNameStream.collectLeft --> ErrorController.setError,
 
 
                 /* Update tree and input with TreeReady response */
@@ -100,7 +97,6 @@ object MainView extends DebugViewPage {
                 onUnmountCallback(_ => unlistenTree.get),
                 onUnmountCallback(_ => unlistenNewTree.get),
                 onUnmountCallback(_ => unlistenCode.get),
-                onUnmountCallback(_ => unlistenFileName.get),
             )
         ))
     }
