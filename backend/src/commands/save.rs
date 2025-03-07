@@ -10,8 +10,16 @@ use crate::files::SAVED_TREE_DIR;
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
 pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<String, SaveTreeError> {
+    /* Get DebugTree from current state */
+    let debug_tree: DebugTree = state.get_tree()?;
+
+    let is_debuggable: bool = debug_tree.is_debuggable();
+
+    /* Get the session_id of the current DebugTree */
+    let session_id: i32 = debug_tree.get_session_id();
+
     /* Access the `tree` field from the locked state */
-    let saved_tree: SavedTree = SavedTree::from(state.get_tree()?); 
+    let saved_tree: SavedTree = SavedTree::from(debug_tree); 
 
     /* Get the serialised JSON */
     let tree_json: String = serde_json::to_string_pretty(&saved_tree)
@@ -24,6 +32,11 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
 
     /* Write tree json to the json file */
     data_file.write(tree_json.as_bytes()).map_err(|_| SaveTreeError::WriteTreeFailed)?;
+
+    /* Add new debugging session if the tree has a valid session_id */
+    if is_debuggable {
+        state.add_session_id(tree_name.clone(), session_id).map_err(|_| SaveTreeError::AddSessionFailed)?;
+    }
     
     /* Get a list of all saved tree names */
     let tree_names: Vec<String> = state.add_tree(tree_name).map_err(|_| SaveTreeError::AddTreeFailed)?;
@@ -40,6 +53,32 @@ pub enum SaveTreeError {
     CreateDirFailed,
     WriteTreeFailed,
     AddTreeFailed,
+    AddSessionFailed,
+}
+
+/* Updates a saved tree with new breakpoint skips */
+pub fn update_tree(tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+    let new_tree: SavedTree = SavedTree::from(tree.clone());
+    /* Get the serialised JSON */
+    let tree_json: String = serde_json::to_string_pretty(&new_tree)
+        .map_err(|_| UpdateTreeError::SerialiseFailed)?;
+
+    /* Open the json file to update the tree */
+    /* TODO: look into only updating the extra bits rather than replacing the tree */
+    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+    let mut data_file: File = File::create(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+
+    /* Write tree json to the json file */
+    data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;
+
+    Ok(())
+}
+
+#[derive(Debug, serde::Serialize)]
+pub enum UpdateTreeError {
+    SerialiseFailed,
+    OpenFileFailed,
+    WriteTreeFailed,
 }
 
 impl From<StateError> for SaveTreeError {
@@ -65,6 +104,9 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
 
+    /* Will remove the session map entry if it exists */
+    state.rmv_session_id(tree_name).map_err(|_| DeleteTreeError::SessionIdRemovalFail)?;
+    
     /* Returns a list of the tree names that are left */
     let tree_names: Vec<String> = state.rmv_tree(index).map_err(|_| DeleteTreeError::TreeRemovalFail)?;
 
@@ -78,6 +120,7 @@ pub enum DeleteTreeError {
     NameRetrievalFail,
     TreeRemovalFail,
     SerialiseFailed,
+    SessionIdRemovalFail,
 }
 
 

@@ -1,5 +1,5 @@
 mod fetch;
-mod save;
+pub mod save;
 mod breakpoint;
 mod source;
 

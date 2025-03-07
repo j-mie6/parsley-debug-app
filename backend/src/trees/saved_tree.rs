@@ -10,6 +10,7 @@ pub struct SavedTree {
     parser_info: HashMap<String, Vec<(i32, i32)>>,
     is_debuggable: bool,
     refs: Vec<(i32, String)>,
+    session_id: i32,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -51,18 +52,19 @@ impl From<DebugTree> for SavedTree {
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
   
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_parser_info().clone(), debug_tree.is_debuggable(), debug_tree.refs())
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_parser_info().clone(), debug_tree.is_debuggable(), debug_tree.refs(), debug_tree.get_session_id())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>) -> Self {
+    pub fn new(input: String, root: SavedNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>, session_id: i32) -> Self {
         SavedTree { 
             input,
             root,
             parser_info,
             is_debuggable,
             refs,
+            session_id,
         }
     }
 
@@ -84,6 +86,10 @@ impl SavedTree {
 
     pub fn refs(&self) -> Vec<(i32, String)> {
         self.refs.clone()
+    }
+
+    pub fn get_session_id(&self) -> i32 {
+        self.session_id
     }
 }
 
@@ -138,7 +144,8 @@ pub mod test {
             },
             "parser_info" : {},
             "is_debuggable": false,
-            "refs": []
+            "refs": [],
+            "session_id": -1
         }"#
         .split_whitespace()
         .collect()
@@ -207,7 +214,8 @@ pub mod test {
             },
             "parser_info" : {},
             "is_debuggable": false,
-            "refs": []
+            "refs": [],
+            "session_id": -1
         }"#
         .split_whitespace()
         .collect()
@@ -229,7 +237,8 @@ pub mod test {
             ),
             HashMap::new(),
             false,
-            Vec::new()
+            Vec::new(),
+            -1
         )
     }
     
@@ -296,7 +305,8 @@ pub mod test {
             ),
             HashMap::new(),
             false,
-            Vec::new()
+            Vec::new(),
+            -1
         )
     }
 
