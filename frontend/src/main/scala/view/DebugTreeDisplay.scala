@@ -47,6 +47,7 @@ object DebugTreeDisplay {
     * 
     * @return HTML element representing the whole tree.
     */
+
     def apply(tree: DebugTree): HtmlElement = 
         StateManagementViewController.setRefs(tree.refs)
         StateManagementViewController.setLocalRefs(tree.refs)
@@ -83,7 +84,6 @@ private object StateRef {
             .mkString
     }
 }
-
 
 /**
 * Object containing rendering methods for a reactive node (and children).
