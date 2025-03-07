@@ -19,7 +19,8 @@ object MainView extends DebugViewPage {
         private val num: Var[Int] = Var(0)
         val increment: Observer[Unit] = num.updater((x, unit) => x + 1)
 
-        /* Generate random name for file */
+        
+        /* Generate name: tree-{num} for file */
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
     }
 

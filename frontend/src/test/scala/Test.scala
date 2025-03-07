@@ -21,19 +21,26 @@ class Test extends AnyFlatSpec with should.Matchers {
             "childId": 0,
             "input": "Test",
             "isLeaf": false,
-            "isIterative": false
+            "isIterative": false,
+            "newlyGenerated": false
         },
-        "isDebuggable": false
+        "isDebuggable": false,
+        "refs": []
     }"""
 
     
     "The tree" should "be deserialised" in {
         val parsed: Either[DillException, DebugTree] = Reader[DebugTree].read(jsonTree)
-        val tree: DebugTree = parsed.toOption.get /* Throws exception if JsonError is returned */
+        val tree: DebugTree = parsed match {
+            case Left(e) => throw new Exception(s"Failed to serialise tree, got DillException: $e")
+            case Right(tree) => tree
+        }
 
         /* Check that the root tree has been deserialised correctly */
         tree.input should be ("Test")
         tree.isDebuggable should be (false)
+        tree.refs should be (Nil)
+
         tree.root.nodeId should be (0)
         tree.root.name should be ("Test")
         tree.root.internal should be ("Test")
@@ -42,6 +49,7 @@ class Test extends AnyFlatSpec with should.Matchers {
         tree.root.input should be ("Test")
         tree.root.isLeaf should be (false)
         tree.root.isIterative should be (false)
+        tree.root.newlyGenerated should be (false)
     }
 
     it should "not be deserialised if the JSON is not properly formatted" in {
