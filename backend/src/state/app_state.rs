@@ -5,9 +5,8 @@ use crate::events::Event;
 use crate::server::TokioMutex;
 use crate::trees::{DebugTree, DebugNode};
 
-pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<(i32, i32)>;
-
 use super::session_counter::SessionCounter;
+use super::state_manager::SkipsSender;
 use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
@@ -15,7 +14,7 @@ struct AppStateInternal {
     app: AppHandle,                          /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,                 /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,            /* Map from node_id to the respective node */
-    skips_tx: TokioMutex<SkipsSender>,       /* Transmitter how many breakpoints to skip, sent to parsley */
+    skips_tx: TokioMutex<HashMap<i32, SkipsSender>>,       /* Transmitter how many breakpoints to skip, sent to parsley */
     tab_names: Vec<String>,                  /* List of saved tree names */
     debug_sessions: HashMap<String, i32>,    /* Map of tree name to sessionId */
     counter: SessionCounter                  /* Counter to hold next sessionId */
@@ -27,14 +26,14 @@ pub struct AppState(Mutex<AppStateInternal>);
 
 impl AppState {
     /* Create a new app state with the app_handle */
-    pub fn new(app_handle: tauri::AppHandle, skips_tx: TokioMutex<SkipsSender>) -> AppState {
+    pub fn new(app_handle: tauri::AppHandle) -> AppState {
         AppState(
             Mutex::new(
                 AppStateInternal {
                     app: AppHandle::new(app_handle),
                     tree: None,
                     map: HashMap::new(),
-                    skips_tx,
+                    skips_tx: TokioMutex::new(HashMap::new()),
                     tab_names: Vec::new(),
                     debug_sessions: HashMap::new(),
                     counter: SessionCounter::new(),
@@ -79,6 +78,7 @@ impl AppState {
         let state: MutexGuard<AppStateInternal> = self.inner()?;
 
         if state.tab_names.is_empty() {
+            println!("IS EMPTY");
             return Err(StateError::ChannelError)
         }
 
@@ -146,8 +146,10 @@ impl StateManager for AppState {
         self.inner()?
             .skips_tx
             .blocking_lock()
-            .try_send((session_id, skips))
-            .map_err(|_| StateError::ChannelError)
+            .remove(&session_id)
+            .ok_or({println!("BAD 1"); StateError::ChannelError})?
+            .send(skips)
+            .map_err(|_| {println!("BAD 2"); StateError::ChannelError})
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
@@ -179,8 +181,21 @@ impl StateManager for AppState {
     }
 
     fn next_session_id(&self) -> Result<i32, StateError> {
+        println!("111111111111111111111");
         let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
+        println!("22222222222222222222");
         
         Ok(state.counter.get_and_increment())
+    }
+
+    fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
+        match self.inner()?
+            .skips_tx
+            .try_lock()
+            .map_err(|_| StateError::ChannelError)?
+            .insert(session_id, tx) {
+                Some(_) => Err(StateError::ChannelError),
+                None => Ok(())
+            }
     }
 }

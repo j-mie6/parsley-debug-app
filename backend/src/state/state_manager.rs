@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 
+pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
 
 #[cfg_attr(test, automock)]
 pub trait StateManager: Send + Sync + 'static {
@@ -27,6 +28,8 @@ pub trait StateManager: Send + Sync + 'static {
     fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError>;
 
     fn next_session_id(&self) -> Result<i32, StateError>;
+
+    fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError>;
 }
 
 

@@ -4,6 +4,7 @@ use tauri::{Emitter, Manager};
 
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
+use crate::state::state_manager::SkipsSender;
 use super::{AppState, StateManager, StateError};
 
 
@@ -64,5 +65,9 @@ impl StateManager for tauri::AppHandle {
 
     fn next_session_id(&self) -> Result<i32, StateError> {
         self.state::<AppState>().next_session_id()
+    }
+    
+    fn new_transmitter(&self,session_id: i32, tx: SkipsSender) -> Result<(),StateError> {
+        self.state::<AppState>().new_transmitter(session_id, tx)
     }
 }

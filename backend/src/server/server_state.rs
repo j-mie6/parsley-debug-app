@@ -6,15 +6,15 @@ use crate::trees::{DebugTree, DebugNode};
 
 use super::TokioMutex;
 
-pub type SkipsReceiver = rocket::tokio::sync::mpsc::Receiver<(i32, i32)>;
+pub type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<i32>;
 
 
 /* Wrapper for StateManager implementation used for Rocket server state management */
-pub struct ServerState(Box<dyn StateManager>, TokioMutex<SkipsReceiver>);
+pub struct ServerState(Box<dyn StateManager>, TokioMutex<HashMap<i32, SkipsReceiver>>);
 
 impl ServerState {
-    pub fn new<S: StateManager>(state: S, rx: TokioMutex<SkipsReceiver>) -> Self {
-        ServerState(Box::new(state), rx)
+    pub fn new<S: StateManager>(state: S) -> Self {
+        ServerState(Box::new(state), TokioMutex::new(HashMap::new()))
     }
 
     /* Get wrapped StateManager implementation */
@@ -65,12 +65,26 @@ impl StateManager for ServerState {
     fn next_session_id(&self) -> Result<i32,StateError> {
         self.inner().next_session_id()
     }
+    
+    fn new_transmitter(&self,session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<i32>) -> Result<(),StateError> {
+        self.inner().new_transmitter(session_id, tx)
+    }
 
     
 }
 
 impl ServerState {
-    pub async fn receive_breakpoint_skips(&self) -> Option<(i32, i32)> {
-        self.1.lock().await.recv().await
+    pub fn new_receiver(&self, session_id: i32, rx: SkipsReceiver) -> Option<SkipsReceiver> {
+        self.1.try_lock().ok().map(|mut map| map.insert(session_id, rx)).flatten()
+    }
+
+    pub async fn receive_breakpoint_skips(&self, session_id: i32) -> Option<i32> {
+        match self.1
+            .lock()
+            .await
+            .remove(&session_id) {
+                Some(rx) => rx.await.ok(),
+                None => None,
+            }
     }
 }

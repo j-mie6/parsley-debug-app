@@ -79,6 +79,15 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     let is_debuggable: bool = debug_tree.is_debuggable();
     let session_id: i32 = debug_tree.get_session_id();
 
+    /* Create channels */
+    if is_debuggable {
+        let (tx, rx) = rocket::tokio::sync::oneshot::channel::<i32>();
+
+        // Ignored: Errors
+        state.new_receiver(session_id, rx); // this better be None
+        state.new_transmitter(session_id, tx).expect("someone handle me 1");
+    }
+
     /* Format informative response for RemoteView */
     let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
     println!("session id is {}", session_id);
@@ -86,7 +95,9 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
     /* Check if tree is needing to be updated or is a new tree */
     let set_tree_result: Result<(), StateError> = if new_tree {
-        state.set_tree(debug_tree).and(state.emit(Event::NewTree))
+        let r = state.set_tree(debug_tree).and(state.emit(Event::NewTree));
+        println!("Set done");
+        r
     } else {
         /* Get the tree_name from the session_id */
         let tree_name: String = {
@@ -96,14 +107,16 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
         /* Update the saved tree and set the updated tree into state */
         save::update_tree(&debug_tree, tree_name).expect("Please");
-        state.set_tree(debug_tree)
+        let r = state.set_tree(debug_tree);
+        println!("updat done");
+        r
     };
 
     match set_tree_result {
         Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
 
-        Ok(()) => match state.receive_breakpoint_skips().await {
-            Some((_, skips)) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, session_id, skips)),
+        Ok(()) => match state.receive_breakpoint_skips(session_id).await {
+            Some(skips) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, session_id, skips)),
             None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
         },
 
