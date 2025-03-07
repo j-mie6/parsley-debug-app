@@ -44,8 +44,8 @@ impl StateManager for tauri::AppHandle {
             .map_err(|_| StateError::EventEmitFailed)
     }
 
-    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(),StateError> {
-        self.state::<AppState>().transmit_breakpoint_skips(skips)
+    fn transmit_breakpoint_skips(&self, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(),StateError> {
+        self.state::<AppState>().transmit_breakpoint_skips(skips, new_refs)
     }
     
     fn get_download_path(&self) -> Result<PathBuf, StateError> {

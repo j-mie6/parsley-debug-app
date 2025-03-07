@@ -1,8 +1,11 @@
 @import url('frontend/styles/pages/debug-view.css');
 @import url('frontend/styles/pages/tree-view.css');
-@import url('frontend/styles/pages/popup-and-toast.css');
 @import url('frontend/styles/pages/tab-bar.css');
+@import url('frontend/styles/pages/settings-sidepanel.css');
+@import url('frontend/styles/pages/state-sidepanel.css');
 @import url('frontend/styles/displays/debug-tree.css');
+@import url('frontend/styles/displays/popup.css');
+@import url('frontend/styles/displays/toast.css');
 @import url('frontend/styles/icons/bootstrap-icons.min.css');
 
 @font-face {
@@ -103,4 +106,22 @@ a {
 
 button {
     all: inherit;
+}
+
+.nothing-shown {
+    color: var(--font-color-no-tree); 
+    
+    font-weight: bold;
+    text-align: center;
+    font-size: 28px;
+    
+    width: 40%;
+    
+    margin: auto;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    
+    padding: 1.5em;
+    padding-right: 2em;
+    padding-left: 2em;
 }

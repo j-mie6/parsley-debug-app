@@ -8,10 +8,10 @@ import com.raquo.laminar.api.L.*
 import typings.tauriAppsApi.eventMod.{listen => tauriListen, Event as TauriEvent}
 
 import model.DebugTree
-import model.json.Reader
-import controller.tauri.Event.UnlistenFn
 import model.errors.DillException
+import model.json.Reader
 import controller.errors.ErrorController
+import controller.tauri.Event.UnlistenFn
 
 
 /**

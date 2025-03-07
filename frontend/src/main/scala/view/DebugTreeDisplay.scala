@@ -3,8 +3,12 @@ package view
 import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
+import controller.errors.ErrorController
 import controller.viewControllers.MainViewController
+import controller.viewControllers.SettingsViewController
+import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
+import controller.viewControllers.TreeViewController
 import controller.tauri.{Tauri, Command}
 
 
@@ -36,7 +40,6 @@ object DebugTreeDisplay {
     /* Resets the zoomFactor to 1 */
     val resetZoom = Observer(_ => zoomFactor.set(1.0))
 
-
     /**
     * Render the entire tree from the root node downwards.
     *
@@ -44,16 +47,22 @@ object DebugTreeDisplay {
     * 
     * @return HTML element representing the whole tree.
     */
-    def apply(tree: DebugTree): HtmlElement = div(
-        className := "debug-tree-container zoom-container",
-        
-        styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
-        wheelHandler,
-        
-        tree.refs.map(StateRef(_)),
 
-        ReactiveNodeDisplay(ReactiveNode(tree.root)),
-    )
+    def apply(tree: DebugTree): HtmlElement = 
+        StateManagementViewController.setRefs(tree.refs)
+        StateManagementViewController.setLocalRefs(tree.refs)
+        StateManagementViewController.setOrigRefs(tree.refs)
+
+        div(
+            className := "debug-tree-container zoom-container",
+            
+            styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
+            wheelHandler,
+
+            children <-- StateManagementViewController.getRefs.map(refs => refs.map(ref => StateRef(ref))),
+
+            ReactiveNodeDisplay(ReactiveNode(tree.root)),
+        )
 
 }
 
@@ -75,7 +84,6 @@ private object StateRef {
             .mkString
     }
 }
-
 
 /**
 * Object containing rendering methods for a reactive node (and children).
@@ -114,9 +122,9 @@ private object ReactiveNodeDisplay {
           * The various states of expansion for a reactive node
           */
         enum ExpansionState:
-            case NoChildren      /* Compressed */
-            case OneIterativeChild /* Iterative single-child */
-            case AllChildren     /* Either non-iterative or iterative fully expanded */
+            case NoChildren           /* Compressed */
+            case OneIterativeChild    /* Iterative single-child */
+            case AllChildren          /* Either non-iterative or iterative fully expanded */
 
         /* Tracker for the expansion state of the current reactive node */
         val expansionState: Signal[ExpansionState] = 
@@ -143,8 +151,8 @@ private object ReactiveNodeDisplay {
             /* Number of child nodes available */
             val childrenLen = node.children.now().length
 
-            /* Default skip size */
-            val skipAmount: Int = 5
+            /* Skip size set by the user */
+            val skipAmount = SettingsViewController.getNumSkipIterativeChildren.now()
 
             def getNearWrap(wrapCondition: Boolean, clampValue: Int, wrapIncr: Int, notWrapValue: Int): Int = {
                 if (wrapCondition) then
@@ -191,18 +199,32 @@ private object ReactiveNodeDisplay {
         val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
         /* Button to increment selected iterative child */
-        def iterativeArrowButton(isRight: Boolean, isFastForward: Boolean): HtmlElement = {
+        def iterativeArrowButton(icon: String, increment: Signal[Int], isRight: Boolean): HtmlElement = {
             val hoverVar: Var[Boolean] = Var(false)
-            val increment: Int = if isFastForward then 5 else 1
-
+            
             button(
-                className := "iterative-button",
-                cls("fast-forward") := isFastForward,
-                cls("facing-right") := isRight,
+                className := "debug-node-iterative-buttons",
+                marginBottom.px := 2,
 
-                i(cls(s"bi bi-${if isFastForward then "fast-forward" else "play"}-fill")),
+                i(
+                    cls(s"bi bi-$icon") <-- hoverVar.signal.not,
+                    cls(s"bi bi-$icon-fill") <-- hoverVar.signal,
+                                        
+                    height.px := 16,
+                    margin.auto,
 
-                onClick.mapTo(if isRight then increment else -increment) --> moveIndex,
+                    whenNot (isRight) {
+                        transform := "scaleX(-1)"
+                    },
+                    
+                    onMouseOver.mapTo(true) --> hoverVar,
+                    onMouseOut.mapTo(false) --> hoverVar,
+                ),
+
+                onClick(event => event.sample(increment).map(incr => if isRight then incr else -incr)) --> moveIndex,
+                
+                onMouseOver.mapTo(true) --> hoverVar,
+                onMouseOut.mapTo(false) --> hoverVar
             )
         }
 
@@ -223,8 +245,8 @@ private object ReactiveNodeDisplay {
             )
         }
 
-        def singleArrow(isRight: Boolean) = iterativeArrowButton(isRight, isFastForward = false)
-        def doubleArrow(isRight: Boolean) = iterativeArrowButton(isRight, isFastForward = true)
+        def singleArrow(isRight: Boolean) = iterativeArrowButton(icon = "play", Signal.fromValue(1), isRight)
+        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", SettingsViewController.getNumSkipIterativeChildren.signal, isRight)
 
         def arrows(isRight: Boolean) = {
             div(
