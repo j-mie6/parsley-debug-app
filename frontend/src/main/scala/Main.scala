@@ -1,8 +1,8 @@
 import scala.util.{Try, Success, Failure}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import org.scalajs.dom
 import com.raquo.laminar.api.L.*
+import org.scalajs.dom
 
 import view.MainView
 

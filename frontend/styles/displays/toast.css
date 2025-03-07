@@ -1,0 +1,96 @@
+.toast {
+    display: flex;
+    position: fixed;
+    align-items: center;
+    gap: 0.5vh;
+
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Center the toast */
+    bottom: 0vh; /* Start off-screen */
+    min-width: 20vw;
+    max-width: 30vw;
+    min-height: 8vh;
+    max-height: 15vh;
+    padding: 1.5vh 2vw;
+
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
+
+    border-style: solid;
+    border-radius: 8px;
+    
+    animation: slideUp 0.5s ease-out forwards, slideDown 0.5s ease-in 2s forwards;
+}
+
+.toast-icon-container {
+    font-size: 1.5vw;
+    box-shadow: none !important;
+}
+
+.toast-header {
+    font-size: 1.2vw;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 0.75vw;
+}
+
+.toast-text {
+    flex-grow: 1;
+    font-size: 1vw;
+    line-height: 1.4;
+    max-height: 8vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit text to 3 lines */
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 15vh);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -2vh);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -2vh);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, 15vh);
+    }
+}
+
+.toast-icon-container.info {
+    color: var(--font-color-info);
+    box-shadow: 0 0 3px rgb(from var(--font-color-info) r g b);
+}
+
+.toast.info {
+    border-color: var(--font-color-info);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-info) r g b / 0.17), rgb(from var(--font-color-info) r g b / 0.01));
+}
+
+.toast-icon-container.success {
+    color: var(--font-color-success);
+    box-shadow: 0 0 3px rgb(from var(--font-color-success) r g b);
+}
+
+.toast.success {
+    border-color: var(--font-color-success);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-success) r g b / 0.17), rgb(from var(--font-color-success) r g b / 0.01));
+}
+
+.toast-text {
+    text-overflow: ellipsis;
+}

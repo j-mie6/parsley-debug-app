@@ -8,10 +8,10 @@ import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import model.json.Reader
 import model.errors.DillException
-import controller.tauri.Args
+import model.json.Reader
 import controller.errors.ErrorController
+import controller.tauri.Args
 
 
 /* Argument trait implemented for types passed to Command invoke call */ 
@@ -107,10 +107,10 @@ object Command {
     }
 
     case object SkipBreakpoints extends Command("skip_breakpoints") {
-        type In = Int
+        type In = (Int, Seq[(Int, String)])
         given args: Args[In] {
-            extension (skips: Int) 
-                def namedArgs: Map[String, Any] = Map("skips" -> skips)
+            extension (args: (Int, Seq[(Int, String)])) 
+                def namedArgs: Map[String, Any] = Map("skips" -> args._1, "newRefs" -> js.Array(args._2.map(js.Tuple2(_, _))*))
         }
         type Out = Unit
     }

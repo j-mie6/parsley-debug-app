@@ -1,26 +1,29 @@
 package view
 
-import com.raquo.laminar.api.L.*
-import com.raquo.laminar.codecs.*
 
-import org.scalajs.dom
-
-import scala.scalajs.js.timers._
 import scala.concurrent.duration._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration
 import scala.util.{Try, Success, Failure}
+import scala.scalajs.js.timers._
+
+import com.raquo.laminar.api.L.*
+import com.raquo.laminar.codecs.*
+import org.scalajs.dom
 
 import model.Page
-
+import view.SettingsView
+import view.StateManagementView
 import controller.AppStateController
-import controller.tauri.Tauri
-import controller.viewControllers.MainViewController.View
+import controller.errors.ErrorController
+import controller.viewControllers.InputViewController
 import controller.viewControllers.MainViewController
+import controller.viewControllers.MainViewController.View
+import controller.viewControllers.SettingsViewController
+import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
-import controller.viewControllers.InputViewController
+import controller.tauri.Tauri
 
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -46,10 +49,33 @@ abstract class DebugViewPage extends Page {
         i(className := "bi bi-info-circle-fill"),
     )
 
+    private lazy val stateButton: HtmlElement = button(
+        className := "debug-view-button debug-view-button-state",
+        i(className:= "bi bi-sliders"),
+        onClick --> (_ => 
+            StateManagementViewController.toggleOpenState()
+        )
+    )
+
     /* Opener for the settings tab. */
     private lazy val settingsTabButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-settings",
-        i(className := "bi bi-gear-wide-connected")
+        i(className := "bi bi-gear-wide-connected"),
+        onClick --> (_ => 
+            SettingsViewController.toggleOpenSettings()
+        )
+    )
+
+
+    /* Fast forward icon for skipping */
+    private lazy val breakpointSkipIcon: Element = i(className := "bi bi-fast-forward-fill")
+
+    /* Adds ability to skip the current breakpoint. */
+    private lazy val breakpointSkipButton: Element = button(
+        className := "debug-view-button debug-view-button-breakpoint-skip-button",
+        breakpointSkipIcon, /* Fast forward icon */
+
+        onClick.mapToUnit.compose(TreeViewController.skipBreakpoints(_).collectLeft) --> ErrorController.setError
     )
 
     /**
@@ -104,7 +130,7 @@ abstract class DebugViewPage extends Page {
 
     /* Button bar internal to the view. */
     private lazy val buttonBar: HtmlElement = div(
-        className := "debug-view-button-bar",
+        className := "debug-view-left-button-bar",
         /* Button bar left. */
         div(
             display.flex,
@@ -121,9 +147,13 @@ abstract class DebugViewPage extends Page {
         ),
         /* Button bar right. */
         div(
-            display.flex,
-            alignItems.center,
-
+            className := "debug-view-right-button-bar",
+            child(
+                div(
+                    breakpointSkipButton
+                )
+            ) <-- TreeViewController.isDebuggingSession,
+            stateButton,
             infoButton,
         )
     )   
@@ -136,16 +166,30 @@ abstract class DebugViewPage extends Page {
       * 
       * @return HTML element of the DebugView page.
       */
-    override def render(child: Option[HtmlElement]): HtmlElement = {
+    override def render(childElem: Option[HtmlElement]): HtmlElement = {
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,
-            TabView(),
             div(
-                className := "tree-view-page",
-                buttonBar,
-                cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
-                child.getOrElse(div())
+                className := "debug-view-body", 
+                child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
+                child(StateManagementView()) <-- StateManagementViewController.isStateOpen,
+                div(
+                    className := "tab-and-tree-view-container",
+                    cls("left-compressed") <-- SettingsViewController.isSettingsOpen,
+                    cls("right-compressed") <-- StateManagementViewController.isStateOpen,
+
+                    div(
+                        className := "tab-view-container",
+                        TabView()
+                    ),
+                    div(
+                        className := "tree-view-page",
+                        buttonBar,
+                        cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
+                        childElem.getOrElse(div())
+                    )
+                )
             )
         )))
     } 

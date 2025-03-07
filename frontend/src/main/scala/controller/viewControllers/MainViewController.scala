@@ -53,5 +53,4 @@ object MainViewController {
 
     /** Get selected view element */
     val getViewElem: Signal[HtmlElement] = view.signal.map(_.elem)
-
 }
