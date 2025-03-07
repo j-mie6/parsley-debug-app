@@ -10,9 +10,7 @@ import controller.viewControllers.SettingsViewController
 
 object SettingsView {
 
-    def renderUserSetting(setting: UserSetting): HtmlElement = {
-        val titleHoverVar: Var[Boolean] = Var(false)
-        
+    def renderUserSetting(setting: UserSetting): HtmlElement = {        
         div(
             className := "single-setting-container",
             div(
@@ -20,7 +18,6 @@ object SettingsView {
                     className := "single-setting-top-container",
                     div(
                         className := "single-setting-name-container",
-
                         setting.settingName,
                     ),
                     div(
@@ -52,7 +49,7 @@ object SettingsView {
                                 input(
                                     typ := "checkbox",
                                     checked <-- SettingsViewController.getColorBlindMode.signal,
-                                    onInput.mapToChecked --> setting.value.writer.contramap[Boolean](b => b)
+                                    onInput.mapToChecked --> setting.value.writer.contramap[Boolean](identity)
                                 )
                         )
                     )
@@ -80,7 +77,7 @@ object SettingsView {
 
                 div(
                     cls("settings-footer"),
-                    button(className := "apply-settings-button", "Apply", onClick --> (_ => 
+                    button(className := "apply-settings-button", "Apply", onClick --> {_ => 
                         /* Get all user setting values from local storage */
                         val appliedNumSkipIterativeChildren: Int =
                             allUserSettings
@@ -88,7 +85,7 @@ object SettingsView {
                                 .flatMap(_.value.now() match {
                                     case i: Int => Some(i) 
                                     case _      => None
-                                }).getOrElse(5)
+                                }).getOrElse(SettingsViewController.numSkipIterativeChildrenDefault)
 
                         val appliedNumSkipBreakpoints: Int =
                             allUserSettings
@@ -96,15 +93,15 @@ object SettingsView {
                                 .flatMap(_.value.now() match {
                                     case i: Int => Some(i) 
                                     case _      => None
-                                }).getOrElse(1)
+                                }).getOrElse(SettingsViewController.numSkipBreakpointsDefault)
 
                         val appliedColorBlindMode: Boolean =
                             allUserSettings
                                 .find(_ == ColorBlindMode)
                                 .flatMap(_.value.now() match {
                                     case b: Boolean => Some(b) 
-                                    case _          => None
-                                }).getOrElse(false)
+                                    case _      => None
+                                }).getOrElse(SettingsViewController.colorBlindModeDefault)
 
                         /* Apply settings globally */
                         SettingsViewController.applySettings(
@@ -114,7 +111,7 @@ object SettingsView {
                         )
 
                         ToastController.setToast(SettingsApplied)
-                    )),
+                    }),
                     button(className:= "default-settings-button", "Restore Defaults", onClick --> {_ =>
                         SettingsViewController.applySettings(
                             newNumSkipIterativeChildren = NumSkipIterativeChildren.default.asInstanceOf[Int],

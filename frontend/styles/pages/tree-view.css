@@ -9,24 +9,6 @@
     flex: 1;
 }
 
-.tree-view-error {
-    color: var(--font-color-no-tree); 
-    
-    font-weight: bold;
-    text-align: center;
-    font-size: 28px;
-    
-    width: 40%;
-    
-    margin: auto;
-    margin-top: 2em;
-    margin-bottom: 1em;
-    
-    padding: 1.5em;
-    padding-right: 2em;
-    padding-left: 2em;
-}
-
 .zoom-container {
     display: flex;
     transform-origin: left top;
@@ -34,16 +16,6 @@
     height: 100%;
     align-items: flex-start;
     justify-content: flex-start;
-}
-
-.skip-button {
-    margin-right: 20px;
-    background: transparent;
-    color: inherit;
-    border: none;
-    font: inherit;
-    outline: inherit;
-    cursor: pointer;
 }
 
 .tree-view-page.highlight-debug-session {

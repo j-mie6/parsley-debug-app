@@ -1,9 +1,9 @@
 package controller
 
 import scala.scalajs.js
+import scala.scalajs.js.internal.UnitOps.unitOrOps
 
 import com.raquo.laminar.api.L.*
-import scala.scalajs.js.internal.UnitOps.unitOrOps
 
 import model.toast.*
 

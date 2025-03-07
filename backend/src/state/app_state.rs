@@ -5,7 +5,7 @@ use crate::events::Event;
 use crate::server::TokioMutex;
 use crate::trees::{DebugTree, DebugNode};
 
-pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<i32>;
+pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<(i32, Vec<(i32, String)>)>;
 
 use super::{StateError, StateManager, AppHandle};
 
@@ -133,11 +133,11 @@ impl StateManager for AppState {
         self.inner()?.app.emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(), StateError> {
+    fn transmit_breakpoint_skips(&self, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
         self.inner()?
             .skips_tx
             .blocking_lock()
-            .try_send(skips)
+            .try_send((skips, new_refs))
             .map_err(|_| StateError::ChannelError)
     }
 }
