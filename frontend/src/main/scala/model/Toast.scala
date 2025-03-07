@@ -44,8 +44,8 @@ sealed trait Toast {
   * The generic toast for information that needs to be passed to the user, styled in blue
   */
 sealed trait InfoToast extends Toast {
-    override def icon: String = "bi bi-info-circle-fill"
     override def style: String = "info" 
+    override def icon: String = "bi bi-info-circle-fill"
 }
 
 /**
@@ -55,6 +55,14 @@ sealed trait SuccessToast extends Toast  {
     override def name: String = "Success"
     override def style: String = "success"
     override def icon: String = "bi bi-check-circle-fill"
+}
+
+/**
+  * The generic toast for error, styled in red
+  */
+sealed trait ErrorToast extends Toast {
+    override def style: String = "error" 
+    override def icon: String = "bi bi-exclamation-triangle-fill"
 }
 
 case object TreeDownloaded extends SuccessToast {
@@ -71,5 +79,17 @@ case object DefaultSettingsApplied extends SuccessToast {
 
 case object StateApplied extends SuccessToast {
     override def message: String = "State applied"
+}
+
+case object TreeDownloaded extends SuccessToast {
+    override def message: String = "Tree downloaded"
+}
+
+case object TreeUploaded extends SuccessToast {
+    override def message: String = "Tree uploaded"
+}
+
+case object TreeImportFailed extends ErrorToast {
+    override def message: String = "Tree importing failed, this probably means the file is malformed"
 }
 

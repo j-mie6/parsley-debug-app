@@ -91,6 +91,16 @@
     background-image: linear-gradient(to bottom, rgb(from var(--font-color-success) r g b / 0.17), rgb(from var(--font-color-success) r g b / 0.01));
 }
 
+.toast-error-container.info {
+    color: var(--font-color-error);
+    box-shadow: 0 0 3px rgb(from var(--font-color-error) r g b);
+}
+
+.toast.error {
+    border-color: var(--font-color-error);
+    background-image: linear-gradient(to bottom, rgb(from var(--font-color-error) r g b / 0.17), rgb(from var(--font-color-error) r g b / 0.01));
+}
+
 .toast-text {
     text-overflow: ellipsis;
 }
