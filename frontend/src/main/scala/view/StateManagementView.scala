@@ -47,7 +47,7 @@ object StateManagementView {
             cls("open") <-- StateManagementViewController.isStateOpen,
             
             div(
-                className := ("state-sidepanel"),
+                className := "state-sidepanel",
                 div(cls("state-header"),
                     h2("References")
                 ),
