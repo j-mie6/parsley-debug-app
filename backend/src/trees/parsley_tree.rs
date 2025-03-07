@@ -184,8 +184,7 @@ pub mod test {
                 ],
                 "isIterative": false
             },
-            "isDebuggable": false,
-            "sessionId": "-1"
+            "isDebuggable": false
         }"#
         .split_whitespace()
         .collect()
