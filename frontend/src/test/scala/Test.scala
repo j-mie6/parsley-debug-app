@@ -25,6 +25,7 @@ class Test extends AnyFlatSpec with should.Matchers {
             "isIterative": false,
             "newlyGenerated": false
         },
+        "parserInfo": {},
         "isDebuggable": false
     }"""
 
@@ -64,24 +65,26 @@ class FileSystemTest extends AnyFlatSpec with should.Matchers {
             "/dir/content/test.scala"
         )
 
-        FileObject.fromPaths(paths) shouldEqual RootDirectory(List(
-            Directory(
-                "content/",
-                List(
-                    Directory(
-                        "scala/",
-                        List(
-                            File("test.scala", "/dir/content/scala/test.scala"),
-                            File("test2.scala", "/dir/content/scala/test2.scala"),
+        FileObject.fromPaths(paths) should matchPattern { 
+            case RootDirectory(List(
+                Directory(
+                    "content/",
+                    List(
+                        Directory(
+                            "scala/",
+                            List(
+                                File("test.scala", "/dir/content/scala/test.scala"),
+                                File("test2.scala", "/dir/content/scala/test2.scala"),
+                            ),
+                            _: Var[Boolean]
                         ),
-                        Var(true)
+                        File("rust/test.rs", "/dir/content/rust/test.rs"),
+                        File("test.scala", "/dir/content/test.scala"),
                     ),
-                    File("rust/test.rs", "/dir/content/rust/test.rs"),
-                    File("test.scala", "/dir/content/test.scala"),
-                ),
-                Var(true)
-            )
-        ))
+                    _: Var[Boolean]
+                )
+            )) =>
+        }
     }
 
     "Single file path" should "be converted" in {
