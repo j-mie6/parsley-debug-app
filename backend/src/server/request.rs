@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 use rocket::{get, post, http, serde::json::Json};
 
 use super::ServerState;
 use crate::events::Event;
 use crate::trees::{DebugTree, ParsleyTree};
-use crate::state::{self, StateError, StateManager};
+use crate::state::{StateError, StateManager};
 use crate::commands::save;
 
 /* Length of input slice returned in post response */
@@ -106,8 +108,14 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     } else {
         /* Get the tree_name from the session_id */
         let tree_name: String = {
-            let res: std::collections::HashMap<String, i32> = state.get_session_ids().expect("oopsies");
-            res.into_iter().find(|(_, v)| *v == session_id).expect("handle value not not found").0
+            let map: HashMap<String, i32> = match state.get_session_ids() {
+                Ok(map) => map,
+                Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not load tree_names", session_id)),
+            };
+            match map.into_iter().find(|(_, v)| *v == session_id) {
+                Some((name, _)) => name,
+                None => return (http::Status::InternalServerError, PostTreeResponse::no_skips("No tree exists with this session id", session_id)),
+            }
         };
 
         /* Update the saved tree and set the updated tree into state */
