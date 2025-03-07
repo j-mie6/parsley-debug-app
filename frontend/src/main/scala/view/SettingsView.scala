@@ -31,18 +31,19 @@ object SettingsView {
                                     /* Update setting only when a valid number is entered */
                                     onInput.mapToValue --> { newValue =>
                                         if (newValue.isEmpty) {
-                                            setting.value.set(false) // Allow empty temporarily
+                                            /* Allow empty temporarily */
+                                            setting.value.set(false) 
                                         } else {
                                             newValue.toIntOption.foreach(setting.value.set)
                                         }
                                     },
 
                                     /* Restore default value if empty when input loses focus */
-                                    onBlur --> { _ =>
-                                        if (setting.value.now() == false) {
-                                            setting.value.set(setting.default)
-                                        }
-                                    }
+                                    onBlur(_
+                                        .sample(setting.value.signal)
+                                        .filter((b: UserSettingType) => b == false)
+                                        .mapTo(setting.default)
+                                    ) --> setting.value.writer
                                 )
                             case "boolean" =>
                                 input(
@@ -50,9 +51,7 @@ object SettingsView {
                                     checked <-- SettingsViewController.getColorBlindMode.signal,
                                     onInput.mapToChecked --> setting.value.writer.contramap[Boolean](identity)
                                 )
-
                         )
-                        
                     )
                 ),
             )

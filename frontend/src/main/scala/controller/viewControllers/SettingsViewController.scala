@@ -72,7 +72,6 @@ object SettingsViewController {
      */
     private def setNumSkipIterativeChildren(newNumSkipIterativeChildren: Int): Unit = 
         numSkipIterativeChildren.set(newNumSkipIterativeChildren)
-        println(s"Set new iterative: ${newNumSkipIterativeChildren}")
 
     /**
      * Updates the number of breakpoints to be skipped.
@@ -81,7 +80,6 @@ object SettingsViewController {
      */
     private def setNumSkipBreakpoints(newNumSkipBreakpoints: Int): Unit = 
         numSkipBreakpoints.set(newNumSkipBreakpoints)
-        println(s"Set new breakpoints: ${newNumSkipBreakpoints}")
 
     /**
      * Updates the colour blind mode setting.
@@ -90,7 +88,6 @@ object SettingsViewController {
      */
     private def setColorBlindMode(newColorBlindMode: Boolean): Unit = 
         colorBlindMode.set(newColorBlindMode)
-        println(s"Set new colour blind mode: ${newColorBlindMode}")
 
     /**
      * Applies new user settings by updating the respective values and propagating changes.

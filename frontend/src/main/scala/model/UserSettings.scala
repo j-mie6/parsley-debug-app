@@ -23,7 +23,7 @@ type UserSettingType = Int | Boolean
  *
  * @param settingName The display name of the setting.
  * @param style A string identifier specifying the type of input (e.g., "number", "boolean").
- * @param default The default value that the user setting has
+ * @param default The default value of the user settings
  * @param value A reactive variable (`Var`) that temporarily stores the user's selected value
  *              before it is applied globally. The type of this variable is defined
  *              by `UserSettingType`.
@@ -32,7 +32,6 @@ sealed trait UserSetting {
     def settingName: String
     def style: String
     def default: UserSettingType
-
     /* Used as a temporary store of the setting prior to applying it platform-wide */
     def value: Var[UserSettingType]
 }

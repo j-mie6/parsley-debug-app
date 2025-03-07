@@ -150,6 +150,8 @@ private object ReactiveNodeDisplay {
         val moveIndex: Observer[Int] = iterativeNodeIndex.updater((currIndex, delta) => {
             /* Number of child nodes available */
             val childrenLen = node.children.now().length
+
+            /* Skip size set by the user */
             val skipAmount = SettingsViewController.getNumSkipIterativeChildren.now()
 
             def getNearWrap(wrapCondition: Boolean, clampValue: Int, wrapIncr: Int, notWrapValue: Int): Int = {

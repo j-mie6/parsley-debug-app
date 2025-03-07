@@ -61,7 +61,6 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-button debug-view-button-settings",
         i(className := "bi bi-gear-wide-connected"),
         onClick --> (_ => 
-            println("Opening settings")
             SettingsViewController.toggleOpenSettings()
         )
     )
