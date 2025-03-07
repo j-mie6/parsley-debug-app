@@ -59,14 +59,17 @@ abstract class DebugViewPage extends Page {
     /* Uploading json element */
     val uploadButton: HtmlElement = label(
         className := "debug-view-file-button",
-        i(className := "bi bi-cloud-upload", fontSize.px := 25),
+        i(className := "bi bi-cloud-download", fontSize.px := 25),
         input(
             typ := "file",
             display := "none",
             multiple := true,
 
             /* Triggers the file input */
-            onChange.mapToFiles.map(_.map(loadFile)) --> Observer.empty,
+            onChange.map(event => event
+            .mapToFiles.map(_.map(loadFile))
+                .tapEach(event.input = "")
+            ) --> Observer.empty,
         )
     )
 
