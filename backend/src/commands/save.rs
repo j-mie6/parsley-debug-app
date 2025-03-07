@@ -184,7 +184,6 @@ fn load_path(file_path: String, state: &tauri::State<AppState>) -> Result<(), Lo
 #[derive(Debug, serde::Serialize)]
 #[allow(clippy::enum_variant_names)]
 pub enum LoadTreeError {
-    NameRetrievalFail,
     LockFailed,
     ReadFileFailed,
     DeserialiseFailed,
