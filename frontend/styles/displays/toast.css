@@ -19,7 +19,7 @@
     border-style: solid;
     border-radius: 8px;
     
-    animation: slideUp 0.5s ease-out forwards, slideDown 0.5s ease-in 2s forwards;
+    animation: slideUp 0.5s ease-out forwards, slideDown 0.5s ease-in 3s forwards;
 }
 
 .toast-icon-container {

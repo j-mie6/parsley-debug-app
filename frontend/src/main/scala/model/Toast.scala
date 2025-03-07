@@ -61,6 +61,7 @@ sealed trait SuccessToast extends Toast  {
   * The generic toast for error, styled in red
   */
 sealed trait ErrorToast extends Toast {
+    override def name: String = "Error"
     override def style: String = "error" 
     override def icon: String = "bi bi-exclamation-triangle-fill"
 }
@@ -81,15 +82,15 @@ case object StateApplied extends SuccessToast {
     override def message: String = "State applied"
 }
 
-case object TreeDownloaded extends SuccessToast {
-    override def message: String = "Tree downloaded"
-}
-
 case object TreeUploaded extends SuccessToast {
     override def message: String = "Tree uploaded"
 }
 
-case object TreeImportFailed extends ErrorToast {
+case object TreeUploadFailed extends ErrorToast {
     override def message: String = "Tree importing failed, this probably means the file is malformed"
+}
+
+case object TreeDownloadFailed extends ErrorToast {
+    override def message: String = "Tree download failed, this is likely caused by an issue in your file system"
 }
 

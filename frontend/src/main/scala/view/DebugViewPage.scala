@@ -1,5 +1,6 @@
 package view
 
+import scala.scalajs.js
 
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -9,9 +10,15 @@ import scala.scalajs.js.timers._
 
 import com.raquo.laminar.api.L.*
 import com.raquo.laminar.codecs.*
+import com.raquo.laminar.api.features.unitArrows
 import org.scalajs.dom
 
 import model.Page
+import model.errors.DillException
+import model.toast.TreeUploadFailed
+import model.toast.TreeUploaded
+import model.toast.TreeDownloaded
+import model.toast.TreeDownloadFailed
 import view.SettingsView
 import view.StateManagementView
 import controller.AppStateController
@@ -24,9 +31,8 @@ import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.tauri.Tauri
+import controller.ToastController
 import controller.errors.ErrorController
-import model.errors.DillException
-import scala.collection.mutable.ListBuffer
 
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -57,8 +63,11 @@ abstract class DebugViewPage extends Page {
             .compose(event => event.sample(TabViewController.getSelectedTab))
             .flatMapSwitch(TabViewController.getFileName)
             .flatMapMerge(TreeViewController.downloadTree)
-            .collectLeft
-        ) --> ErrorController.setError,
+            .map {
+                case Left(_) => TreeDownloadFailed
+                case Right(_) =>  TreeDownloaded
+            }
+        ) --> ToastController.setToast
     )
 
     /* Uploading json element */
@@ -69,31 +78,42 @@ abstract class DebugViewPage extends Page {
             typ := "file",
             display := "none",
             multiple := true,
-
-            /* Triggers the file input */
-            onChange.map(ev => loadFile(ev.target.asInstanceOf[dom.html.Input])) --> Observer.empty
             
+            /* Handle tree uploading */
+            onChange.flatMap { ev =>
+                loadFile(ev.target.asInstanceOf[dom.html.Input])
+                    .map {
+                        case Left(_)   => TreeUploadFailed 
+                        case Right(_)  => TreeUploaded  
+                    }
+            } --> ToastController.setToast
+
         )
     )
 
     /* Reads contents of file and passes them to backend */
     private def loadFile(input: dom.html.Input): EventStream[Either[DillException, Unit]] = {
         val files = input.files
-        EventStream.fromValue(0 until files.length)
-            .flatMapMerge(_
-                .map(i => files(i))
-                .map(file => {
+        val streams = (0 until files.length).map { i =>
+            val file = files(i)
+            EventStream.fromJsPromise {
+                new js.Promise[Either[DillException, Unit]]((resolve, _) => {
                     val reader = new dom.FileReader()
-                    reader.onload = {_ => {
+                    reader.onload = _ => {
                         val content = reader.result.asInstanceOf[String]
-                        TreeViewController.importTree(file.name, content)
-                    }}
-                    
+                        val result = TreeViewController.importTree(file.name, content)
+                        result.collectRight.foreach(_ => resolve(Right(())))(unsafeWindowOwner)
+                        result.collectLeft.foreach(err => resolve(Left(err)))(unsafeWindowOwner)
+                    }
                     reader.readAsText(file)
-                }))
-            /* Resets value so we can import the same file multiple times */
-            .tapEach(_ => input.value = "")
+                })
+            }
+        }
+
+        EventStream.merge(streams*) // Merge all file streams 
+            .tapEach(_ => input.value = "") // Reset input field after processing
     }
+
                 
     /* Overview information tab. */
     private lazy val infoButton: HtmlElement = button(
