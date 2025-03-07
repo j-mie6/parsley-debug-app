@@ -267,7 +267,7 @@ private object ReactiveNodeDisplay {
                     //     }
                     // ) --> node.children.writer,
 
-                    onClick(event => getNamedChildren(node.debugNode)) --> node.children.writer
+                    onClick.flatMapTo(getNamedChildren(node.debugNode)) --> node.children.writer
                 ),
                 
                 arrows(isRight = true),
