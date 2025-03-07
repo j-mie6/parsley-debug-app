@@ -6,13 +6,41 @@
     align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
 }
 
+.debug-input-container {
+    display: flex;
+    flex-direction: column;
+    
+    width: 80%;
+    max-width: 1200px;
+
+    padding: 15px;
+    margin: 20px auto;
+
+    background-color: var(--background-tertiary);
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
 .debug-input-main-view {
     text-align: left;
-    width: 100%;
-    padding-inline: 10px;
-    font-size: 20px;
-    display: flex;
+    padding: 15px;
+    font-size: 18px;
+    font-family: "Fira Code", "Courier New", monospace;
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
+    border-radius: 6px;
+    word-wrap: break-word;
+    overflow-x: auto;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
 }
+
+.debug-input-container:hover {
+    box-shadow: 0px 0px 5px var(--background-tertiary);
+}
+
 
 .code-text {
     width: fit-content;
