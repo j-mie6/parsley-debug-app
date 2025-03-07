@@ -273,10 +273,11 @@ pub fn get_refs(session_id: i32, state: tauri::State<AppState>) -> Result<Vec<(i
 
 /* Resets local changes to default for a tree's refs */
 #[tauri::command]
-pub fn reset_refs(session_id: i32, state: tauri::State<AppState>) -> Result<(), RefError>  {
+pub fn reset_refs(session_id: i32, state: tauri::State<AppState>) -> Result<Vec<(i32, String)>, RefError>  {
     let default_refs: Vec<(i32, String)> = state.get_tree().expect("Please").refs();
-
-    Ok(state.reset_refs(session_id, default_refs)?)
+    state.reset_refs(session_id, default_refs.clone())?;
+    
+    Ok(default_refs)
 }
 
 #[derive(Debug, serde::Serialize)]

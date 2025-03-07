@@ -143,7 +143,7 @@ object Command {
                 def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
         }
 
-        type Out = Unit
+        type Out = Seq[(Int, String)]
     }
 
     case object SetRefs extends Command("set_refs") {
