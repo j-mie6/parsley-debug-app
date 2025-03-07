@@ -7,6 +7,7 @@ import model.DebugTree
 import model.DebugNode
 import model.json.{Reader, Writer}
 import model.errors.DillException
+import com.raquo.airstream.state.Var
 
 
 class Test extends AnyFlatSpec with should.Matchers {
@@ -24,6 +25,7 @@ class Test extends AnyFlatSpec with should.Matchers {
             "isIterative": false,
             "newlyGenerated": false
         },
+        "parserInfo": {},
         "isDebuggable": false,
         "refs": [],
         "sessionId": -1
@@ -57,5 +59,47 @@ class Test extends AnyFlatSpec with should.Matchers {
     it should "not be deserialised if the JSON is not properly formatted" in {
         val wrongJson: String = "Testing..."
         assert(Reader[DebugTree].read(wrongJson).isLeft)
+    }
+}
+
+import view.{FileObject, RootDirectory, Directory, File}
+
+class FileSystemTest extends AnyFlatSpec with should.Matchers {
+    "List of file paths" should "be converted" in {
+        val paths: List[String] = List(
+            "/dir/content/scala/test.scala",
+            "/dir/content/scala/test2.scala",
+            "/dir/content/rust/test.rs",
+            "/dir/content/test.scala"
+        )
+
+        FileObject.fromPaths(paths) should matchPattern { 
+            case RootDirectory(List(
+                Directory(
+                    "content/",
+                    List(
+                        Directory(
+                            "scala/",
+                            List(
+                                File("test.scala", "/dir/content/scala/test.scala"),
+                                File("test2.scala", "/dir/content/scala/test2.scala"),
+                            ),
+                            _: Var[Boolean]
+                        ),
+                        File("rust/test.rs", "/dir/content/rust/test.rs"),
+                        File("test.scala", "/dir/content/test.scala"),
+                    ),
+                    _: Var[Boolean]
+                )
+            )) =>
+        }
+    }
+
+    "Single file path" should "be converted" in {
+        val paths = List("/dir/scala/main/scala3/file.scala")
+
+        FileObject.fromPaths(paths) shouldEqual RootDirectory(List(
+            File("file.scala", "/dir/scala/main/scala3/file.scala")
+        ))
     }
 }

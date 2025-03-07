@@ -21,7 +21,7 @@ object InputViewController {
     /* Default tree view when no tree is loaded */
         case None => 
             div(
-                className := "tree-view-error",
+                className := "nothing-shown",
                 "Nothing to show"
             )
     

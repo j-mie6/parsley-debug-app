@@ -134,4 +134,13 @@ object Command {
         }
         type Out = Unit
     }
+
+    case object RequestSourceFile extends Command("request_source_file") {
+        type In = String
+        given args: Args[In] {
+            extension (filePath: String)
+                def namedArgs: Map[String, Any] = Map("filePath" -> filePath)
+        }
+        type Out = Unit
+    }
 }
