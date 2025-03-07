@@ -66,23 +66,26 @@ abstract class DebugViewPage extends Page {
             multiple := true,
 
             /* Triggers the file input */
-            onChange.map(event => event
-            .mapToFiles.map(_.map(loadFile))
-                .tapEach(event.input = "")
-            ) --> Observer.empty,
+            onChange.map(ev => loadFile(ev.target.asInstanceOf[dom.html.Input])) --> Observer.empty
+            
         )
     )
 
     /* Reads contents of file and passes them to backend */
-    private def loadFile(file: dom.File): Unit = {
-        val reader = new dom.FileReader()
-
-        reader.onload = _ => {
-            val content = reader.result.asInstanceOf[String]
-            TreeViewController.importTree.tupled((file.name, content)) --> Observer.empty
+    private def loadFile(input: dom.html.Input): Unit = {
+        val files = input.files
+        for (i <- 0 until files.length) {
+            val file = files(i)
+            val reader = new dom.FileReader()
+            reader.onload = _ => {
+                val content = reader.result.asInstanceOf[String]
+                TreeViewController.importTree.tupled((file.name, content)) --> Observer.empty
+            }
+            
+            reader.readAsText(file)
         }
-
-        reader.readAsText(file)
+        /* Resets value so we can import the same file multiple times */
+        input.value = ""
     }
                 
     /* Overview information tab. */
