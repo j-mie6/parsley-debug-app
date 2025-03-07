@@ -10,7 +10,7 @@ import controller.viewControllers.TreeViewController.treeExists
 
 object StateManagementView {
 
-    def renderReference(ref:(Int, String)): HtmlElement = {
+    def renderReference(ref: (Int, String)): HtmlElement = {
         val refAddr: Int = ref._1
         val refValue: String = ref._2
 
