@@ -85,6 +85,10 @@ case object TreeDownloaded extends SuccessToast {
     override def message: String = "Tree downloaded"
 }
 
+case object TreeUploaded extends SuccessToast {
+    override def message: String = "Tree uploaded"
+}
+
 case object TreeImportFailed extends ErrorToast {
     override def message: String = "Tree importing failed, this probably means the file is malformed"
 }
