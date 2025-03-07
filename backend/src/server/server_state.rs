@@ -65,7 +65,7 @@ impl StateManager for ServerState {
         self.inner().next_session_id()
     }
     
-    fn new_transmitter(&self, session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<i32>) -> Result<(), StateError> {
+    fn new_transmitter(&self, session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<(i32, Vec<(i32, String)>)>) -> Result<(), StateError> {
         self.inner().new_transmitter(session_id, tx)
     }
 }
@@ -75,7 +75,7 @@ impl ServerState {
         self.1.try_lock().ok().map(|mut map| map.insert(session_id, rx)).flatten()
     }
 
-    pub async fn receive_breakpoint_skips(&self, session_id: i32) -> Option<i32> {
+    pub async fn receive_breakpoint_skips(&self, session_id: i32) -> Option<(i32, Vec<(i32, String)>)> {
         let rx = self.1.lock().await.remove(&session_id);
         match rx {
             Some(rx) => rx.await.ok(),

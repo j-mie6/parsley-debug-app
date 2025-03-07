@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 
-pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
+pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<(i32, Vec<(i32, String)>)>;
 
 #[cfg_attr(test, automock)]
 pub trait StateManager: Send + Sync + 'static {

@@ -91,7 +91,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
     /* Create channels */
     if is_debuggable {
-        let (tx, rx) = rocket::tokio::sync::oneshot::channel::<i32>();
+        let (tx, rx) = rocket::tokio::sync::oneshot::channel::<(i32, Vec<(i32, String)>)>();
 
         match state.new_receiver(session_id, rx) {
             Some(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Receiver already exists for this session id", session_id)),
