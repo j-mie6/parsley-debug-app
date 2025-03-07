@@ -14,7 +14,6 @@
 
     z-index: 1000;
     transform: translateX(-25vw); /* Completely hidden initially */
-    transition: transform 0.75s ease-in-out;
 }
 
 .settings-sidepanel-container.open {
@@ -72,15 +71,32 @@
     padding: 5px;
 }
 
-.single-setting-name-container.underlined {
-    text-decoration: underline;
-}
-
-.single-setting-modify-container {
+.single-setting-modify-container input[type="number"] {
+    width: 70px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+  
+    border: 1px solid var(--font-color-tertiary);
     border-radius: 5px;
-    background-color: transparent;
-    padding: 2px 5px;
-}
+  
+    outline: none;
+  }
+  
+  .single-setting-modify-container input[type="number"]:focus {
+    border-color: var(--font-color-secondary);
+  }
+  
+  .single-setting-modify-container input[type="number"]::-webkit-outer-spin-button,
+  .single-setting-modify-container input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .single-setting-modify-container input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield; 
+  }
+  
 
 .single-setting-info-text {
     position: relative;

@@ -24,7 +24,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         )?;
     }
 
-    let (tx, rx): (state::SkipsSender, server::SkipsReceiver) = mpsc::channel::<i32>(1);
+    let (tx, rx): (state::SkipsSender, server::SkipsReceiver) = mpsc::channel::<(i32, Vec<(i32, String)>)>(1);
 
     /* Manage the app state using Tauri */
     let app_state: AppState = AppState::new(app.app_handle().clone(), Mutex::new(tx));

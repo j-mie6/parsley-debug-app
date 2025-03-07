@@ -34,7 +34,7 @@ sealed trait Popup {
             
             div(
                 h2(className := "popup-header",name),
-                div(className := "popup-text", checkGithubIssue(message)),
+                div(className := "popup-text", embedGithubIssue(message)),
             ),
 
             onClick.mapTo(None).filter(_ => closable) --> ErrorController.setOptError,
@@ -72,16 +72,18 @@ sealed trait Error extends DillException {
   * @param msg Full message that we are checking on
   * @return Github Issue as a link HTML element if "Github Issue" is in the message
   */
-def checkGithubIssue(msg: String): HtmlElement = {
+def embedGithubIssue(msg: String): HtmlElement = {
     val githubLink = a(
         href := "https://github.com/j-mie6/parsley-debug-app/issues/new",
         target := "_blank",
         "GitHub Issue",
     )
 
-    val parts = msg.split("GitHub Issue")
-    
-    span(parts.head, githubLink, parts.last)
+    if (msg.contains("Github Issue")) then
+        val parts = msg.split("GitHub Issue")
+        span(parts.head, githubLink, parts.last)
+    else
+        span(msg)
 }
 
 /* List of DILL Exceptions */

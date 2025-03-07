@@ -9,6 +9,7 @@ import model.json.Reader
   * @param input the input string the tree node has to parse
   * @param root the debug tree root node
   * @param isDebuggable if this tree is using live debugging operations like breakpoint skipping
+  * @param refs A list of pairs: `Address` and `Reference Value` from `Parsley`'s State
   */
 case class DebugTree(input: String, root: DebugNode, parserInfo: Map[String, List[(Int, Int)]], isDebuggable: Boolean, refs: Seq[(Int, String)] = Nil) derives Reader.upickle
 

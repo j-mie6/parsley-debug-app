@@ -7,9 +7,9 @@ import org.scalajs.dom
 
 import model.DebugTree
 import model.errors.DillException
-import controller.tauri.{Tauri, Command}
 import controller.errors.ErrorController
-import controller.viewControllers.{TabViewController, TreeViewController, InputViewController}
+import controller.tauri.{Tauri, Command}
+import controller.viewControllers.{InputViewController, TabViewController, TreeViewController}
 
 
 object TabView {
@@ -87,10 +87,15 @@ object TabView {
                 .collectLeft --> controller.errors.ErrorController.setError, 
 
 
-            /* If there are no tabs, unload tree from frontend */
+            /* If there are no tabs, unload tree and input from frontend */
             TabViewController.noSavedTrees.changes
                 .filter(identity)
                 .mapToUnit --> TreeViewController.unloadTree,
+
+            TabViewController.noSavedTrees.changes
+                .filter(identity)
+                .mapToUnit --> InputViewController.unloadInput,
+
 
             /* Renders tabs */ 
             children <-- TabViewController

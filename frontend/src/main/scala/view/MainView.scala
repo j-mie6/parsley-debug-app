@@ -2,19 +2,19 @@ package view
 
 import scala.util.Random
 
-import org.scalajs.dom
 import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
+import org.scalajs.dom
 
-import controller.tauri.{Tauri, Event}
-import controller.errors.ErrorController
+import model.errors.DillException
 import controller.AppStateController
-import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController}
+import controller.errors.ErrorController
 import controller.viewControllers.CodeViewController
 import model.CodeFileInformation
 import model.DebugTree
 import controller.ToastController
-import model.errors.DillException
+import controller.tauri.{Tauri, Event}
+import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController, StateManagementViewController}
 
 object MainView extends DebugViewPage {
     
@@ -57,6 +57,7 @@ object MainView extends DebugViewPage {
                 /* Update tree and input with TreeReady response */
                 treeStream.collectRight --> TreeViewController.setTree,
                 treeStream.collectRight.map((tree: DebugTree) => Some(CodeFileInformation(tree.parserInfo))) --> CodeViewController.setFileInformation,
+                treeStream.collectRight --> StateManagementViewController.setCurrTree,
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
 
                 /* Notify of any errors caught by treeStream */

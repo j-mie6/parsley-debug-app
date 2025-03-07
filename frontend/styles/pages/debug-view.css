@@ -77,7 +77,6 @@
     display: flex;
     flex-direction: column;
     height: inherit;
-    transition: margin 0.75s ease-in-out !important;
 }
 
 /* When left side is open, shift content to the right */
@@ -168,7 +167,7 @@
     padding-block: 4px;
 }
 
-.debug-view-source-button {
+.debug-view-input-button {
     font-size: 25px;
     padding-inline: 7px;
     padding-block: 4px;
@@ -188,10 +187,17 @@
     width: 105px;
 }
 
-.debug-view-expand-source.expanded {
-    width: 132px;
+.debug-view-expand-input.expanded {
+    width: 118px;
 }
 
 .debug-view-expand-code.expanded {
     width: 113px;
 }
+
+@media (max-width: 1024px) {
+    .debug-view-button-settings,
+    .debug-view-button-state {
+      display: none;
+    }
+  }

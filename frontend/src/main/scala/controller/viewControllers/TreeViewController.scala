@@ -34,10 +34,12 @@ object TreeViewController {
     /** Get debug tree element or warning if no tree found */
     def getTreeElem: Signal[HtmlElement] = tree.signal.map(_ match 
         /* Default tree view when no tree is loaded */
-        case None => div(
-            className := "tree-view-error",
+        case None => 
+          StateManagementViewController.clearRefs()
+          div(
+            className := "nothing-shown",
             "Nothing to show"
-        )
+          )
 
         /* Render as DebugTreeDisplay */
         case Some(tree) => DebugTreeDisplay(tree)
@@ -50,9 +52,11 @@ object TreeViewController {
       *
       * @param skips The amount of times to skip a breakpoint
       */
-    def skipBreakpoints(): Unit =
-        Tauri.invoke(Command.SkipBreakpoints, SettingsViewController.getNumSkipBreakpoints.now() - 1)
-    
-    /* Toggle whether the button to skip through breakpoints is visible */
+    def skipBreakpoints(trigger: EventStream[Unit]): EventStream[Either[DillException, Unit]] = {
+        trigger.sample(SettingsViewController.getNumSkipBreakpoints.signal.combineWith(StateManagementViewController.getRefs))
+            .map((skips, refs) => (skips - 1, refs))
+            .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _))
+    }
+        
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
 }

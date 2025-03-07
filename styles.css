@@ -108,3 +108,21 @@ a {
 button {
     all: inherit;
 }
+
+.nothing-shown {
+    color: var(--font-color-no-tree); 
+    
+    font-weight: bold;
+    text-align: center;
+    font-size: 28px;
+    
+    width: 40%;
+    
+    margin: auto;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    
+    padding: 1.5em;
+    padding-right: 2em;
+    padding-left: 2em;
+}
