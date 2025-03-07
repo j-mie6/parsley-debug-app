@@ -26,7 +26,7 @@ object TreeView {
 
         onClick(_
             .sample(TreeViewController.getSessionId)
-            .flatMapMerge(TreeViewController.skipBreakpoints(_, 0))
+            .flatMapMerge(TreeViewController.skipBreakpoints(_))
             .collectLeft
         ) --> ErrorController.setError,
     )
