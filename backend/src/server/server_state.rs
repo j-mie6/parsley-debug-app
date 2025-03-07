@@ -74,6 +74,14 @@ impl StateManager for ServerState {
     fn get_download_path(&self) -> Result<PathBuf,StateError> {
         self.inner().get_download_path()
     }
+    
+    fn reset_refs(&self,session_id:i32,default_refs:Vec<(i32,String)>) -> Result<(),StateError> {
+        self.inner().reset_refs(session_id, default_refs)
+    }
+
+    fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
+        self.inner().get_refs(session_id)
+    }
 }
 
 impl ServerState {

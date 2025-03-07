@@ -187,7 +187,7 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
 
-    /* Will remove the session map entry if it exists */
+    /* Will remove the session map entry and saved refs if they exist */
     state.rmv_session_id(tree_name).map_err(|_| DeleteTreeError::SessionIdRemovalFail)?;
     
     /* Returns a list of the tree names that are left */
@@ -257,4 +257,31 @@ impl From<StateError> for LoadTreeError {
 
 fn format_filepath(tree_name: &str) -> String {
     format!("{}{}.json", SAVED_TREE_DIR, tree_name)
+}
+
+/* Updates local changed references for a tree */
+#[tauri::command]
+pub fn update_refs(session_id: i32, new_refs: Vec<(i32, String)>, state: tauri::State<AppState>) -> Result<(), RefError>  {
+    Ok(state.update_refs(session_id, new_refs)?)
+}
+
+/* Retrieves local changed references for a tree */
+#[tauri::command]
+pub fn get_refs(session_id: i32, state: tauri::State<AppState>) -> Result<Vec<(i32, String)>, RefError>  {
+    Ok(state.get_refs(session_id)?)
+}
+
+#[derive(Debug, serde::Serialize)]
+#[allow(clippy::enum_variant_names)]
+pub enum RefError {
+    RefMapFail,
+}
+
+impl From<StateError> for RefError {
+    fn from(state_error: StateError) -> Self {
+        match state_error {
+            StateError::LockFailed => RefError::RefMapFail,
+            _ => panic!("Unexpected error on load_saved_tree"),
+        }
+    }
 }

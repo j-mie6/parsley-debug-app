@@ -12,13 +12,14 @@ use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
 struct AppStateInternal {
-    app: AppHandle,                          /* Handle to instance of Tauri app, used for events */
-    tree: Option<DebugTree>,                 /* Parser tree that is posted to Server */
-    map: HashMap<u32, DebugNode>,            /* Map from node_id to the respective node */
-    skips_tx: HashMap<i32, SkipsSender>,       /* Transmitter how many breakpoints to skip, sent to parsley */
-    tab_names: Vec<String>,                  /* List of saved tree names */
-    debug_sessions: HashMap<String, i32>,    /* Map of tree name to sessionId */
-    counter: SessionCounter                  /* Counter to hold next sessionId */
+    app: AppHandle,                                 /* Handle to instance of Tauri app, used for events */
+    tree: Option<DebugTree>,                        /* Parser tree that is posted to Server */
+    map: HashMap<u32, DebugNode>,                   /* Map from node_id to the respective node */
+    skips_tx: HashMap<i32, SkipsSender>,            /* Transmitter how many breakpoints to skip, sent to parsley */
+    tab_names: Vec<String>,                         /* List of saved tree names */
+    debug_sessions: HashMap<String, i32>,           /* Map of tree name to sessionId */
+    saved_refs: HashMap<i32, Vec<(i32, String)>>,   /* Map of sessionId to saved refs for a tab */
+    counter: SessionCounter                         /* Counter to hold next sessionId */
 }
 
 
@@ -37,6 +38,7 @@ impl AppState {
                     skips_tx: HashMap::new(),
                     tab_names: Vec::new(),
                     debug_sessions: HashMap::new(),
+                    saved_refs: HashMap::new(),
                     counter: SessionCounter::new(),
                 }
             )
@@ -80,6 +82,14 @@ impl AppState {
         
         /* Index will never be out of range as the frontend representation and the backend will be in sync */
         Ok(state.tab_names[index].clone()) 
+    }
+
+    pub fn update_refs(&self, session_id: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
+        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+
+        state.saved_refs.insert(session_id, new_refs);
+
+        Ok(())
     }
 }
 
@@ -160,6 +170,13 @@ impl StateManager for AppState {
     }
     
     fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
+
+        let session_id: i32 = *self.inner()?.debug_sessions.get(&tree_name).expect("Please");
+
+        self.inner()?
+            .saved_refs
+            .remove(&session_id);
+
         self.inner()?
             .debug_sessions
             .remove(&tree_name);
@@ -192,5 +209,21 @@ impl StateManager for AppState {
                 Some(_) => Err(StateError::ChannelError),
                 None => Ok(())
             }
+    }
+
+    fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {
+        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+
+        state.saved_refs.insert(session_id, default_refs);
+
+        Ok(())
+    }
+
+    fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
+        let state: MutexGuard<AppStateInternal> = self.inner()?;
+
+        let refs: &Vec<(i32, String)> = state.saved_refs.get(&session_id).expect("Session id should be known");
+
+        Ok(refs.clone())
     }
 }

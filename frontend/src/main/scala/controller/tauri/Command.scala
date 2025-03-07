@@ -126,6 +126,26 @@ object Command {
         type Out = Unit
     }
 
+    case object GetRefs extends Command("get_refs") {
+        type In = Int
+        given args: Args[In] {
+            extension (sessionId: Int)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
+        }
+
+        type Out = Seq[(Int, String)]
+    }
+
+    case object SetRefs extends Command("set_refs") {
+        type In = (Int, Seq[(Int, String)])
+        given args: Args[In] {
+            extension (args: (Int, Seq[(Int, String)]))
+                def namedArgs: Map[String, Any] = Map("sessionId" -> args._1, "newRefs" -> js.Array(args._2.map(js.Tuple2(_, _))*))
+        }
+
+        type Out = Unit
+    }
+
     case object SkipBreakpoints extends Command("skip_breakpoints") {
         type In = (Int, Int, Seq[(Int, String)])
         given args: Args[In] {
