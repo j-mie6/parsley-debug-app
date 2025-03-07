@@ -75,7 +75,10 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-button debug-view-button-breakpoint-skip-button",
         breakpointSkipIcon, /* Fast forward icon */
 
-        onClick.mapToUnit.compose(TreeViewController.skipBreakpoints(_).collectLeft) --> ErrorController.setError
+        onClick.compose(_
+            .sample(TreeViewController.getSessionId)
+            .compose(TreeViewController.skipBreakpoints)
+            .collectLeft) --> ErrorController.setError
     )
 
     /**

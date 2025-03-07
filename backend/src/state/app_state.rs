@@ -2,20 +2,22 @@ use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
 use crate::events::Event;
-use crate::server::TokioMutex;
 use crate::trees::{DebugTree, DebugNode};
 
-pub type SkipsSender = rocket::tokio::sync::mpsc::Sender<(i32, Vec<(i32, String)>)>;
+pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<(i32, Vec<(i32, String)>)>;
 
+use super::session_counter::SessionCounter;
 use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
 struct AppStateInternal {
-    app: AppHandle,                 /* Handle to instance of Tauri app, used for events */
-    tree: Option<DebugTree>,        /* Parser tree that is posted to Server */
-    map: HashMap<u32, DebugNode>,   /* Map from node_id to the respective node */
-    skips_tx: TokioMutex<SkipsSender>, /* Transmitter how many breakpoints to skip, sent to parsley */
-    tab_names: Vec<String>,         /* List of saved tree names */
+    app: AppHandle,                          /* Handle to instance of Tauri app, used for events */
+    tree: Option<DebugTree>,                 /* Parser tree that is posted to Server */
+    map: HashMap<u32, DebugNode>,            /* Map from node_id to the respective node */
+    skips_tx: HashMap<i32, SkipsSender>,       /* Transmitter how many breakpoints to skip, sent to parsley */
+    tab_names: Vec<String>,                  /* List of saved tree names */
+    debug_sessions: HashMap<String, i32>,    /* Map of tree name to sessionId */
+    counter: SessionCounter                  /* Counter to hold next sessionId */
 }
 
 
@@ -24,15 +26,17 @@ pub struct AppState(Mutex<AppStateInternal>);
 
 impl AppState {
     /* Create a new app state with the app_handle */
-    pub fn new(app_handle: tauri::AppHandle, skips_tx: TokioMutex<SkipsSender>) -> AppState {
+    pub fn new(app_handle: tauri::AppHandle) -> AppState {
         AppState(
             Mutex::new(
                 AppStateInternal {
                     app: AppHandle::new(app_handle),
                     tree: None,
                     map: HashMap::new(),
-                    skips_tx,
+                    skips_tx: HashMap::new(),
                     tab_names: Vec::new(),
+                    debug_sessions: HashMap::new(),
+                    counter: SessionCounter::new(),
                 }
             )
         )
@@ -72,7 +76,7 @@ impl AppState {
     /* Given an index returns the tree name */
     pub fn get_tree_name(&self, index: usize) -> Result<String, StateError> {
         let state: MutexGuard<AppStateInternal> = self.inner()?;
-
+        
         /* Index will never be out of range as the frontend representation and the backend will be in sync */
         Ok(state.tab_names[index].clone()) 
     }
@@ -133,11 +137,55 @@ impl StateManager for AppState {
         self.inner()?.app.emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
         self.inner()?
             .skips_tx
-            .blocking_lock()
-            .try_send((skips, new_refs))
+            .remove(&session_id)
+            .ok_or(StateError::ChannelError)?
+            .send((skips, new_refs))
             .map_err(|_| StateError::ChannelError)
+    }
+    
+    fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
+        self.inner()?
+            .debug_sessions
+            .insert(tree_name, session_id);
+
+        Ok(())
+    }
+    
+    fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
+        self.inner()?
+            .debug_sessions
+            .remove(&tree_name);
+
+        Ok(())
+    }
+    
+    fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
+        let state: MutexGuard<'_, AppStateInternal> = self.inner()?;
+
+        Ok(state.debug_sessions.values().any(|&id| id == session_id))
+    }
+
+    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError> {
+        let state: MutexGuard<AppStateInternal> = self.inner()?;
+        
+        Ok(state.debug_sessions.clone())
+    }
+
+    fn next_session_id(&self) -> Result<i32, StateError> {
+        let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
+        
+        Ok(state.counter.get_and_increment())
+    }
+
+    fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
+        match self.inner()?
+            .skips_tx
+            .insert(session_id, tx) {
+                Some(_) => Err(StateError::ChannelError),
+                None => Ok(())
+            }
     }
 }

@@ -1,18 +1,20 @@
+use std::collections::HashMap;
+
 use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
 
 use super::TokioMutex;
 
-pub type SkipsReceiver = rocket::tokio::sync::mpsc::Receiver<(i32, Vec<(i32, String)>)>;
+pub type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<(i32, Vec<(i32, String)>)>;
 
 
 /* Wrapper for StateManager implementation used for Rocket server state management */
-pub struct ServerState(Box<dyn StateManager>, TokioMutex<SkipsReceiver>);
+pub struct ServerState(Box<dyn StateManager>, TokioMutex<HashMap<i32, SkipsReceiver>>);
 
 impl ServerState {
-    pub fn new<S: StateManager>(state: S, rx: TokioMutex<SkipsReceiver>) -> Self {
-        ServerState(Box::new(state), rx)
+    pub fn new<S: StateManager>(state: S) -> Self {
+        ServerState(Box::new(state), TokioMutex::new(HashMap::new()))
     }
 
     /* Get wrapped StateManager implementation */
@@ -39,13 +41,45 @@ impl StateManager for ServerState {
         self.inner().emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(),StateError> {
-        self.0.as_ref().transmit_breakpoint_skips(skips, new_refs)
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
+        self.0.as_ref().transmit_breakpoint_skips(session_id, skips, new_refs)
+    }
+    
+    fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
+        self.inner().add_session_id(tree_name, session_id)
+    }
+    
+    fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
+        self.inner().rmv_session_id(tree_name)
+    }
+    
+    fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
+        self.inner().session_id_exists(session_id)
+    }
+    
+    fn get_session_ids(&self) -> Result<HashMap<String, i32>,StateError> {
+        self.inner().get_session_ids()
+    }
+
+    fn next_session_id(&self) -> Result<i32,StateError> {
+        self.inner().next_session_id()
+    }
+    
+    fn new_transmitter(&self, session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<(i32, Vec<(i32, String)>)>) -> Result<(), StateError> {
+        self.inner().new_transmitter(session_id, tx)
     }
 }
 
 impl ServerState {
-    pub async fn receive_breakpoint_skips(&self) -> Option<(i32, Vec<(i32, String)>)> {
-        self.1.lock().await.recv().await
+    pub fn new_receiver(&self, session_id: i32, rx: SkipsReceiver) -> Option<SkipsReceiver> {
+        self.1.try_lock().ok().map(|mut map| map.insert(session_id, rx)).flatten()
+    }
+
+    pub async fn receive_breakpoint_skips(&self, session_id: i32) -> Option<(i32, Vec<(i32, String)>)> {
+        let rx = self.1.lock().await.remove(&session_id);
+        match rx {
+            Some(rx) => rx.await.ok(),
+            None => None,
+        }
     }
 }
