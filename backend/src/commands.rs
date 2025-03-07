@@ -1,5 +1,5 @@
 mod fetch;
-pub(crate) mod save;
+pub mod save;
 mod breakpoint;
 
 /* Expose command handlers for Tauri setup */

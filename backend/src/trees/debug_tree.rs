@@ -119,7 +119,7 @@ pub mod test {
                 "isIterative": false,
                 "newlyGenerated": false
             },
-            "isDebugging": false,
+            "isDebuggable": false,
             "sessionId": -1
         }"#
         .split_whitespace()
@@ -140,7 +140,7 @@ pub mod test {
                 "isIterative": false,
                 "newlyGenerated": false
             },
-            "isDebugging": false,
+            "isDebuggable": false,
             "sessionId": -1
         }"#
         .split_whitespace()

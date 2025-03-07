@@ -56,7 +56,6 @@ pub enum SaveTreeError {
     AddSessionFailed,
 }
 
-/* SHOULD be current tree */
 /* Updates a saved tree with new breakpoint skips */
 pub fn update_tree(tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
     let new_tree: SavedTree = SavedTree::from(tree.clone());

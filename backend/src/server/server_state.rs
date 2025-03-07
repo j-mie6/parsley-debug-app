@@ -41,7 +41,7 @@ impl StateManager for ServerState {
         self.inner().emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(),StateError> {
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
         self.0.as_ref().transmit_breakpoint_skips(session_id, skips)
     }
     
@@ -51,14 +51,13 @@ impl StateManager for ServerState {
     
     fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
         self.inner().rmv_session_id(tree_name)
-
     }
     
     fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
         self.inner().session_id_exists(session_id)
     }
     
-    fn get_session_ids(&self) -> Result<HashMap<String,i32>,StateError> {
+    fn get_session_ids(&self) -> Result<HashMap<String, i32>,StateError> {
         self.inner().get_session_ids()
     }
 
@@ -66,11 +65,9 @@ impl StateManager for ServerState {
         self.inner().next_session_id()
     }
     
-    fn new_transmitter(&self,session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<i32>) -> Result<(),StateError> {
+    fn new_transmitter(&self, session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<i32>) -> Result<(), StateError> {
         self.inner().new_transmitter(session_id, tx)
     }
-
-    
 }
 
 impl ServerState {
