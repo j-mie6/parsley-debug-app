@@ -3,7 +3,7 @@ use rocket::{get, post, http, serde::json::Json};
 use super::ServerState;
 use crate::events::Event;
 use crate::trees::{DebugTree, ParsleyTree};
-use crate::state::{StateError, StateManager};
+use crate::state::{self, StateError, StateManager};
 use crate::commands::save;
 
 /* Length of input slice returned in post response */
@@ -59,21 +59,29 @@ fn get_index() -> String {
     String::from("DILL: Debugging Interactively for the ParsLey Language")
 }
 
+fn process_parsley_tree(mut parsley_tree: ParsleyTree, state: &rocket::State<ServerState>) -> Result<DebugTree, StateError> {
+    /* SETUP: Allocate id if RemoteView doesn't have one */
+    if parsley_tree.get_session_id() == -1 {
+        let allocated_id: i32 = state.inner().next_session_id()?;
+        parsley_tree.set_session_id(allocated_id);
+    }
+
+    Ok(parsley_tree.into())
+}
+
 /* Post request handler to accept debug tree */
 #[post("/api/remote/tree", format = "application/json", data = "<data>")]
 async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, Json<PostTreeResponse>) {
     /* Deserialise and unwrap json data */
-    let mut parsley_tree: ParsleyTree = data.into_inner();
+    let parsley_tree: ParsleyTree = data.into_inner();
     let new_tree: bool = parsley_tree.get_session_id() == -1;
 
-    /* SETUP: Allocate id if tree doesn't have one */
-    if new_tree {
-        let allocated_id: i32 = state.inner().next_session_id().expect("Pretty please");
-        parsley_tree.set_session_id(allocated_id);
-    }
-
-    /* Convert to debug_tree and extract information */
-    let debug_tree: DebugTree = parsley_tree.into();
+    let debug_tree: DebugTree = match process_parsley_tree(parsley_tree, state) {
+        Ok(tree) => tree,
+        Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not allocate a session id", -1)),
+    };
+    
+    /*  */
     let is_debuggable: bool = debug_tree.is_debuggable();
     let session_id: i32 = debug_tree.get_session_id();
 
@@ -91,8 +99,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
     /* Check if tree is needing to be updated or is a new tree */
     let set_tree_result: Result<(), StateError> = if new_tree {
-        let r = state.set_tree(debug_tree).and(state.emit(Event::NewTree));
-        r
+        state.set_tree(debug_tree).and(state.emit(Event::NewTree))
     } else {
         /* Get the tree_name from the session_id */
         let tree_name: String = {
