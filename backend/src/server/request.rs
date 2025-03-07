@@ -81,7 +81,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not allocate a session id", -1)),
     };
     
-    /*  */
+    /* Extract useful fields from tree */
     let is_debuggable: bool = debug_tree.is_debuggable();
     let session_id: i32 = debug_tree.get_session_id();
 
@@ -89,9 +89,12 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     if is_debuggable {
         let (tx, rx) = rocket::tokio::sync::oneshot::channel::<i32>();
 
-        // Ignored: Errors
-        state.new_receiver(session_id, rx); // this better be None
-        state.new_transmitter(session_id, tx).expect("someone handle me 1");
+        match state.new_receiver(session_id, rx) {
+            Some(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Receiver already exists for this session id", session_id)),
+            None => if let Err(_) = state.new_transmitter(session_id, tx) {
+                return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise transmitter in state", session_id));
+            },
+        };
     }
 
     /* Format informative response for RemoteView */
