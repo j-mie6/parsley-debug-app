@@ -19,6 +19,26 @@
     width: fit-content;
 }
 
+
+/* Render stateful refs */
+.debug-tree-ref {
+    color: var(--font-color-tertiary);
+    background-color: var(--background-tertiary-20);
+
+    padding: 10px;
+    margin: 0px 5px;
+
+    border-radius: 8px;
+    border-width: 2px;
+
+    border-style: solid;
+    border-bottom-width: 4px;
+    border-color: var(--font-color-quaternary);
+
+    text-align: center;
+}
+
+
 /* Container of debug tree */
 .debug-tree-container {
     height: calc(100vh - 215px);

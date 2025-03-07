@@ -4,6 +4,7 @@ import com.raquo.laminar.api.L.*
 
 import model.{DebugTree, DebugNode, ReactiveNode}
 import controller.viewControllers.MainViewController
+import controller.viewControllers.SettingsViewController
 import controller.viewControllers.TabViewController
 import controller.tauri.{Tauri, Command}
 
@@ -50,9 +51,32 @@ object DebugTreeDisplay {
         styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
         wheelHandler,
         
+        tree.refs.map(StateRef(_)),
+
         ReactiveNodeDisplay(ReactiveNode(tree.root)),
     )
+
 }
+
+
+/** Render a Ref passed as to a breakpoint */
+private object StateRef {
+    def apply(codedRef: (Int, String)): HtmlElement = {
+        p(
+            className := "debug-tree-ref",
+            s"R${subscriptInt(codedRef._1)}: ${codedRef._2}"
+        )
+    }
+
+    private def subscriptInt(x: Int): String = {
+        val subscriptInts = "\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089"
+
+        x.toString
+            .map(i => subscriptInts.charAt(i.asDigit))
+            .mkString
+    }
+}
+
 
 /**
 * Object containing rendering methods for a reactive node (and children).
@@ -120,8 +144,8 @@ private object ReactiveNodeDisplay {
             /* Number of child nodes available */
             val childrenLen = node.children.now().length
 
-            /* Default skip size */
-            val skipAmount: Int = 5
+            /* Skip size set by the user */
+            val skipAmount = SettingsViewController.getNumSkipIterativeChildren.now()
 
             def getNearWrap(wrapCondition: Boolean, clampValue: Int, wrapIncr: Int, notWrapValue: Int): Int = {
                 if (wrapCondition) then
@@ -168,18 +192,32 @@ private object ReactiveNodeDisplay {
         val moreThanTenChildren: Signal[Boolean] = node.children.signal.map(_.length >= 10)
 
         /* Button to increment selected iterative child */
-        def iterativeArrowButton(isRight: Boolean, isFastForward: Boolean): HtmlElement = {
+        def iterativeArrowButton(icon: String, increment: Signal[Int], isRight: Boolean): HtmlElement = {
             val hoverVar: Var[Boolean] = Var(false)
-            val increment: Int = if isFastForward then 5 else 1
-
+            
             button(
-                className := "iterative-button",
-                cls("fast-forward") := isFastForward,
-                cls("facing-right") := isRight,
+                className := "debug-node-iterative-buttons",
+                marginBottom.px := 2,
 
-                i(cls(s"bi bi-${if isFastForward then "fast-forward" else "play"}-fill")),
+                i(
+                    cls(s"bi bi-$icon") <-- hoverVar.signal.not,
+                    cls(s"bi bi-$icon-fill") <-- hoverVar.signal,
+                                        
+                    height.px := 16,
+                    margin.auto,
 
-                onClick.mapTo(if isRight then increment else -increment) --> moveIndex,
+                    whenNot (isRight) {
+                        transform := "scaleX(-1)"
+                    },
+                    
+                    onMouseOver.mapTo(true) --> hoverVar,
+                    onMouseOut.mapTo(false) --> hoverVar,
+                ),
+
+                onClick(event => event.sample(increment).map(incr => if isRight then incr else -incr)) --> moveIndex,
+                
+                onMouseOver.mapTo(true) --> hoverVar,
+                onMouseOut.mapTo(false) --> hoverVar
             )
         }
 
@@ -200,8 +238,8 @@ private object ReactiveNodeDisplay {
             )
         }
 
-        def singleArrow(isRight: Boolean) = iterativeArrowButton(isRight, isFastForward = false)
-        def doubleArrow(isRight: Boolean) = iterativeArrowButton(isRight, isFastForward = true)
+        def singleArrow(isRight: Boolean) = iterativeArrowButton(icon = "play", Signal.fromValue(1), isRight)
+        def doubleArrow(isRight: Boolean) = iterativeArrowButton(icon = "fast-forward", SettingsViewController.getNumSkipIterativeChildren.signal, isRight)
 
         def arrows(isRight: Boolean) = {
             div(

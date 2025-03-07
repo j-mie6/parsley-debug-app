@@ -10,11 +10,12 @@ pub struct DebugTree {
     root: DebugNode,
     parser_info: HashMap<String, Vec<(i32, i32)>>,
     is_debuggable: bool,
+    refs: Vec<(i32, String)>, 
 }
 
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool) -> Self {
-        DebugTree { input, root, parser_info, is_debuggable }
+    pub fn new(input: String, root: DebugNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>) -> Self {
+        DebugTree { input, root, parser_info, is_debuggable, refs }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -32,10 +33,14 @@ impl DebugTree {
     pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
     }
+    
+    pub fn refs(&self) -> Vec<(i32, String)> {
+        self.refs.clone()
+    }
 }
 
 impl From<SavedTree> for DebugTree {
-    fn from(debug_tree: SavedTree) -> Self {
+    fn from(saved_tree: SavedTree) -> Self {
         /* Recursively convert children into SavedNodes */
         fn convert_node(node: SavedNode) -> DebugNode {
             let children: Vec<DebugNode> = node.children
@@ -57,8 +62,8 @@ impl From<SavedTree> for DebugTree {
             )
         }
 
-        let node: DebugNode = convert_node(debug_tree.get_root().clone());
-        DebugTree::new(debug_tree.get_input().clone(), node, HashMap::new(), debug_tree.is_debuggable())
+        let node: DebugNode = convert_node(saved_tree.get_root().clone());
+        DebugTree::new(saved_tree.get_input().clone(), node, HashMap::new(), saved_tree.is_debuggable(), saved_tree.refs())
     }
 }
 
@@ -123,7 +128,8 @@ pub mod test {
                 "isIterative": false,
                 "newlyGenerated": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect::<String>()
@@ -143,7 +149,8 @@ pub mod test {
                 "isIterative": false,
                 "newlyGenerated": false
             },
-            "isDebuggable": false
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -164,7 +171,8 @@ pub mod test {
                 false
             ),
             HashMap::new(),
-            false
+            false,
+            Vec::new()
         )
     }
 
@@ -194,7 +202,7 @@ pub mod test {
                                 true,
                                 Some(2),
                                 String::from("2"),
-                                vec![],
+                                Vec::new(),
                                 false,
                                 false
                             )
@@ -217,7 +225,7 @@ pub mod test {
                                 true,
                                 Some(4),
                                 String::from("4"),
-                                vec![],
+                                Vec::new(),
                                 false,
                                 false
                             )
@@ -230,7 +238,8 @@ pub mod test {
                 false
             ),
             HashMap::new(),
-            false
+            false,
+            Vec::new()
         )
     }
  

@@ -13,6 +13,7 @@ import controller.viewControllers.{MainViewController, TreeViewController, Input
 import controller.viewControllers.CodeViewController
 import model.CodeFileInformation
 import model.DebugTree
+import controller.ToastController
 import model.errors.DillException
 
 object MainView extends DebugViewPage {
@@ -89,6 +90,9 @@ object MainView extends DebugViewPage {
 
                 /* Displaying Dill Exceptions */
                 child.maybe <-- ErrorController.getErrorElem,
+
+                /* Displaying Dill Toasts */
+                child.maybe <-- ToastController.getToastElem,
 
 
                 /* Unlisten to TreeReady event */
