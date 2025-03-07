@@ -1,5 +1,5 @@
 [package]
-name = "dill"
+name = "Dill"
 version = "0.4.0"
 description = "A cross-platform debugging UI for `parsley-debug`"
 authors = ["Jamie Willis (@j-mie6)", "Josh Walker (@josh-ja-walker)", "Aniket Gupta (@aniket1101)", "Priyansh Chugh (@PriyanshC)", "Alejandro Perez Fadon (@Aito0)", "Riley Horrix (@Riley-horrix)", "Adam Watson (@AdamW1087)"]
