@@ -261,19 +261,25 @@ fn format_filepath(tree_name: &str) -> String {
 
 /* Updates local changed references for a tree */
 #[tauri::command]
-pub fn update_refs(session_id: i32, new_refs: Vec<(i32, String)>, state: tauri::State<AppState>) -> Result<(), RefError>  {
+pub fn update_refs(new_refs: Vec<(i32, String)>, state: tauri::State<AppState>) -> Result<(), RefError>  {
+    let session_id: i32 = state.get_tree().expect("Please").get_session_id();
+
     Ok(state.update_refs(session_id, new_refs)?)
 }
 
 /* Retrieves local changed references for a tree */
 #[tauri::command]
-pub fn get_refs(session_id: i32, state: tauri::State<AppState>) -> Result<Vec<(i32, String)>, RefError>  {
+pub fn get_refs(state: tauri::State<AppState>) -> Result<Vec<(i32, String)>, RefError>  {
+    let session_id: i32 = state.get_tree().expect("Please").get_session_id();
+
     Ok(state.get_refs(session_id)?)
 }
 
 /* Resets local changes to default for a tree's refs */
 #[tauri::command]
-pub fn reset_refs(session_id: i32, state: tauri::State<AppState>) -> Result<Vec<(i32, String)>, RefError>  {
+pub fn reset_refs(state: tauri::State<AppState>) -> Result<Vec<(i32, String)>, RefError>  {
+    let session_id: i32 = state.get_tree().expect("Please").get_session_id();
+
     let default_refs: Vec<(i32, String)> = state.get_tree().expect("Please").refs();
     state.reset_refs(session_id, default_refs.clone())?;
     

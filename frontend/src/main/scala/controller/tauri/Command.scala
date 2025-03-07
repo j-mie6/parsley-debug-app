@@ -127,30 +127,24 @@ object Command {
     }
 
     case object GetRefs extends Command("get_refs") {
-        type In = Int
-        given args: Args[In] {
-            extension (sessionId: Int)
-                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
-        }
+        type In = Unit
+        given args: Args[In] = Args.noArgs
 
         type Out = Seq[(Int, String)]
     }
 
     case object ResetRefs extends Command("reset_refs") {
-        type In = Int
-        given args: Args[In] {
-            extension (sessionId: Int)
-                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
-        }
+        type In = Unit
+        given args: Args[In] = Args.noArgs
 
         type Out = Seq[(Int, String)]
     }
 
     case object SetRefs extends Command("set_refs") {
-        type In = (Int, Seq[(Int, String)])
+        type In = (Seq[(Int, String)])
         given args: Args[In] {
-            extension (args: (Int, Seq[(Int, String)]))
-                def namedArgs: Map[String, Any] = Map("sessionId" -> args._1, "newRefs" -> js.Array(args._2.map(js.Tuple2(_, _))*))
+            extension (new_refs: Seq[(Int, String)])
+                def namedArgs: Map[String, Any] = Map("newRefs" -> js.Array(new_refs.map(js.Tuple2(_, _))*))
         }
 
         type Out = Unit
