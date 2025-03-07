@@ -126,27 +126,42 @@
     gap: 30px;
 }
 
-.debug-view-button-info {
-    font-size: 22px;
-    margin-right: 2px;
-}
-
 .debug-view-button-settings {
     font-size: 30px;
     margin-left: 5px;
 }
 
-.debug-view-file-button {
-    background: transparent;
-    border: none;
-    cursor: pointer;   
-    margin-right: 15px;
-    color: var(--font-color-tertiary);
+.debug-view-button-breakpoint-skip {
+    font-size: 22px;
+    margin-right: 2px;
+}
+
+.debug-view-button-download {
+    font-size: 22px;
+    margin-right: 2px;
+}
+
+.debug-view-button-upload {
+    font-size: 22px;
+    margin-left: 5px;
+}
+
+.debug-view-button-state {
+    font-size: 22px;
+    margin-left: 5px;
+}
+
+.debug-view-button-info {
+    font-size: 22px;
+    margin-right: 2px;
 }
 
 /* Makes button disappear if screen size is too small */
 @media (max-width: 450px) {
-    .debug-view-file-button {
+    .debug-view-button-download {
+        display: none;
+    }
+    .debug-view-button-upload {
         display: none;
     }
 }

@@ -53,10 +53,10 @@ abstract class DebugViewPage extends Page {
 
     /* Export tree button */
     val downloadButton: HtmlElement = button(
-        className := "debug-view-file-button",
+        className := "debug-view-button debug-view-button-download",
 
         /* Save button icon */
-        i(className := "bi bi-floppy", fontSize.px := 22),
+        i(className := "bi bi-floppy"),
 
         /* Exports current tree */
         onClick(_
@@ -72,8 +72,8 @@ abstract class DebugViewPage extends Page {
 
     /* Uploading json element */
     val uploadButton: HtmlElement = label(
-        className := "debug-view-file-button",
-        i(className := "bi bi-cloud-download", fontSize.px := 25),
+        className := "debug-view-button debug-view-button-upload",
+        i(className := "bi bi-cloud-download"),
         input(
             typ := "file",
             display := "none",
@@ -144,7 +144,7 @@ abstract class DebugViewPage extends Page {
 
     /* Adds ability to skip the current breakpoint. */
     private lazy val breakpointSkipButton: Element = button(
-        className := "debug-view-button debug-view-button-breakpoint-skip-button",
+        className := "debug-view-button debug-view-button-breakpoint-skip",
         breakpointSkipIcon, /* Fast forward icon */
 
         onClick.compose(_
