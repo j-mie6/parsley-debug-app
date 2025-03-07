@@ -142,14 +142,12 @@ impl StateManager for AppState {
     }
 
     fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
-        println!("transmit_breakpoint_skips{session_id}, {skips})");
-        // dbg!(self.inner().expect("mrrr").skips_tx.blocking_lock());
         self.inner()?
             .skips_tx
             .remove(&session_id)
-            .ok_or({println!("BAD 1"); StateError::ChannelError})?
+            .ok_or(StateError::ChannelError)?
             .send(skips)
-            .map_err(|_| {println!("BAD 2"); StateError::ChannelError})
+            .map_err(|_| StateError::ChannelError)
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
@@ -181,9 +179,7 @@ impl StateManager for AppState {
     }
 
     fn next_session_id(&self) -> Result<i32, StateError> {
-        println!("111111111111111111111");
         let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
-        println!("22222222222222222222");
         
         Ok(state.counter.get_and_increment())
     }

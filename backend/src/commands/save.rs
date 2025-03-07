@@ -10,7 +10,6 @@ use crate::files::SAVED_TREE_DIR;
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
 pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<String, SaveTreeError> {
-    println!("saving tree with name {}", tree_name);
     /* Get DebugTree from current state */
     let debug_tree: DebugTree = state.get_tree()?;
 
@@ -36,7 +35,6 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
 
     /* Add new debugging session if the tree has a valid session_id */
     if is_debuggable {
-        println!("saving with sessionid of {}", session_id);
         state.add_session_id(tree_name.clone(), session_id).map_err(|_| SaveTreeError::AddSessionFailed)?;
     }
     

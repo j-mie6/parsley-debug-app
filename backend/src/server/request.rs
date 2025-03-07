@@ -66,8 +66,6 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     let mut parsley_tree: ParsleyTree = data.into_inner();
     let new_tree: bool = parsley_tree.get_session_id() == -1;
 
-    println!("session id before is {}", parsley_tree.get_session_id());
-
     /* SETUP: Allocate id if tree doesn't have one */
     if new_tree {
         let allocated_id: i32 = state.inner().next_session_id().expect("Pretty please");
@@ -90,13 +88,10 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
     /* Format informative response for RemoteView */
     let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
-    println!("session id is {}", session_id);
-    println!("newtree is {}", new_tree);
 
     /* Check if tree is needing to be updated or is a new tree */
     let set_tree_result: Result<(), StateError> = if new_tree {
         let r = state.set_tree(debug_tree).and(state.emit(Event::NewTree));
-        println!("Set done");
         r
     } else {
         /* Get the tree_name from the session_id */
@@ -107,9 +102,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
         /* Update the saved tree and set the updated tree into state */
         save::update_tree(&debug_tree, tree_name).expect("Please");
-        let r = state.set_tree(debug_tree);
-        println!("updat done");
-        r
+        state.set_tree(debug_tree)
     };
 
     match set_tree_result {
