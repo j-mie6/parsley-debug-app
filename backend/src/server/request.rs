@@ -184,6 +184,9 @@ pub mod test {
             .with(predicate::eq(debug_tree::test::tree()))
             .returning(|_| Ok(()));
         
+        mock.expect_next_session_id().returning(|| Ok(-1));
+
+
         mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
         
@@ -236,6 +239,7 @@ pub mod test {
     fn get_returns_tree() {
         let mut mock = MockStateManager::new();
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
+        mock.expect_next_session_id().returning(|| Ok(-1));
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -250,11 +254,13 @@ pub mod test {
     #[test]
     fn get_returns_posted_tree() {
         let mut mock = MockStateManager::new();
+
         mock.expect_set_tree()
             .with(predicate::eq(debug_tree::test::tree()))
             .returning(|_| Ok(()));
 
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
+        mock.expect_next_session_id().returning(|| Ok(-1));
         
         mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
