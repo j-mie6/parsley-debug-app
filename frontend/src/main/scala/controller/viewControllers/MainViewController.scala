@@ -7,6 +7,7 @@ import org.scalajs.dom
 import view.DebugViewPage
 import view.InputView
 import view.TreeView
+import view.CodeView
 
 /**
  * Object containing functions and variables for the main view,cconditionally
@@ -18,7 +19,7 @@ object MainViewController {
     enum View(val elem: HtmlElement) {
         case Tree extends View(TreeView())
         case Input extends View(InputView())
-        case Code extends View(InputView()) // TODO
+        case Code extends View(CodeView())
     }
 
     /* Current view selected */

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{DebugNode, DebugTree};
 
 /* Struct identical to DebugTree that allows serialized saving */
@@ -5,6 +7,7 @@ use super::{DebugNode, DebugTree};
 pub struct SavedTree {
     input: String,
     root: SavedNode,
+    parser_info: HashMap<String, Vec<(i32, i32)>>,
     is_debuggable: bool,
     refs: Vec<(i32, String)>,
     session_id: i32,
@@ -48,15 +51,17 @@ impl From<DebugTree> for SavedTree {
         }
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable(), debug_tree.refs(), debug_tree.get_session_id())
+  
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_parser_info().clone(), debug_tree.is_debuggable(), debug_tree.refs(), debug_tree.get_session_id())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, is_debuggable: bool, refs: Vec<(i32, String)>, session_id: i32) -> Self {
+    pub fn new(input: String, root: SavedNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>, session_id: i32) -> Self {
         SavedTree { 
             input,
             root,
+            parser_info,
             is_debuggable,
             refs,
             session_id,
@@ -69,6 +74,10 @@ impl SavedTree {
 
     pub fn get_input(&self) -> &String {
         &self.input
+    }
+
+    pub fn get_parser_info(&self) -> &HashMap<String, Vec<(i32, i32)>> {
+        &self.parser_info
     }
 
     pub fn is_debuggable(&self) -> bool {
@@ -111,6 +120,7 @@ pub mod test {
 
     /* Saved Tree unit testing */
 
+    use std::collections::HashMap;
     use std::io::Write;
     use std::fs::{self, File};
 
@@ -132,6 +142,7 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
+            "parser_info" : {},
             "is_debuggable": false,
             "refs": [],
             "session_id": -1
@@ -201,6 +212,7 @@ pub mod test {
                 "is_iterative": false,
                 "newly_generated": false
             },
+            "parser_info" : {},
             "is_debuggable": false,
             "refs": [],
             "session_id": -1
@@ -223,6 +235,7 @@ pub mod test {
                 false,
                 false
             ),
+            HashMap::new(),
             false,
             Vec::new(),
             -1
@@ -290,6 +303,7 @@ pub mod test {
                 false,
                 false
             ),
+            HashMap::new(),
             false,
             Vec::new(),
             -1

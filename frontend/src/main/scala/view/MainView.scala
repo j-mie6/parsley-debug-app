@@ -4,14 +4,18 @@ import scala.util.Random
 
 import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
+
 import org.scalajs.dom
 
 import model.errors.DillException
 import controller.AppStateController
 import controller.errors.ErrorController
+import controller.viewControllers.CodeViewController
 import controller.ToastController
 import controller.tauri.{Tauri, Event}
 import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController, StateManagementViewController}
+
+import model.{CodeFileInformation, DebugTree}
 
 object MainView extends DebugViewPage {
     
@@ -29,6 +33,8 @@ object MainView extends DebugViewPage {
     /* Listen for posted tree */
     val (treeStream, unlistenTree) = Tauri.listen(Event.TreeReady)
     val (newTreeStream, unlistenNewTree) = Tauri.listen(Event.NewTree)
+
+    val (codeStream, unlistenCode) = Tauri.listen(Event.UploadCodeFile)
     
     /* Render main viewing page */
     def apply(): HtmlElement = {
@@ -40,9 +46,14 @@ object MainView extends DebugViewPage {
                 /* Update DOM theme with theme value */
                 AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
 
-                
+                /* Update any code view streams */
+                codeStream.collectRight.map(Some(_)) --> CodeViewController.setCurrentFile,
+                codeStream.collectLeft --> ErrorController.setError,
+
+
                 /* Update tree and input with TreeReady response */
                 treeStream.collectRight --> TreeViewController.setTree,
+                treeStream.collectRight.map((tree: DebugTree) => Some(CodeFileInformation(tree.parserInfo))) --> CodeViewController.setFileInformation,
                 treeStream.collectRight --> StateManagementViewController.setCurrTree,
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
 
@@ -84,7 +95,8 @@ object MainView extends DebugViewPage {
 
                 /* Unlisten to TreeReady event */
                 onUnmountCallback(_ => unlistenTree.get),
-                onUnmountCallback(_ => unlistenNewTree.get)
+                onUnmountCallback(_ => unlistenNewTree.get),
+                onUnmountCallback(_ => unlistenCode.get),
             )
         ))
     }

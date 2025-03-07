@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{DebugNode, DebugTree};
 
 /* Represents tree received from parsley-debug-views' Remote View*/
@@ -24,9 +26,11 @@ pub struct ParsleyNode {
 pub struct ParsleyTree {
     input: String,              /* The input string being parsed */
     root: ParsleyNode,          /* Root node of the debug tree */
-    
+
+    parser_info: HashMap<String, Vec<(i32, i32)>>, /* Map from srcFile => List of parser indexes */
+
     /* If this tree was produced by a currently-running parser */
-    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool, 
+    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool,
 
     /* State references to be modified */
     #[serde(default = "Vec::new")] refs: Vec<(i32, String)>, 
@@ -99,7 +103,7 @@ impl From<ParsleyTree> for DebugTree {
         let session_id = tree.get_session_id();
         let is_debuggable = tree.is_debuggable();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, is_debuggable, tree.refs, session_id)
+        DebugTree::new(tree.input, node, tree.parser_info, is_debuggable, tree.refs, session_id)
     }
 }
 
@@ -108,6 +112,8 @@ impl From<ParsleyTree> for DebugTree {
 pub mod test {
 
     /* Data unit testing */
+
+    use std::collections::HashMap;
 
     use super::{ParsleyNode, ParsleyTree};
     use crate::trees::{debug_tree, DebugTree};
@@ -125,6 +131,7 @@ pub mod test {
                 "children": [],
                 "isIterative": false
             },
+            "parserInfo" : {},
             "isDebuggable": false,
             "refs": []
         }"#
@@ -188,6 +195,7 @@ pub mod test {
                 ],
                 "isIterative": false
             },
+            "parserInfo" : {},
             "isDebuggable": false,
             "refs": []
         }"#
@@ -209,6 +217,7 @@ pub mod test {
                 is_iterative: false,
                 newly_generated: false,
             },
+            parser_info: HashMap::new(),
             is_debuggable: false,
             refs: Vec::new(),
             session_id: -1,
@@ -276,6 +285,7 @@ pub mod test {
                 is_iterative: false,
                 newly_generated: false,
             },
+            parser_info: HashMap::new(),
             is_debuggable: false,
             refs: Vec::new(),
             session_id: -1,

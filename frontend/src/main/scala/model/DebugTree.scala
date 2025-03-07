@@ -13,7 +13,7 @@ import model.json.Reader
   *                  it will be some id for trees that are actively being debugged or have been debugged  
   * @param refs A list of pairs: `Address` and `Reference Value` from `Parsley`'s State
   */
-case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean, sessionId: Int, refs: Seq[(Int, String)] = Nil) derives Reader.upickle
+case class DebugTree(input: String, root: DebugNode, parserInfo: Map[String, List[(Int, Int)]], isDebuggable: Boolean, sessionId: Int, refs: Seq[(Int, String)] = Nil) derives Reader.upickle
 
 
 /**
