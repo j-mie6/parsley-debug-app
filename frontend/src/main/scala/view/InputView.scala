@@ -18,11 +18,7 @@ import controller.tauri.{Tauri, Event}
   */
 
 object InputView {
-    def apply(): HtmlElement = {
-        h1(
-            className := "debug-input-main-view",
-
-            text <-- InputViewController.getInput,
-        )
-    }
+    def apply(): HtmlElement = 
+        /* Renders the input */
+        div(className:= "debug-input-page", child <-- InputViewController.getInputElem) 
 }

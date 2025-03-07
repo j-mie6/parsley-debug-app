@@ -30,7 +30,8 @@ val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
 /**
   * The DebugViewPage class represents the main page of the application, 
-  * containing both the title and github / light & dark mode buttons.
+  * containing both the tree and input view tabs, title and github / 
+  * light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {
     private lazy val gitIcon: HtmlElement = i(className := "bi bi-github", fontSize.px := 40)
