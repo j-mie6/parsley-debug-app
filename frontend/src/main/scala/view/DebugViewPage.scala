@@ -27,7 +27,7 @@ val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
 /**
   * The DebugViewPage class represents the main page of the application, 
-  * containing both the tree and source view tabs, title and github / 
+  * containing both the tree and input view tabs, title and github / 
   * light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {

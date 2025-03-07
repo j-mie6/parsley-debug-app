@@ -6,14 +6,17 @@
     align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
 }
 
+
 .debug-input-container {
     display: flex;
     flex-direction: column;
+    flex: 1;
     
     width: 80%;
     max-width: 1200px;
+    max-height: 70vh;
 
-    padding: 15px;
+    padding: 2px;
     margin: 20px auto;
 
     background-color: var(--background-tertiary);
@@ -22,6 +25,7 @@
     overflow: hidden;
 }
 
+
 .debug-input-main-view {
     text-align: left;
     padding: 15px;
@@ -29,16 +33,14 @@
     font-family: "Fira Code", "Courier New", monospace;
     color: var(--font-color-primary);
     background-color: var(--background-primary);
+    border-color: var(--background-tertiary);
+    border-width: 2px;
     border-radius: 6px;
     word-wrap: break-word;
     overflow-x: auto;
-    max-height: 200px;
+    max-height: 70vh;
     overflow-y: auto;
     white-space: pre-wrap;
-}
-
-.debug-input-container:hover {
-    box-shadow: 0px 0px 5px var(--background-tertiary);
 }
 
 
