@@ -25,6 +25,8 @@ import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.tauri.Tauri
 import controller.errors.ErrorController
+import model.errors.DillException
+import scala.collection.mutable.ListBuffer
 
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
@@ -75,20 +77,22 @@ abstract class DebugViewPage extends Page {
     )
 
     /* Reads contents of file and passes them to backend */
-    private def loadFile(input: dom.html.Input): Unit = {
+    private def loadFile(input: dom.html.Input): EventStream[Either[DillException, Unit]] = {
         val files = input.files
-        for (i <- 0 until files.length) {
-            val file = files(i)
-            val reader = new dom.FileReader()
-            reader.onload = _ => {
-                val content = reader.result.asInstanceOf[String]
-                TreeViewController.importTree.tupled((file.name, content)) --> Observer.empty
-            }
-            
-            reader.readAsText(file)
-        }
-        /* Resets value so we can import the same file multiple times */
-        input.value = ""
+        EventStream.fromValue(0 until files.length)
+            .flatMapMerge(_
+                .map(i => files(i))
+                .map(file => {
+                    val reader = new dom.FileReader()
+                    reader.onload = {_ => {
+                        val content = reader.result.asInstanceOf[String]
+                        TreeViewController.importTree(file.name, content)
+                    }}
+                    
+                    reader.readAsText(file)
+                }))
+            /* Resets value so we can import the same file multiple times */
+            .tapEach(_ => input.value = "")
     }
                 
     /* Overview information tab. */
