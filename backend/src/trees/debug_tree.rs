@@ -68,7 +68,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(saved_tree.get_root().clone());
-        DebugTree::new(saved_tree.get_input().clone(), node, HashMap::new(), saved_tree.is_debuggable(), saved_tree.refs(), saved_tree.get_session_id())
+        DebugTree::new(saved_tree.get_input().clone(), node, saved_tree.get_parser_info(), saved_tree.is_debuggable(), saved_tree.refs(), saved_tree.get_session_id())
     }
 }
 

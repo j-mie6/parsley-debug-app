@@ -23,7 +23,7 @@ object MainViewController {
     }
 
     /* Current view selected */
-    private val view: Var[View] = Var(View.Code)
+    private val view: Var[View] = Var(View.Tree)
 
     private def renderButton(buttonType: String, icon: String, text: String, view: View, openSemaphore: Var[Int]): HtmlElement = button(
         className := f"debug-view-select-button debug-view-${buttonType}-button",
