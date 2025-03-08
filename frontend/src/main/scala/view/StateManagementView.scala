@@ -18,8 +18,8 @@ object StateManagementView {
             className := "single-ref-top-container",
             div(
                 className := "single-ref-title-container",
-                "Ref ",
                 text <-- StateManagementViewController.getRefNumber(refAddr)
+                    .map(i => s"R${StateRef.subscriptInt(i)}")
             ),
             div(
                 "Current Value: ",
