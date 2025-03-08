@@ -52,7 +52,11 @@ object StateManagementView {
                     h2("References")
                 ),
 
-                child(div(className := "nothing-shown", "Nothing to show")) <-- StateManagementViewController.refsEmptySignal,
+                child(div(
+                    className := "nothing-shown", 
+                    fontSize.px := 20,
+                    "Nothing to show"
+                )) <-- StateManagementViewController.refsEmptySignal,
 
 
                 div(cls("state-contents"),
