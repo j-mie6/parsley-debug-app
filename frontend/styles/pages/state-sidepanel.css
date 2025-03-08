@@ -70,11 +70,16 @@
     gap: 6px;
 
     /* Subtle background and border around each reference item */
-    /* background-color: var(--background-tertiary); */
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
     border: 1px solid var(--font-color-tertiary);
     border-radius: 6px;
 
     padding: 8px 12px;
+}
+.single-ref-top-container:hover {
+    background: var(--background-tertiary-20);
+
 }
 
 .single-ref-title-container {
@@ -133,14 +138,14 @@
 .restore-original-state-button {
     width: 100%;
     height: 20px;
-    background: var(--font-color-primary);
     padding: 12px;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    color: var(--background-primary);
+    background: var(--background-primary);
+    color: var(--font-color-primary);
 
     border: none;
     border-radius: 8px;
@@ -154,7 +159,7 @@
 
 .apply-state-button:hover,
 .restore-original-state-button:hover {
-    background: var(--font-color-secondary);
+    background: var(--background-tertiary-20);
 }
 
 .state-view-error {

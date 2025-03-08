@@ -124,15 +124,14 @@
 .default-settings-button {
     width: 50%;
     height: 20px;
-    overflow: auto;
-    background: var(--font-color-primary);
     padding: 12px;
-
+    
     display: flex;
     justify-content: center;
     align-items: center;
-
-    color: var(--background-primary);
+    
+    background: var(--background-primary);
+    color: var(--font-color-primary);
 
     border: none;
     border-radius: 8px;
@@ -146,5 +145,5 @@
 
 .apply-settings-button:hover,
 .default-settings-button:hover {
-    background: var(--font-color-secondary);
+    background: var(--background-tertiary-20);
 }
