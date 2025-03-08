@@ -124,7 +124,7 @@ object CodeView {
             file.split("\n").map(line => 
                 div(
                     p(line),
-                    if line.strip() == "" then br() else div()
+                    if line.trim == "" then br() else div()
                 ))
         )
     }
