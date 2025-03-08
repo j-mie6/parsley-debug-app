@@ -99,7 +99,9 @@ object StateManagementViewController {
     * @param newRefs A sequence of (Int, String) pairs to replace the existing references.
     */
     def setRefs(newRefs: Seq[(Int, String)]): Unit = refs.set(newRefs)
-    
+
+    val setRefs: Observer[Seq[(Int, String)]] = refs.writer
+
     /**
     * Retrieves a signal of the current sequence of (reference address, reference value) pairs.
     *

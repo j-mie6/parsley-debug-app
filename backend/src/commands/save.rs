@@ -262,28 +262,32 @@ fn format_filepath(tree_name: &str) -> String {
 /* Updates local changed references for a tree */
 #[tauri::command]
 pub fn update_refs(new_refs: Vec<(i32, String)>, state: tauri::State<AppState>) -> Result<(), RefError>  {
-    let session_id: i32 = state.get_tree().expect("Please").get_session_id();
+    let session_id: i32 = state.get_tree()?.get_session_id();
 
     Ok(state.update_refs(session_id, new_refs)?)
 }
 
 /* Retrieves local changed references for a tree */
 #[tauri::command]
-pub fn get_refs(state: tauri::State<AppState>) -> Result<Vec<(i32, String)>, RefError>  {
-    let session_id: i32 = state.get_tree().expect("Please").get_session_id();
+pub fn get_refs(session_id: i32, state: tauri::State<AppState>) -> Result<String, RefError>  {
+    let refs: Vec<(i32, String)> = state.get_refs(session_id)?;
 
-    Ok(state.get_refs(session_id)?)
+    serde_json::to_string_pretty(&refs)
+        .map_err(|_| RefError::RefMapFail)
 }
 
 /* Resets local changes to default for a tree's refs */
 #[tauri::command]
-pub fn reset_refs(state: tauri::State<AppState>) -> Result<Vec<(i32, String)>, RefError>  {
-    let session_id: i32 = state.get_tree().expect("Please").get_session_id();
+pub fn reset_refs(state: tauri::State<AppState>) -> Result<String, RefError>  {
+    let debug_tree: DebugTree = state.get_tree()?;
 
-    let default_refs: Vec<(i32, String)> = state.get_tree().expect("Please").refs();
+    let session_id: i32 = debug_tree.get_session_id();
+
+    let default_refs: Vec<(i32, String)> = debug_tree.refs();
     state.reset_refs(session_id, default_refs.clone())?;
     
-    Ok(default_refs)
+    serde_json::to_string_pretty(&default_refs)
+        .map_err(|_| RefError::RefMapFail)
 }
 
 #[derive(Debug, serde::Serialize)]

@@ -69,7 +69,7 @@ object StateManagementView {
                         ToastController.setToast(StateApplied)
                     ))) <-- StateManagementViewController.refsEmptySignal.not,
                     child(button(className := "restore-original-state-button", "Restore Originals", onClick --> (_ => 
-                        StateManagementViewController.setRefs(TreeViewController.resetRefs())
+                        TreeViewController.resetRefs().collectRight --> StateManagementViewController.getRefsVar
 
                         ToastController.setToast(StateApplied)
                     ))) <-- StateManagementViewController.refsEmptySignal.not,

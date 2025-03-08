@@ -77,7 +77,7 @@ object TreeViewController {
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
 
     /** Get the references of a debugging tree */
-    def getRefs(): EventStream[Either[DillException, Seq[(Int, String)]]] = Tauri.invoke(Command.GetRefs, ())
+    def getRefs(sessionId: Int): EventStream[Either[DillException, Seq[(Int, String)]]] = Tauri.invoke(Command.GetRefs, sessionId)
 
     /** Get the references of a debugging tree */
     def setRefs(newRefs: Seq[(Int, String)]): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.SetRefs, newRefs)

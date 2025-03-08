@@ -170,16 +170,15 @@ impl StateManager for AppState {
     }
     
     fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
+        let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
 
-        let session_id: i32 = *self.inner()?.debug_sessions.get(&tree_name).expect("Please");
-
-        self.inner()?
-            .saved_refs
-            .remove(&session_id);
-
-        self.inner()?
+        state
             .debug_sessions
             .remove(&tree_name);
+
+        if let Some(session_id) = state.debug_sessions.get(&tree_name).cloned() {
+            state.saved_refs.remove(&session_id);
+        }
 
         Ok(())
     }
@@ -222,8 +221,11 @@ impl StateManager for AppState {
     fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
         let state: MutexGuard<AppStateInternal> = self.inner()?;
 
-        let refs: &Vec<(i32, String)> = state.saved_refs.get(&session_id).expect("Session id should be known");
+        let refs_opt: Option<&Vec<(i32, String)>> = state.saved_refs.get(&session_id);
 
-        Ok(refs.clone())
+        match refs_opt {
+            Some(refs) => Ok(refs.clone()),
+            None => Ok(Vec::new()),
+        }
     }
 }

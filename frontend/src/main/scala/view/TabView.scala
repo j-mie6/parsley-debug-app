@@ -86,11 +86,6 @@ object TabView {
                 .flatMapMerge(TabViewController.loadSavedTree) 
                 .collectLeft --> controller.errors.ErrorController.setError,
 
-            TabViewController.getSelectedTab.changes
-                .flatMapMerge(TreeViewController.getRefs)
-                .collectRight --> StateViewController.getRefsVar
-
-
             /* If there are no tabs, unload tree and input from frontend */
             TabViewController.noSavedTrees.changes
                 .filter(identity)
@@ -99,7 +94,6 @@ object TabView {
             TabViewController.noSavedTrees.changes
                 .filter(identity)
                 .mapToUnit --> InputViewController.unloadInput,
-
 
             /* Renders tabs */ 
             children <-- TabViewController

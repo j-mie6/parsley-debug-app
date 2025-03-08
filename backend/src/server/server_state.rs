@@ -59,11 +59,11 @@ impl StateManager for ServerState {
         self.inner().session_id_exists(session_id)
     }
     
-    fn get_session_ids(&self) -> Result<HashMap<String, i32>,StateError> {
+    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError> {
         self.inner().get_session_ids()
     }
 
-    fn next_session_id(&self) -> Result<i32,StateError> {
+    fn next_session_id(&self) -> Result<i32, StateError> {
         self.inner().next_session_id()
     }
     
@@ -71,11 +71,11 @@ impl StateManager for ServerState {
         self.inner().new_transmitter(session_id, tx)
     }
     
-    fn get_download_path(&self) -> Result<PathBuf,StateError> {
+    fn get_download_path(&self) -> Result<PathBuf, StateError> {
         self.inner().get_download_path()
     }
     
-    fn reset_refs(&self,session_id:i32,default_refs:Vec<(i32,String)>) -> Result<(),StateError> {
+    fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {
         self.inner().reset_refs(session_id, default_refs)
     }
 

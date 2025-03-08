@@ -99,6 +99,13 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
                 return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise transmitter in state", session_id));
             },
         };
+
+        /* Reset references for a post tree */
+        let res: Result<(), StateError> = state.inner().reset_refs(session_id, debug_tree.refs());
+
+        if let Err(_) = res {
+            return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not get internal lock", -1))
+        }
     }
 
     /* Format informative response for RemoteView */
@@ -120,9 +127,6 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
             }
         };
 
-        state.inner().reset_refs(session_id, debug_tree.refs()).expect("Pretty please");
-
-
         /* Update the saved tree and set the updated tree into state */
         if let Err(_) = save::update_tree(&debug_tree, tree_name) {
             return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
@@ -134,7 +138,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
 
         Ok(()) => match state.receive_breakpoint_skips(session_id).await {
-            Some((skips, _)) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, state.get_refs(session_id).expect("Please"))),
+            Some((skips, _)) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, state.get_refs(session_id).expect("Session ID should exist"))),
             None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
         },
 
