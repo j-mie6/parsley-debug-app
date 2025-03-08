@@ -34,6 +34,10 @@ pub trait StateManager: Send + Sync + 'static {
     fn next_session_id(&self) -> Result<i32, StateError>;
 
     fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError>;
+
+    fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError>;
+
+    fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError>;
 }
 
 

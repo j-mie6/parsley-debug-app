@@ -79,4 +79,12 @@ impl StateManager for tauri::AppHandle {
         self.path().download_dir()
             .map_err(|_| StateError::GetDownloadPathFail)
     }
+    
+    fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(),StateError> {
+        self.state::<AppState>().reset_refs(session_id, default_refs)
+    }
+
+    fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
+        self.state::<AppState>().get_refs(session_id)
+    }
 }
