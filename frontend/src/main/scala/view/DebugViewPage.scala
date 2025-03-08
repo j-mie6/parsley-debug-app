@@ -223,11 +223,7 @@ abstract class DebugViewPage extends Page {
         /* Button bar right. */
         div(
             className := "debug-view-right-button-bar",
-            child(
-                div(
-                    breakpointSkipButton
-                )
-            ) <-- TreeViewController.isDebuggingSession,
+            child(div(breakpointSkipButton)) <-- TreeViewController.isDebuggingSession,
             /* Render download button */
             child(downloadButton) <-- TreeViewController.treeExists,
             uploadButton,
