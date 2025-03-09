@@ -28,8 +28,7 @@ object TreeView {
         TreeViewController.isDebuggingSession.changes
             .filterNot(identity)
             .mapToUnit
-            .map(_ => StateManagementViewController.clearRefs())
-            .mapTo(Nil) --> StateManagementViewController.setRefs,
+            --> StateManagementViewController.clearRefs,
 
         TreeViewController.getSessionId.changes
             .flatMapMerge(TreeViewController.getRefs) --> returnBus.writer,

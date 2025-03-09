@@ -63,16 +63,15 @@ object StateManagementView {
 
                 div(
                     cls("state-footer"),
-                    child(button(className := "apply-state-button", "Apply", onClick --> (_ => 
+                    child(button(className := "apply-state-button", "Apply", onClick --> (_ => {
                         StateManagementViewController.getLocalRefs.foreach(StateManagementViewController.updateNewRefValue)
                         TreeViewController.setRefs(StateManagementViewController.getLocalRefs)
                         ToastController.setToast(StateApplied)
-                    ))) <-- StateManagementViewController.refsEmptySignal.not,
-                    child(button(className := "restore-original-state-button", "Restore Originals", onClick --> (_ => 
+                    }))) <-- StateManagementViewController.refsEmptySignal.not,
+                    child(button(className := "restore-original-state-button", "Restore Originals", onClick --> (_ => {
                         TreeViewController.resetRefs().collectRight --> StateManagementViewController.getRefsVar
-
                         ToastController.setToast(StateApplied)
-                    ))) <-- StateManagementViewController.refsEmptySignal.not,
+                    }))) <-- StateManagementViewController.refsEmptySignal.not,
                 ),
             )
         )

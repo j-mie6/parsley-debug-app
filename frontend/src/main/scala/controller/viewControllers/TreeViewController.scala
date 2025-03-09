@@ -42,7 +42,7 @@ object TreeViewController {
     def getTreeElem: Signal[HtmlElement] = getTree.map(_ match 
         /* Default tree view when no tree is loaded */
         case None => 
-          StateManagementViewController.clearRefs()
+          StateManagementViewController.clearRefs
           div(
             className := "nothing-shown",
             "Nothing to show"
