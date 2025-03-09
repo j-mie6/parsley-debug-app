@@ -42,7 +42,7 @@ object TreeViewController {
     def getTreeElem: Signal[HtmlElement] = getTree.map(_ match 
         /* Default tree view when no tree is loaded */
         case None => 
-          StateManagementViewController.clearRefs()
+          StateManagementViewController.clearRefs
           div(
             className := "nothing-shown",
             "Nothing to show"
@@ -69,10 +69,19 @@ object TreeViewController {
       */
     def skipBreakpoints(sessionId: EventStream[Int]): EventStream[Either[DillException, Unit]] = {
         sessionId
-            .withCurrentValueOf(SettingsViewController.getNumSkipBreakpoints.signal, StateManagementViewController.getRefs)
-            .map((sessionId, skips, refs) => (sessionId, skips - 1, refs))
+            .withCurrentValueOf(SettingsViewController.getNumSkipBreakpoints.signal)
+            .map((sessionId, skips) => (sessionId, skips - 1))
             .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _))
     }
         
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
+
+    /** Get the references of a debugging tree */
+    def getRefs(sessionId: Int): EventStream[Either[DillException, Seq[(Int, String)]]] = Tauri.invoke(Command.GetRefs, sessionId)
+
+    /** Get the references of a debugging tree */
+    def setRefs(newRefs: Seq[(Int, String)]): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.SetRefs, newRefs)
+
+     /** Resets the references of a debugging tree */
+    def resetRefs(): EventStream[Either[DillException, Seq[(Int, String)]]] = Tauri.invoke(Command.ResetRefs, ())
 }

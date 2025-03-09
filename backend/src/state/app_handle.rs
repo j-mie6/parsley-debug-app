@@ -47,8 +47,8 @@ impl StateManager for tauri::AppHandle {
             .map_err(|_| StateError::EventEmitFailed)
     }
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
-        self.state::<AppState>().transmit_breakpoint_skips(session_id, skips, new_refs)
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
+        self.state::<AppState>().transmit_breakpoint_skips(session_id, skips)
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
@@ -78,6 +78,14 @@ impl StateManager for tauri::AppHandle {
     fn get_download_path(&self) -> Result<PathBuf, StateError> {
         self.path().download_dir()
             .map_err(|_| StateError::GetDownloadPathFail)
+    }
+    
+    fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {
+        self.state::<AppState>().reset_refs(session_id, default_refs)
+    }
+
+    fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
+        self.state::<AppState>().get_refs(session_id)
     }
 
     fn reset_trees(&self) -> Result<(), StateError> {

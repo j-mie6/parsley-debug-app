@@ -7,6 +7,8 @@ import controller.ToastController
 import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.TreeViewController.treeExists
+import controller.tauri.{Tauri, Command}
+
 
 object StateManagementView {
 
@@ -58,15 +60,17 @@ object StateManagementView {
             div(    
                 className := "sidepanel-footer",
 
-                child(button("Apply", onClick --> (_ => 
+                child(button("Apply", onClick --> (_ => {
                     StateManagementViewController.getLocalRefs.foreach(StateManagementViewController.updateNewRefValue)
+                    TreeViewController.setRefs(StateManagementViewController.getLocalRefs)
                     ToastController.setToast(StateApplied)
-                ))) <-- StateManagementViewController.refsEmptySignal.not,
+                }))) <-- StateManagementViewController.refsEmptySignal.not,
 
-                child(button("Restore Originals", onClick --> (_ => 
+                child(button("Restore Originals", onClick --> (_ => {
+                    TreeViewController.resetRefs().collectRight --> StateManagementViewController.getRefsVar
                     StateManagementViewController.getOrigRefs.foreach(StateManagementViewController.updateNewRefValue)
                     ToastController.setToast(StateApplied)
-                ))) <-- StateManagementViewController.refsEmptySignal.not,
+                }))) <-- StateManagementViewController.refsEmptySignal.not,
             ),
         )
     }

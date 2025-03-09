@@ -133,11 +133,38 @@ object Command {
         type Out = Unit
     }
 
-    case object SkipBreakpoints extends Command("skip_breakpoints") {
-        type In = (Int, Int, Seq[(Int, String)])
+    case object GetRefs extends Command("get_refs") {
+        type In = Int
         given args: Args[In] {
-            extension (args: (Int, Int, Seq[(Int, String)]))
-                def namedArgs: Map[String, Any] = Map("sessionId" -> args._1, "skips" -> args._2, "newRefs" -> js.Array(args._3.map(js.Tuple2(_, _))*))
+            extension (sessionId: Int)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
+        }
+
+        type Out = Seq[(Int, String)]
+    }
+
+    case object ResetRefs extends Command("reset_refs") {
+        type In = Unit
+        given args: Args[In] = Args.noArgs
+
+        type Out = Seq[(Int, String)]
+    }
+
+    case object SetRefs extends Command("update_refs") {
+        type In = (Seq[(Int, String)])
+        given args: Args[In] {
+            extension (new_refs: Seq[(Int, String)])
+                def namedArgs: Map[String, Any] = Map("newRefs" -> js.Array(new_refs.map(js.Tuple2(_, _))*))
+        }
+
+        type Out = Unit
+    }
+
+    case object SkipBreakpoints extends Command("skip_breakpoints") {
+        type In = (Int, Int)
+        given args: Args[In] {
+            extension (args: (Int, Int))
+                def namedArgs: Map[String, Any] = Map("sessionId" -> args._1, "skips" -> args._2)
         }
         type Out = Unit
     }
