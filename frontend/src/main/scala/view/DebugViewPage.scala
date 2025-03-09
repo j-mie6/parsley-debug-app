@@ -56,7 +56,7 @@ abstract class DebugViewPage extends Page {
         className := "debug-view-button debug-view-button-download",
 
         /* Save button icon */
-        i(className := "bi bi-floppy"),
+        i(className := "bi bi-download"),
 
         /* Exports current tree */
         onClick(_
@@ -73,7 +73,7 @@ abstract class DebugViewPage extends Page {
     /* Uploading json element */
     val uploadButton: HtmlElement = label(
         className := "debug-view-button debug-view-button-upload",
-        i(className := "bi bi-cloud-download"),
+        i(className := "bi bi-file-earmark-arrow-up"),
         input(
             typ := "file",
             display := "none",
@@ -223,11 +223,7 @@ abstract class DebugViewPage extends Page {
         /* Button bar right. */
         div(
             className := "debug-view-right-button-bar",
-            child(
-                div(
-                    breakpointSkipButton
-                )
-            ) <-- TreeViewController.isDebuggingSession,
+            child(div(breakpointSkipButton)) <-- TreeViewController.isDebuggingSession,
             /* Render download button */
             child(downloadButton) <-- TreeViewController.treeExists,
             uploadButton,

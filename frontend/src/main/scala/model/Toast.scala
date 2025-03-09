@@ -30,11 +30,11 @@ sealed trait Toast {
             ),
 
             div(
+                textAlign.left,
+                paddingLeft.px := 20,
                 h3(className:= "toast-header", name),
                 div(className := "toast-text", message),
             ),
-
-            onClick.mapTo(None) --> ErrorController.setOptError,
         )
     }
 }
