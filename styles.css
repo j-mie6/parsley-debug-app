@@ -109,6 +109,29 @@ button {
     all: inherit;
 }
 
+
+/* Style scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--background-secondary-hover); 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--background-tertiary-60); 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--background-tertiary); 
+}
+
+
 .nothing-shown {
     color: var(--font-color-no-tree); 
     
