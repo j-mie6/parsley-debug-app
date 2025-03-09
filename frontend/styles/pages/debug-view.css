@@ -190,10 +190,3 @@
 .debug-view-expand-code.expanded {
     width: 113px;
 }
-
-@media (max-width: 1024px) {
-    .debug-view-button-settings,
-    .debug-view-button-state {
-      display: none;
-    }
-  }
