@@ -234,6 +234,7 @@ impl StateManager for AppState {
 
         state.tab_names = Vec::new();
         state.debug_sessions = HashMap::new();
+        state.saved_refs = HashMap::new();
 
         Ok(())
     }
