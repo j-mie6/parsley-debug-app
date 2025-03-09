@@ -10,6 +10,7 @@ import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.tauri.{Tauri, Command}
+import controller.viewControllers.TreeViewController.loadedTrees
 
 
 /**
@@ -258,6 +259,7 @@ private object ReactiveNodeDisplay {
             )
         }
 
+        val testBus: EventBus[List[DebugNode]] = EventBus()
 
         div(
             className := "debug-node-container",
@@ -310,7 +312,13 @@ private object ReactiveNodeDisplay {
                                     }
                                     Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
                         }
-                    ) --> node.children.writer
+                    ) --> testBus,
+
+                    testBus.stream --> node.children.writer,
+
+                    node.children.signal
+                        .sample(TreeViewController.getSessionId)
+                        --> TreeViewController.test,
                 ),
                 
                 arrows(isRight = true),

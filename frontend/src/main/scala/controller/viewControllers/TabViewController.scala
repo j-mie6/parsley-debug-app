@@ -42,6 +42,12 @@ object TabViewController {
 
     /** Get selected tab index */
     val getSelectedTab: Signal[Int] = selectedTab.signal
+
+
+    // val getSelectedTab: Signal[Int] = selectedTab.signal
+
+    // val getFileNames: Signal[List[String]] = fileNames.signal
+
     
     /** Checks if tab is currently selected */
     def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)

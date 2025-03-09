@@ -26,6 +26,9 @@ object TreeViewController {
     /** Set debug tree */
     val setTree: Observer[DebugTree] = tree.someWriter
 
+    // /** Set debug tree */
+    // val setTree2: Observer[Option[DebugTree]] = Observer(newTree => newTree.get.sessionId)
+
     /** Set optional debug tree (can be None) */
     val setTreeOpt: Observer[Option[DebugTree]] = tree.writer
 
@@ -34,6 +37,16 @@ object TreeViewController {
     
     /** Return true signal if tree is loaded into frontend */
     def treeExists: Signal[Boolean] = getTree.map(_.isDefined)
+
+    val loadedTrees: Var[Map[Int, DebugTree]] = Var(Map.empty)
+
+    val getLoadedTrees: Signal[Map[Int, DebugTree]] = loadedTrees.signal
+    val setLoadedTrees: Observer[Map[Int, DebugTree]] = loadedTrees.writer
+
+    // val reloadTree: Observer[Int] = Observer(sessionId => )
+
+    val test: Observer[Int] = Observer(sessionId => loadedTrees.set(loadedTrees.now().updated(sessionId, tree.now().get)))
+
 
     /** Get sessionId from loaded tree, -1 for non-debuggable */
     def getSessionId: Signal[Int] = tree.signal.map(_.get.sessionId)
