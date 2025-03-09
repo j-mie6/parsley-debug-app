@@ -34,6 +34,8 @@ pub trait StateManager: Send + Sync + 'static {
     fn next_session_id(&self) -> Result<i32, StateError>;
 
     fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError>;
+
+    fn reset_trees(&self) -> Result<(), StateError>;
 }
 
 

@@ -74,6 +74,10 @@ impl StateManager for ServerState {
     fn get_download_path(&self) -> Result<PathBuf,StateError> {
         self.inner().get_download_path()
     }
+
+    fn reset_trees(&self) -> Result<(), StateError> {
+        self.inner().reset_trees()
+    }
 }
 
 impl ServerState {
