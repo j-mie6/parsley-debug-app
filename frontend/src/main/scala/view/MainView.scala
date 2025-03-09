@@ -45,7 +45,7 @@ object MainView extends DebugViewPage {
             div(
                 EventStream.fromValue(())
                     .take(1)
-                    //TODO: .flatMapTo(Tauri.invoke(Command.DeleteSavedTrees, ()))
+                    .flatMapTo(Tauri.invoke(Command.DeleteSavedTrees, ()))
                     --> Observer.empty,
                 
                 /* Update DOM theme with theme value */
