@@ -79,4 +79,8 @@ impl StateManager for tauri::AppHandle {
         self.path().download_dir()
             .map_err(|_| StateError::GetDownloadPathFail)
     }
+
+    fn reset_trees(&self) -> Result<(), StateError> {
+        self.state::<AppState>().reset_trees()
+    }
 }

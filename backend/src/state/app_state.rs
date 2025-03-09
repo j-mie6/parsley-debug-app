@@ -15,7 +15,7 @@ struct AppStateInternal {
     app: AppHandle,                          /* Handle to instance of Tauri app, used for events */
     tree: Option<DebugTree>,                 /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,            /* Map from node_id to the respective node */
-    skips_tx: HashMap<i32, SkipsSender>,       /* Transmitter how many breakpoints to skip, sent to parsley */
+    skips_tx: HashMap<i32, SkipsSender>,     /* Transmitter how many breakpoints to skip, sent to parsley */
     tab_names: Vec<String>,                  /* List of saved tree names */
     debug_sessions: HashMap<String, i32>,    /* Map of tree name to sessionId */
     counter: SessionCounter                  /* Counter to hold next sessionId */
@@ -192,5 +192,14 @@ impl StateManager for AppState {
                 Some(_) => Err(StateError::ChannelError),
                 None => Ok(())
             }
+    }
+
+    fn reset_trees(&self) -> Result<(), StateError> {
+        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+
+        state.tab_names = Vec::new();
+        state.debug_sessions = HashMap::new();
+
+        Ok(())
     }
 }
