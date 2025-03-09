@@ -15,66 +15,57 @@ object StateManagementView {
         val refValue: String = ref._2
 
         div(
-            className := "single-ref-top-container",
+            className := "ref-container",
+            
             div(
-                className := "single-ref-title-container",
+                className := "ref-title",
                 text <-- StateManagementViewController.getRefNumber(refAddr)
                     .map(i => s"R${StateRef.subscriptInt(i)}")
             ),
-            div(
-                "Current Value: ",
-                text <-- StateManagementViewController.getRefValue(refAddr)
+            
+            div("Current Value: ", span(className := "ref-value", text <-- StateManagementViewController.getRefValue(refAddr))),
+            div("Original Value: ", span(className := "ref-value", StateManagementViewController.getOrigRefValue(refAddr))),
+            
+            input(
+                placeholder := "New value",
+                onInput.mapToValue --> { newRefValue =>
+                    StateManagementViewController.updateLocalRefValue(refAddr, newRefValue)
+                }
             ),
-            div(
-                "Original Value: ",
-                StateManagementViewController.getOrigRefValue(refAddr)
-            ),
-            div(
-                className := "single-ref-modify-container",
-                input(
-                    placeholder := "New value",
-                    onInput.mapToValue --> { newRefValue =>
-                        StateManagementViewController.updateLocalRefValue(refAddr, newRefValue)
-                    }
-                )
-            )
         )
     }
 
     def apply(): HtmlElement = {
         div(
-            className := "state-sidepanel-container",
+            className := "sidepanel-container state",
             cls("open") <-- StateManagementViewController.isStateOpen,
             
+            div(className := "sidepanel-header", "References"),
+
+            child(div(
+                className := "nothing-shown", 
+                fontSize.px := 18,
+                "Nothing to show"
+            )) <-- StateManagementViewController.refsEmptySignal,
+
             div(
-                className := "state-sidepanel",
-                div(cls("state-header"),
-                    h2("References")
-                ),
+                className := "state-contents",
+                children <-- StateManagementViewController.getRefs.signal.map(_.map(renderReference))
+            ),
 
-                child(div(
-                    className := "nothing-shown", 
-                    fontSize.px := 20,
-                    "Nothing to show"
-                )) <-- StateManagementViewController.refsEmptySignal,
+            div(
+                className := "sidepanel-footer",
 
+                child(button("Apply", onClick --> (_ => 
+                    StateManagementViewController.getLocalRefs.foreach(StateManagementViewController.updateNewRefValue)
+                    ToastController.setToast(StateApplied)
+                ))) <-- StateManagementViewController.refsEmptySignal.not,
 
-                div(cls("state-contents"),
-                    children <-- StateManagementViewController.getRefs.signal.map(_.map(renderReference))
-                ),
-
-                div(
-                    cls("state-footer"),
-                    child(button(className := "apply-state-button", "Apply", onClick --> (_ => 
-                        StateManagementViewController.getLocalRefs.foreach(StateManagementViewController.updateNewRefValue)
-                        ToastController.setToast(StateApplied)
-                    ))) <-- StateManagementViewController.refsEmptySignal.not,
-                    child(button(className := "restore-original-state-button", "Restore Originals", onClick --> (_ => 
-                        StateManagementViewController.getOrigRefs.foreach(StateManagementViewController.updateNewRefValue)
-                        ToastController.setToast(StateApplied)
-                    ))) <-- StateManagementViewController.refsEmptySignal.not,
-                ),
-            )
+                child(button("Restore Originals", onClick --> (_ => 
+                    StateManagementViewController.getOrigRefs.foreach(StateManagementViewController.updateNewRefValue)
+                    ToastController.setToast(StateApplied)
+                ))) <-- StateManagementViewController.refsEmptySignal.not,
+            ),
         )
     }
 }

@@ -18,6 +18,8 @@
 
     border-style: solid;
     border-radius: 8px;
+
+    z-index: 5;
     
     animation: slideUp 0.5s ease-out forwards, slideDown 0.5s ease-in 3s forwards;
 }

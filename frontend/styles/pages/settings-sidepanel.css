@@ -1,65 +1,8 @@
-.settings-sidepanel-container {
-    width: 25vw;
-    padding-top: 10px;
-    padding-left: 20px;
-
-    display: flex;
-    position: fixed;
-    justify-content: center;
-    align-items: center;
-
-    box-sizing: border-box;
-    background: transparent;
-
-
-    z-index: 1000;
-    transform: translateX(-25vw); /* Completely hidden initially */
-}
-
-.settings-sidepanel-container.open {
-    transform: translateX(0);
-}
-
-.settings-sidepanel {
-    width: 50vw;
-    max-width: 600px;
-    height: 80vh;
-    padding: 3vh 3vw;
-
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    align-items: center;
-
-    background: var(--background-secondary);
-
-    border: 2px solid var(--font-color-tertiary);
-    border-radius: 20px;
-
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.settings-header {
-    width: 100%;
-    text-align: center;
-    position: relative;
-    margin-bottom: 1.5vh;
-}
-
-.settings-header h2 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin: 0 auto;
-}
-
 .settings-content {
-    display: grid;
-    columns: 3;
-    width: 100%;
     padding: 1vh 0;
 }
 
-.single-setting-top-container {
+.single-setting-container {
     display: flex;
     flex-direction: row;
     overflow-y: auto;
@@ -67,12 +10,18 @@
     margin-bottom: 5px;
 }
 
-.single-setting-name-container {
+.single-setting-name {
     padding: 5px;
 }
 
-.single-setting-modify-container input[type="number"] {
-    width: 70px;
+.single-setting-container input {
+    margin: 0.3rem 0;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9rem;
+    
+    height: 1rem;
+    width: 5rem;
+
     padding: 4px 8px;
     font-size: 0.9rem;
   
@@ -80,70 +29,17 @@
     border-radius: 5px;
   
     outline: none;
-  }
-  
-  .single-setting-modify-container input[type="number"]:focus {
-    border-color: var(--font-color-secondary);
-  }
-  
-  .single-setting-modify-container input[type="number"]::-webkit-outer-spin-button,
-  .single-setting-modify-container input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  
-  .single-setting-modify-container input[type="number"] {
+
     appearance: textfield;
     -moz-appearance: textfield; 
-  }
-  
-
-.single-setting-info-text {
-    position: relative;
-    padding: 15px;
-    margin-bottom: 10px;
-
-    background-color: var(--background-tertiary);
-    border-radius: 5px;
-    font-size: 10px;
 }
 
-.single-setting-info-text[hidden] {
-    pointer-events: none;
+.single-setting-container input:focus {
+    border-color: var(--font-color-secondary);
 }
 
-.settings-footer {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: auto;
-    gap: 20px;
-}
-
-.apply-settings-button,
-.default-settings-button {
-    width: 50%;
-    height: 20px;
-    padding: 12px;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    background: var(--background-primary);
-    color: var(--font-color-primary);
-
-    border: none;
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-align: center;
-}
-
-.apply-settings-button:hover,
-.default-settings-button:hover {
-    background: var(--background-tertiary-20);
+.single-setting-container input::-webkit-outer-spin-button,
+.single-setting-container input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
