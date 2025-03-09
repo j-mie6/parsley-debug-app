@@ -19,6 +19,8 @@
     overflow-y: fill;
 
     padding: 5vh 30px 5vh;
+
+    z-index: 5;
     
     align-items: center;
     justify-content: center;

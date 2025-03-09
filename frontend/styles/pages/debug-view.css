@@ -61,46 +61,34 @@
 }
 
 .debug-view-body {
-    overflow: hidden;
     display: flex;
-    flex-direction: column;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    height: 100vh;
+    flex-direction: row;
+    align-content: stretch;
+    justify-content: space-between;
+
+    height: 100%;
+    padding: 2vh 1vw;
+    gap: 1.25vw;
+
+    overflow: hidden;
 }
 
 .tab-and-tree-view-container {
-    box-sizing: border-box;
-    padding: 20px;
-    padding-top: 10px;
-    overflow: hidden;
+    flex-grow: 1;
+
     display: flex;
     flex-direction: column;
-    height: inherit;
+
+    overflow: hidden;
 }
 
-/* When left side is open, shift content to the right */
-.tab-and-tree-view-container.left-compressed {
-    margin-left: 25vw;
-}
-
-/* When right side is open, shift content to the left */
-.tab-and-tree-view-container.right-compressed {
-    margin-right: 25vw;
-}
-
-/* If both left & right are open, center it back (or do any combined offset you want) */
-.tab-and-tree-view-container.left-compressed.right-compressed {
-    margin-left: 25vw;
-    margin-right: 25vw;
-}
 
 .debug-view-page {
     box-sizing: border-box;
     padding-top: 10px;
     width: 100vw;
     height: 100vh;
-    /* overflow: hidden; */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }

@@ -59,7 +59,11 @@ object DebugTreeDisplay {
             styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
             wheelHandler,
 
-            children <-- StateManagementViewController.getRefs.map(refs => refs.map(ref => StateRef(ref))),
+            div(
+                className := "debug-tree-refs-container",
+                children <-- StateManagementViewController.getRefs
+                    .map(refs => refs.map(ref => StateRef(ref))),
+            ),
 
             ReactiveNodeDisplay(ReactiveNode(tree.root)),
         )
@@ -68,15 +72,16 @@ object DebugTreeDisplay {
 
 
 /** Render a Ref passed as to a breakpoint */
-private object StateRef {
+object StateRef {
     def apply(codedRef: (Int, String)): HtmlElement = {
         p(
             className := "debug-tree-ref",
-            s"R${subscriptInt(codedRef._1)}: ${codedRef._2}"
+            text <-- StateManagementViewController.getRefNumber(codedRef._1)
+                .map(i => s"R${subscriptInt(i)}: ${codedRef._2}")
         )
     }
 
-    private def subscriptInt(x: Int): String = {
+    def subscriptInt(x: Int): String = {
         val subscriptInts = "\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089"
 
         x.toString

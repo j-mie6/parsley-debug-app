@@ -245,9 +245,10 @@ abstract class DebugViewPage extends Page {
             className := "debug-view-page",
             headerView,
             div(
-                className := "debug-view-body", 
+                className := "debug-view-body",
+                
                 child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
-                child(StateManagementView()) <-- StateManagementViewController.isStateOpen,
+                
                 div(
                     className := "tab-and-tree-view-container",
                     cls("left-compressed") <-- SettingsViewController.isSettingsOpen,
@@ -263,7 +264,9 @@ abstract class DebugViewPage extends Page {
                         cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
                         childElem.getOrElse(div())
                     )
-                )
+                ),
+
+                child(StateManagementView()) <-- StateManagementViewController.isStateOpen,
             )
         )))
     } 
