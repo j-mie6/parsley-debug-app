@@ -26,11 +26,9 @@ object TreeView {
       val debuggableBus: EventBus[Boolean] = EventBus()
       div(
         TreeViewController.isDebuggingSession.changes
-            .filter(a => !a)
+            .filterNot(identity)
             .mapToUnit
-            .map(_ => {
-                StateManagementViewController.clearRefs()
-            })
+            .map(_ => StateManagementViewController.clearRefs())
             .mapTo(Nil) --> StateManagementViewController.setRefs,
 
         TreeViewController.getSessionId.changes
@@ -42,7 +40,7 @@ object TreeView {
         seqBus.stream.sample(TreeViewController.isDebuggingSession) --> debuggableBus.writer,
 
         debuggableBus.stream.filter(identity).flatMapTo(seqBus.stream) --> StateManagementViewController.setRefs,
-        debuggableBus.stream.filter(a => !a).mapTo(Nil) --> StateManagementViewController.setRefs,
+        debuggableBus.stream.filterNot(identity).mapTo(Nil) --> StateManagementViewController.setRefs,
 
         child <-- TreeViewController.getTreeElem, /* Renders the tree */
     )
