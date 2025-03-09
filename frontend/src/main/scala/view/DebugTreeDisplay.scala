@@ -293,7 +293,12 @@ private object ReactiveNodeDisplay {
 
                     /* Render debug node information */
                     div(
-                        p(className := "debug-node-name", node.debugNode.internal),
+                        p(className := "debug-node-name", 
+                            child(i(className := "bi bi-stars", float.left, marginRight.ch := 1)) := node.debugNode.newlyGenerated,
+                            node.debugNode.internal, 
+                            child(i(className := "bi bi-stars", float.right, marginLeft.ch := 1)) := node.debugNode.newlyGenerated
+                        ),
+
                         p(fontStyle := "italic", node.debugNode.input),
                         child(p(className := "debug-node-iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
                         child(iterativeProgress) <-- showIterativeOneByOne,
