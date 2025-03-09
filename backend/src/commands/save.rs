@@ -200,12 +200,10 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
 /* Deletes all saved trees */
 #[tauri::command]
 pub fn delete_saved_trees(state: tauri::State<AppState>) -> Result<(), DeleteTreeError> {
-    state.reset_trees().map_err(|_| DeleteTreeError::TreeRemovalFail)?;
+    state.reset_trees()?;
 
     fs::remove_dir_all(SAVED_TREE_DIR).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
-    fs::create_dir(SAVED_TREE_DIR).map_err(|_| DeleteTreeError::TreeRemovalFail)?;
-    
-    Ok(())
+    fs::create_dir(SAVED_TREE_DIR).map_err(|_| DeleteTreeError::FolderCreationFail)
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -215,6 +213,14 @@ pub enum DeleteTreeError {
     TreeRemovalFail,
     SerialiseFailed,
     SessionIdRemovalFail,
+    FolderCreationFail,
+    TreesResetFailed,
+}
+
+impl From<StateError> for DeleteTreeError {
+    fn from(_: StateError) -> Self {
+        DeleteTreeError::TreesResetFailed
+    }
 }
 
 

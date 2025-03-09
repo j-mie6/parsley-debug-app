@@ -108,7 +108,7 @@ object Command {
 
     case object DeleteSavedTrees extends Command("delete_saved_trees") {
         type In = Unit
-        given args: Args[In] = Args.noArgs
+        given args: Args[Unit] = Args.noArgs
 
         type Out = Unit
     }

@@ -81,15 +81,6 @@ impl AppState {
         /* Index will never be out of range as the frontend representation and the backend will be in sync */
         Ok(state.tab_names[index].clone()) 
     }
-
-    pub fn reset_trees(&self) -> Result<(), StateError> {
-        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
-
-        state.tab_names = Vec::new();
-        state.debug_sessions = HashMap::new();
-
-        Ok(())
-    }
 }
 
 
@@ -201,5 +192,14 @@ impl StateManager for AppState {
                 Some(_) => Err(StateError::ChannelError),
                 None => Ok(())
             }
+    }
+
+    fn reset_trees(&self) -> Result<(), StateError> {
+        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+
+        state.tab_names = Vec::new();
+        state.debug_sessions = HashMap::new();
+
+        Ok(())
     }
 }
