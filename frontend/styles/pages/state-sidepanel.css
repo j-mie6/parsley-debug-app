@@ -6,6 +6,8 @@
     align-content: stretch;
     gap: 2vh;
 
+    margin-bottom: 2vh;
+
     overflow-y: auto;
 }
 
