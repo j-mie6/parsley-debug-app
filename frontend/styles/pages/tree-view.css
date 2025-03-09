@@ -1,30 +1,11 @@
 .tree-view-page {
-    background-color: var(--background-secondary);
-    height: 85%;
-    overflow: auto;
-    border: 2px solid var(--font-color-tertiary);
+    height: 100%;
+    
     border-radius: 20px;
-    box-sizing: border-box;
-    padding-bottom: 20px;
-    flex: 1;
-}
+    border: 2px solid transparent;
+    background-color: var(--background-secondary);
 
-.tree-view-error {
-    color: var(--font-color-no-tree); 
-    
-    font-weight: bold;
-    text-align: center;
-    font-size: 28px;
-    
-    width: 40%;
-    
-    margin: auto;
-    margin-top: 2em;
-    margin-bottom: 1em;
-    
-    padding: 1.5em;
-    padding-right: 2em;
-    padding-left: 2em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .zoom-container {
@@ -36,24 +17,13 @@
     justify-content: flex-start;
 }
 
-.skip-button {
-    margin-right: 20px;
-    background: transparent;
-    color: inherit;
-    border: none;
-    font: inherit;
-    outline: inherit;
-    cursor: pointer;
-}
-
 .tree-view-page.highlight-debug-session {
-    animation: borderPulseRed 1.8s infinite alternate ease-in !important;
+    animation: borderColorDebugAnim 1.8s infinite alternate ease-in !important;
 }
 
-
-@keyframes borderPulseRed {
+@keyframes borderColorDebugAnim {
     from { }
     to {
-        border: 2px solid #de2100d8
+        border-color: var(--font-color-debug);
     }
 }
