@@ -258,10 +258,12 @@ abstract class DebugViewPage extends Page {
                         className := "tab-view-container",
                         TabView()
                     ),
+                    
                     div(
                         className := "tree-view-page",
-                        buttonBar,
                         cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
+                        
+                        buttonBar,
                         childElem.getOrElse(div())
                     )
                 ),

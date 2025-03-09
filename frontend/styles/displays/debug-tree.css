@@ -1,12 +1,3 @@
-.debug-tree-display {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
-}
-
-
 .debug-input-container {
     display: flex;
     flex-direction: column;

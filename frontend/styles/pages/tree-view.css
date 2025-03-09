@@ -1,10 +1,11 @@
 .tree-view-page {
     height: 100%;
     
-    background-color: var(--background-secondary);
     border-radius: 20px;
+    border: 2px solid transparent;
+    background-color: var(--background-secondary);
 
-    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .zoom-container {
@@ -17,13 +18,12 @@
 }
 
 .tree-view-page.highlight-debug-session {
-    animation: borderPulseRed 1.8s infinite alternate ease-in !important;
+    animation: borderColorDebugAnim 1.8s infinite alternate ease-in !important;
 }
 
-
-@keyframes borderPulseRed {
+@keyframes borderColorDebugAnim {
     from { }
     to {
-        border: 2px solid #de2100d8
+        border-color: var(--font-color-debug);
     }
 }
