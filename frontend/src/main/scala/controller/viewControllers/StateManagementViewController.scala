@@ -46,15 +46,6 @@ object StateManagementViewController {
     private var origRefs: Seq[(Int, String)] = Nil
     
     /**
-    * An HTML element indicating that there are no references available
-    * to display in the state management panel. Displayed when `refs` is empty.
-    */
-    val noReferencesError: HtmlElement = div(
-    className := "state-view-error",
-    "Nothing to show"
-    )
-    
-    /**
     * A signal that emits `true` when the sequence of references is empty,
     * and `false` otherwise. Useful for conditionally displaying error messages or content.
     */
