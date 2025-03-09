@@ -106,6 +106,13 @@ object Command {
         type Out = List[String]
     }
 
+    case object DeleteSavedTrees extends Command("delete_saved_trees") {
+        type In = Unit
+        given args: Args[Unit] = Args.noArgs
+
+        type Out = Unit
+    }
+
     case object DownloadTree extends Command("download_tree") {
         type In = String
         given args: Args[String] {

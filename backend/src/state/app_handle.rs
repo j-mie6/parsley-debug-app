@@ -87,4 +87,8 @@ impl StateManager for tauri::AppHandle {
     fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
         self.state::<AppState>().get_refs(session_id)
     }
+
+    fn reset_trees(&self) -> Result<(), StateError> {
+        self.state::<AppState>().reset_trees()
+    }
 }

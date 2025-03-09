@@ -30,11 +30,11 @@ sealed trait Toast {
             ),
 
             div(
+                textAlign.left,
+                paddingLeft.px := 20,
                 h3(className:= "toast-header", name),
                 div(className := "toast-text", message),
             ),
-
-            onClick.mapTo(None) --> ErrorController.setOptError,
         )
     }
 }
@@ -44,8 +44,8 @@ sealed trait Toast {
   * The generic toast for information that needs to be passed to the user, styled in blue
   */
 sealed trait InfoToast extends Toast {
-    override def icon: String = "bi bi-info-circle-fill"
     override def style: String = "info" 
+    override def icon: String = "bi bi-info-circle-fill"
 }
 
 /**
@@ -55,6 +55,15 @@ sealed trait SuccessToast extends Toast  {
     override def name: String = "Success"
     override def style: String = "success"
     override def icon: String = "bi bi-check-circle-fill"
+}
+
+/**
+  * The generic toast for error, styled in red
+  */
+sealed trait ErrorToast extends Toast {
+    override def name: String = "Error"
+    override def style: String = "error" 
+    override def icon: String = "bi bi-exclamation-triangle-fill"
 }
 
 case object TreeDownloaded extends SuccessToast {
@@ -71,5 +80,17 @@ case object DefaultSettingsApplied extends SuccessToast {
 
 case object StateApplied extends SuccessToast {
     override def message: String = "State applied"
+}
+
+case object TreeUploaded extends SuccessToast {
+    override def message: String = "Tree uploaded"
+}
+
+case object TreeUploadFailed extends ErrorToast {
+    override def message: String = "Tree importing failed, this probably means the file is malformed"
+}
+
+case object TreeDownloadFailed extends ErrorToast {
+    override def message: String = "Tree download failed, this is likely caused by an issue in your file system"
 }
 

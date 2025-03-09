@@ -38,6 +38,8 @@ pub trait StateManager: Send + Sync + 'static {
     fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError>;
 
     fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError>;
+
+    fn reset_trees(&self) -> Result<(), StateError>;
 }
 
 

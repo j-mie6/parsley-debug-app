@@ -82,6 +82,10 @@ impl StateManager for ServerState {
     fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
         self.inner().get_refs(session_id)
     }
+
+    fn reset_trees(&self) -> Result<(), StateError> {
+        self.inner().reset_trees()
+    }
 }
 
 impl ServerState {

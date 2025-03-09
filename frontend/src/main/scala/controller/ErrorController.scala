@@ -6,7 +6,7 @@ import scala.scalajs.js.internal.UnitOps.unitOrOps
 import com.raquo.laminar.api.L.*
 
 import model.errors.*
-
+import controller.ToastController
 
 /** 
   * ErrorController keeps track of the error state of the app 
