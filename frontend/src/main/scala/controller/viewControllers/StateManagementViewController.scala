@@ -217,9 +217,9 @@ object StateManagementViewController {
     * Clears both the local (non-reactive) references and the reactive `refs`,
     * effectively resetting all reference data.
     */
-    def clearRefs: Observer[Unit] = Observer(_ => {
+    def clearRefs: Observer[Unit] = Observer{_ =>
         localRefs = Nil
         origRefs = Nil
         refs.set(Nil)
-    })
+    }
 }
