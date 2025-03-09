@@ -2,7 +2,6 @@
     height: 100%;
     
     background-color: var(--background-secondary);
-    border: 2px solid var(--font-color-tertiary);
     border-radius: 20px;
 
     overflow: hidden;
