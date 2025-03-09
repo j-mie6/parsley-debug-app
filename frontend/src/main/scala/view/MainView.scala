@@ -90,7 +90,10 @@ object MainView extends DebugViewPage {
 
 
                 /* Load main page */
-                child <-- MainViewController.getViewElem,
+                div(
+                    overflow.hidden,
+                    child <-- MainViewController.getViewElem,
+                ),
 
                 /* Displaying Dill Exceptions */
                 child.maybe <-- ErrorController.getErrorElem,

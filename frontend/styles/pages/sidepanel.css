@@ -7,9 +7,8 @@
     align-items: stretch;
 
     z-index: 2;
-    
+
     background: var(--background-secondary);
-    border: 2px solid var(--font-color-tertiary);
     border-radius: 20px;
 
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -53,7 +52,6 @@
 
     color: var(--font-color-primary);
     background-color: var(--background-primary);
-    border: 2px solid var(--font-color-tertiary);
     border-radius: 8px;
 
     padding: 8px 12px;
@@ -84,7 +82,7 @@
     padding: 0.5rem 0.6rem;
     font-size: 0.9rem;
   
-    border: 1px solid var(--font-color-tertiary);
+    border: 1px solid transparent;
     border-radius: 5px;
   
     color: var(--font-color-tertiary);
@@ -94,6 +92,10 @@
     -moz-appearance: textfield;
 
     outline: none;
+}
+
+.sidepanel-item-container input:focus {
+    border-color: var(--font-color-tertiary);
 }
 
 .sidepanel-item-container input::-webkit-outer-spin-button,
@@ -125,7 +127,6 @@
     
     color: var(--font-color-primary);
     background-color: var(--background-primary);
-    border: 2px solid var(--font-color-tertiary);
     border-radius: 8px;
 
     cursor: pointer;
