@@ -111,38 +111,15 @@
 .debug-view-right-button-bar {
     display: flex;
     align-items: center;
-    gap: 30px;
+    margin-right: 2px;
+    gap: 18px;
+    font-size: 22px;
 }
 
 .debug-view-button-settings {
-    font-size: 30px;
-    margin-left: 5px;
+    font-size: 30px; 
 }
 
-.debug-view-button-breakpoint-skip {
-    font-size: 22px;
-    margin-right: 2px;
-}
-
-.debug-view-button-download {
-    font-size: 22px;
-    margin-right: 2px;
-}
-
-.debug-view-button-upload {
-    font-size: 22px;
-    margin-left: 5px;
-}
-
-.debug-view-button-state {
-    font-size: 22px;
-    margin-left: 5px;
-}
-
-.debug-view-button-info {
-    font-size: 22px;
-    margin-right: 2px;
-}
 
 /* Makes button disappear if screen size is too small */
 @media (max-width: 450px) {

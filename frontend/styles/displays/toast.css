@@ -35,19 +35,18 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-left: 0.75vw;
 }
 
 .toast-text {
     flex-grow: 1;
-    font-size: 1vw;
     line-height: 1.4;
     max-height: 8vh;
     overflow: hidden;
-    text-overflow: ellipsis;
+    
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Limit text to 3 lines */
+    text-overflow: ellipsis;
     line-clamp: 3;
+    -webkit-line-clamp: 3; /* Limit text to 3 lines */
     -webkit-box-orient: vertical;
 }
 
