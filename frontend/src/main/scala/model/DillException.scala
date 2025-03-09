@@ -3,7 +3,6 @@ package model.errors
 import com.raquo.laminar.api.L.*
 
 import controller.errors.ErrorController
-import com.raquo.laminar.api.features.unitArrows
 
 
 /**
@@ -34,67 +33,12 @@ sealed trait Popup {
             
             div(
                 h2(className := "popup-header",name),
-                div(className := "popup-text", checkGithubIssue(message)),
+                div(className := "popup-text", embedGithubIssue(message)),
             ),
 
             onClick.mapTo(None).filter(_ => closable) --> ErrorController.setOptError,
         )
     }
-}
-
-/**
-  * Toast is the generic frontend representation of any toast that the user sees
-  * 
-  * @param name Header of the toast
-  * @param message More detailed message displayed to the user
-  * @param icon Class name of the bootstrap icon relating to the pop up style
-  * @param style CSS style used for toast, blue for info and green for success
-  */
-sealed trait Toast {
-    def name: String
-    def message: String
-    def icon: String
-    def style: String
-
-    def displayElement: HtmlElement = {
-        div(
-            cls("toast", style),
-
-            div(
-                cls("toast-icon-container", style),
-                i(className:= icon, width.px := 30, height.px := 30)
-            ),
-
-            div(
-                h3(className:= "toast-header", name),
-                div(className := "toast-text", message),
-            ),
-
-            onClick.mapTo(None) --> ErrorController.setOptError,
-        )
-    }
-}
-
-
-/**
-  * The generic toast for information that needs to be passed to the user, styled in blue
-  */
-sealed trait InfoToast extends Toast {
-    override def icon: String = "bi bi-info-circle-fill"
-    override def style: String = "info" 
-}
-
-/**
-  * The generic toast for success, styled in green
-  */
-sealed trait SuccessToast extends Toast  {
-    override def name: String = "Success"
-    override def style: String = "success"
-    override def icon: String = "bi bi-check-circle-fill"
-}
-
-case object TreeDownloaded extends SuccessToast {
-    override def message: String = "Tree downloaded successfully"
 }
 
 /**
@@ -127,19 +71,28 @@ sealed trait Error extends DillException {
   * @param msg Full message that we are checking on
   * @return Github Issue as a link HTML element if "Github Issue" is in the message
   */
-def checkGithubIssue(msg: String): HtmlElement = {
+def embedGithubIssue(msg: String): HtmlElement = {
     val githubLink = a(
         href := "https://github.com/j-mie6/parsley-debug-app/issues/new",
         target := "_blank",
         "GitHub Issue",
     )
 
-    val parts = msg.split("GitHub Issue")
-    
-    span(parts.head, githubLink, parts.last)
+    if (msg.contains("Github Issue")) then
+        val parts = msg.split("GitHub Issue")
+        span(parts.head, githubLink, parts.last)
+    else
+        span(msg)
 }
 
 /* List of DILL Exceptions */
+
+case object DownloadFailed extends Warning {
+    override def name: String = "Download Failed"
+    override def message: String = 
+        "Downloading Debug Tree failed, please try again. If this problem" +
+        "persists, please report this on GitHub Issues"
+}
 
 case object TreeNotFound extends Error {
     override def name: String = "Tree Not Found"
@@ -196,6 +149,36 @@ case object SuffixNotFound extends Error {
 case object EventEmitFailed extends Error {
     override def name: String = "Event Emitting Failed"
     override def message: String = "An event could not be emitted from the backend. Try again."
+}
+
+case object CreateDirFailed extends Error {
+    override def name: String = "Creating directory failed"
+    override def message: String = "The saved tree file could not be made."
+}
+
+case object WriteToFileFailed extends Error {
+    override def name: String = "Writing to a file failed"
+    override def message: String = "An error occured during writing to the saved tree file."
+}
+
+case object DownloadPathNotFound extends Error {
+    override def name: String = "Download path was not found"
+    override def message: String = "Could not find the path for downloading files."
+}
+
+case object TreeFileRemoveFail extends Error {
+    override def name: String = "Removing a tree file failed"
+    override def message: String = "An error occured while attempting to remove a saved tree file."
+}
+
+case object NameRetrievalFail extends Error {
+    override def name: String = "Name retrieval failed"
+    override def message: String = "Tree name could not be found."
+}
+
+case object DeserialiseFailed extends Error {
+    override def name: String = "Deserialising the tree failed"
+    override def message: String = "An error occured creating the tree from the saved file."
 }
 
 case object MalformedJSON extends Error {

@@ -1,33 +1,45 @@
 package view
 
-import com.raquo.laminar.api.L.*
-import com.raquo.laminar.codecs.*
+import scala.scalajs.js
 
-import org.scalajs.dom
-
-import scala.scalajs.js.timers._
 import scala.concurrent.duration._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration
 import scala.util.{Try, Success, Failure}
+import scala.scalajs.js.timers._
+
+import com.raquo.laminar.api.L.*
+import com.raquo.laminar.codecs.*
+import com.raquo.laminar.api.features.unitArrows
+import org.scalajs.dom
 
 import model.Page
-
+import model.errors.DillException
+import model.toast.TreeUploadFailed
+import model.toast.TreeUploaded
+import model.toast.TreeDownloaded
+import model.toast.TreeDownloadFailed
+import view.SettingsView
+import view.StateManagementView
 import controller.AppStateController
-import controller.tauri.Tauri
-import controller.viewControllers.MainViewController.View
+import controller.errors.ErrorController
+import controller.viewControllers.InputViewController
 import controller.viewControllers.MainViewController
+import controller.viewControllers.MainViewController.View
+import controller.viewControllers.SettingsViewController
+import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
-import controller.viewControllers.InputViewController
+import controller.tauri.Tauri
+import controller.ToastController
+import controller.errors.ErrorController
 
 
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
 /**
   * The DebugViewPage class represents the main page of the application, 
-  * containing both the tree and source view tabs, title and github / 
+  * containing both the tree and input view tabs, title and github / 
   * light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {
@@ -39,17 +51,106 @@ abstract class DebugViewPage extends Page {
         h1("Dill", fontSize.px := 40, margin.px := 0)
     )
 
+    /* Export tree button */
+    val downloadButton: HtmlElement = button(
+        className := "debug-view-button debug-view-button-download",
+
+        /* Save button icon */
+        i(className := "bi bi-download"),
+
+        /* Exports current tree */
+        onClick(_
+            .compose(event => event.sample(TabViewController.getSelectedTab))
+            .flatMapSwitch(TabViewController.getFileName)
+            .flatMapMerge(TreeViewController.downloadTree)
+            .map {
+                case Left(_) => TreeDownloadFailed
+                case Right(_) =>  TreeDownloaded
+            }
+        ) --> ToastController.setToast
+    )
+
+    /* Uploading json element */
+    val uploadButton: HtmlElement = label(
+        className := "debug-view-button debug-view-button-upload",
+        i(className := "bi bi-file-earmark-arrow-up"),
+        input(
+            typ := "file",
+            display := "none",
+            multiple := true,
+            
+            /* Handle tree uploading */
+            onChange.flatMap { ev =>
+                loadFile(ev.target.asInstanceOf[dom.html.Input])
+                    .map {
+                        case Left(_)   => TreeUploadFailed 
+                        case Right(_)  => TreeUploaded  
+                    }
+            } --> ToastController.setToast
+
+        )
+    )
+
+    /* Reads contents of file and passes them to backend */
+    private def loadFile(input: dom.html.Input): EventStream[Either[DillException, Unit]] = {
+        val files = input.files
+        val streams = (0 until files.length).map { i =>
+            val file = files(i)
+            EventStream.fromJsPromise {
+                new js.Promise[Either[DillException, Unit]]((resolve, _) => {
+                    val reader = new dom.FileReader()
+                    reader.onload = _ => {
+                        val content = reader.result.asInstanceOf[String]
+                        val result = TreeViewController.importTree(file.name, content)
+                        result.collectRight.foreach(_ => resolve(Right(())))(unsafeWindowOwner)
+                        result.collectLeft.foreach(err => resolve(Left(err)))(unsafeWindowOwner)
+                    }
+                    reader.readAsText(file)
+                })
+            }
+        }
+
+        EventStream.merge(streams*) // Merge all file streams 
+            .tapEach(_ => input.value = "") // Reset input field after processing
+    }
+
+                
     /* Overview information tab. */
     private lazy val infoButton: HtmlElement = button(
-        // TODO
         className := "debug-view-button debug-view-button-info",
         i(className := "bi bi-info-circle-fill"),
+    )
+
+    private lazy val stateButton: HtmlElement = button(
+        className := "debug-view-button debug-view-button-state",
+        i(className:= "bi bi-sliders"),
+        onClick --> (_ => 
+            StateManagementViewController.toggleOpenState()
+        )
     )
 
     /* Opener for the settings tab. */
     private lazy val settingsTabButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-settings",
-        i(className := "bi bi-gear-wide-connected")
+        i(className := "bi bi-gear-wide-connected"),
+        onClick --> (_ => 
+            SettingsViewController.toggleOpenSettings()
+        )
+    )
+
+
+    /* Fast forward icon for skipping */
+    private lazy val breakpointSkipIcon: Element = i(className := "bi bi-play-fill")
+
+    /* Adds ability to skip the current breakpoint. */
+    private lazy val breakpointSkipButton: Element = button(
+        className := "debug-view-button debug-view-button-breakpoint-skip",
+        breakpointSkipIcon, /* Fast forward icon */
+
+        onClick.compose(_
+            .sample(TreeViewController.getSessionId)
+            .compose(TreeViewController.skipBreakpoints)
+            .collectLeft) --> ErrorController.setError
     )
 
     /**
@@ -104,7 +205,7 @@ abstract class DebugViewPage extends Page {
 
     /* Button bar internal to the view. */
     private lazy val buttonBar: HtmlElement = div(
-        className := "debug-view-button-bar",
+        className := "debug-view-left-button-bar",
         /* Button bar left. */
         div(
             display.flex,
@@ -121,9 +222,12 @@ abstract class DebugViewPage extends Page {
         ),
         /* Button bar right. */
         div(
-            display.flex,
-            alignItems.center,
-
+            className := "debug-view-right-button-bar",
+            child(div(breakpointSkipButton)) <-- TreeViewController.isDebuggingSession,
+            /* Render download button */
+            child(downloadButton) <-- TreeViewController.treeExists,
+            uploadButton,
+            stateButton,
             infoButton,
         )
     )   
@@ -136,16 +240,35 @@ abstract class DebugViewPage extends Page {
       * 
       * @return HTML element of the DebugView page.
       */
-    override def render(child: Option[HtmlElement]): HtmlElement = {
+    override def render(childElem: Option[HtmlElement]): HtmlElement = {
         super.render(Some(mainTag(
             className := "debug-view-page",
             headerView,
-            TabView(),
             div(
-                className := "tree-view-page",
-                buttonBar,
-                cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
-                child.getOrElse(div())
+                className := "debug-view-body",
+                
+                child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
+                
+                div(
+                    className := "tab-and-tree-view-container",
+                    cls("left-compressed") <-- SettingsViewController.isSettingsOpen,
+                    cls("right-compressed") <-- StateManagementViewController.isStateOpen,
+
+                    div(
+                        className := "tab-view-container",
+                        TabView()
+                    ),
+                    
+                    div(
+                        className := "tree-view-page",
+                        cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
+                        
+                        buttonBar,
+                        childElem.getOrElse(div())
+                    )
+                ),
+
+                child(StateManagementView()) <-- StateManagementViewController.isStateOpen,
             )
         )))
     } 

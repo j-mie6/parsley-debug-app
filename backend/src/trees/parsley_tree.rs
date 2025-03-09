@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{DebugNode, DebugTree};
 
 /* Represents tree received from parsley-debug-views' Remote View*/
@@ -24,21 +26,36 @@ pub struct ParsleyNode {
 pub struct ParsleyTree {
     input: String,              /* The input string being parsed */
     root: ParsleyNode,          /* Root node of the debug tree */
-    
+
+    parser_info: HashMap<String, Vec<(i32, i32)>>, /* Map from srcFile => List of parser indexes */
+
     /* If this tree was produced by a currently-running parser */
-    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool, 
+    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool,
 
     /* State references to be modified */
     #[serde(default = "Vec::new")] refs: Vec<(i32, String)>, 
+
+    /* If this tree was produced by a currently-running parser */
+    #[serde(default = "ParsleyTree::default_session_id")] session_id: i32, 
 }
 
 impl ParsleyTree {
-    pub fn is_debugging(&self) -> bool {
+    pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
     }
 
     /* Function used by serde to parse default boolean values as false */
     fn default_bool() -> bool { false } 
+
+    pub fn get_session_id(&self) -> i32 {
+        self.session_id
+    }
+
+    fn default_session_id() -> i32 { -1 }
+
+    pub fn set_session_id(&mut self, session_id: i32) {
+        self.session_id = session_id
+    }
 }
 
 /* Convert from ParsleyTree to DebugTree */
@@ -83,8 +100,10 @@ impl From<ParsleyTree> for DebugTree {
         let mut current_id: u32 = 0;
 
         /* Convert the root node and return DebugTree */
+        let session_id = tree.get_session_id();
+        let is_debuggable = tree.is_debuggable();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, tree.is_debuggable, tree.refs)
+        DebugTree::new(tree.input, node, tree.parser_info, is_debuggable, tree.refs, session_id)
     }
 }
 
@@ -93,6 +112,8 @@ impl From<ParsleyTree> for DebugTree {
 pub mod test {
 
     /* Data unit testing */
+
+    use std::collections::HashMap;
 
     use super::{ParsleyNode, ParsleyTree};
     use crate::trees::{debug_tree, DebugTree};
@@ -110,6 +131,7 @@ pub mod test {
                 "children": [],
                 "isIterative": false
             },
+            "parserInfo" : {},
             "isDebuggable": false,
             "refs": []
         }"#
@@ -173,6 +195,7 @@ pub mod test {
                 ],
                 "isIterative": false
             },
+            "parserInfo" : {},
             "isDebuggable": false,
             "refs": []
         }"#
@@ -194,8 +217,10 @@ pub mod test {
                 is_iterative: false,
                 newly_generated: false,
             },
+            parser_info: HashMap::new(),
             is_debuggable: false,
-            refs: Vec::new()
+            refs: Vec::new(),
+            session_id: -1,
         }
     }
 
@@ -260,8 +285,10 @@ pub mod test {
                 is_iterative: false,
                 newly_generated: false,
             },
+            parser_info: HashMap::new(),
             is_debuggable: false,
-            refs: Vec::new()
+            refs: Vec::new(),
+            session_id: -1,
         }
     }
 
