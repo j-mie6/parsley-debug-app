@@ -210,14 +210,6 @@ impl StateManager for AppState {
             }
     }
 
-    fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {
-        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
-
-        state.saved_refs.insert(session_id, default_refs);
-
-        Ok(())
-    }
-
     fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
         let state: MutexGuard<AppStateInternal> = self.inner()?;
 
@@ -235,17 +227,6 @@ impl StateManager for AppState {
         state.saved_refs.insert(session_id, default_refs);
 
         Ok(())
-    }
-
-    fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
-        let state: MutexGuard<AppStateInternal> = self.inner()?;
-
-        let refs_opt: Option<&Vec<(i32, String)>> = state.saved_refs.get(&session_id);
-
-        match refs_opt {
-            Some(refs) => Ok(refs.clone()),
-            None => Ok(Vec::new()),
-        }
     }
 
     fn reset_trees(&self) -> Result<(), StateError> {
