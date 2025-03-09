@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use crate::events::Event;
 use crate::trees::{DebugTree, DebugNode};
 
-pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<(i32, Vec<(i32, String)>)>;
+pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
 
 use super::session_counter::SessionCounter;
 use super::{StateError, StateManager, AppHandle};
@@ -148,12 +148,12 @@ impl StateManager for AppState {
         self.inner()?.app.emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
         self.inner()?
             .skips_tx
             .remove(&session_id)
             .ok_or(StateError::ChannelError)?
-            .send((skips, new_refs))
+            .send(skips)
             .map_err(|_| StateError::ChannelError)
     }
     

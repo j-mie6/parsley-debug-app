@@ -69,8 +69,8 @@ object TreeViewController {
       */
     def skipBreakpoints(sessionId: EventStream[Int]): EventStream[Either[DillException, Unit]] = {
         sessionId
-            .withCurrentValueOf(SettingsViewController.getNumSkipBreakpoints.signal, StateManagementViewController.getRefs)
-            .map((sessionId, skips, refs) => (sessionId, skips - 1, refs))
+            .withCurrentValueOf(SettingsViewController.getNumSkipBreakpoints.signal)
+            .map((sessionId, skips) => (sessionId, skips - 1))
             .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _))
     }
         

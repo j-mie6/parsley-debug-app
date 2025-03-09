@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 
-pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<(i32, Vec<(i32, String)>)>;
+pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
 
 #[cfg_attr(test, automock)]
 pub trait StateManager: Send + Sync + 'static {
@@ -19,7 +19,7 @@ pub trait StateManager: Send + Sync + 'static {
 
     fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError>;
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError>;
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError>;
 
     fn get_download_path(&self) -> Result<PathBuf, StateError>;
 

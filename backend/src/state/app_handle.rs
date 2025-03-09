@@ -47,8 +47,8 @@ impl StateManager for tauri::AppHandle {
             .map_err(|_| StateError::EventEmitFailed)
     }
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
-        self.state::<AppState>().transmit_breakpoint_skips(session_id, skips, new_refs)
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
+        self.state::<AppState>().transmit_breakpoint_skips(session_id, skips)
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
