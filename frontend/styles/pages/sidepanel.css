@@ -33,23 +33,99 @@
 }
 
 
+.sidepanel-items-container {
+    padding: 1vh 0.5vw;
+    
+    display: flex;
+    flex-direction: column;
+    align-content: stretch;
+    gap: 2vh;
+
+    margin-bottom: 2vh;
+
+    overflow-y: auto;
+}
+
+.sidepanel-item-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
+    border: 2px solid var(--font-color-tertiary);
+    border-radius: 8px;
+
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.sidepanel-item-container:hover {
+    background: var(--background-tertiary-20);
+}
+
+.sidepanel-item-title {
+    font-weight: 600;
+    font-size: large;
+    color: var(--font-color-primary);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.sidepanel-item-value {
+    font-style: italic;
+}
+
+.sidepanel-item-container input {
+    margin: 0.3rem 0;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9rem;
+  
+    border: 1px solid var(--font-color-tertiary);
+    border-radius: 5px;
+  
+    color: var(--font-color-tertiary);
+    background-color: var(--background-secondary);
+
+    appearance: textfield;
+    -moz-appearance: textfield;
+
+    outline: none;
+}
+
+.sidepanel-item-container input::-webkit-outer-spin-button,
+.sidepanel-item-container input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
 .sidepanel-footer {
     display: flex;
     flex-direction: row;
     
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
 
-    margin-top: auto;
+    gap: 1rem;
+    height: 4vh;
+    
+    margin-bottom: 2vh;
 }
 
 .sidepanel-footer button {
-    padding: 0.8rem 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    background: var(--background-primary);
+    padding: 0.75vh 1vw;
+    
     color: var(--font-color-primary);
-
-    border: none;
+    background-color: var(--background-primary);
+    border: 2px solid var(--font-color-tertiary);
     border-radius: 8px;
 
     cursor: pointer;

@@ -15,10 +15,10 @@ object StateManagementView {
         val refValue: String = ref._2
 
         div(
-            className := "ref-container",
+            className := "sidepanel-item-container",
             
             div(
-                className := "ref-title",
+                className := "sidepanel-item-title",
                 text <-- StateManagementViewController.getRefNumber(refAddr)
                     .map(i => s"R${StateRef.subscriptInt(i)}")
             ),
@@ -49,11 +49,13 @@ object StateManagementView {
             )) <-- StateManagementViewController.refsEmptySignal,
 
             div(
-                className := "state-contents",
+                className := "sidepanel-items-container",
                 children <-- StateManagementViewController.getRefs.signal.map(_.map(renderReference))
             ),
+            
+            div(flexGrow := 1),
 
-            div(
+            div(    
                 className := "sidepanel-footer",
 
                 child(button("Apply", onClick --> (_ => 

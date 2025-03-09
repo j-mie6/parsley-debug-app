@@ -46,10 +46,10 @@ private case class SettingView(setting: UserSetting) {
     
     def render: HtmlElement = {        
         div(
-            className := "single-setting-container",
+            className := "sidepanel-item-container",
 
             div(
-                className := "single-setting-name",
+                className := "sidepanel-item-name",
                 setting.settingName,
             ),
 
@@ -72,9 +72,11 @@ object SettingsView {
             div(className := "sidepanel-header", "Settings"),
             
             div(
-                className := "settings-content",
+                className := "sidepanel-items-container",
                 allUserSettings.map(SettingView(_).render),
             ),
+
+            div(flexGrow := 1),
 
             div(
                 className := ("sidepanel-footer"),
