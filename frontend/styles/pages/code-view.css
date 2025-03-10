@@ -3,21 +3,42 @@
     flex-direction: row;
     padding: 10px;
     padding-top: 0px;
+    margin-top: 2vh;
     font-size: 16px;
 }
 
 .code-view-file-view {
+    text-align: left;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 18px;
+    font-family: "Fira Code", "Courier New", monospace;
+    
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
+    
+    border: 2px solid var(--background-tertiary);
+    border-radius: 6px;
+    padding: 15px;
+    
+    max-height: 65vh;
+    box-sizing: border-box;
+
+    overflow: auto;
 }
 
 .code-view-file-view-wrapper {
-    flex: 1;
-    margin-left: 20px;
-    padding: 7px;
-    margin-right: 12px;
-    background-color: #bdbdbd1f;
-    border: 1px solid var(--background-tertiary-40);
-    height: calc(100vh - 260px);
-    overflow-y: auto;
+    width: 80%;
+    max-width: 70vw;
+    max-height: 70vh;
+
+    padding: 2px;
+    margin: 0px auto;
+
+    background-color: var(--background-tertiary);
+    border-radius: 8px;
+
+    overflow: hidden;
 }
 
 .code-view-file-explorer {
