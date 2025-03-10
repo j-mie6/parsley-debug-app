@@ -5,6 +5,7 @@ use crate::{state::StateError, trees::DebugTree};
 pub enum Event<'a> {
     TreeReady(&'a DebugTree),   /* Tree is ready for loading in frontend */
     NewTree,                    /* New tree is sent from RemoteView */
+    SourceFile(&'a String),     /* Source file requested is sent */
 }
 
 impl Event<'_> {
@@ -14,6 +15,7 @@ impl Event<'_> {
         match self {
             Event::TreeReady(_) => "tree-ready",
             Event::NewTree => "new-tree",
+            Event::SourceFile(_) => "upload-code-file"
         }.to_string()
     }
 
@@ -22,6 +24,7 @@ impl Event<'_> {
         match self {
             Event::TreeReady(tree) => serde_json::to_string(tree),
             Event::NewTree => serde_json::to_string(&()),
+            Event::SourceFile(contents) => serde_json::to_string(contents),
         }.map_err(EventError::from)
     }
 

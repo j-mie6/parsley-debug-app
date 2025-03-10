@@ -60,9 +60,29 @@
     margin-block: auto;
 }
 
+.debug-view-body {
+    display: flex;
+    flex-direction: row;
+    align-content: stretch;
+    justify-content: space-between;
+
+    height: 100%;
+    padding: 2vh 1vw;
+    gap: 1.25vw;
+
+    overflow: hidden;
+}
+
+.tab-and-tree-view-container {
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
 .debug-view-page {
     box-sizing: border-box;
-    padding: 30px;
     padding-top: 10px;
     width: 100vw;
     height: 100vh;
@@ -71,7 +91,8 @@
     flex-direction: column;
 }
 
-.debug-view-button-bar {
+.debug-view-left-button-bar {
+    border-radius: 20px;
     background-color: var(--background-secondary);
     z-index: 1;
     position: sticky;
@@ -86,15 +107,29 @@
     align-items: center;
 }
 
-.debug-view-button-info {
-    font-size: 22px;
+.debug-view-right-button-bar {
+    display: flex;
+    align-items: center;
     margin-right: 2px;
+    gap: 18px;
+    font-size: 22px;
 }
 
 .debug-view-button-settings {
-    font-size: 30px;
-    margin-left: 5px;
+    font-size: 30px; 
 }
+
+
+/* Makes button disappear if screen size is too small */
+@media (max-width: 450px) {
+    .debug-view-button-download {
+        display: none;
+    }
+    .debug-view-button-upload {
+        display: none;
+    }
+}
+
 
 .debug-view-button {
     cursor: pointer;
@@ -127,7 +162,7 @@
     padding-block: 4px;
 }
 
-.debug-view-source-button {
+.debug-view-input-button {
     font-size: 25px;
     padding-inline: 7px;
     padding-block: 4px;
@@ -143,12 +178,16 @@
     font-size: 20px;
 }
 
+.debug-view-button-breakpoint-skip {
+    color: var(--font-color-debug);
+}
+
 .debug-view-expand-tree.expanded {
     width: 105px;
 }
 
-.debug-view-expand-source.expanded {
-    width: 132px;
+.debug-view-expand-input.expanded {
+    width: 118px;
 }
 
 .debug-view-expand-code.expanded {

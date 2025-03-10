@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{DebugNode, DebugTree};
 
 /* Represents tree received from parsley-debug-views' Remote View*/
@@ -11,20 +13,48 @@ pub struct ParsleyNode {
     from_offset: i32,           /* Offset into the input in which this node's parse attempt starts */
     to_offset: i32,             /* Offset into the input in which this node's parse attempt finished */
     children: Vec<ParsleyNode>, /* The children of this node */
-    is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
+
+    /* Whether this node needs bubbling (iterative and transparent) */
+    #[serde(default = "ParsleyTree::default_bool")] is_iterative: bool, 
+
+    /* Whether this node was generated since the previous breakpoint */
+    #[serde(default = "ParsleyTree::default_bool")] newly_generated: bool, 
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ParsleyTree {
-    input: String,       /* The input string being parsed */
-    root: ParsleyNode,   /* Root node of the debug tree */
-    is_debuggable: bool, /* If this tree was produced by a currently-running parser */
+    input: String,              /* The input string being parsed */
+    root: ParsleyNode,          /* Root node of the debug tree */
+
+    parser_info: HashMap<String, Vec<(i32, i32)>>, /* Map from srcFile => List of parser indexes */
+
+    /* If this tree was produced by a currently-running parser */
+    #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool,
+
+    /* State references to be modified */
+    #[serde(default = "Vec::new")] refs: Vec<(i32, String)>, 
+
+    /* If this tree was produced by a currently-running parser */
+    #[serde(default = "ParsleyTree::default_session_id")] session_id: i32, 
 }
 
 impl ParsleyTree {
-    pub fn is_debugging(&self) -> bool {
+    pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
+    }
+
+    /* Function used by serde to parse default boolean values as false */
+    fn default_bool() -> bool { false } 
+
+    pub fn get_session_id(&self) -> i32 {
+        self.session_id
+    }
+
+    fn default_session_id() -> i32 { -1 }
+
+    pub fn set_session_id(&mut self, session_id: i32) {
+        self.session_id = session_id
     }
 }
 
@@ -61,7 +91,8 @@ impl From<ParsleyTree> for DebugTree {
                 child_id,
                 input_slice,
                 children,
-                node.is_iterative
+                node.is_iterative,
+                node.newly_generated,
             )
         }
 
@@ -69,8 +100,10 @@ impl From<ParsleyTree> for DebugTree {
         let mut current_id: u32 = 0;
 
         /* Convert the root node and return DebugTree */
+        let session_id = tree.get_session_id();
+        let is_debuggable = tree.is_debuggable();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, tree.is_debuggable)
+        DebugTree::new(tree.input, node, tree.parser_info, is_debuggable, tree.refs, session_id)
     }
 }
 
@@ -79,6 +112,8 @@ impl From<ParsleyTree> for DebugTree {
 pub mod test {
 
     /* Data unit testing */
+
+    use std::collections::HashMap;
 
     use super::{ParsleyNode, ParsleyTree};
     use crate::trees::{debug_tree, DebugTree};
@@ -96,7 +131,9 @@ pub mod test {
                 "children": [],
                 "isIterative": false
             },
-            "isDebuggable": false
+            "parserInfo" : {},
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -158,7 +195,9 @@ pub mod test {
                 ],
                 "isIterative": false
             },
-            "isDebuggable": false
+            "parserInfo" : {},
+            "isDebuggable": false,
+            "refs": []
         }"#
         .split_whitespace()
         .collect()
@@ -174,10 +213,14 @@ pub mod test {
                 child_id: 0,
                 from_offset: 0,
                 to_offset: 4,
-                children: vec![],
-                is_iterative: false
+                children: Vec::new(),
+                is_iterative: false,
+                newly_generated: false,
             },
+            parser_info: HashMap::new(),
             is_debuggable: false,
+            refs: Vec::new(),
+            session_id: -1,
         }
     }
 
@@ -207,11 +250,13 @@ pub mod test {
                                 child_id: 2,
                                 from_offset: 2,
                                 to_offset: 3,
-                                children: vec![],
-                                is_iterative: false
+                                children: Vec::new(),
+                                is_iterative: false,
+                                newly_generated: false,
                             }
                         ],
-                        is_iterative: false
+                        is_iterative: false,
+                        newly_generated: false,
                     },
                     ParsleyNode {
                         name: String::from("3"),
@@ -228,16 +273,22 @@ pub mod test {
                                 child_id: 4,
                                 from_offset: 4,
                                 to_offset: 5,
-                                children: vec![],
-                                is_iterative: false
+                                children: Vec::new(),
+                                is_iterative: false,
+                                newly_generated: false,
                             }
                         ],
-                        is_iterative: false
+                        is_iterative: false,
+                        newly_generated: false,
                     }
                 ],
                 is_iterative: false,
+                newly_generated: false,
             },
+            parser_info: HashMap::new(),
             is_debuggable: false,
+            refs: Vec::new(),
+            session_id: -1,
         }
     }
 

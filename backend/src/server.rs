@@ -3,7 +3,7 @@ mod request;
 mod server_state;
 
 pub use launch::launch;
-pub use server_state::{ServerState, SkipsReceiver};
+pub use server_state::ServerState;
 
 pub type TokioMutex<T> = rocket::tokio::sync::Mutex<T>;
 
@@ -12,7 +12,6 @@ pub mod test {
 
     use mockall::predicate;
     use rocket::{http, local::blocking};
-    use rocket::tokio::sync::mpsc;
 
     use super::{launch, ServerState};
     use crate::events::Event;
@@ -25,14 +24,8 @@ pub mod test {
     /* Start a blocking, tracked client for rocket
     The mock should already be set with expectations */
     pub fn tracked_client(mock: MockStateManager) -> blocking::Client {
-        let rx = empty_channel::<i32>();
-        let state = ServerState::new(mock, super::TokioMutex::new(rx));
+        let state = ServerState::new(mock);
         blocking::Client::tracked(launch::build(state)).expect("Could not launch rocket")
-    }
-
-    pub fn empty_channel<T>() -> mpsc::Receiver<T> {
-        let (_, rx) = mpsc::channel::<T>(1);
-        rx
     }
 
     #[test]
@@ -52,6 +45,8 @@ pub mod test {
         mock.expect_get_tree()
             .times(NUM_REPEATS)
             .returning(|| Ok(debug_tree::test::tree()));
+
+        mock.expect_next_session_id().returning(|| Ok(-1));
 
         let client: blocking::Client = tracked_client(mock);
 

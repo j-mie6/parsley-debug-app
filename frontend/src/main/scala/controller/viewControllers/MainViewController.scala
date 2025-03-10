@@ -7,6 +7,7 @@ import org.scalajs.dom
 import view.DebugViewPage
 import view.InputView
 import view.TreeView
+import view.CodeView
 
 /**
  * Object containing functions and variables for the main view,cconditionally
@@ -18,7 +19,7 @@ object MainViewController {
     enum View(val elem: HtmlElement) {
         case Tree extends View(TreeView())
         case Input extends View(InputView())
-        case Code extends View(InputView()) // TODO
+        case Code extends View(CodeView())
     }
 
     /* Current view selected */
@@ -41,7 +42,7 @@ object MainViewController {
 
     def renderViewButton(view: View, openSemaphore: Var[Int]): HtmlElement = view match {
         case View.Tree =>   renderButton("tree", "tree-fill", "Tree View", View.Tree, openSemaphore)
-        case View.Input =>  renderButton("source", "file-earmark-text-fill", "Source View", View.Input, openSemaphore)
+        case View.Input =>  renderButton("input", "file-earmark-text-fill", "Input View", View.Input, openSemaphore)
         case View.Code =>   renderButton("code", "file-earmark-code-fill", "Code View", View.Code, openSemaphore)
     }
 
@@ -53,5 +54,4 @@ object MainViewController {
 
     /** Get selected view element */
     val getViewElem: Signal[HtmlElement] = view.signal.map(_.elem)
-
 }

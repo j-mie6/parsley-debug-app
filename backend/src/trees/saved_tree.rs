@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{DebugNode, DebugTree};
 
 /* Struct identical to DebugTree that allows serialized saving */
@@ -5,7 +7,10 @@ use super::{DebugNode, DebugTree};
 pub struct SavedTree {
     input: String,
     root: SavedNode,
+    parser_info: HashMap<String, Vec<(i32, i32)>>,
     is_debuggable: bool,
+    refs: Vec<(i32, String)>,
+    session_id: i32,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -18,7 +23,8 @@ pub struct SavedNode {
     pub input: String,              /* Offset into the input in which this node's parse attempt finished */
     pub children: Vec<SavedNode>,   /* The children of this node */
     pub is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
-} 
+    pub newly_generated: bool,      /* Whether this node was generated since the previous breakpoint */
+}
 
 impl From<DebugTree> for SavedTree {
     fn from(debug_tree: DebugTree) -> Self {
@@ -39,22 +45,26 @@ impl From<DebugTree> for SavedTree {
                 node.child_id,
                 node.input,
                 children,
-                node.is_iterative
+                node.is_iterative,
+                node.newly_generated,
             )
         }
 
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
   
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.is_debuggable())
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_parser_info().clone(), debug_tree.is_debuggable(), debug_tree.refs(), debug_tree.get_session_id())
     }
 }
 
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, is_debuggable: bool) -> Self {
+    pub fn new(input: String, root: SavedNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>, session_id: i32) -> Self {
         SavedTree { 
             input,
             root,
+            parser_info,
             is_debuggable,
+            refs,
+            session_id,
         }
     }
 
@@ -66,15 +76,27 @@ impl SavedTree {
         &self.input
     }
 
+    pub fn get_parser_info(&self) -> &HashMap<String, Vec<(i32, i32)>> {
+        &self.parser_info
+    }
+
     pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
+    }
+
+    pub fn refs(&self) -> Vec<(i32, String)> {
+        self.refs.clone()
+    }
+
+    pub fn get_session_id(&self) -> i32 {
+        self.session_id
     }
 }
 
 impl SavedNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool, 
             child_id: Option<u32>, input: String, children: Vec<SavedNode>,
-            is_iterative: bool) -> Self {
+            is_iterative: bool, newly_generated: bool) -> Self {
 
         SavedNode {
             node_id,
@@ -84,7 +106,8 @@ impl SavedNode {
             child_id,
             input,
             children,
-            is_iterative
+            is_iterative,
+            newly_generated,
         }
     }
 }
@@ -97,6 +120,7 @@ pub mod test {
 
     /* Saved Tree unit testing */
 
+    use std::collections::HashMap;
     use std::io::Write;
     use std::fs::{self, File};
 
@@ -115,9 +139,13 @@ pub mod test {
                 "child_id": 0,
                 "input": "Test",
                 "children": [],
-                "is_iterative": false
+                "is_iterative": false,
+                "newly_generated": false
             },
-            "is_debuggable": false
+            "parser_info" : {},
+            "is_debuggable": false,
+            "refs": [],
+            "session_id": -1
         }"#
         .split_whitespace()
         .collect()
@@ -150,10 +178,12 @@ pub mod test {
                                 "child_id": 2,
                                 "input": "2",
                                 "children": [],
-                                "is_iterative": false
+                                "is_iterative": false,
+                                "newly_generated": false
                             }
                         ],
-                        "is_iterative": false
+                        "is_iterative": false,
+                        "newly_generated": false
                     },
                     {
                         "node_id": 3,
@@ -171,15 +201,21 @@ pub mod test {
                                 "child_id": 4,
                                 "input": "4",
                                 "children": [],
-                                "is_iterative": false
+                                "is_iterative": false,
+                                "newly_generated": false
                             }
                         ],
-                        "is_iterative": false
+                        "is_iterative": false,
+                        "newly_generated": false
                     }
                 ],
-                "is_iterative": false
+                "is_iterative": false,
+                "newly_generated": false
             },
-            "is_debuggable": false
+            "parser_info" : {},
+            "is_debuggable": false,
+            "refs": [],
+            "session_id": -1
         }"#
         .split_whitespace()
         .collect()
@@ -196,9 +232,13 @@ pub mod test {
                 Some(0),
                 String::from("Test"),
                 Vec::new(),
+                false,
                 false
             ),
-            false
+            HashMap::new(),
+            false,
+            Vec::new(),
+            -1
         )
     }
     
@@ -228,10 +268,12 @@ pub mod test {
                                 true,
                                 Some(2),
                                 String::from("2"),
-                                vec![],
+                                Vec::new(),
+                                false,
                                 false
                             )
                         ],
+                        false,
                         false
                     ),
                     SavedNode::new(
@@ -249,16 +291,22 @@ pub mod test {
                                 true,
                                 Some(4),
                                 String::from("4"),
-                                vec![],
+                                Vec::new(),
+                                false,
                                 false
                             )
                         ],
+                        false,
                         false
                     )
                 ],
+                false,
                 false
             ),
-            false
+            HashMap::new(),
+            false,
+            Vec::new(),
+            -1
         )
     }
 
