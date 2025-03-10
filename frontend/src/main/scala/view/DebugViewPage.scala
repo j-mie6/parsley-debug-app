@@ -259,19 +259,22 @@ abstract class DebugViewPage extends Page {
                         TabView()
                     ),
                     
-                    div(
-                        className := "debug-view-button-bar",
-                        cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
-                        leftButtonBar,
-                        rightButtonBar,
-                    ),
-                    
-                    div(
+                    div (
                         className := "tree-view-page",
                         cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
                         
-                        childElem.getOrElse(div())
-                    )
+                        div(
+                            className := "debug-view-button-bar",
+                            leftButtonBar,
+                            rightButtonBar,
+                        ),
+
+                        div(
+                            className := "tree-view-page-scroll",
+                            
+                            childElem.getOrElse(div())
+                        )
+                    ),
                 ),
 
                 child(StateManagementView()) <-- StateManagementViewController.isStateOpen,

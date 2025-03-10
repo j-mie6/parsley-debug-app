@@ -105,30 +105,14 @@
 
     box-sizing: border-box;
     width: 100%;
-    height: 8vh;
-    
-    border: 2px solid transparent;
-    border-bottom: none;
-    
+    height: 10%;
     padding: 2vh 2vw;
     
-    box-shadow: 0 4px -12px rgba(0, 0, 0, 0.2);
-    
     z-index: 1;
-    
-    border-radius: 20px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    
-    background-color: var(--background-secondary);
     
     font-size: 22px;
 
     overflow: hidden;
-}
-
-.debug-view-button-bar.highlight-debug-session {
-    animation: borderColorDebugAnim 1.8s infinite alternate ease-in !important;
 }
 
 .debug-view-left-button-bar {
