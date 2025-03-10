@@ -106,31 +106,31 @@ jobs:
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: dill-${{ matrix.platform }}.exe
-          path: ./backend/target/release/dill.exe
+          name: Dill-${{ matrix.platform }}.exe
+          path: ./backend/target/release/Dill.exe
           if-no-files-found: error
       
       - name: Upload app executable (Linux)
         if: matrix.platform == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: dill-${{ matrix.platform }}
-          path: ./backend/target/release/dill
+          name: Dill-${{ matrix.platform }}
+          path: ./backend/target/release/Dill
           if-no-files-found: error
 
       - name: Upload app executable (MacOS)
         if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: dill-${{ matrix.platform }}
-          path: ./backend/target/universal-apple-darwin/release/dill
+          name: Dill-${{ matrix.platform }}
+          path: ./backend/target/universal-apple-darwin/release/Dill
           if-no-files-found: error
 
       - name: Upload app bundles (Linux and Windows)
         if: matrix.platform == 'windows-latest' || matrix.platform == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
-            name: dill-bundles-${{ matrix.platform }}
+            name: Dill-bundles-${{ matrix.platform }}
             path: ./backend/target/release/bundle/
             if-no-files-found: error
       
@@ -138,6 +138,6 @@ jobs:
         if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-            name: dill-bundles-${{ matrix.platform }}
+            name: Dill-bundles-${{ matrix.platform }}
             path: ./backend/target/universal-apple-darwin/release/bundle/
             if-no-files-found: error
