@@ -7,6 +7,7 @@
 @import url('frontend/styles/displays/debug-tree.css');
 @import url('frontend/styles/displays/popup.css');
 @import url('frontend/styles/displays/toast.css');
+@import url('frontend/styles/pages/help-section.css');
 @import url('frontend/styles/icons/bootstrap-icons.min.css');
 
 @font-face {

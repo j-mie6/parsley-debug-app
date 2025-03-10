@@ -95,7 +95,10 @@ impl From<StateError> for SaveTreeError {
 
 /* Downloads the tree into Downloads folder */
 #[tauri::command]
-pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), DownloadTreeError> {
+pub fn download_tree(state: tauri::State<AppState>, index: usize) -> Result<(), DownloadTreeError> {
+    /* Get tree name from index */
+    let tree_name: String = state.get_tree_name(index)?;
+    
     /* Path to the json file used to store the tree */
     let file_path: String = format_filepath(&tree_name);
 
@@ -139,7 +142,7 @@ pub fn import_tree(tree_name: String, contents: String, state: tauri::State<AppS
     imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteToFileFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
-    load_path(app_path, &state)?;
+    load_path(app_path, true, &state)?;
     state.emit(Event::NewTree).map_err(ImportTreeError::from)
 }
 
@@ -232,11 +235,11 @@ pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<()
 
     /* Get the file path of the tree to be reloaded */
     let file_path: String = format_filepath(&tree_name);
-    load_path(file_path, &state)
+    load_path(file_path, false, &state)
 }
-    
+
 /* Loads a tree from the specified file path */
-fn load_path(file_path: String, state: &tauri::State<AppState>) -> Result<(), LoadTreeError> {
+fn load_path(file_path: String, is_import: bool, state: &tauri::State<AppState>) -> Result<(), LoadTreeError> {
     /* Read the contents of the file as a string */
     let contents: String = fs::read_to_string(file_path)
         .map_err(|_| LoadTreeError::ReadFileFailed)?;
@@ -245,7 +248,14 @@ fn load_path(file_path: String, state: &tauri::State<AppState>) -> Result<(), Lo
     /* Deserialize the tree into SavedTree, then convert to DebugTree */
     let saved_tree: SavedTree = serde_json::from_str(&contents).map_err(|_| LoadTreeError::DeserialiseFailed)?;
 
-    let tree: DebugTree = DebugTree::from(saved_tree);
+    let mut tree: DebugTree = DebugTree::from(saved_tree);
+
+    /* If we are importing the tree, we must turn debugging off and give it a new session_id */
+    if is_import {
+        tree.set_is_debugging(false);
+        let session_id: i32 = state.next_session_id()?;
+        tree.set_session_id(session_id);
+    }
 
     /* Update the global tauri state with the reloaded tree */
     state.set_tree(tree)?;

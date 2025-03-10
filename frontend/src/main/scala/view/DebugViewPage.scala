@@ -13,16 +13,19 @@ import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.features.unitArrows
 import org.scalajs.dom
 
+
 import model.Page
 import model.errors.DillException
 import model.toast.TreeUploadFailed
 import model.toast.TreeUploaded
 import model.toast.TreeDownloaded
 import model.toast.TreeDownloadFailed
+import view.HelpView
 import view.SettingsView
 import view.StateManagementView
 import controller.AppStateController
 import controller.errors.ErrorController
+import controller.viewControllers.HelpViewController
 import controller.viewControllers.InputViewController
 import controller.viewControllers.MainViewController
 import controller.viewControllers.MainViewController.View
@@ -60,10 +63,9 @@ abstract class DebugViewPage extends Page {
 
         /* Exports current tree */
         onClick(_
-            .compose(event => event.sample(TabViewController.getSelectedTab))
-            .flatMapSwitch(TabViewController.getFileName)
+            .sample(TabViewController.getSelectedTab)
             .flatMapMerge(TreeViewController.downloadTree)
-            .map {
+        .map {
                 case Left(_) => TreeDownloadFailed
                 case Right(_) =>  TreeDownloaded
             }
@@ -115,10 +117,11 @@ abstract class DebugViewPage extends Page {
     }
 
                 
-    /* Overview information tab. */
-    private lazy val infoButton: HtmlElement = button(
+    /* Overview help popup */
+    private lazy val helpButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-info",
-        i(className := "bi bi-info-circle-fill"),
+        i(className := "bi bi-question-circle-fill"),
+        onClick --> (_ => HelpViewController.openPopup())
     )
 
     private lazy val stateButton: HtmlElement = button(
@@ -228,7 +231,7 @@ abstract class DebugViewPage extends Page {
             child(downloadButton) <-- TreeViewController.treeExists,
             uploadButton,
             stateButton,
-            infoButton,
+            helpButton,
         )
     }
 
@@ -246,7 +249,7 @@ abstract class DebugViewPage extends Page {
             headerView,
             div(
                 className := "debug-view-body",
-                
+                child(HelpView(HelpViewController.getActiveSection)) <-- HelpViewController.isPopupOpen,
                 child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
                 
                 div(
