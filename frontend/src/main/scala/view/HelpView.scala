@@ -33,7 +33,7 @@ object HelpView {
                 div(cls("help-progress-container"),
                     div(
                         cls("help-progress-fill"),
-                        width <-- HelpViewController.progressPercentage.map(p => s"${p}%") // Dynamic width
+                        width <-- HelpViewController.progressPercentage.map(p => s"${p}%")
                     )
                 )
             )
