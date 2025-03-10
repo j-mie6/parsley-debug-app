@@ -205,11 +205,11 @@ abstract class DebugViewPage extends Page {
 
     /* Button bar internal to the view. */
     private lazy val buttonBar: HtmlElement = div(
-        className := "debug-view-left-button-bar",
+        className := "debug-view-button-bar",
+
         /* Button bar left. */
         div(
-            display.flex,
-            alignItems.center,
+            className := "debug-view-left-button-bar",
 
             onMouseEnter.mapTo(2) --> viewCloseSemaphoreIncrement,
             onMouseEnter(_.delay(mouseEnterOpenDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
@@ -220,11 +220,12 @@ abstract class DebugViewPage extends Page {
             MainViewController.renderViewButton(View.Input, viewCloseSemaphore),
             MainViewController.renderViewButton(View.Code, viewCloseSemaphore),
         ),
+        
         /* Button bar right. */
         div(
             className := "debug-view-right-button-bar",
+
             child(div(breakpointSkipButton)) <-- TreeViewController.isDebuggingSession,
-            /* Render download button */
             child(downloadButton) <-- TreeViewController.treeExists,
             uploadButton,
             stateButton,

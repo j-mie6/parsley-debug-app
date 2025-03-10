@@ -101,45 +101,51 @@
     flex-direction: column;
 }
 
-.debug-view-left-button-bar {
-    border-radius: 20px;
-    background-color: var(--background-secondary);
-    z-index: 1;
+.debug-view-button-bar {    
     position: sticky;
     top: 0px;
-    left: 0px;
-    padding: 15px;
-    padding-left: 13px;
-    padding-right: 20px;
+    left: 0px;  
+    right: 0px;
+
+    width: 100%;
+    height: 38px;
+    
+    margin-bottom: 10vh;
+
+    z-index: 1;
+    
+    border-radius: 20px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    
+    background-color: var(--background-secondary);
+    
+    font-size: 22px;
+
+    overflow: hidden;
+}
+
+.debug-view-left-button-bar {
+    float: left;
+
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    justify-content: start;
     align-items: center;
 }
 
 .debug-view-right-button-bar {
+    float: right;
+    
+    height: inherit;
+
     display: flex;
+    justify-content: end;
     align-items: center;
+    
     margin-right: 2px;
+    
     gap: 18px;
-    font-size: 22px;
 }
-
-.debug-view-button-settings {
-    font-size: 30px; 
-}
-
-
-/* Makes button disappear if screen size is too small */
-@media (max-width: 450px) {
-    .debug-view-button-download {
-        display: none;
-    }
-    .debug-view-button-upload {
-        display: none;
-    }
-}
-
 
 .debug-view-button {
     cursor: pointer;
@@ -149,10 +155,15 @@
 .debug-view-select-button {
     cursor: pointer;
     transition: color 0.5s;
+    
     color: var(--font-color-tertiary);
+    
     border: 1px solid var(--font-color-tertiary);
     border-radius: 15px;
+
     margin-left: 13px;
+    padding-inline: 7px;
+    padding-block: 4px;
 }
 
 .debug-view-select-button.selected {
@@ -160,32 +171,17 @@
     background-color: var(--font-color-tertiary);
 }
 
-.debug-view-tree-button {
-    font-size: 25px;
-    padding-inline: 7px;
-    padding-block: 4px;
-}
-
-.debug-view-code-button {
-    font-size: 25px;
-    padding-inline: 7px;
-    padding-block: 4px;
-}
-
-.debug-view-input-button {
-    font-size: 25px;
-    padding-inline: 7px;
-    padding-block: 4px;
-}
-
 .debug-view-expand-button {
-    white-space: nowrap;
-    overflow: hidden;
     width: 0;
+    white-space: nowrap;
+    
+    margin-left: 0px;
+    
+    font-size: 16px;
+    
     transition: margin-left 0.5s;
     transition: width 0.5s;
-    margin-left: 0px;
-    font-size: 20px;
+    overflow: hidden;
 }
 
 .debug-view-button-breakpoint-skip {
@@ -193,13 +189,13 @@
 }
 
 .debug-view-expand-tree.expanded {
-    width: 105px;
+    width: 90px;
 }
 
 .debug-view-expand-input.expanded {
-    width: 118px;
+    width: 100px;
 }
 
 .debug-view-expand-code.expanded {
-    width: 113px;
+    width: 100px;
 }
