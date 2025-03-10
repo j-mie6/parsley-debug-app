@@ -4,14 +4,11 @@
     flex: 1;
     
     width: 80%;
-    max-width: 1200px;
+    max-width: 70vw;
     max-height: 70vh;
 
-    padding: 2px;
     margin: 20px auto;
 
-    background-color: var(--background-tertiary);
-    border-radius: 8px;
 
     overflow: hidden;
 }
@@ -24,9 +21,10 @@
     font-family: "Fira Code", "Courier New", monospace;
     color: var(--font-color-primary);
     background-color: var(--background-primary);
-    border-color: var(--background-tertiary);
-    border-width: 2px;
-    border-radius: 6px;
+
+    border: 2px solid var(--background-tertiary);
+    border-radius: 8px;
+
     word-wrap: break-word;
     overflow-x: auto;
     max-height: 70vh;
