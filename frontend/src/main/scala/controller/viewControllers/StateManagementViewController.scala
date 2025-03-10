@@ -90,13 +90,22 @@ object StateManagementViewController {
     * @param newRefs A sequence of (Int, String) pairs to replace the existing references.
     */
     def setRefs(newRefs: Seq[(Int, String)]): Unit = refs.set(newRefs)
-    
+
+    val setRefs: Observer[Seq[(Int, String)]] = refs.writer
+
     /**
     * Retrieves a signal of the current sequence of (reference address, reference value) pairs.
     *
     * @return A signal emitting the sequence of references.
     */
     def getRefs: Signal[Seq[(Int, String)]] = refs.signal
+
+    /**
+    * Retrieves a Var of the current sequence of (reference address, reference value) pairs.
+    *
+    * @return A Var emitting the sequence of references.
+    */
+    def getRefsVar: Var[Seq[(Int, String)]] = refs
     
     /**
     * Produces a signal that calculates the "reference number" (1-based index)
@@ -208,7 +217,7 @@ object StateManagementViewController {
     * Clears both the local (non-reactive) references and the reactive `refs`,
     * effectively resetting all reference data.
     */
-    def clearRefs(): Unit = {
+    def clearRefs: Observer[Unit] = Observer{_ =>
         localRefs = Nil
         origRefs = Nil
         refs.set(Nil)

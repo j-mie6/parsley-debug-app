@@ -78,8 +78,6 @@
 
     display: flex;
     flex-direction: column;
-
-    overflow: hidden;
 }
 
 
@@ -94,6 +92,7 @@
 }
 
 .debug-view-left-button-bar {
+    border-radius: 20px;
     background-color: var(--background-secondary);
     z-index: 1;
     position: sticky;
@@ -179,6 +178,10 @@
     font-size: 20px;
 }
 
+.debug-view-button-breakpoint-skip {
+    color: var(--font-color-debug);
+}
+
 .debug-view-expand-tree.expanded {
     width: 105px;
 }
@@ -190,10 +193,3 @@
 .debug-view-expand-code.expanded {
     width: 113px;
 }
-
-@media (max-width: 1024px) {
-    .debug-view-button-settings,
-    .debug-view-button-state {
-      display: none;
-    }
-  }

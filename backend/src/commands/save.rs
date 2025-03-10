@@ -95,7 +95,10 @@ impl From<StateError> for SaveTreeError {
 
 /* Downloads the tree into Downloads folder */
 #[tauri::command]
-pub fn download_tree(tree_name: String, state: tauri::State<AppState>) -> Result<(), DownloadTreeError> {
+pub fn download_tree(state: tauri::State<AppState>, index: usize) -> Result<(), DownloadTreeError> {
+    /* Get tree name from index */
+    let tree_name: String = state.get_tree_name(index)?;
+    
     /* Path to the json file used to store the tree */
     let file_path: String = format_filepath(&tree_name);
 
@@ -139,7 +142,7 @@ pub fn import_tree(tree_name: String, contents: String, state: tauri::State<AppS
     imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteToFileFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
-    load_path(app_path, &state)?;
+    load_path(app_path, true, &state)?;
     state.emit(Event::NewTree).map_err(ImportTreeError::from)
 }
 
@@ -187,7 +190,7 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
 
-    /* Will remove the session map entry if it exists */
+    /* Will remove the session map entry and saved refs if they exist */
     state.rmv_session_id(tree_name).map_err(|_| DeleteTreeError::SessionIdRemovalFail)?;
     
     /* Returns a list of the tree names that are left */
@@ -197,6 +200,15 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
         .map_err(|_| DeleteTreeError::SerialiseFailed)
 }
 
+/* Deletes all saved trees */
+#[tauri::command]
+pub fn delete_saved_trees(state: tauri::State<AppState>) -> Result<(), DeleteTreeError> {
+    state.reset_trees()?;
+
+    fs::remove_dir_all(SAVED_TREE_DIR).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
+    fs::create_dir(SAVED_TREE_DIR).map_err(|_| DeleteTreeError::FolderCreationFail)
+}
+
 #[derive(Debug, serde::Serialize)]
 pub enum DeleteTreeError {
     TreeFileRemoveFail,
@@ -204,6 +216,14 @@ pub enum DeleteTreeError {
     TreeRemovalFail,
     SerialiseFailed,
     SessionIdRemovalFail,
+    FolderCreationFail,
+    TreesResetFailed,
+}
+
+impl From<StateError> for DeleteTreeError {
+    fn from(_: StateError) -> Self {
+        DeleteTreeError::TreesResetFailed
+    }
 }
 
 
@@ -215,11 +235,11 @@ pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<()
 
     /* Get the file path of the tree to be reloaded */
     let file_path: String = format_filepath(&tree_name);
-    load_path(file_path, &state)
+    load_path(file_path, false, &state)
 }
-    
+
 /* Loads a tree from the specified file path */
-fn load_path(file_path: String, state: &tauri::State<AppState>) -> Result<(), LoadTreeError> {
+fn load_path(file_path: String, is_import: bool, state: &tauri::State<AppState>) -> Result<(), LoadTreeError> {
     /* Read the contents of the file as a string */
     let contents: String = fs::read_to_string(file_path)
         .map_err(|_| LoadTreeError::ReadFileFailed)?;
@@ -228,7 +248,14 @@ fn load_path(file_path: String, state: &tauri::State<AppState>) -> Result<(), Lo
     /* Deserialize the tree into SavedTree, then convert to DebugTree */
     let saved_tree: SavedTree = serde_json::from_str(&contents).map_err(|_| LoadTreeError::DeserialiseFailed)?;
 
-    let tree: DebugTree = DebugTree::from(saved_tree);
+    let mut tree: DebugTree = DebugTree::from(saved_tree);
+
+    /* If we are importing the tree, we must turn debugging off and give it a new session_id */
+    if is_import {
+        tree.set_is_debugging(false);
+        let session_id: i32 = state.next_session_id()?;
+        tree.set_session_id(session_id);
+    }
 
     /* Update the global tauri state with the reloaded tree */
     state.set_tree(tree)?;
@@ -257,4 +284,50 @@ impl From<StateError> for LoadTreeError {
 
 fn format_filepath(tree_name: &str) -> String {
     format!("{}{}.json", SAVED_TREE_DIR, tree_name)
+}
+
+/* Updates local changed references for a tree */
+#[tauri::command]
+pub fn update_refs(new_refs: Vec<(i32, String)>, state: tauri::State<AppState>) -> Result<(), RefError>  {
+    let session_id: i32 = state.get_tree()?.get_session_id();
+
+    Ok(state.update_refs(session_id, new_refs)?)
+}
+
+/* Retrieves local changed references for a tree */
+#[tauri::command]
+pub fn get_refs(session_id: i32, state: tauri::State<AppState>) -> Result<String, RefError>  {
+    let refs: Vec<(i32, String)> = state.get_refs(session_id)?;
+
+    serde_json::to_string_pretty(&refs)
+        .map_err(|_| RefError::RefMapFail)
+}
+
+/* Resets local changes to default for a tree's refs */
+#[tauri::command]
+pub fn reset_refs(state: tauri::State<AppState>) -> Result<String, RefError>  {
+    let debug_tree: DebugTree = state.get_tree()?;
+
+    let session_id: i32 = debug_tree.get_session_id();
+
+    let default_refs: Vec<(i32, String)> = debug_tree.refs();
+    state.reset_refs(session_id, default_refs.clone())?;
+    
+    serde_json::to_string_pretty(&default_refs)
+        .map_err(|_| RefError::RefMapFail)
+}
+
+#[derive(Debug, serde::Serialize)]
+#[allow(clippy::enum_variant_names)]
+pub enum RefError {
+    RefMapFail,
+}
+
+impl From<StateError> for RefError {
+    fn from(state_error: StateError) -> Self {
+        match state_error {
+            StateError::LockFailed => RefError::RefMapFail,
+            _ => panic!("Unexpected error on load_saved_tree"),
+        }
+    }
 }

@@ -7,6 +7,8 @@ import controller.ToastController
 import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TreeViewController
 import controller.viewControllers.TreeViewController.treeExists
+import controller.tauri.{Tauri, Command}
+
 
 object StateManagementView {
 
@@ -15,10 +17,10 @@ object StateManagementView {
         val refValue: String = ref._2
 
         div(
-            className := "ref-container",
+            className := "sidepanel-item-container",
             
             div(
-                className := "ref-title",
+                className := "sidepanel-item-title",
                 text <-- StateManagementViewController.getRefNumber(refAddr)
                     .map(i => s"R${StateRef.subscriptInt(i)}")
             ),
@@ -49,22 +51,26 @@ object StateManagementView {
             )) <-- StateManagementViewController.refsEmptySignal,
 
             div(
-                className := "state-contents",
+                className := "sidepanel-items-container",
                 children <-- StateManagementViewController.getRefs.signal.map(_.map(renderReference))
             ),
+            
+            div(flexGrow := 1),
 
-            div(
+            div(    
                 className := "sidepanel-footer",
 
-                child(button("Apply", onClick --> (_ => 
+                child(button("Apply", onClick --> (_ => {
                     StateManagementViewController.getLocalRefs.foreach(StateManagementViewController.updateNewRefValue)
+                    TreeViewController.setRefs(StateManagementViewController.getLocalRefs)
                     ToastController.setToast(StateApplied)
-                ))) <-- StateManagementViewController.refsEmptySignal.not,
+                }))) <-- StateManagementViewController.refsEmptySignal.not,
 
-                child(button("Restore Originals", onClick --> (_ => 
+                child(button("Restore Originals", onClick --> (_ => {
+                    TreeViewController.resetRefs().collectRight --> StateManagementViewController.getRefsVar
                     StateManagementViewController.getOrigRefs.foreach(StateManagementViewController.updateNewRefValue)
                     ToastController.setToast(StateApplied)
-                ))) <-- StateManagementViewController.refsEmptySignal.not,
+                }))) <-- StateManagementViewController.refsEmptySignal.not,
             ),
         )
     }

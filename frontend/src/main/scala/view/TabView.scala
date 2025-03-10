@@ -84,8 +84,7 @@ object TabView {
             /* Update tree on new tab selected */  
             TabViewController.getSelectedTab.changes
                 .flatMapMerge(TabViewController.loadSavedTree) 
-                .collectLeft --> controller.errors.ErrorController.setError, 
-
+                .collectLeft --> controller.errors.ErrorController.setError,
 
             /* If there are no tabs, unload tree and input from frontend */
             TabViewController.noSavedTrees.changes

@@ -91,7 +91,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
     /* Create channels */
     if is_debuggable {
-        let (tx, rx) = rocket::tokio::sync::oneshot::channel::<(i32, Vec<(i32, String)>)>();
+        let (tx, rx) = rocket::tokio::sync::oneshot::channel::<i32>();
 
         match state.new_receiver(session_id, rx) {
             Some(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Receiver already exists for this session id", session_id)),
@@ -99,6 +99,13 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
                 return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise transmitter in state", session_id));
             },
         };
+
+        /* Reset references for a post tree */
+        let res: Result<(), StateError> = state.inner().reset_refs(session_id, debug_tree.refs());
+
+        if let Err(_) = res {
+            return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not get internal lock", -1))
+        }
     }
 
     /* Format informative response for RemoteView */
@@ -131,7 +138,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
 
         Ok(()) => match state.receive_breakpoint_skips(session_id).await {
-            Some((skips, new_refs)) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, new_refs)),
+            Some(skips) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, state.get_refs(session_id).expect("Session ID should exist"))),
             None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
         },
 

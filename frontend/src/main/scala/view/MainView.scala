@@ -16,6 +16,7 @@ import controller.tauri.{Tauri, Event}
 import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController, StateManagementViewController}
 
 import model.{CodeFileInformation, DebugTree}
+import controller.tauri.Command
 
 object MainView extends DebugViewPage {
     
@@ -42,6 +43,11 @@ object MainView extends DebugViewPage {
 
         super.render(Some(
             div(
+                EventStream.fromValue(())
+                    .take(1)
+                    .flatMapTo(Tauri.invoke(Command.DeleteSavedTrees, ()))
+                    --> Observer.empty,
+                
                 /* Update DOM theme with theme value */
                 AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
 
@@ -86,7 +92,10 @@ object MainView extends DebugViewPage {
 
 
                 /* Load main page */
-                child <-- MainViewController.getViewElem,
+                div(
+                    overflow.hidden,
+                    child <-- MainViewController.getViewElem,
+                ),
 
                 /* Displaying Dill Exceptions */
                 child.maybe <-- ErrorController.getErrorElem,
