@@ -86,6 +86,9 @@ object TabView {
                 .flatMapMerge(TabViewController.loadSavedTree) 
                 .collectLeft --> controller.errors.ErrorController.setError,
 
+            TabViewController.getSelectedTab.changes
+                .mapToUnit --> DebugTreeDisplay.resetZoom,
+
             /* If there are no tabs, unload tree and input from frontend */
             TabViewController.noSavedTrees.changes
                 .filter(identity)
