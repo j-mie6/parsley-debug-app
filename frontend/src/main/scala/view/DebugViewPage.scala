@@ -226,7 +226,6 @@ abstract class DebugViewPage extends Page {
         /* Button bar right. */
         div(
             className := "debug-view-right-button-bar",
-            child(HelpView(HelpViewController.getActiveSection)) <-- HelpViewController.isPopupOpen,
             child(div(breakpointSkipButton)) <-- TreeViewController.isDebuggingSession,
             /* Render download button */
             child(downloadButton) <-- TreeViewController.treeExists,
@@ -250,7 +249,7 @@ abstract class DebugViewPage extends Page {
             headerView,
             div(
                 className := "debug-view-body",
-                
+                child(HelpView(HelpViewController.getActiveSection)) <-- HelpViewController.isPopupOpen,
                 child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
                 
                 div(

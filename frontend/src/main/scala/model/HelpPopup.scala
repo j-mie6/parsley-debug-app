@@ -97,7 +97,7 @@ case object HelpBreakpoints extends HelpSection {
 }
 
 case object HelpSettings extends HelpSection {
-    override def title: String = "12. Settings"
+    override def title: String = "11. Settings"
     override def infoText: String = "Modify to customise your Dill experience."
     override def visualSource: String = "frontend/src/assets/help/settings.gif"
     override def index: Int = 11
