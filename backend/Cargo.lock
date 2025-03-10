@@ -3,6 +3,21 @@
 version = 3
 
 [[package]]
+name = "Dill"
+version = "0.5.0"
+dependencies = [
+ "log",
+ "mockall",
+ "rocket",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-log",
+ "tauri-plugin-shell",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -771,21 +786,6 @@ checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
 dependencies = [
  "block-buffer",
  "crypto-common",
-]
-
-[[package]]
-name = "dill"
-version = "0.4.3"
-dependencies = [
- "log",
- "mockall",
- "rocket",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-log",
- "tauri-plugin-shell",
 ]
 
 [[package]]
