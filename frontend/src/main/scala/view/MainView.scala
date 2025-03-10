@@ -58,9 +58,11 @@ object MainView extends DebugViewPage {
 
                 /* Update tree and input with TreeReady response */
                 treeStream.collectRight --> TreeViewController.setTree,
-                treeStream.collectRight.map((tree: DebugTree) => Some(CodeFileInformation(tree.parserInfo))) --> CodeViewController.setFileInformation,
                 treeStream.collectRight --> StateManagementViewController.setCurrTree,
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
+                treeStream.collectRight
+                    .map((tree: DebugTree) => CodeFileInformation(tree.parserInfo)) 
+                    --> CodeViewController.setFileInformation,
 
                 /* Notify of any errors caught by treeStream */
                 treeStream.collectLeft --> ErrorController.setError,

@@ -14,8 +14,12 @@ object CodeViewController {
 
     val getFileInformation: Signal[Option[CodeFileInformation]] = codeFileInformation.signal
 
-    val setFileInformation: Observer[Option[CodeFileInformation]] = codeFileInformation.writer
+    val setFileInformation: Observer[CodeFileInformation] = codeFileInformation.someWriter
 
+    val unloadCode: Observer[Unit] = Observer(_ => 
+        codeFileInformation.set(None)
+        currentFile.set(None)
+    )
 
     /* The file string to be rendered by the code view. */
     private val currentFile: Var[Option[String]] = Var(None)
