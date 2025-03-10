@@ -114,10 +114,10 @@ object Command {
     }
 
     case object DownloadTree extends Command("download_tree") {
-        type In = String
-        given args: Args[String] {
-            extension (treeName: String)
-                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
+        type In = Int
+        given args: Args[In] {
+            extension (index: Int)
+                def namedArgs: Map[String, Any] = Map("index" -> index)
         }
 
         type Out = Unit
