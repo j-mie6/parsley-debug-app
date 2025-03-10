@@ -54,7 +54,7 @@ object TreeViewController {
 
 
     /* Downloads tree to users device */
-    def downloadTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, name)
+    def downloadTree(index: Int): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, index)
 
     /* Imports JSON in path from users device */
     def importTree(name: String, contents: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.ImportTree, (name, contents))

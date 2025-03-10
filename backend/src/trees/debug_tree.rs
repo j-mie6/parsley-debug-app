@@ -42,6 +42,14 @@ impl DebugTree {
     pub fn get_session_id(&self) -> i32 {
         self.session_id
     }
+
+    pub fn set_is_debugging(&mut self, is_debug: bool) {
+        self.is_debuggable = is_debug
+    }
+
+    pub fn set_session_id(&mut self, session_id: i32) {
+        self.session_id = session_id
+    }
 }
 
 impl From<SavedTree> for DebugTree {
