@@ -14,9 +14,9 @@ import scala.annotation.experimental
 @experimental @parsley.debuggable
 object Parser {
 
-    val word = letter | digit | '+'
+    val word = many(letter <|> digit <|> '+')
 
-    val param = (many(word) <* '=') <~> many(word)
+    val param = (word <* '=') <~> word
 
     val queryParams = '?' *> sepBy(param, '&') <* eof
 }
