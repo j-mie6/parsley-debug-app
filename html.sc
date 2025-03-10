@@ -31,7 +31,7 @@ object Parser {
 
     val html = openHeader.fillRef { r1 => 
         openUnderline.fillRef { r2 => 
-            stringOfSome(letter).break(ExitBreak, r1.encoded, r2.encoded) <* ("</" *> r2.get.flatMap(char) <* ">")
+            stringOfSome(letter).break(ExitBreak, r1.encodable, r2.encodable) <* ("</" *> r2.get.flatMap(char) <* ">")
         } <* ("</" *> r1.get.flatMap(string) <* ">")
     }
 }
