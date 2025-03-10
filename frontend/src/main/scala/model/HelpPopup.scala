@@ -22,7 +22,7 @@ sealed trait HelpSection {
 case object BaseHelpSection extends HelpSection {
     override def title: String = "How to Dill"
     override def infoText: String = "Getting started"
-    override def visualSource: String = "frontend/styles/icons/dillIcon.png"
+    override def visualSource: String = "frontend/styles/icons/dill-logo.png"
     override def index: Int = 0
 }
 
@@ -63,7 +63,7 @@ case object HelpTreeColours extends HelpSection {
 
 case object HelpIterativeNodes extends HelpSection {
     override def title: String = "6. Iterative Nodes"
-    override def infoText: String = "Iterative nodes display one child by default and can be scrolled through. Clicking an iterative node expands all its children."
+    override def infoText: String = "Iterative nodes are blue and display one child that can be scrolled through by default. Clicking an iterative node expands all its children."
     override def visualSource: String = "frontend/src/assets/help/iterativeNodes.gif"
     override def index: Int = 6
 }
