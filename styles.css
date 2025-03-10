@@ -32,6 +32,7 @@
     --font-color-success: #4BB543;          /* Success green */
     --font-color-info: #6495ED;             /* Info blue */
     --font-color-no-tree: #3c4b46a3;        /* Dark green. */
+    --font-color-debug: #ffa65e;            /* Debug highlight */       
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
 
     --node-color: #242526;
@@ -67,6 +68,7 @@
     --font-color-success: #4BB543;      /* Success green */
     --font-color-info: #6495ED;         /* Info blue */
     --font-color-no-tree: #bde3d8;      /* Light green. */
+    --font-color-debug: #ffa65e;        /* Debug highlight */       
     
     --node-color: #96DEC4;
     --node-color-fail: #ffa3a3;

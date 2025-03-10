@@ -60,10 +60,9 @@ abstract class DebugViewPage extends Page {
 
         /* Exports current tree */
         onClick(_
-            .compose(event => event.sample(TabViewController.getSelectedTab))
-            .flatMapSwitch(TabViewController.getFileName)
+            .sample(TabViewController.getSelectedTab)
             .flatMapMerge(TreeViewController.downloadTree)
-            .map {
+        .map {
                 case Left(_) => TreeDownloadFailed
                 case Right(_) =>  TreeDownloaded
             }
@@ -258,10 +257,12 @@ abstract class DebugViewPage extends Page {
                         className := "tab-view-container",
                         TabView()
                     ),
+                    
                     div(
                         className := "tree-view-page",
-                        buttonBar,
                         cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
+                        
+                        buttonBar,
                         childElem.getOrElse(div())
                     )
                 ),
