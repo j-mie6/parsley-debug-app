@@ -36,7 +36,7 @@ object TreeViewController {
     def treeExists: Signal[Boolean] = getTree.map(_.isDefined)
 
     /** Get sessionId from loaded tree, -1 for non-debuggable */
-    def getSessionId: Signal[Int] = tree.signal.map(_.get.sessionId)
+    def getSessionId: Signal[Int] = getTree.foldOption(-1)(_.sessionId)
 
     /** Get debug tree element or warning if no tree found */
     def getTreeElem: Signal[HtmlElement] = getTree.map(_ match 
@@ -54,7 +54,7 @@ object TreeViewController {
 
 
     /* Downloads tree to users device */
-    def downloadTree(name: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, name)
+    def downloadTree(index: Int): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.DownloadTree, index)
 
     /* Imports JSON in path from users device */
     def importTree(name: String, contents: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.ImportTree, (name, contents))
