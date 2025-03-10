@@ -203,25 +203,24 @@ abstract class DebugViewPage extends Page {
     private final val mouseEnterOpenDelay = 500
     private final val mouseLeaveCloseDelay = 200
 
-    /* Button bar internal to the view. */
-    private lazy val buttonBar: HtmlElement = div(
-        className := "debug-view-button-bar",
-
-        /* Button bar left. */
+    /* Button bar left. */
+    private lazy val leftButtonBar: HtmlElement = {
         div(
             className := "debug-view-left-button-bar",
-
+            
             onMouseEnter.mapTo(2) --> viewCloseSemaphoreIncrement,
             onMouseEnter(_.delay(mouseEnterOpenDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
             onMouseLeave(_.delay(mouseLeaveCloseDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
-
+            
             settingsTabButton,
             MainViewController.renderViewButton(View.Tree, viewCloseSemaphore),
             MainViewController.renderViewButton(View.Input, viewCloseSemaphore),
             MainViewController.renderViewButton(View.Code, viewCloseSemaphore),
-        ),
+        )
+    }
         
-        /* Button bar right. */
+    /* Button bar right. */
+    private lazy val rightButtonBar: HtmlElement = {
         div(
             className := "debug-view-right-button-bar",
 
@@ -231,7 +230,7 @@ abstract class DebugViewPage extends Page {
             stateButton,
             infoButton,
         )
-    )   
+    }
 
     /**
       * Render the DebugViewPage header and a child element. This allows different views to 
@@ -261,10 +260,16 @@ abstract class DebugViewPage extends Page {
                     ),
                     
                     div(
+                        className := "debug-view-button-bar",
+                        cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
+                        leftButtonBar,
+                        rightButtonBar,
+                    ),
+                    
+                    div(
                         className := "tree-view-page",
                         cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
                         
-                        buttonBar,
                         childElem.getOrElse(div())
                     )
                 ),

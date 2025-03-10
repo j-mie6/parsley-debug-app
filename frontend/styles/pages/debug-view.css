@@ -107,11 +107,17 @@
     left: 0px;  
     right: 0px;
 
+    box-sizing: border-box;
     width: 100%;
-    height: 38px;
+    height: 8vh;
     
-    margin-bottom: 1vh;
-
+    border: 2px solid transparent;
+    border-bottom: none;
+    
+    padding: 2vh 2vw;
+    
+    box-shadow: 0 4px -12px rgba(0, 0, 0, 0.2);
+    
     z-index: 1;
     
     border-radius: 20px;
@@ -123,6 +129,10 @@
     font-size: 22px;
 
     overflow: hidden;
+}
+
+.debug-view-button-bar.highlight-debug-session {
+    animation: borderColorDebugAnim 1.8s infinite alternate ease-in !important;
 }
 
 .debug-view-left-button-bar {
@@ -137,8 +147,6 @@
 .debug-view-right-button-bar {
     float: right;
     
-    height: inherit;
-
     display: flex;
     flex-wrap: nowrap;
     justify-content: end;
