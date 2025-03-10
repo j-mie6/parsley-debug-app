@@ -1,12 +1,12 @@
 package controller.errors
 
 import scala.scalajs.js
-
-import com.raquo.laminar.api.L.*
 import scala.scalajs.js.internal.UnitOps.unitOrOps
 
-import model.errors.*
+import com.raquo.laminar.api.L.*
 
+import model.errors.*
+import controller.ToastController
 
 /** 
   * ErrorController keeps track of the error state of the app 
@@ -61,6 +61,13 @@ object ErrorController {
             case "StringContainsInvalidUnicode" => StringContainsInvalidUnicode
             case "SuffixNotFound" => SuffixNotFound
             case "EventEmitFailed" => EventEmitFailed
+            case "DownloadFailed" => DownloadFailed
+            case "CreateDirFailed" => CreateDirFailed
+            case "WriteToFileFailed" => WriteToFileFailed
+            case "DownloadPathNotFound" => DownloadPathNotFound
+            case "TreeFileRemoveFail" => TreeFileRemoveFail
+            case "NameRetrievalFail" => NameRetrievalFail
+            case "DeserialiseFailed" => DeserialiseFailed
             case _ => new UnknownError(s"Unknown backend error: ${errorName}")
     }
     

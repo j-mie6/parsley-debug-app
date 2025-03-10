@@ -1,0 +1,105 @@
+.code-view-main-view {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    padding-top: 0px;
+    margin-top: 2vh;
+    font-size: 16px;
+}
+
+.code-view-file-view {
+    text-align: left;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 18px;
+    font-family: "Fira Code", "Courier New", monospace;
+    
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
+    
+    border: 2px solid var(--background-tertiary);
+    border-radius: 6px;
+    padding: 15px;
+    
+    max-height: 65vh;
+    box-sizing: border-box;
+
+    overflow: auto;
+}
+
+.code-view-file-view-wrapper {
+    width: 80%;
+    max-width: 70vw;
+    max-height: 70vh;
+
+    padding: 2px;
+    margin: 0px auto;
+
+    background-color: var(--background-tertiary);
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+.code-view-file-explorer {
+    height: fit-content;
+}
+
+.code-view-file {
+    border-radius: 10px;
+    padding-block: 2px;
+    margin-block: 3px;
+    padding-inline: 4px;
+    cursor: pointer;
+    border: 1px solid #ffffff00;
+    transition: border 0.5s;
+}
+
+.code-view-file:hover {
+    background-color: var(--background-tertiary-20);
+    border: 1px solid var(--background-tertiary-60);
+    cursor: pointer;
+}
+
+.code-view-directory {
+    border-radius: 10px;
+    padding-block: 3px;
+    padding-right: 3px;
+    margin-block: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+.code-view-directory-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 10px;
+    padding-left: 5px;
+    padding-right: 10px;
+    padding-bottom: 1px;
+    align-items: center;
+}
+
+.code-view-directory-header:hover {
+    background-color: var(--background-tertiary-20);
+    cursor: pointer;
+}
+
+.code-view-directory-contents {
+    padding-left: 20px;
+    overflow: hidden;
+    height: 0;
+}
+
+.code-view-directory-contents.expanded {
+    height: fit-content;
+}
+
+.code-view-root-directory {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}

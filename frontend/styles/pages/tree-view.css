@@ -1,59 +1,41 @@
 .tree-view-page {
-    background-color: var(--background-secondary);
-    height: 85%;
-    overflow: auto;
-    border: 2px solid var(--font-color-tertiary);
-    border-radius: 20px;
     box-sizing: border-box;
-    padding-bottom: 20px;
-    flex: 1;
+
+    height: 100%;
+    width: 100%;
+
+    border-radius: 20px;
+    border: 2px solid transparent;
+    background-color: var(--background-secondary);
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
 }
 
-.tree-view-error {
-    color: var(--font-color-no-tree); 
+.tree-view-page-scroll {
+    box-sizing: border-box;
     
-    font-weight: bold;
-    text-align: center;
-    font-size: 28px;
+    height: 90%;
+    width: 100%;
     
-    width: 40%;
-    
-    margin: auto;
-    margin-top: 2em;
-    margin-bottom: 1em;
-    
-    padding: 1.5em;
-    padding-right: 2em;
-    padding-left: 2em;
+    overflow: auto;
 }
 
 .zoom-container {
-    display: flex;
     transform-origin: left top;
-    width: 100%;
-    height: 100%;
-    align-items: flex-start;
-    justify-content: flex-start;
-}
-
-.skip-button {
-    margin-right: 20px;
-    background: transparent;
-    color: inherit;
-    border: none;
-    font: inherit;
-    outline: inherit;
-    cursor: pointer;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
 }
 
 .tree-view-page.highlight-debug-session {
-    animation: borderPulseRed 1.8s infinite alternate ease-in !important;
+    animation: borderColorDebugAnim 1.8s infinite alternate ease-in !important;
 }
 
-
-@keyframes borderPulseRed {
+@keyframes borderColorDebugAnim {
     from { }
     to {
-        border: 2px solid #de2100d8
+        border-color: var(--font-color-debug);
     }
 }

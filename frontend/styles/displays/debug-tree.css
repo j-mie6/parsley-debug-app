@@ -1,23 +1,69 @@
-.debug-tree-display {
+.debug-input-container {
     display: flex;
     flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
+    flex: 1;
+    
+    width: 80%;
+    max-width: 70vw;
+    max-height: 70vh;
+
+    margin: 20px auto;
+
+
+    overflow: hidden;
 }
+
 
 .debug-input-main-view {
     text-align: left;
-    width: 100%;
-    padding-inline: 10px;
-    font-size: 20px;
-    font-family: 'Courier New', Courier, monospace;
-    display: flex;
+    padding: 15px;
+    font-size: 18px;
+    font-family: "Fira Code", "Courier New", monospace;
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
+
+    border: 2px solid var(--background-tertiary);
+    border-radius: 8px;
+
+    word-wrap: break-word;
+    overflow-x: auto;
+    max-height: 70vh;
+    overflow-y: auto;
+    white-space: pre-wrap;
 }
+
 
 .code-text {
     width: fit-content;
 }
+
+
+/* Render stateful refs */
+.debug-tree-refs-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    
+    margin: 20px;
+
+    border-radius: 15px;
+    color: var(--node-font-color-debug);
+    background-color: var(--node-color-debug);
+    border: 2px solid var(--node-font-color-debug);
+    border-bottom-width: 4px;
+}
+
+.debug-tree-ref:not(:last-child) {
+    border-right: 2px solid var(--node-font-color-debug);
+}
+
+.debug-tree-ref {
+    text-align: center;
+    padding: 0.15vh 1vw;
+    margin: 1.5vh 0; 
+}
+
 
 /* Container of debug tree */
 .debug-tree-container {

@@ -1,9 +1,12 @@
+use std::collections::HashMap;
+
 use tauri::{Emitter, Manager};
 
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
+use crate::state::state_manager::SkipsSender;
 use super::{AppState, StateManager, StateError};
-
+use std::path::PathBuf;
 
 /* Wrapper for Tauri AppHandle */
 pub struct AppHandle(tauri::AppHandle);
@@ -16,6 +19,10 @@ impl AppHandle {
     /* Delegate emit to wrapped Tauri AppHandle */
     pub fn emit(&self, event: Event) -> Result<(), StateError> {
         StateManager::emit(&self.0, event)
+    }
+
+    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.0.get_download_path()
     }
 }
 
@@ -40,7 +47,48 @@ impl StateManager for tauri::AppHandle {
             .map_err(|_| StateError::EventEmitFailed)
     }
 
-    fn transmit_breakpoint_skips(&self, skips: i32) -> Result<(),StateError> {
-        self.state::<AppState>().transmit_breakpoint_skips(skips)
+    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
+        self.state::<AppState>().transmit_breakpoint_skips(session_id, skips)
+    }
+    
+    fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
+        self.state::<AppState>().add_session_id(tree_name, session_id)
+    }
+    
+    fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
+        self.state::<AppState>().rmv_session_id(tree_name)
+    }
+    
+    fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
+        self.state::<AppState>().session_id_exists(session_id)
+    }
+
+    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError> {
+        self.state::<AppState>().get_session_ids()
+    }
+
+    fn next_session_id(&self) -> Result<i32, StateError> {
+        self.state::<AppState>().next_session_id()
+    }
+    
+    fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
+        self.state::<AppState>().new_transmitter(session_id, tx)
+    }
+    
+    fn get_download_path(&self) -> Result<PathBuf, StateError> {
+        self.path().download_dir()
+            .map_err(|_| StateError::GetDownloadPathFail)
+    }
+    
+    fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {
+        self.state::<AppState>().reset_refs(session_id, default_refs)
+    }
+
+    fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError> {
+        self.state::<AppState>().get_refs(session_id)
+    }
+
+    fn reset_trees(&self) -> Result<(), StateError> {
+        self.state::<AppState>().reset_trees()
     }
 }

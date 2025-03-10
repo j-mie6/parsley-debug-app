@@ -1,9 +1,12 @@
+use std::collections::HashMap;
+
 use rocket::{get, post, http, serde::json::Json};
 
 use super::ServerState;
 use crate::events::Event;
 use crate::trees::{DebugTree, ParsleyTree};
 use crate::state::{StateError, StateManager};
+use crate::commands::save;
 
 /* Length of input slice returned in post response */
 const RESPONSE_INPUT_LEN: usize = 16;
@@ -17,14 +20,18 @@ pub fn routes() -> Vec<rocket::Route> {
 #[serde(rename_all = "camelCase")]
 struct PostTreeResponse {
     message: String,
+    session_id: i32,
     #[serde(skip_serializing_if = "Option::is_none")] skip_breakpoint: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")] new_refs: Option<Vec<(i32, String)>>,
 }
 
 impl PostTreeResponse {
-    fn new(message: &str, skips: Option<i32>) -> Json<PostTreeResponse> {     
+    fn new(msg: impl Into<String>, session_id: i32, skips: Option<i32>, new_refs: Option<Vec<(i32, String)>>) -> Json<PostTreeResponse> {
         Json(PostTreeResponse {
-            message: message.to_string(),
+            message: msg.into(),
+            session_id,
             skip_breakpoint: skips,
+            new_refs,
         })
     }
 
@@ -41,12 +48,12 @@ impl PostTreeResponse {
         )
     }
 
-    fn no_skips(message: &str) -> Json<PostTreeResponse> {
-        PostTreeResponse::new(message, None)
+    fn no_skips(message: &str, session_id: i32) -> Json<PostTreeResponse> {
+        PostTreeResponse::new(message, session_id, None, None)
     }
 
-    fn with_skips(message: &str, skips: i32) -> Json<PostTreeResponse> {
-        PostTreeResponse::new(message, Some(skips))
+    fn with_refs(message: &str, session_id: i32, skips: i32, new_refs: Vec<(i32, String)>) -> Json<PostTreeResponse> {
+        PostTreeResponse::new(message, session_id, Some(skips), Some(new_refs))
     }
 }
 
@@ -56,31 +63,90 @@ fn get_index() -> String {
     String::from("DILL: Debugging Interactively for the ParsLey Language")
 }
 
+fn process_parsley_tree(mut parsley_tree: ParsleyTree, state: &rocket::State<ServerState>) -> Result<DebugTree, StateError> {
+    /* SETUP: Allocate id if RemoteView doesn't have one */
+    if parsley_tree.get_session_id() == -1 {
+        let allocated_id: i32 = state.inner().next_session_id()?;
+        parsley_tree.set_session_id(allocated_id);
+    }
+
+    Ok(parsley_tree.into())
+}
+
 /* Post request handler to accept debug tree */
 #[post("/api/remote/tree", format = "application/json", data = "<data>")]
 async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, Json<PostTreeResponse>) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
-    let is_debugging: bool = parsley_tree.is_debugging();
-    let debug_tree: DebugTree = parsley_tree.into();
+    let new_tree: bool = parsley_tree.get_session_id() == -1;
+
+    let debug_tree: DebugTree = match process_parsley_tree(parsley_tree, state) {
+        Ok(tree) => tree,
+        Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not allocate a session id", -1)),
+    };
+    
+    /* Extract useful fields from tree */
+    let is_debuggable: bool = debug_tree.is_debuggable();
+    let session_id: i32 = debug_tree.get_session_id();
+
+    /* Create channels */
+    if is_debuggable {
+        let (tx, rx) = rocket::tokio::sync::oneshot::channel::<i32>();
+
+        match state.new_receiver(session_id, rx) {
+            Some(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Receiver already exists for this session id", session_id)),
+            None => if let Err(_) = state.new_transmitter(session_id, tx) {
+                return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise transmitter in state", session_id));
+            },
+        };
+
+        /* Reset references for a post tree */
+        let res: Result<(), StateError> = state.inner().reset_refs(session_id, debug_tree.refs());
+
+        if let Err(_) = res {
+            return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not get internal lock", -1))
+        }
+    }
 
     /* Format informative response for RemoteView */
     let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
 
-    /* Update state with new debug_tree and return response */
-    match state.set_tree(debug_tree).and(state.emit(Event::NewTree)) {
-        Ok(()) if !is_debugging => (http::Status::Ok, PostTreeResponse::no_skips(&msg)),
+    /* Check if tree is needing to be updated or is a new tree */
+    let set_tree_result: Result<(), StateError> = if new_tree {
+        state.set_tree(debug_tree).and(state.emit(Event::NewTree))
+    } else {
+        /* Get the tree_name from the session_id */
+        let tree_name: String = {
+            let map: HashMap<String, i32> = match state.get_session_ids() {
+                Ok(map) => map,
+                Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not load tree_names", session_id)),
+            };
+            match map.into_iter().find(|(_, v)| *v == session_id) {
+                Some((name, _)) => name,
+                None => return (http::Status::InternalServerError, PostTreeResponse::no_skips("No tree exists with this session id", session_id)),
+            }
+        };
 
-        Ok(()) => match state.receive_breakpoint_skips().await {
-            Some(skips) => (http::Status::Ok, PostTreeResponse::with_skips(&msg, skips)),
-            None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg)),
+        /* Update the saved tree and set the updated tree into state */
+        if let Err(_) = save::update_tree(&debug_tree, tree_name) {
+            return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
+        }
+        state.set_tree(debug_tree)
+    };
+
+    match set_tree_result {
+        Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
+
+        Ok(()) => match state.receive_breakpoint_skips(session_id).await {
+            Some(skips) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, state.get_refs(session_id).expect("Session ID should exist"))),
+            None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
         },
 
         Err(StateError::LockFailed) => 
-            (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again")),
+            (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again", session_id)),
 
         Err(StateError::ChannelError) =>
-            (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again")),
+            (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again", session_id)),
 
         Err(_) => panic!("Unexpected error on post_tree"),
     }
@@ -147,6 +213,9 @@ pub mod test {
             .with(predicate::eq(debug_tree::test::tree()))
             .returning(|_| Ok(()));
         
+        mock.expect_next_session_id().returning(|| Ok(-1));
+
+
         mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
         
@@ -199,6 +268,7 @@ pub mod test {
     fn get_returns_tree() {
         let mut mock = MockStateManager::new();
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
+        mock.expect_next_session_id().returning(|| Ok(-1));
 
         let client: blocking::Client = tracked_client(mock);
 
@@ -213,11 +283,13 @@ pub mod test {
     #[test]
     fn get_returns_posted_tree() {
         let mut mock = MockStateManager::new();
+
         mock.expect_set_tree()
             .with(predicate::eq(debug_tree::test::tree()))
             .returning(|_| Ok(()));
 
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
+        mock.expect_next_session_id().returning(|| Ok(-1));
         
         mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));

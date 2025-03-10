@@ -8,10 +8,10 @@ import org.scalablytyped.runtime.StringDictionary
 import typings.tauriAppsApi.coreMod.{invoke => tauriInvoke}
 
 import model.{DebugNode, DebugTree}
-import model.json.Reader
 import model.errors.DillException
-import controller.tauri.Args
+import model.json.Reader
 import controller.errors.ErrorController
+import controller.tauri.Args
 
 
 /* Argument trait implemented for types passed to Command invoke call */ 
@@ -66,7 +66,7 @@ object Command {
 
     case object FetchNodeChildren extends Command("fetch_node_children") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (id: Int) 
                 def namedArgs: Map[String, Any] = Map("nodeId" -> id)
         }
@@ -78,7 +78,7 @@ object Command {
     /* Save commands */
     case object SaveTree extends Command("save_tree") {
         type In = String
-        given args: Args[String] {
+        given args: Args[In] {
             extension (treeName: String)
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
@@ -88,7 +88,7 @@ object Command {
 
     case object LoadSavedTree extends Command("load_saved_tree") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (index: Int)
                 def namedArgs: Map[String, Any] = Map("index" -> index)
         }
@@ -98,7 +98,7 @@ object Command {
 
     case object DeleteTree extends Command("delete_tree") {
         type In = Int
-        given args: Args[Int] {
+        given args: Args[In] {
             extension (index: Int)
                 def namedArgs: Map[String, Any] = Map("index" -> index)
         }
@@ -106,13 +106,75 @@ object Command {
         type Out = List[String]
     }
 
-    case object SkipBreakpoints extends Command("skip_breakpoints") {
+    case object DeleteSavedTrees extends Command("delete_saved_trees") {
+        type In = Unit
+        given args: Args[Unit] = Args.noArgs
+
+        type Out = Unit
+    }
+
+    case object DownloadTree extends Command("download_tree") {
         type In = Int
         given args: Args[In] {
-            extension (skips: Int) 
-                def namedArgs: Map[String, Any] = Map("skips" -> skips)
+            extension (index: Int)
+                def namedArgs: Map[String, Any] = Map("index" -> index)
+        }
+
+        type Out = Unit
+    }
+
+    case object ImportTree extends Command("import_tree") {
+        type In = (String, String)
+        given args: Args[In] {
+            extension (fileInfo: (String, String))
+                def namedArgs: Map[String, Any] = Map("treeName" -> fileInfo._1, "contents" -> fileInfo._2)
+        }
+
+        type Out = Unit
+    }
+
+    case object GetRefs extends Command("get_refs") {
+        type In = Int
+        given args: Args[In] {
+            extension (sessionId: Int)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
+        }
+
+        type Out = Seq[(Int, String)]
+    }
+
+    case object ResetRefs extends Command("reset_refs") {
+        type In = Unit
+        given args: Args[In] = Args.noArgs
+
+        type Out = Seq[(Int, String)]
+    }
+
+    case object SetRefs extends Command("update_refs") {
+        type In = (Seq[(Int, String)])
+        given args: Args[In] {
+            extension (new_refs: Seq[(Int, String)])
+                def namedArgs: Map[String, Any] = Map("newRefs" -> js.Array(new_refs.map(js.Tuple2(_, _))*))
+        }
+
+        type Out = Unit
+    }
+
+    case object SkipBreakpoints extends Command("skip_breakpoints") {
+        type In = (Int, Int)
+        given args: Args[In] {
+            extension (args: (Int, Int))
+                def namedArgs: Map[String, Any] = Map("sessionId" -> args._1, "skips" -> args._2)
         }
         type Out = Unit
     }
 
+    case object RequestSourceFile extends Command("request_source_file") {
+        type In = String
+        given args: Args[In] {
+            extension (filePath: String)
+                def namedArgs: Map[String, Any] = Map("filePath" -> filePath)
+        }
+        type Out = Unit
+    }
 }

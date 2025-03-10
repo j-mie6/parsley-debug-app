@@ -1,8 +1,13 @@
+@import url('frontend/styles/pages/code-view.css');
 @import url('frontend/styles/pages/debug-view.css');
 @import url('frontend/styles/pages/tree-view.css');
-@import url('frontend/styles/pages/popup-and-toast.css');
 @import url('frontend/styles/pages/tab-bar.css');
+@import url('frontend/styles/pages/sidepanel.css');
+@import url('frontend/styles/pages/state-sidepanel.css');
 @import url('frontend/styles/displays/debug-tree.css');
+@import url('frontend/styles/displays/popup.css');
+@import url('frontend/styles/displays/toast.css');
+@import url('frontend/styles/pages/help-section.css');
 @import url('frontend/styles/icons/bootstrap-icons.min.css');
 
 @font-face {
@@ -28,6 +33,7 @@
     --font-color-success: #4BB543;          /* Success green */
     --font-color-info: #6495ED;             /* Info blue */
     --font-color-no-tree: #3c4b46a3;        /* Dark green. */
+    --font-color-debug: #ffa65e;            /* Debug highlight */       
     --font-family: Righteous, Verdana, Geneva, Tahoma, sans-serif; 
 
     --node-color: #242526;
@@ -63,6 +69,7 @@
     --font-color-success: #4BB543;      /* Success green */
     --font-color-info: #6495ED;         /* Info blue */
     --font-color-no-tree: #bde3d8;      /* Light green. */
+    --font-color-debug: #ffa65e;        /* Debug highlight */       
     
     --node-color: #96DEC4;
     --node-color-fail: #ffa3a3;
@@ -103,4 +110,45 @@ a {
 
 button {
     all: inherit;
+}
+
+
+/* Style scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--background-secondary-hover); 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--background-tertiary-60); 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--background-tertiary); 
+}
+
+
+.nothing-shown {
+    color: var(--font-color-no-tree); 
+    
+    font-weight: bold;
+    text-align: center;
+    font-size: 28px;
+    
+    width: 40%;
+    
+    margin: auto;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    
+    padding: 1.5em;
+    padding-right: 2em;
+    padding-left: 2em;
 }

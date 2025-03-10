@@ -8,9 +8,12 @@ import model.json.Reader
   *
   * @param input the input string the tree node has to parse
   * @param root the debug tree root node
-  * @param isDebuggable if this tree is using live debugging operations like breakpoint skipping
+  * @param isDebuggable Used for if the tree is being actively used for debugging with breakpoints
+  * @param sessionId Id of a debugging session, This will be -1 for trees that cannot be debugged, whereas 
+  *                  it will be some id for trees that are actively being debugged or have been debugged  
+  * @param refs A list of pairs: `Address` and `Reference Value` from `Parsley`'s State
   */
-case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean) derives Reader.upickle
+case class DebugTree(input: String, root: DebugNode, parserInfo: Map[String, List[(Int, Int)]], isDebuggable: Boolean, sessionId: Int, refs: Seq[(Int, String)] = Nil) derives Reader.upickle
 
 
 /**
@@ -27,5 +30,8 @@ case class DebugTree(input: String, root: DebugNode, isDebuggable: Boolean) deri
   * @param isIterative if a node is iterative (and opaque)
   */
 case class DebugNode(nodeId: Int, name: String, internal: String, success: Boolean,
-    childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean, newlyGenerated: Boolean) derives Reader.upickle
+        childId: Int, input: String, isLeaf: Boolean, isIterative: Boolean, newlyGenerated: Boolean) derives Reader.upickle {
+  
+    def isBreakpoint: Boolean = internal == "remoteBreak"
+}
 
