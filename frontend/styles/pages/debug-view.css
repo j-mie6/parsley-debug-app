@@ -82,6 +82,14 @@
     width: 100%;
 }
 
+.tab-and-tree-view-container.left-compressed, 
+.tab-and-tree-view-container.right-compressed {
+    width: calc(100vw - 2vw - 18vw - 6vw - 1.25vw) !important;
+}
+
+.tab-and-tree-view-container.left-compressed.right-compressed {
+    width: calc(100vw - 2vw - 2 * (18vw + 6vw + 1.25vw)) !important;
+}
 
 .debug-view-page {
     box-sizing: border-box;
