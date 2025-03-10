@@ -48,14 +48,14 @@ object DebugTreeDisplay {
     * @return HTML element representing the whole tree.
     */
 
-    def apply(tree: DebugTree): HtmlElement = 
+    def apply(tree: DebugTree): HtmlElement = {
         StateManagementViewController.setRefs(tree.refs)
         StateManagementViewController.setLocalRefs(tree.refs)
         StateManagementViewController.setOrigRefs(tree.refs)
 
         div(
-            className := "debug-tree-container zoom-container",
-            
+            className := "zoom-container debug-tree-container",
+
             styleAttr <-- zoomFactor.signal.map(factor => s"transform: scale($factor);"),
             wheelHandler,
 
@@ -67,7 +67,8 @@ object DebugTreeDisplay {
 
             ReactiveNodeDisplay(ReactiveNode(tree.root)),
         )
-
+    }
+    
 }
 
 
