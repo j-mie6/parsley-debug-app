@@ -98,15 +98,14 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    background: var(--background-tertiary);
-    color: #e8f5ec;
-    transition: 0.2s ease-in-out;
+    color: var(--font-color-primary);
+    background-color: var(--background-primary);
 }
 
 .help-prev-button:hover,
 .help-next-button:hover,
 .help-done-button {
-    background: var(--background-tertiary-60);
+    background: var(--background-tertiary-20);
 }
 
 .help-progress-container {
