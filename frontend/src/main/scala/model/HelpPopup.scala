@@ -96,11 +96,18 @@ case object HelpBreakpoints extends HelpSection {
     override def index: Int = 10
 }
 
+case object HelpSettings extends HelpSection {
+    override def title: String = "12. Settings"
+    override def infoText: String = "Modify to customise your Dill experience."
+    override def visualSource: String = "frontend/src/assets/help/settings.gif"
+    override def index: Int = 11
+}
+
 case object HelpSummary extends HelpSection {
     override def title: String = "That's it!"
     override def infoText: String = "Debug interactively with Dill"
     override def visualSource: String = "frontend/src/assets/help/dillSummary.gif"
-    override def index: Int = 11
+    override def index: Int = 12
 }
 
 val allHelpSections: List[HelpSection] = List(
@@ -115,5 +122,6 @@ val allHelpSections: List[HelpSection] = List(
     HelpUploadingTrees,
     HelpRefManagement,
     HelpBreakpoints,
+    HelpSettings,
     HelpSummary
 )
