@@ -42,8 +42,10 @@ import parsley.state.*
 import parsley.quick.*
 import parsley.syntax.character.{charLift, stringLift}
 import parsley.debug.combinator.*
-import parsley.debug.DillRemoteView
+
 import scala.annotation.experimental
+
+import parsley.debug.DillRemoteView
 
 @experimental @parsley.debuggable
 object Parser {
@@ -90,10 +92,10 @@ object Parser {
     }
 }
 
-// Parser.expr.attach(DillRemoteView).parse("(3+1)-(2*4)")
-// Parser.seq.attach(DillRemoteView).parse("abcd")
-// Parser.xyxyxy.attach(DillRemoteView).parse("xyxyxyxyxyxyxyxyxyx")
-// Parser.xml.attach(DillRemoteView).parse("<a><b> </B></A>") // Fails unless "A" and "B" are passed back by the user
+Parser.expr.attach(DillRemoteView).parse("(3+1)-(2*4)")
+Parser.seq.attach(DillRemoteView).parse("abcd")
+Parser.xyxyxy.attach(DillRemoteView).parse("xyxyxyxyxyxyxyxyxyx")
+Parser.xml.attach(DillRemoteView).parse("<a><b> </B></A>") // Fails unless "A" and "B" are passed back by the user
 
 
 ```
