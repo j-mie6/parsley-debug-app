@@ -24,6 +24,7 @@ object TreeView {
 
       val seqBus: EventBus[Seq[(Int, String)]] = EventBus()
       val debuggableBus: EventBus[Boolean] = EventBus()
+      
       div(
         TreeViewController.isDebuggingSession.changes
             .filterNot(identity)
