@@ -1,20 +1,32 @@
 .tree-view-page {
+    box-sizing: border-box;
+
     height: 100%;
-    
+    width: 100%;
+
     border-radius: 20px;
     border: 2px solid transparent;
     background-color: var(--background-secondary);
 
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
+}
+
+.tree-view-page-scroll {
+    box-sizing: border-box;
+    
+    height: 90%;
+    width: 100%;
+    
+    overflow: auto;
 }
 
 .zoom-container {
-    display: flex;
     transform-origin: left top;
-    width: 100%;
-    height: 100%;
-    align-items: flex-start;
-    justify-content: flex-start;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
 }
 
 .tree-view-page.highlight-debug-session {

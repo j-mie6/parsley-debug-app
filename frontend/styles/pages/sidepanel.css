@@ -1,24 +1,26 @@
 .sidepanel-container {
-    width: 0;
+    flex: 0 0 18vw;
 
     display: flex;
     flex-direction: column;
     justify-content: start;
     align-items: stretch;
-
+    
     z-index: 2;
-
+    
     background: var(--background-secondary);
     border-radius: 20px;
-
+    
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+    padding: 3vh 3vw;
+
     overflow: hidden;
+    visibility: collapse;
 }
 
 .sidepanel-container.open {
-    width: 18vw;
-    min-width: 18vw;
-    padding: 3vh 3vw;
+    visibility: visible;
 }
 
 .sidepanel-header {
