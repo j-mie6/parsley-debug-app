@@ -161,9 +161,12 @@ abstract class DebugViewPage extends Page {
 
     private lazy val stopDebuggingButton: Element = button(
         className := "debug-view-button debug-view-button-stop-debugging",
-        stopDebuggingIcon
+        stopDebuggingIcon,
 
-        // TODO: onclick
+        onClick.compose(_
+            .sample(TreeViewController.getSessionId)
+            .compose(TreeViewController.stopDebuggingSession)
+            .collectLeft) --> ErrorController.setError
     )
 
 
