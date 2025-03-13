@@ -21,7 +21,7 @@ pub trait StateManager: Send + Sync + 'static {
 
     fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError>;
 
-    fn stop_debugging_session(&self) -> Result<(), StateError>;
+    fn stop_debugging_session(&self, session_id: i32) -> Result<(), StateError>;
 
     fn get_download_path(&self) -> Result<PathBuf, StateError>;
 

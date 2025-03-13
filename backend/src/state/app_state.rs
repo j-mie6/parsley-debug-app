@@ -157,7 +157,8 @@ impl StateManager for AppState {
             .map_err(|_| StateError::ChannelError)
     }
 
-    fn stop_debugging_session(&self) -> Result<(), StateError> {
+    // FIXME: Use session_id
+    fn stop_debugging_session(&self, _session_id: i32) -> Result<(), StateError> {
         let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
         state
             .tree

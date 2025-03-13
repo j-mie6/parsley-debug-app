@@ -51,8 +51,8 @@ impl StateManager for tauri::AppHandle {
         self.state::<AppState>().transmit_breakpoint_skips(session_id, skips)
     }
 
-    fn stop_debugging_session(&self) -> Result<(), StateError> {
-        self.state::<AppState>().stop_debugging_session()
+    fn stop_debugging_session(&self, session_id: i32) -> Result<(), StateError> {
+        self.state::<AppState>().stop_debugging_session(session_id)
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
