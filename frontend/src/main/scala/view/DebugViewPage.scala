@@ -156,6 +156,17 @@ abstract class DebugViewPage extends Page {
             .collectLeft) --> ErrorController.setError
     )
 
+    /* Square stop button for ending a debug session */
+    private lazy val stopDebuggingIcon: Element = i(className := "bi bi-stop")
+
+    private lazy val stopDebuggingButton: Element = button(
+        className := "debug-view-button debug-view-button-stop-debugging",
+        stopDebuggingIcon
+
+        // TODO: onclick
+    )
+
+
     /**
      * Semaphore controlling expansion of the descriptions.
      * 
@@ -228,7 +239,8 @@ abstract class DebugViewPage extends Page {
             className := "debug-view-right-button-bar",
 
             child(div(breakpointSkipButton)) <-- TreeViewController.isDebuggingSession,
-            child(downloadButton) <-- TreeViewController.treeExists,
+            child(downloadButton) <-- TreeViewController.treeExists.combineWithFn(TreeViewController.isDebuggingSession.not)(_ && _),
+            child(stopDebuggingButton) <-- TreeViewController.treeExists.combineWithFn(TreeViewController.isDebuggingSession)(_ && _),
             uploadButton,
             stateButton,
             helpButton,

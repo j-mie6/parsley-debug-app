@@ -180,6 +180,10 @@
     color: var(--font-color-debug);
 }
 
+.debug-view-button-stop-debugging {
+    color: var(--font-color-debug);
+}
+
 .debug-view-expand-tree.expanded {
     width: 90px;
 }
