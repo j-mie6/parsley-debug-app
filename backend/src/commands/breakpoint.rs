@@ -19,3 +19,24 @@ impl From<StateError> for SkipBreakpointError {
         }
     }
 }
+
+#[tauri::command]
+pub fn stop_debugging(state: tauri::State<'_, AppState>) -> Result<(), StopDebuggingError> {
+    state.stop_debugging_session().map_err(StopDebuggingError::from)
+}
+
+#[derive(Debug, serde::Serialize)]
+pub enum StopDebuggingError {
+    LockFailed,
+    TreeNotFound,
+}
+
+impl From<StateError> for StopDebuggingError {
+    fn from(err: StateError) -> Self {
+        match err {
+            StateError::LockFailed => Self::LockFailed,
+            StateError::TreeNotFound => Self::TreeNotFound,
+            _ => panic!("Unexpected errror on stop_debuggging")
+        }
+    }
+}

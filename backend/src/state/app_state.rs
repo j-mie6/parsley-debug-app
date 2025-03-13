@@ -156,6 +156,15 @@ impl StateManager for AppState {
             .send(skips)
             .map_err(|_| StateError::ChannelError)
     }
+
+    fn stop_debugging_session(&self) -> Result<(), StateError> {
+        let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
+        state
+            .tree
+            .as_mut()
+            .map(|tree| tree.set_is_debugging(false))
+            .ok_or(StateError::TreeNotFound)
+    }
     
     fn get_download_path(&self) -> Result<PathBuf, StateError> {
         self.inner()?.app.get_download_path()
