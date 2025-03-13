@@ -21,7 +21,7 @@ impl From<StateError> for SkipBreakpointError {
 }
 
 #[tauri::command]
-pub fn stop_debugging(state: tauri::State<'_, AppState>) -> Result<(), StopDebuggingError> {
+pub fn stop_debugging(state: tauri::State<'_, AppState>, session_id: i32) -> Result<(), StopDebuggingError> {
     state.stop_debugging_session().map_err(StopDebuggingError::from)
 }
 

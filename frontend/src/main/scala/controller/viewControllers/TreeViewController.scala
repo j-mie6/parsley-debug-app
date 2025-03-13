@@ -84,4 +84,9 @@ object TreeViewController {
 
      /** Resets the references of a debugging tree */
     def resetRefs(): EventStream[Either[DillException, Seq[(Int, String)]]] = Tauri.invoke(Command.ResetRefs, ())
+
+    /** Ends the debugging session */
+    def stopDebuggingSession(sessionId: EventStream[Int]): EventStream[Either[DillException, Unit]] = {
+      sessionId.flatMapMerge(Tauri.invoke(Command.StopDebugging, _))
+    }
 }

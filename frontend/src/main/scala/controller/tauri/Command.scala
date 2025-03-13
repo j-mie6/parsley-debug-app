@@ -169,6 +169,16 @@ object Command {
         type Out = Unit
     }
 
+    case object StopDebugging extends Command("stop_debugging") {
+        
+        type In = Int
+        given args: Args[In] {
+            extension (sessionId: Int)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
+        }
+        type Out = Unit
+    }
+
     case object RequestSourceFile extends Command("request_source_file") {
         type In = String
         given args: Args[In] {
