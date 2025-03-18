@@ -47,6 +47,7 @@
 .tab-button.selected {
     color: var(--font-color-tertiary);
     background-color: var(--background-secondary); 
+    z-index: 1;
 }
 
 .close-tab-button {
