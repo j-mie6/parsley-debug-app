@@ -1,5 +1,6 @@
 .tab-bar {
     max-width: 100%;
+    width: fit-content;
     
     display: flex;
     flex-direction: row;
@@ -17,15 +18,36 @@
     white-space: nowrap;
 }
 
+[data-theme="dark"] {
+    .tab-bar {
+        border-bottom: 2px solid var(--background-tertiary);
+    }
+
+    .tab-button {
+        color: var(--font-color-tertiary);
+        background-color: var(--background-secondary);     
+    }
+
+    .tab-button:hover {
+        color: var(--background-secondary);
+        background-color: var(--background-tertiary);
+    }
+    
+    .tab-button.selected {
+        background-color: var(--background-tertiary);
+        color: var(--background-secondary);
+    }
+}
+
+
 .tab-button {
+    border: none;
     margin: 0;
-    margin-bottom: -2px;
     padding-left: 15px;
     padding-right: 12px;
     padding-block: 2px;
     font-size: 15px;
 
-    border: 2px solid var(--font-color-tertiary);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 
