@@ -1,7 +1,6 @@
 .tab-bar {
     max-width: 100%;
-    width: fit-content;
-    
+
     display: flex;
     flex-direction: row;
     flex-shrink: 0;
@@ -18,30 +17,8 @@
     white-space: nowrap;
 }
 
-[data-theme="dark"] {
-    .tab-bar {
-        border-bottom: 2px solid var(--background-tertiary);
-    }
-
-    .tab-button {
-        color: var(--font-color-tertiary);
-        background-color: var(--background-secondary);     
-    }
-
-    .tab-button:hover {
-        color: var(--background-secondary);
-        background-color: var(--background-tertiary);
-    }
-    
-    .tab-button.selected {
-        background-color: var(--background-tertiary);
-        color: var(--background-secondary);
-    }
-}
-
 
 .tab-button {
-    border: none;
     margin: 0;
     padding-left: 15px;
     padding-right: 12px;
@@ -51,8 +28,12 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 
-    color: var(--background-secondary);
-    background-color: var(--background-tertiary-60);
+    color: 
+        color-mix(in srgb, transparent 35%, var(--font-color-tertiary));
+    background-color: 
+        color-mix(in srgb, transparent 45%, var(--background-secondary));
+        
+    border-bottom: 2px solid transparent;
     
     cursor: pointer;
     white-space: nowrap;
@@ -61,9 +42,11 @@
     font-weight: bold;
 }
 
-.tab-button:hover {
-    color: var(--background-secondary);
-    background-color: var(--background-tertiary-40);
+.tab-button:hover:not(.selected) {
+    background-color: 
+        color-mix(in srgb, transparent 25%, var(--background-secondary));
+    border-bottom: 2px solid 
+        color-mix(in srgb, transparent 70%, var(--font-color-tertiary));
 }
 
 .tab-button.selected {
