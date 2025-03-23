@@ -10,16 +10,11 @@ import model.CodeFileInformation
 
 object CodeViewController {
     /* The file string to be rendered by the code view. */
-    private val codeFileInformation: Var[Option[CodeFileInformation]] = Var(None)
+    val getFileInformation: Signal[Option[CodeFileInformation]] = MainViewController.parserInfo.map(_.map(CodeFileInformation.apply))
 
-    val getFileInformation: Signal[Option[CodeFileInformation]] = codeFileInformation.signal
-
-    val setFileInformation: Observer[CodeFileInformation] = codeFileInformation.someWriter
-
-    val unloadCode: Observer[Unit] = Observer(_ => 
-        codeFileInformation.set(None)
-        currentFile.set(None)
-    )
+    val unloadFile: Observer[Unit] = Observer {
+        _ => currentFile.set(None)
+    }
 
     /* The file string to be rendered by the code view. */
     private val currentFile: Var[Option[String]] = Var(None)

@@ -17,21 +17,9 @@ import controller.viewControllers.SettingsViewController
   */
 object TreeViewController {
 
-    /* Reactive DebugTree */
-    private val tree: Var[Option[DebugTree]] = Var(None) 
-
     /* DebugTree signal */
-    val getTree: Signal[Option[DebugTree]] = tree.signal
+    val getTree: Signal[Option[DebugTree]] = MainViewController.tree
 
-    /** Set debug tree */
-    val setTree: Observer[DebugTree] = tree.someWriter
-
-    /** Set optional debug tree (can be None) */
-    val setTreeOpt: Observer[Option[DebugTree]] = tree.writer
-
-    /** Set debug tree to None to stop rendering */
-    def unloadTree: Observer[Unit] = Observer(_ => tree.set(None))
-    
     /** Return true signal if tree is loaded into frontend */
     def treeExists: Signal[Boolean] = getTree.map(_.isDefined)
 
@@ -39,18 +27,7 @@ object TreeViewController {
     def getSessionId: Signal[Int] = getTree.foldOption(-1)(_.sessionId)
 
     /** Get debug tree element or warning if no tree found */
-    def getTreeElem: Signal[HtmlElement] = getTree.map(_ match 
-        /* Default tree view when no tree is loaded */
-        case None => 
-          StateManagementViewController.clearRefs
-          div(
-            className := "nothing-shown",
-            "Nothing to show"
-          )
-
-        /* Render as DebugTreeDisplay */
-        case Some(tree) => DebugTreeDisplay(tree)
-    )
+    def getTreeElem: Signal[Option[HtmlElement]] = getTree.map(_.map(DebugTreeDisplay.apply))
 
 
     /* Downloads tree to users device */
@@ -74,7 +51,7 @@ object TreeViewController {
             .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _))
     }
         
-    val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
+    val isDebuggingSession: Signal[Boolean] = getTree.map(_.exists(_.isDebuggable))
 
     /** Get the references of a debugging tree */
     def getRefs(sessionId: Int): EventStream[Either[DillException, Seq[(Int, String)]]] = Tauri.invoke(Command.GetRefs, sessionId)

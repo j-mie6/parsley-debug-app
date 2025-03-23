@@ -8,6 +8,8 @@ import view.DebugViewPage
 import view.InputView
 import view.TreeView
 import view.CodeView
+import model.DebugTree
+import model.DebugNode
 
 /**
  * Object containing functions and variables for the main view,cconditionally
@@ -15,6 +17,27 @@ import view.CodeView
  */
 object MainViewController {
     
+    private val state: Var[Option[DebugTree]] = Var(None)
+
+    lazy val setState: Observer[DebugTree] = state.someWriter
+    lazy val tree = state.signal 
+
+    private lazy val root: Var[Option[DebugNode]] 
+        = state.zoomLazy(_.map(_.root))((tree, root) => tree.zip(root).map((t, r) => t.copy(root = r)))
+    
+    lazy val input = inputVal.signal 
+    private lazy val inputVal: Var[Option[String]] 
+        = state.zoomLazy(_.map(_.input))((tree, input) => tree.zip(input).map((t, i) => t.copy(input = i)))
+        
+    lazy val parserInfo = parserInfoVal.signal 
+    private lazy val parserInfoVal: Var[Option[Map[String, List[(Int, Int)]]]] 
+        = state.zoomLazy(_.map(_.parserInfo))((tree, parserInfo) => tree.zip(parserInfo).map((t, p) => t.copy(parserInfo = p)))
+
+
+    val unload: Observer[Unit] = Observer {
+        _ => state.set(None) 
+    }
+        
     /* View selected */
     enum View(val elem: HtmlElement) {
         case Tree extends View(TreeView())
@@ -29,7 +52,7 @@ object MainViewController {
         className := f"debug-view-select-button debug-view-${buttonType}-button",
         i(className := f"bi bi-${icon}"),
         
-        cls("selected") <-- MainViewController.getView.map(_ == view),
+        cls("selected") <-- MainViewController.view.signal.map(_ == view),
 
         div(
             className := f"debug-view-expand-button debug-view-expand-${buttonType}",
@@ -46,12 +69,17 @@ object MainViewController {
         case View.Code =>   renderButton("code", "file-earmark-code-fill", "Code View", View.Code, openSemaphore)
     }
 
-    /** Get current selected view */
-    val getView: Signal[View] = view.signal
-
     /** Set selected view */
     val setView: Observer[View] = view.writer
 
     /** Get selected view element */
-    val getViewElem: Signal[HtmlElement] = view.signal.map(_.elem)
+    val getView: Signal[HtmlElement] = view.signal.withCurrentValueOf(state.signal)
+        .map((view, state) => if state.isDefined then view.elem else nothingShown)
+        
+    lazy val nothingShown: HtmlElement = {
+        div(
+            className := "nothing-shown",
+            "Nothing to show"
+        )
+    }
 }

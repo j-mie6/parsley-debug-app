@@ -9,34 +9,16 @@ import com.raquo.laminar.api.L.*
 object InputViewController {
     
     /* The input element to be render by InputView */
-    private val input: Var[Option[String]] = Var(None)
+    private lazy val input: Signal[Option[String]] = MainViewController.input
     
-    /** Set input string */
-    val setInput: Observer[String] = input.someWriter
-    
-    /** Set input to None to stop rendering */
-    def unloadInput: Observer[Unit] = Observer(_ => input.set(None))
-    
-    def getInputElem: Signal[HtmlElement] = input.signal.map(_ match 
-    /* Default tree view when no tree is loaded */
-        case None => 
+    def getInputElem: Signal[Option[HtmlElement]] = input.signal.map(_.map(
+        (input: String) => div(
+            className := "debug-input-container",
             div(
-                className := "nothing-shown",
-                "Nothing to show"
+                className := "debug-input-main-view",
+                span(input) /* Ensures correct text rendering */
             )
-    
-        /* Render as Input View */
-        case Some(inputString) => {
-            div(
-                className := "debug-input-container",
-                div(
-                    className := "debug-input-main-view",
-                    
-                    /* Ensures correct text rendering */
-                    span(inputString)
-                )
-            )
-        }
-    )
+        )
+    ))
     
 }

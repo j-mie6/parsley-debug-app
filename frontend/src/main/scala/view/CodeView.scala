@@ -119,7 +119,7 @@ case object FileObject {
 
 
 object CodeView {
-    def transformFileString(file: String): Element = {
+    def transformFileString(file: String): HtmlElement = {
         div(
             file.split("\n").map(line => 
                 div(
@@ -129,7 +129,7 @@ object CodeView {
         )
     }
 
-    def renderFile(contents: Signal[String]): Element = {
+    def renderFile(contents: Signal[String]): HtmlElement = {
         div(
             className := "code-view-file-view-wrapper",
             div(
@@ -139,7 +139,7 @@ object CodeView {
         )
     }
 
-    def renderFileExplorer(fileInfo: List[String]): Element = {
+    def renderFileExplorer(fileInfo: List[String]): HtmlElement = {
         val fileSystem: FileObject = FileObject.fromPaths(fileInfo)
         div(
             className := "code-view-file-explorer",
@@ -147,22 +147,15 @@ object CodeView {
         )
     }
 
-    lazy val defaultFileExplorer: Element = div(
-        className := "nothing-shown",
-        "Nothing to show"
-    )
-
-    lazy val defaultFile: Element = div()
-
     def apply(): HtmlElement = {
-        val maybeFileContents: Signal[Option[Element]] = CodeViewController.getCurrentFile.splitOption((_, signal) => renderFile(signal))
-        val maybeFileExplorer: Signal[Option[Element]] = CodeViewController.getFileInformation.splitOption((codeInfo, _) => renderFileExplorer(codeInfo.info.keySet.toList))
+        val maybeFileContents: Signal[Option[HtmlElement]] = CodeViewController.getCurrentFile.splitOption((_, signal) => renderFile(signal))
+        val maybeFileExplorer: Signal[Option[HtmlElement]] = CodeViewController.getFileInformation.map(_.map(codeInfo => renderFileExplorer(codeInfo.info.keySet.toList)))
 
         div(
             className := "code-view-main-view",
 
-            child <-- maybeFileExplorer.map(_.getOrElse(defaultFileExplorer)),
-            child <-- maybeFileContents.map(_.getOrElse(defaultFile)),
+            child.maybe <-- maybeFileExplorer,
+            child.maybe <-- maybeFileContents,
         )
     }
 }

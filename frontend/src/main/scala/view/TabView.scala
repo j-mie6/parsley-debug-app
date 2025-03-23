@@ -10,6 +10,7 @@ import model.errors.DillException
 import controller.errors.ErrorController
 import controller.tauri.{Tauri, Command}
 import controller.viewControllers.{InputViewController, TabViewController, TreeViewController, CodeViewController}
+import controller.viewControllers.MainViewController
 
 
 object TabView {
@@ -92,15 +93,11 @@ object TabView {
             /* If there are no tabs, unload tree and input from frontend */
             TabViewController.noSavedTrees.changes
                 .filter(identity)
-                .mapToUnit --> TreeViewController.unloadTree,
+                .mapToUnit --> MainViewController.unload,
 
             TabViewController.noSavedTrees.changes
                 .filter(identity)
-                .mapToUnit --> InputViewController.unloadInput,
-
-            TabViewController.noSavedTrees.changes
-                .filter(identity)
-                .mapToUnit --> CodeViewController.unloadCode,
+                .mapToUnit --> CodeViewController.unloadFile,
 
 
             /* Renders tabs */ 

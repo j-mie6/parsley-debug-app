@@ -57,12 +57,8 @@ object MainView extends DebugViewPage {
 
 
                 /* Update tree and input with TreeReady response */
-                treeStream.collectRight --> TreeViewController.setTree,
+                treeStream.collectRight --> MainViewController.setState,
                 treeStream.collectRight --> StateManagementViewController.setCurrTree,
-                treeStream.collectRight.map(_.input) --> InputViewController.setInput,
-                treeStream.collectRight
-                    .map((tree: DebugTree) => CodeFileInformation(tree.parserInfo)) 
-                    --> CodeViewController.setFileInformation,
 
                 /* Notify of any errors caught by treeStream */
                 treeStream.collectLeft --> ErrorController.setError,
@@ -92,7 +88,7 @@ object MainView extends DebugViewPage {
 
 
                 /* Load main page */
-                child <-- MainViewController.getViewElem,
+                child <-- MainViewController.getView,
 
                 /* Displaying Dill Exceptions */
                 child.maybe <-- ErrorController.getErrorElem,
