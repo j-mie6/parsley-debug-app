@@ -128,7 +128,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         };
 
         /* Update the saved tree and set the updated tree into state */
-        if let Err(_) = save::update_tree(&debug_tree, tree_name) {
+        if let Err(_) = save::update_tree(state.get_app_localdata_path().expect("msg"), &debug_tree, tree_name) {
             return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
         }
         state.set_tree(debug_tree)

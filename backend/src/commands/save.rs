@@ -59,7 +59,7 @@ pub enum SaveTreeError {
 }
 
 /* Updates a saved tree with new breakpoint skips */
-pub fn update_tree(tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+pub fn update_tree(mut path: PathBuf, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
     let new_tree: SavedTree = SavedTree::from(tree.clone());
     /* Get the serialised JSON */
     let tree_json: String = serde_json::to_string_pretty(&new_tree)
@@ -67,7 +67,9 @@ pub fn update_tree(tree: &DebugTree, tree_name: String) -> Result<(), UpdateTree
 
     /* Open the json file to update the tree */
     /* TODO: look into only updating the extra bits rather than replacing the tree */
-    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
+    path.push(SAVED_TREE_DIR);
+    path.push(format!("{}.json", tree_name));
+    let file_path: OsString = path.into_os_string();
     let mut data_file: File = File::create(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
 
     /* Write tree json to the json file */
