@@ -158,7 +158,7 @@ impl StateManager for AppState {
     }
     
     fn get_app_localdata_path(&self) -> Result<PathBuf,StateError> {
-        self.inner()?.app.get_localdata_path()
+        self.inner()?.app.get_app_localdata_path()
     }
     
     fn get_download_path(&self) -> Result<PathBuf, StateError> {

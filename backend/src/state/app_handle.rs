@@ -21,7 +21,7 @@ impl AppHandle {
         StateManager::emit(&self.0, event)
     }
 
-    pub fn get_localdata_path(&self) -> Result<PathBuf, StateError> {
+    pub fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
         self.0.get_app_localdata_path()
     }
 
