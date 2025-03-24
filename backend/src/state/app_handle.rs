@@ -21,6 +21,10 @@ impl AppHandle {
         StateManager::emit(&self.0, event)
     }
 
+    pub fn get_localdata_path(&self) -> Result<PathBuf, StateError> {
+        self.0.get_download_path()
+    }
+
     pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
         self.0.get_download_path()
     }
@@ -73,6 +77,11 @@ impl StateManager for tauri::AppHandle {
     
     fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
         self.state::<AppState>().new_transmitter(session_id, tx)
+    }
+
+    fn get_app_localdata_path(&self) -> Result<PathBuf,StateError> {
+        self.path().app_local_data_dir()
+            .map_err(|_| StateError::GetAppLocalDataPathFail)
     }
     
     fn get_download_path(&self) -> Result<PathBuf, StateError> {

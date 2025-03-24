@@ -70,6 +70,10 @@ impl StateManager for ServerState {
     fn new_transmitter(&self, session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<i32>) -> Result<(), StateError> {
         self.inner().new_transmitter(session_id, tx)
     }
+
+    fn get_app_localdata_path(&self) -> Result<PathBuf,StateError> {
+        self.inner().get_app_localdata_path()
+    }
     
     fn get_download_path(&self) -> Result<PathBuf, StateError> {
         self.inner().get_download_path()
