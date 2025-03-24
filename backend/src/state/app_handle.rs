@@ -22,7 +22,7 @@ impl AppHandle {
     }
 
     pub fn get_localdata_path(&self) -> Result<PathBuf, StateError> {
-        self.0.get_download_path()
+        self.0.get_app_localdata_path()
     }
 
     pub fn get_download_path(&self) -> Result<PathBuf, StateError> {

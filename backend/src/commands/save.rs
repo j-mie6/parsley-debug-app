@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::PathBuf;
@@ -29,7 +30,7 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
 
 
     /* Create the json file to store the tree */
-    let file_path: String = format_filepath(&state, &tree_name)?;
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
     let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
 
     /* Write tree json to the json file */
@@ -100,7 +101,7 @@ pub fn download_tree(state: tauri::State<AppState>, index: usize) -> Result<(), 
     let tree_name: String = state.get_tree_name(index)?;
     
     /* Path to the json file used to store the tree */
-    let file_path: String = format_filepath(&state, &tree_name)?;
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
 
     /* Get path to Downloads folder */
     let mut download_path: PathBuf = state.get_download_path()?;
@@ -142,7 +143,7 @@ pub fn import_tree(tree_name: String, contents: String, state: tauri::State<AppS
     imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteToFileFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
-    load_path(app_path, true, &state)?;
+    load_path(OsString::from(app_path), true, &state)?;
     state.emit(Event::NewTree).map_err(ImportTreeError::from)
 }
 
@@ -185,7 +186,7 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     let tree_name: String = state.get_tree_name(index).map_err(|_| DeleteTreeError::NameRetrievalFail)?;
 
     /* Path to the json file used to store the tree */
-    let file_path: String = format_filepath(&state, &tree_name)?;
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
 
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
@@ -234,12 +235,12 @@ pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<()
     let tree_name: String = state.get_tree_name(index)?;
 
     /* Get the file path of the tree to be reloaded */
-    let file_path: String = format_filepath(&state, &tree_name)?;
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
     load_path(file_path, false, &state)
 }
 
 /* Loads a tree from the specified file path */
-fn load_path(file_path: String, is_import: bool, state: &tauri::State<AppState>) -> Result<(), LoadTreeError> {
+fn load_path(file_path: OsString, is_import: bool, state: &tauri::State<AppState>) -> Result<(), LoadTreeError> {
     /* Read the contents of the file as a string */
     let contents: String = fs::read_to_string(file_path)
         .map_err(|_| LoadTreeError::ReadFileFailed)?;
@@ -282,11 +283,11 @@ impl From<StateError> for LoadTreeError {
     }
 }
 
-fn format_filepath(state: &tauri::State<AppState>, tree_name: &str) -> Result<String, StateError> {
+fn format_filepath(state: &tauri::State<AppState>, tree_name: &str) -> Result<OsString, StateError> {
     let mut path = state.get_app_localdata_path()?;
     path.push(SAVED_TREE_DIR);
     path.push(tree_name);
-    path.to_str().map(String::from).ok_or(todo!())
+    Ok(path.into_os_string())
 }
 
 /* Updates local changed references for a tree */
