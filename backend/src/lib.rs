@@ -32,7 +32,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
     app.manage(app_state);
 
-    files::create_saved_trees_dir(path_to_saved_trees.as_path()).map_err(|_| tauri::Error::UnknownPath)?;
+    files::create_saved_trees_dir(&path_to_saved_trees).map_err(|_| tauri::Error::UnknownPath)?;
     
     /* Clone the app handle and use to create a ServerState */
     let server_state: ServerState = ServerState::new(app.handle().clone());
@@ -60,13 +60,13 @@ pub fn run() {
         .build(tauri::generate_context!())      /* Build the app */
         .expect("Error building Dill");
 
-    let app_local: PathBuf = app.path().app_local_data_dir().expect("Error occured whilst trying to find app-local storage");
+    let path_to_saved_trees: PathBuf = app.handle().app_path_to(PathBuf::from(SAVED_TREE_DIR)).expect("Error occured whilst trying to find app-local storage");
 
     /* Runs app with handling events */
     app.run(move |_, event| {
         /* On window shutdown, remove saved_trees folder */
         if let RunEvent::ExitRequested { code: None, .. } = event {
-            files::delete_saved_trees_dir(app_local.clone()).expect("Error occured cleaning saved trees");
+            files::delete_saved_trees_dir(&path_to_saved_trees).expect("Error occured cleaning saved trees");
         }
     })
 }
