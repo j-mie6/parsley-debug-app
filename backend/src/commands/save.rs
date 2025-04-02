@@ -59,7 +59,7 @@ pub enum SaveTreeError {
 }
 
 /* Updates a saved tree with new breakpoint skips */
-pub fn update_tree(mut path: PathBuf, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+pub fn update_tree(state: &impl StateManager, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
     let new_tree: SavedTree = SavedTree::from(tree.clone());
     /* Get the serialised JSON */
     let tree_json: String = serde_json::to_string_pretty(&new_tree)
@@ -67,10 +67,13 @@ pub fn update_tree(mut path: PathBuf, tree: &DebugTree, tree_name: String) -> Re
 
     /* Open the json file to update the tree */
     /* TODO: look into only updating the extra bits rather than replacing the tree */
-    path.push(SAVED_TREE_DIR);
-    path.push(format!("{}.json", tree_name));
-    let file_path: OsString = path.into_os_string();
-    let mut data_file: File = File::create(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+    let mut file_path = PathBuf::new();
+    file_path.push(SAVED_TREE_DIR);
+    file_path.push(format!("{}.json", tree_name));
+
+    let full_path: PathBuf = state.app_path_to(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+
+    let mut data_file: File = File::create(full_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
 
     /* Write tree json to the json file */
     data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;

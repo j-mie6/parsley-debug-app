@@ -128,12 +128,8 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         };
 
         /* Update the saved tree and set the updated tree into state */
-        if let Ok(app_local) = state.get_app_localdata_path() {
-            if let Err(_) = save::update_tree(app_local, &debug_tree, tree_name) {
-                return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
-            }
-        } else {
-            return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not find app-local storage", session_id))
+        if let Err(_) = save::update_tree(state.inner(), &debug_tree, tree_name) {
+            return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
         }
         state.set_tree(debug_tree)
     };
