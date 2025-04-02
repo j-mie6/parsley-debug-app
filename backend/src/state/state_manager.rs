@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{self, PathBuf};
 
 use std::collections::HashMap;
 
@@ -22,6 +22,14 @@ pub trait StateManager: Send + Sync + 'static {
     fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError>;
 
     fn get_app_localdata_path(&self) -> Result<PathBuf, StateError>;
+
+    /* Returns the given PathBuf prefixed with /path/to/app_localdata */
+    fn app_path_to(&self, path: PathBuf) -> Result<PathBuf, StateError> {
+        if path.is_absolute() {
+            return Err(StateError::GetAppLocalDataPathFail);
+        }
+        self.get_app_localdata_path().map(|app_local| app_local.join(path))
+    }
 
     fn get_download_path(&self) -> Result<PathBuf, StateError>;
 
