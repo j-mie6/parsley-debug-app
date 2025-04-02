@@ -29,7 +29,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     app.manage(app_state);
 
     let app_local: PathBuf = app.path().app_local_data_dir()?;
-    files::create_saved_trees_dir(app_local).expect("Error occured while making saved_trees folder");
+    files::create_saved_trees_dir(app_local).map_err(|_| tauri::Error::UnknownPath)?;
     
     /* Clone the app handle and use to create a ServerState */
     let server_state: ServerState = ServerState::new(app.handle().clone());
