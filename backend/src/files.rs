@@ -15,10 +15,7 @@ pub fn delete_saved_trees_dir(mut app_local: PathBuf) -> Result<(), FileError> {
 }
 
 
-pub fn create_saved_trees_dir(mut app_local: PathBuf) -> Result<(), FileError> {
-    app_local.push(SAVED_TREE_DIR);
-    let path: &Path = app_local.as_path();
-    
+pub fn create_saved_trees_dir(path: &Path) -> Result<(), FileError> {
     /* If the folder for saved_trees does not exist, create it. */
     if !path.exists() {
         fs::create_dir(path)

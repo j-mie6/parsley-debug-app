@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+use files::SAVED_TREE_DIR;
+use state::StateManager;
 use tauri::Manager;
 use tauri::RunEvent;
 
@@ -26,10 +28,11 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
     /* Manage the app state using Tauri */
     let app_state: AppState = AppState::new(app.app_handle().clone());
+    let path_to_saved_trees: PathBuf = app_state.app_path_to(PathBuf::from(SAVED_TREE_DIR)).map_err(|_| tauri::Error::UnknownPath)?;
+
     app.manage(app_state);
 
-    let app_local: PathBuf = app.path().app_local_data_dir()?;
-    files::create_saved_trees_dir(app_local).map_err(|_| tauri::Error::UnknownPath)?;
+    files::create_saved_trees_dir(path_to_saved_trees.as_path()).map_err(|_| tauri::Error::UnknownPath)?;
     
     /* Clone the app handle and use to create a ServerState */
     let server_state: ServerState = ServerState::new(app.handle().clone());
