@@ -211,10 +211,10 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
 pub fn delete_saved_trees(state: tauri::State<AppState>) -> Result<(), DeleteTreeError> {
     state.reset_trees()?;
 
-    let path: PathBuf = state.app_path_to(PathBuf::from(SAVED_TREE_DIR))?;
+    let path_to_saved_trees: PathBuf = state.app_path_to(PathBuf::from(SAVED_TREE_DIR))?;
 
-    fs::remove_dir_all(path.clone()).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
-    fs::create_dir(path).map_err(|_| DeleteTreeError::FolderCreationFail)
+    fs::remove_dir_all(path_to_saved_trees.clone()).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
+    fs::create_dir(path_to_saved_trees).map_err(|_| DeleteTreeError::FolderCreationFail)
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -290,6 +290,7 @@ impl From<StateError> for LoadTreeError {
     }
 }
 
+/* Generates the full path to a tree file in the form `APPDATA/SAVED_TREE_DIR/tree_name` */
 fn format_filepath(state: &tauri::State<AppState>, tree_name: &str) -> Result<OsString, StateError> {
     let mut path_to_tree = PathBuf::new();
     path_to_tree.push(SAVED_TREE_DIR);
