@@ -157,7 +157,7 @@ impl StateManager for AppState {
             .map_err(|_| StateError::ChannelError)
     }
     
-    fn get_app_localdata_path(&self) -> Result<PathBuf,StateError> {
+    fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
         self.inner()?.app.get_app_localdata_path()
     }
     

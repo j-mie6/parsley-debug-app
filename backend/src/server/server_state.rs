@@ -71,7 +71,7 @@ impl StateManager for ServerState {
         self.inner().new_transmitter(session_id, tx)
     }
 
-    fn get_app_localdata_path(&self) -> Result<PathBuf,StateError> {
+    fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
         self.inner().get_app_localdata_path()
     }
     
