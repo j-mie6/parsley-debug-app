@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use tauri::Manager;
 use tauri::RunEvent;
 
@@ -26,7 +28,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let app_state: AppState = AppState::new(app.app_handle().clone());
     app.manage(app_state);
 
-    let app_local = app.path().app_local_data_dir().expect("Error occured whilst trying to find app-local storage");
+    let app_local: PathBuf = app.path().app_local_data_dir()?;
     files::create_saved_trees_dir(app_local).expect("Error occured while making saved_trees folder");
     
     /* Clone the app handle and use to create a ServerState */
@@ -55,7 +57,7 @@ pub fn run() {
         .build(tauri::generate_context!())      /* Build the app */
         .expect("Error building Dill");
 
-    let app_local = app.path().app_local_data_dir().expect("Error occured whilst trying to find app-local storage");
+    let app_local: PathBuf = app.path().app_local_data_dir().expect("Error occured whilst trying to find app-local storage");
 
     /* Runs app with handling events */
     app.run(move |_, event| {
