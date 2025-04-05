@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
-
+use crate::state::state_manager::UpdateTreeError;
 use super::TokioMutex;
 
 pub type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<i32>;
@@ -89,6 +89,10 @@ impl StateManager for ServerState {
 
     fn reset_trees(&self) -> Result<(), StateError> {
         self.inner().reset_trees()
+    }
+
+    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+        self.inner().update_tree(tree, tree_name)
     }
 }
 

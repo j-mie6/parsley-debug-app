@@ -1,13 +1,16 @@
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Write;
 use std::sync::{Mutex, MutexGuard};
 use std::path::PathBuf;
 
 use crate::events::Event;
-use crate::trees::{DebugTree, DebugNode};
+use crate::trees::{DebugNode, DebugTree, SavedTree};
 
 pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
 
 use super::session_counter::SessionCounter;
+use super::state_manager::UpdateTreeError;
 use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
@@ -239,6 +242,28 @@ impl StateManager for AppState {
         state.tab_names = Vec::new();
         state.debug_sessions = HashMap::new();
         state.saved_refs = HashMap::new();
+
+        Ok(())
+    }
+
+    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+        let new_tree: SavedTree = SavedTree::from(tree.clone());
+        /* Get the serialised JSON */
+        let tree_json: String = serde_json::to_string_pretty(&new_tree)
+            .map_err(|_| UpdateTreeError::SerialiseFailed)?;
+
+        /* Open the json file to update the tree */
+        /* TODO: look into only updating the extra bits rather than replacing the tree */
+        let mut file_path = PathBuf::new();
+        file_path.push(crate::files::SAVED_TREE_DIR);
+        file_path.push(format!("{}.json", tree_name));
+
+        let full_path: PathBuf = self.app_path_to(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+
+        let mut data_file: File = File::create(full_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+
+        /* Write tree json to the json file */
+        data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;
 
         Ok(())
     }

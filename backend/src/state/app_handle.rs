@@ -5,6 +5,7 @@ use tauri::{Emitter, Manager};
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 use crate::state::state_manager::SkipsSender;
+use super::state_manager::UpdateTreeError;
 use super::{AppState, StateManager, StateError};
 use std::path::PathBuf;
 
@@ -99,5 +100,9 @@ impl StateManager for tauri::AppHandle {
 
     fn reset_trees(&self) -> Result<(), StateError> {
         self.state::<AppState>().reset_trees()
+    }
+
+    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+        self.state::<AppState>().update_tree(tree, tree_name)
     }
 }

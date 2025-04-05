@@ -50,6 +50,16 @@ pub trait StateManager: Send + Sync + 'static {
     fn get_refs(&self, session_id: i32) -> Result<Vec<(i32, String)>, StateError>;
 
     fn reset_trees(&self) -> Result<(), StateError>;
+
+    /* Updates a saved tree with new breakpoint skips */
+    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError>;
+}
+
+#[derive(Debug, serde::Serialize)]
+pub enum UpdateTreeError {
+    SerialiseFailed,
+    OpenFileFailed,
+    WriteTreeFailed,
 }
 
 
