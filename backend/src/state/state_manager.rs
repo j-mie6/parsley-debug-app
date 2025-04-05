@@ -23,10 +23,10 @@ pub trait StateManager: Send + Sync + 'static {
 
     fn get_app_localdata_path(&self) -> Result<PathBuf, StateError>;
 
-    /* Returns the given PathBuf prefixed with /path/to/app_localdata */
+    /** Returns the given PathBuf prefixed with `/path/to/app_localdata`. The given path should be a relative path. */
     fn app_path_to(&self, path: PathBuf) -> Result<PathBuf, StateError> {
         if path.is_absolute() {
-            return Err(StateError::GotAbsolutePath);
+            return Err(StateError::AbsolutePathNotAllowed);
         }
         self.get_app_localdata_path().map(|app_local| app_local.join(path))
     }
@@ -59,7 +59,7 @@ pub enum StateError {
     TreeNotFound,
     NodeNotFound(u32),
     EventEmitFailed,
-    GotAbsolutePath,
+    AbsolutePathNotAllowed, /* A function was given an unexpected absolute path */
     GetAppLocalDataPathFail,
     GetDownloadPathFail,
     ChannelError, /* Non-fatal error: The receiver from Parsley is no longer listening */
