@@ -31,7 +31,8 @@ object MainView extends DebugViewPage {
     }
 
     /* Listen for posted tree */
-    val (treeStream, unlistenTree) = Tauri.listen(Event.TreeReady)
+    val (eitherTreeStream, unlistenTree) = Tauri.listen(Event.TreeReady)
+    val treeStream = eitherTreeStream.collectRight
     val (newTreeStream, unlistenNewTree) = Tauri.listen(Event.NewTree)
 
     val (codeStream, unlistenCode) = Tauri.listen(Event.UploadCodeFile)
@@ -57,13 +58,13 @@ object MainView extends DebugViewPage {
 
 
                 /* Update tree and input with TreeReady response */
-                treeStream.collectRight --> TreeViewController.setTree,
-                treeStream.collectRight --> StateManagementViewController.setCurrTree,
-                treeStream.collectRight.map(_.input) --> InputViewController.setInput,
-                treeStream.collectRight.map(tree => CodeFileInformation(tree.parserInfo)) --> CodeViewController.setFileInformation,
+                treeStream --> TreeViewController.setTree,
+                //treeStream --> StateManagementViewController.setCurrTree,
+                treeStream.map(_.input) --> InputViewController.setInput,
+                treeStream.map(tree => CodeFileInformation(tree.parserInfo)) --> CodeViewController.setFileInformation,
 
                 /* Notify of any errors caught by treeStream */
-                treeStream.collectLeft --> ErrorController.setError,
+                eitherTreeStream.collectLeft --> ErrorController.setError,
 
                 /* Save any new trees when received */
                 newTreeStream
