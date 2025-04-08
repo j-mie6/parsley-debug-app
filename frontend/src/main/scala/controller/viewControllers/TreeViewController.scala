@@ -18,7 +18,7 @@ import controller.viewControllers.SettingsViewController
 object TreeViewController {
 
     /* Reactive DebugTree */
-    private val tree: Var[Option[DebugTree]] = Var(None) 
+    private val tree: Var[Option[DebugTree]] = Var(None)
 
     /* DebugTree signal */
     val getTree: Signal[Option[DebugTree]] = tree.signal
@@ -30,18 +30,21 @@ object TreeViewController {
     val setTreeOpt: Observer[Option[DebugTree]] = tree.writer
 
     /** Set debug tree to None to stop rendering */
-    def unloadTree: Observer[Unit] = Observer(_ => tree.set(None))
-    
+    def unloadTree: Observer[Unit] = setTreeOpt.contramap(_ => None)
+
     /** Return true signal if tree is loaded into frontend */
     def treeExists: Signal[Boolean] = getTree.map(_.isDefined)
 
     /** Get sessionId from loaded tree, -1 for non-debuggable */
     def getSessionId: Signal[Int] = getTree.foldOption(-1)(_.sessionId)
 
+    /** Get sessionName from loaded tree, "tree" for a plain name */
+    def getSessionName: Signal[String] = getTree.foldOption("tree")(_.sessionName)
+
     /** Get debug tree element or warning if no tree found */
-    def getTreeElem: Signal[HtmlElement] = getTree.map(_ match 
+    def getTreeElem: Signal[HtmlElement] = getTree.map(_ match
         /* Default tree view when no tree is loaded */
-        case None => 
+        case None =>
           StateManagementViewController.clearRefs
           div(
             className := "nothing-shown",
@@ -58,10 +61,10 @@ object TreeViewController {
 
     /* Imports JSON in path from users device */
     def importTree(name: String, contents: String): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.ImportTree, (name, contents))
-    
+
     /** Fetch the debug tree root from the backend, return in EventStream */
     def reloadTree: EventStream[Either[DillException, DebugTree]] = Tauri.invoke(Command.FetchDebugTree, ())
-    
+
     /** Skips the current breakpoint 'skips' times
       *
       * @param skips The amount of times to skip a breakpoint
@@ -71,9 +74,9 @@ object TreeViewController {
         sessionId
             .withCurrentValueOf(SettingsViewController.getNumSkipBreakpoints.signal)
             .map((sessionId, skips) => (sessionId, skips - 1))
-            .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _))
+            .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _)) // FIXME: I think this can be a flatMapSwitch?
     }
-        
+
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
 
     /** Get the references of a debugging tree */

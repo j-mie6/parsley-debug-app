@@ -1,6 +1,6 @@
 import scala.util.{Try, Success, Failure}
 import org.scalatest
-import org.scalatest.flatspec.AnyFlatSpec   
+import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.*
 
 import model.DebugTree
@@ -28,10 +28,11 @@ class Test extends AnyFlatSpec with should.Matchers {
         "parserInfo": {},
         "isDebuggable": false,
         "refs": [],
-        "sessionId": -1
+        "sessionId": -1,
+        "sessionName": "tree"
     }"""
 
-    
+
     "The tree" should "be deserialised" in {
         val parsed: Either[DillException, DebugTree] = Reader[DebugTree].read(jsonTree)
         val tree: DebugTree = parsed match {
@@ -73,7 +74,7 @@ class FileSystemTest extends AnyFlatSpec with should.Matchers {
             "/dir/content/test.scala"
         )
 
-        FileObject.fromPaths(paths) should matchPattern { 
+        FileObject.fromPaths(paths) should matchPattern {
             case RootDirectory(List(
                 Directory(
                     "content/",
