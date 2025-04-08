@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::PathBuf;
@@ -29,7 +30,7 @@ pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<Str
 
 
     /* Create the json file to store the tree */
-    let file_path: String = format_filepath(&tree_name);
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
     let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
 
     /* Write tree json to the json file */
@@ -57,31 +58,6 @@ pub enum SaveTreeError {
     AddSessionFailed,
 }
 
-/* Updates a saved tree with new breakpoint skips */
-pub fn update_tree(tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
-    let new_tree: SavedTree = SavedTree::from(tree.clone());
-    /* Get the serialised JSON */
-    let tree_json: String = serde_json::to_string_pretty(&new_tree)
-        .map_err(|_| UpdateTreeError::SerialiseFailed)?;
-
-    /* Open the json file to update the tree */
-    /* TODO: look into only updating the extra bits rather than replacing the tree */
-    let file_path: String = format!("{}{}.json", SAVED_TREE_DIR, tree_name);
-    let mut data_file: File = File::create(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
-
-    /* Write tree json to the json file */
-    data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;
-
-    Ok(())
-}
-
-#[derive(Debug, serde::Serialize)]
-pub enum UpdateTreeError {
-    SerialiseFailed,
-    OpenFileFailed,
-    WriteTreeFailed,
-}
-
 impl From<StateError> for SaveTreeError {
     fn from(state_error: StateError) -> Self {
         match state_error {
@@ -100,7 +76,7 @@ pub fn download_tree(state: tauri::State<AppState>, index: usize) -> Result<(), 
     let tree_name: String = state.get_tree_name(index)?;
     
     /* Path to the json file used to store the tree */
-    let file_path: String = format_filepath(&tree_name);
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
 
     /* Get path to Downloads folder */
     let mut download_path: PathBuf = state.get_download_path()?;
@@ -142,7 +118,7 @@ pub fn import_tree(tree_name: String, contents: String, state: tauri::State<AppS
     imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteToFileFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
-    load_path(app_path, true, &state)?;
+    load_path(OsString::from(app_path), true, &state)?;
     state.emit(Event::NewTree).map_err(ImportTreeError::from)
 }
 
@@ -185,7 +161,7 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
     let tree_name: String = state.get_tree_name(index).map_err(|_| DeleteTreeError::NameRetrievalFail)?;
 
     /* Path to the json file used to store the tree */
-    let file_path: String = format_filepath(&tree_name);
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
 
     /* Remove the file from the file system */
     fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
@@ -205,8 +181,10 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
 pub fn delete_saved_trees(state: tauri::State<AppState>) -> Result<(), DeleteTreeError> {
     state.reset_trees()?;
 
-    fs::remove_dir_all(SAVED_TREE_DIR).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
-    fs::create_dir(SAVED_TREE_DIR).map_err(|_| DeleteTreeError::FolderCreationFail)
+    let path_to_saved_trees: PathBuf = state.app_path_to(PathBuf::from(SAVED_TREE_DIR))?;
+
+    fs::remove_dir_all(path_to_saved_trees.clone()).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
+    fs::create_dir(path_to_saved_trees).map_err(|_| DeleteTreeError::FolderCreationFail)
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -234,12 +212,12 @@ pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<()
     let tree_name: String = state.get_tree_name(index)?;
 
     /* Get the file path of the tree to be reloaded */
-    let file_path: String = format_filepath(&tree_name);
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
     load_path(file_path, false, &state)
 }
 
 /* Loads a tree from the specified file path */
-fn load_path(file_path: String, is_import: bool, state: &tauri::State<AppState>) -> Result<(), LoadTreeError> {
+fn load_path(file_path: OsString, is_import: bool, state: &tauri::State<AppState>) -> Result<(), LoadTreeError> {
     /* Read the contents of the file as a string */
     let contents: String = fs::read_to_string(file_path)
         .map_err(|_| LoadTreeError::ReadFileFailed)?;
@@ -282,8 +260,14 @@ impl From<StateError> for LoadTreeError {
     }
 }
 
-fn format_filepath(tree_name: &str) -> String {
-    format!("{}{}.json", SAVED_TREE_DIR, tree_name)
+/* Generates the full path to a tree file in the form `APPDATA/SAVED_TREE_DIR/tree_name` */
+fn format_filepath(state: &tauri::State<AppState>, tree_name: &str) -> Result<OsString, StateError> {
+    let mut path_to_tree = PathBuf::new();
+    path_to_tree.push(SAVED_TREE_DIR);
+    path_to_tree.push(tree_name);
+
+    let full_path = state.app_path_to(path_to_tree)?;
+    Ok(full_path.into_os_string())
 }
 
 /* Updates local changed references for a tree */

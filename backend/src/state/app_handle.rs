@@ -5,6 +5,7 @@ use tauri::{Emitter, Manager};
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 use crate::state::state_manager::SkipsSender;
+use super::state_manager::UpdateTreeError;
 use super::{AppState, StateManager, StateError};
 use std::path::PathBuf;
 
@@ -19,6 +20,10 @@ impl AppHandle {
     /* Delegate emit to wrapped Tauri AppHandle */
     pub fn emit(&self, event: Event) -> Result<(), StateError> {
         StateManager::emit(&self.0, event)
+    }
+
+    pub fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
+        self.0.get_app_localdata_path()
     }
 
     pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
@@ -74,6 +79,11 @@ impl StateManager for tauri::AppHandle {
     fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
         self.state::<AppState>().new_transmitter(session_id, tx)
     }
+
+    fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
+        self.path().app_local_data_dir()
+            .map_err(|_| StateError::GetAppLocalDataPathFail)
+    }
     
     fn get_download_path(&self) -> Result<PathBuf, StateError> {
         self.path().download_dir()
@@ -90,5 +100,9 @@ impl StateManager for tauri::AppHandle {
 
     fn reset_trees(&self) -> Result<(), StateError> {
         self.state::<AppState>().reset_trees()
+    }
+
+    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+        self.state::<AppState>().update_tree(tree, tree_name)
     }
 }
