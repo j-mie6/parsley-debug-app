@@ -131,34 +131,37 @@ pub mod test {
     use super::{SavedTree, SavedNode};
     use crate::trees::{debug_tree, DebugTree};
 
+    const DEFAULT_SESSION_ID: i32 = -1;
+    const DEFAULT_SESSION_NAME: &str = "tree";
+
     pub fn json() -> String {
-        r#"{
+        format!(r#"{{
             "input": "Test",
-            "root": {
-                "node_id": 0,
+            "root": {{
+                "nodeId": 0,
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
-                "child_id": 0,
+                "childId": 0,
                 "input": "Test",
-                "children": [],
-                "is_iterative": false,
-                "newly_generated": false
-            },
-            "parser_info" : {},
-            "is_debuggable": false,
+                "isLeaf": true,
+                "isIterative": false,
+                "newlyGenerated": false
+            }},
+            "parserInfo" : {{}},
+            "isDebuggable": false,
             "refs": [],
-            "session_id": -1,
-            "session_name": "tree"
-        }"#
+            "sessionId": {session_id},
+            "sessionName": {session_name}
+        }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect()
     }
 
     pub fn nested_json() -> String {
-        r#"{
+        format!(r#"{{
             "input": "01234",
-            "root": {
+            "root": {{
                 "node_id": 0,
                 "name": "0",
                 "internal": "0",
@@ -166,7 +169,7 @@ pub mod test {
                 "child_id": 0,
                 "input": "0",
                 "children": [
-                    {
+                    {{
                         "node_id": 1,
                         "name": "1",
                         "internal": "1",
@@ -174,7 +177,7 @@ pub mod test {
                         "child_id": 1,
                         "input": "1",
                         "children": [
-                            {
+                            {{
                                 "node_id": 2,
                                 "name": "2",
                                 "internal": "2",
@@ -184,12 +187,12 @@ pub mod test {
                                 "children": [],
                                 "is_iterative": false,
                                 "newly_generated": false
-                            }
+                            }}
                         ],
                         "is_iterative": false,
                         "newly_generated": false
-                    },
-                    {
+                    }},
+                    {{
                         "node_id": 3,
                         "name": "3",
                         "internal": "3",
@@ -197,7 +200,7 @@ pub mod test {
                         "child_id": 3,
                         "input": "3",
                         "children": [
-                            {
+                            {{
                                 "node_id": 4,
                                 "name": "4",
                                 "internal": "4",
@@ -207,21 +210,21 @@ pub mod test {
                                 "children": [],
                                 "is_iterative": false,
                                 "newly_generated": false
-                            }
+                            }}
                         ],
                         "is_iterative": false,
                         "newly_generated": false
-                    }
+                    }}
                 ],
                 "is_iterative": false,
                 "newly_generated": false
-            },
-            "parser_info" : {},
+            }},
+            "parser_info" : {{}},
             "is_debuggable": false,
             "refs": [],
-            "session_id": -1,
-            "session_name": "tree"
-        }"#
+            "sessionId": {session_id},
+            "sessionName": {session_name}
+        }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect()
     }
@@ -243,8 +246,8 @@ pub mod test {
             HashMap::new(),
             false,
             Vec::new(),
-            -1,
-            String::from("tree"),
+            DEFAULT_SESSION_ID,
+            String::from(DEFAULT_SESSION_NAME),
         )
     }
 
@@ -312,8 +315,8 @@ pub mod test {
             HashMap::new(),
             false,
             Vec::new(),
-            -1,
-            String::from("tree"),
+            DEFAULT_SESSION_ID,
+            String::from(DEFAULT_SESSION_NAME),
         )
     }
 

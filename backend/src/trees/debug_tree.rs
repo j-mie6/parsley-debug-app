@@ -96,10 +96,13 @@ pub mod test {
 
     use super::{DebugNode, DebugTree};
 
+    const DEFAULT_SESSION_ID: i32 = -1;
+    const DEFAULT_SESSION_NAME: &str = "tree";
+
     pub fn json() -> String {
-        r#"{
+        format!(r#"{{
             "input": "Test",
-            "root": {
+            "root": {{
                 "nodeId": 0,
                 "name": "Test",
                 "internal": "Test",
@@ -109,20 +112,21 @@ pub mod test {
                 "isLeaf": true,
                 "isIterative": false,
                 "newlyGenerated": false
-            },
-            "parserInfo" : {},
+            }},
+            "parserInfo" : {{}},
             "isDebuggable": false,
             "refs": [],
-            "sessionId": -1
-        }"#
+            "sessionId": {session_id},
+            "sessionName": {session_name}
+        }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect::<String>()
     }
 
     pub fn nested_json() -> String {
-        r#"{
+        format!(r#"{{
             "input": "01234",
-            "root": {
+            "root": {{
                 "nodeId": 0,
                 "name": "0",
                 "internal": "0",
@@ -132,12 +136,13 @@ pub mod test {
                 "isLeaf": false,
                 "isIterative": false,
                 "newlyGenerated": false
-            },
-            "parserInfo" : {},
+            }},
+            "parserInfo" : {{}},
             "isDebuggable": false,
             "refs": [],
-            "sessionId": -1
-        }"#
+            "sessionId": {session_id},
+            "sessionName": {session_name}
+        }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect()
     }
@@ -159,8 +164,8 @@ pub mod test {
             HashMap::new(),
             false,
             Vec::new(),
-            -1,
-            String::from("tree"),
+            DEFAULT_SESSION_ID,
+            String::from(DEFAULT_SESSION_NAME),
         )
     }
 
@@ -228,8 +233,8 @@ pub mod test {
             HashMap::new(),
             false,
             Vec::new(),
-            -1,
-            String::from("tree"),
+            DEFAULT_SESSION_ID,
+            String::from(DEFAULT_SESSION_NAME),
         )
     }
 

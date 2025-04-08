@@ -114,6 +114,9 @@ pub mod test {
     use super::{ParsleyNode, ParsleyTree};
     use crate::trees::{debug_tree, DebugTree};
 
+    const DEFAULT_SESSION_ID: i32 = -1;
+    const DEFAULT_SESSION_NAME: &str = "tree";
+
     pub fn json() -> String {
         r#"{
             "input": "Test",
@@ -216,8 +219,8 @@ pub mod test {
             parser_info: HashMap::new(),
             is_debuggable: false,
             refs: Vec::new(),
-            session_id: ParsleyTree::default_session_id(),
-            session_name: ParsleyTree::default_session_name(),
+            session_id: DEFAULT_SESSION_ID,
+            session_name: String::from(DEFAULT_SESSION_NAME),
         }
     }
 
@@ -285,8 +288,8 @@ pub mod test {
             parser_info: HashMap::new(),
             is_debuggable: false,
             refs: Vec::new(),
-            session_id: ParsleyTree::default_session_id(),
-            session_name: ParsleyTree::default_session_name(),
+            session_id: DEFAULT_SESSION_ID,
+            session_name: String::from(DEFAULT_SESSION_NAME),
         }
     }
 
