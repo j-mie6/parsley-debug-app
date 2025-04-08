@@ -117,7 +117,7 @@ pub mod test {
             "isDebuggable": false,
             "refs": [],
             "sessionId": {session_id},
-            "sessionName": {session_name}
+            "sessionName": "{session_name}"
         }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect::<String>()
@@ -141,7 +141,7 @@ pub mod test {
             "isDebuggable": false,
             "refs": [],
             "sessionId": {session_id},
-            "sessionName": {session_name}
+            "sessionName": "{session_name}"
         }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect()

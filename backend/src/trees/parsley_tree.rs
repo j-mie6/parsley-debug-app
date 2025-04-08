@@ -48,8 +48,8 @@ impl ParsleyTree {
 
     pub fn is_new_tree(&self) -> bool { self.session_id == Self::default_session_id() }
 
-    fn default_session_id() -> i32 { -1 }
-    fn default_session_name() -> String { String::from("run") }
+    const fn default_session_id() -> i32 { -1 }
+    fn default_session_name() -> String { String::from("tree") }
 
     pub fn set_session_id(&mut self, session_id: i32) {
         self.session_id = session_id
@@ -114,7 +114,7 @@ pub mod test {
     use super::{ParsleyNode, ParsleyTree};
     use crate::trees::{debug_tree, DebugTree};
 
-    const DEFAULT_SESSION_ID: i32 = -1;
+    const DEFAULT_SESSION_ID: i32 = ParsleyTree::default_session_id();
     const DEFAULT_SESSION_NAME: &str = "tree";
 
     pub fn json() -> String {

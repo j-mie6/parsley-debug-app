@@ -26,7 +26,7 @@ impl SavedTree {
         }
     }
 
-    fn default_session_name() -> String { String::from("run") }
+    fn default_session_name() -> String { String::from("tree") }
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -138,21 +138,21 @@ pub mod test {
         format!(r#"{{
             "input": "Test",
             "root": {{
-                "nodeId": 0,
+                "node_id": 0,
                 "name": "Test",
                 "internal": "Test",
                 "success": true,
-                "childId": 0,
+                "child_id": 0,
                 "input": "Test",
-                "isLeaf": true,
-                "isIterative": false,
-                "newlyGenerated": false
+                "children": [],
+                "is_iterative": false,
+                "newly_generated": false
             }},
-            "parserInfo" : {{}},
-            "isDebuggable": false,
+            "parser_info" : {{}},
+            "is_debuggable": false,
             "refs": [],
-            "sessionId": {session_id},
-            "sessionName": {session_name}
+            "session_id": {session_id},
+            "session_name": "{session_name}"
         }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect()
@@ -222,8 +222,8 @@ pub mod test {
             "parser_info" : {{}},
             "is_debuggable": false,
             "refs": [],
-            "sessionId": {session_id},
-            "sessionName": {session_name}
+            "session_id": {session_id},
+            "session_name": "{session_name}"
         }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect()
