@@ -24,8 +24,8 @@ To build the `Dill` debugger on your own machine, go to [building](#building).
 You will first need to [install](#how-do-i-install-it) / [build](#building) the `Dill` debugging application onto your machine. Then once the application has started, you are ready to start sending it debug information from within `Parsley`:
 
 - First, ensure that your project has the `remote-view` project as a dependency (you will of course need to have the `Parsley` library as a dependency too).
-- Import the `DillRemoteView` object from `parsley.debug`.
-- Then on the parser which you would like to debug, attach the `DillRemoteView` object, before the parse step.
+- Import the `RemoteView` object from `parsley.debug`.
+- Then on the parser which you would like to debug, attach `RemoteView.dill` before calling `parse()`.
 
 **`test.sc`**: the following `scala` script uses `Parsley 5.0.0-M14`
 
@@ -34,7 +34,7 @@ You will first need to [install](#how-do-i-install-it) / [build](#building) the 
 
 //> using dep com.github.j-mie6::parsley:5.0.0-M14
 //> using dep com.github.j-mie6::parsley-debug:5.0.0-M14
-//> using dep com.github.j-mie6::parsley-debug-remote::0.1-5c47cfb-SNAPSHOT
+//> using dep com.github.j-mie6::parsley-debug-remote::0.1-49c36c0-SNAPSHOT
 //> using options -experimental
 
 import parsley.debug.*
@@ -44,8 +44,6 @@ import parsley.syntax.character.{charLift, stringLift}
 import parsley.debug.combinator.*
 
 import scala.annotation.experimental
-
-import parsley.debug.DillRemoteView
 
 @experimental @parsley.debuggable
 object Parser {
@@ -92,10 +90,10 @@ object Parser {
     }
 }
 
-Parser.expr.attach(DillRemoteView).parse("(3+1)-(2*4)")
-Parser.seq.attach(DillRemoteView).parse("abcd")
-Parser.xyxyxy.attach(DillRemoteView).parse("xyxyxyxyxyxyxyxyxyx")
-Parser.xml.attach(DillRemoteView).parse("<a><b> </B></A>") // Fails unless "A" and "B" are passed back by the user
+Parser.expr.attach(RemoteView.dill).parse("(3+1)-(2*4)")
+Parser.seq.attach(RemoteView.dill).parse("abcd")
+Parser.xyxyxy.attach(RemoteView.dill).parse("xyxyxyxyxyxyxyxyxyx")
+Parser.xml.attach(RemoteView.dill).parse("<a><b> </B></A>") // Fails unless "A" and "B" are passed back by the user
 
 
 ```
@@ -106,7 +104,7 @@ You will then be able to view a representation of the abstract syntax tree gener
 
 ![Debugging Simple Expr Parser](readme/images/exampleParser.png)
 
-The `DillRemoteView` object extends a generic `RemoteView` interface; by default the `DillRemoteView` object sends the debug tree over HTTP to local host, on the `Dill` default port. To send requests to another IP address on another port, use the `RemoteView` object with `userAddress = "..."` and `userPort = ...` parameters filled in the apply constructor.
+The `RemoteView` object creates instances of a generic `RemoteView` interface which sends debug trees to a target over HTTP. To create an instance for Dill running locally attach `RemoteView.dill`, or if hosted externally attach `RemoteView.dill(address)`.
 
 ## Building
 
