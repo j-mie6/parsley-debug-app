@@ -19,12 +19,12 @@ import model.errors.DillException
 object TreeView {
 
     /* Render tree as HtmlElement */
-    def apply(): HtmlElement = 
+    def apply(): HtmlElement =
       val returnBus: EventBus[Either[DillException, Seq[(Int, String)]]] = EventBus()
 
       val seqBus: EventBus[Seq[(Int, String)]] = EventBus()
       val debuggableBus: EventBus[Boolean] = EventBus()
-      
+
       div(
         TreeViewController.isDebuggingSession.changes
             .filterNot(identity)
@@ -32,7 +32,7 @@ object TreeView {
             --> StateManagementViewController.clearRefs,
 
         TreeViewController.getSessionId.changes
-            .flatMapMerge(TreeViewController.getRefs) --> returnBus.writer,
+            .flatMapMerge(TreeViewController.getRefs) --> returnBus.writer, // FIXME: I think this can be a flatMapSwitch?
 
         returnBus.stream.collectRight --> seqBus.writer,
         returnBus.stream.collectLeft --> ErrorController.setError,
@@ -44,5 +44,5 @@ object TreeView {
 
         child <-- TreeViewController.getTreeElem, /* Renders the tree */
     )
-            
+
 }

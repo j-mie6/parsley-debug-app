@@ -54,9 +54,7 @@ object TabView {
             i(className := "bi bi-x"),
 
             /* Deletes the respective tab, not allowing propogation for the tab select onClick */
-            onClick
-                .stopPropagation
-                .flatMapTo(TabViewController.deleteSavedTree(index)) --> deleteBus.writer,
+            onClick.stopPropagation.flatMapTo(TabViewController.deleteSavedTree(index)) --> deleteBus.writer,
 
             /* Pipe errors */
             deleteBus.stream.collectLeft --> ErrorController.setError,
@@ -68,12 +66,7 @@ object TabView {
             deleteBus.stream.collectRight
                 .filter(_.nonEmpty)
                 .sample(TabViewController.getSelectedTab)
-                .map((currIndex: Int) =>
-                    if currIndex >= index then
-                        Math.max(0, currIndex - 1)
-                    else
-                        currIndex
-                ) --> TabViewController.setSelectedTab
+                .map((currIndex: Int) => if currIndex >= index then 0 max (currIndex - 1) else currIndex) --> TabViewController.setSelectedTab
         )
     }
 
@@ -83,7 +76,7 @@ object TabView {
 
             /* Update tree on new tab selected */
             TabViewController.getSelectedTab.changes
-                .flatMapMerge(TabViewController.loadSavedTree)
+                .flatMapMerge(TabViewController.loadSavedTree) // FIXME: I think this can be a flatMapSwitch?
                 .collectLeft --> controller.errors.ErrorController.setError,
 
             TabViewController.getSelectedTab.changes
@@ -102,10 +95,9 @@ object TabView {
                 .filter(identity)
                 .mapToUnit --> CodeViewController.unloadCode,
 
-
             /* Renders tabs */
             children <-- TabViewController
-                .getFileNames
+                .getFileNames.distinct
                 .map(_.indices.map(tabButton(_)))
         )
     }

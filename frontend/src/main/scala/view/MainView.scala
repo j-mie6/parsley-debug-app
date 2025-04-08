@@ -1,6 +1,7 @@
 package view
 
 import scala.util.Random
+import scala.collection.mutable
 
 import com.raquo.laminar.codecs.*
 import com.raquo.laminar.api.L.*
@@ -19,15 +20,14 @@ import model.{CodeFileInformation, DebugTree}
 import controller.tauri.Command
 
 object MainView extends DebugViewPage {
-
-    // TODO: we want this to be unique per session name, so that we can number cleanly.
-    /* File counter */
-    object Counter {
-        private val num: Var[Int] = Var(0)
-        val increment: Observer[Unit] = num.updater((x, unit) => x + 1)
-
-        /* Generate name: tree-{num} for file */
-        def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
+    // the stream-based counter is a bit awkward with the increment, plus requires a flatMap to make unique nums
+    private object FileCounter {
+        private val cs = mutable.Map.empty[String, Int]
+        def freshName(name: String) = {
+            val n = cs.getOrElseUpdate(name, 0)
+            cs(name) = n + 1
+            s"$name-$n"
+        }
     }
 
     /* Listen for posted tree */
@@ -69,8 +69,8 @@ object MainView extends DebugViewPage {
                 /* Save any new trees when received */
                 newTreeStream
                     .collectRight
-                    .sample(Counter.genName)
-                    .flatMapMerge(TabViewController.saveTree) --> tabBus.writer,
+                    .sample(TreeViewController.getSessionName.map(FileCounter.freshName))
+                    .flatMapMerge(TabViewController.saveTree) --> tabBus.writer, // FIXME: I think this can be a flatMapSwitch?
 
                 /* Update file names */
                 tabBus.stream.collectRight --> TabViewController.setFileNames,
@@ -80,9 +80,6 @@ object MainView extends DebugViewPage {
 
                 /* Set selected tab to newest tree */
                 tabBus.stream.collectRight.map(_.length - 1) --> TabViewController.setSelectedTab,
-
-                /* Increment name counter */
-                newTreeStream.collectRight --> Counter.increment,
 
                 /* Notify of any errors caught by newTreeStream */
                 newTreeStream.collectLeft --> ErrorController.setError,
