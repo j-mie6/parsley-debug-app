@@ -26,48 +26,20 @@ impl SavedTree {
         }
     }
 
-    pub fn get_root(&self) -> &SavedNode {
-        &self.root
-    }
-
-    pub fn get_input(&self) -> &String {
-        &self.input
-    }
-
-    pub fn get_parser_info(&self) -> &HashMap<String, Vec<(i32, i32)>> {
-        &self.parser_info
-    }
-
-    pub fn is_debuggable(&self) -> bool {
-        self.is_debuggable
-    }
-
-    pub fn refs(&self) -> Vec<(i32, String)> {
-        self.refs.clone()
-    }
-
-    pub fn get_session_id(&self) -> i32 {
-        self.session_id
-    }
-
-    pub fn get_session_name(&self) -> &String {
-        &self.session_name
-    }
-
     fn default_session_name() -> String { String::from("run") }
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SavedNode {
-    pub node_id: u32,               /* The user-defined name */
-    pub name: String,               /* The internal name of the parser */
-    pub internal: String,           /* Whether the parser was successful */
-    pub success: bool,              /* The unique child number of this node */
-    pub child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
-    pub input: String,              /* Offset into the input in which this node's parse attempt finished */
-    pub children: Vec<SavedNode>,   /* The children of this node */
-    pub is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
-    pub newly_generated: bool,      /* Whether this node was generated since the previous breakpoint */
+    node_id: u32,               /* The user-defined name */
+    name: String,               /* The internal name of the parser */
+    internal: String,           /* Whether the parser was successful */
+    success: bool,              /* The unique child number of this node */
+    child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
+    input: String,              /* Offset into the input in which this node's parse attempt finished */
+    children: Vec<SavedNode>,   /* The children of this node */
+    is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
+    newly_generated: bool,      /* Whether this node was generated since the previous breakpoint */
 }
 impl SavedNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool,
@@ -115,6 +87,34 @@ impl From<DebugTree> for SavedTree {
         let node: SavedNode = convert_node(debug_tree.get_root().clone());
 
         SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_parser_info().clone(), debug_tree.is_debuggable(), debug_tree.refs(), debug_tree.get_session_id(), String::from("tree"))
+    }
+}
+
+impl From<SavedTree> for DebugTree {
+    fn from(saved_tree: SavedTree) -> Self {
+        /* Recursively convert children into SavedNodes */
+        fn convert_node(node: SavedNode) -> DebugNode {
+            let children: Vec<DebugNode> = node.children
+                .into_iter()
+                .map(convert_node)
+                .collect();
+
+            /* Instantiate SavedNode */
+            DebugNode::new(
+                node.node_id,
+                node.name,
+                node.internal,
+                node.success,
+                node.child_id,
+                node.input,
+                children,
+                node.is_iterative,
+                node.newly_generated
+            )
+        }
+
+        let node: DebugNode = convert_node(saved_tree.root.clone());
+        DebugTree::new(saved_tree.input.clone(), node, saved_tree.parser_info.clone(), saved_tree.is_debuggable, saved_tree.refs, saved_tree.session_id/*, saved_tree.session_name.clone()*/)
     }
 }
 
