@@ -19,13 +19,13 @@ import model.{CodeFileInformation, DebugTree}
 import controller.tauri.Command
 
 object MainView extends DebugViewPage {
-    
+
     /* File counter */
     object Counter {
         private val num: Var[Int] = Var(0)
         val increment: Observer[Unit] = num.updater((x, unit) => x + 1)
 
-        
+
         /* Generate name: tree-{num} for file */
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
     }
@@ -35,11 +35,11 @@ object MainView extends DebugViewPage {
     val (newTreeStream, unlistenNewTree) = Tauri.listen(Event.NewTree)
 
     val (codeStream, unlistenCode) = Tauri.listen(Event.UploadCodeFile)
-    
+
     /* Render main viewing page */
     def apply(): HtmlElement = {
 
-        val tabBus: EventBus[Either[DillException, List[String]]] = EventBus()
+        val tabBus: EventBus[Either[DillException, IndexedSeq[String]]] = EventBus()
 
         super.render(Some(
             div(
@@ -47,9 +47,9 @@ object MainView extends DebugViewPage {
                     .take(1)
                     .flatMapTo(Tauri.invoke(Command.DeleteSavedTrees, ()))
                     --> Observer.empty,
-                
+
                 /* Update DOM theme with theme value */
-                AppStateController.isLightMode --> AppStateController.updateDomTheme(), 
+                AppStateController.isLightMode --> AppStateController.updateDomTheme(),
 
                 /* Update any code view streams */
                 codeStream.collectRight.map(Some(_)) --> CodeViewController.setCurrentFile,
@@ -61,7 +61,7 @@ object MainView extends DebugViewPage {
                 treeStream.collectRight --> StateManagementViewController.setCurrTree,
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
                 treeStream.collectRight
-                    .map((tree: DebugTree) => CodeFileInformation(tree.parserInfo)) 
+                    .map((tree: DebugTree) => CodeFileInformation(tree.parserInfo))
                     --> CodeViewController.setFileInformation,
 
                 /* Notify of any errors caught by treeStream */
@@ -80,9 +80,7 @@ object MainView extends DebugViewPage {
                 tabBus.stream.collectLeft --> ErrorController.setError,
 
                 /* Set selected tab to newest tree */
-                tabBus.stream.collectRight
-                    .map((fileNames: List[String]) => fileNames.length - 1) 
-                    --> TabViewController.setSelectedTab,
+                tabBus.stream.collectRight.map(_.length - 1) --> TabViewController.setSelectedTab,
 
                 /* Increment name counter */
                 newTreeStream.collectRight --> Counter.increment,
