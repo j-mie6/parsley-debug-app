@@ -216,8 +216,8 @@ pub mod test {
             parser_info: HashMap::new(),
             is_debuggable: false,
             refs: Vec::new(),
-            session_id: -1,
-            session_name: String::from("tree"),
+            session_id: ParsleyTree::default_session_id(),
+            session_name: ParsleyTree::default_session_name(),
         }
     }
 
@@ -285,8 +285,8 @@ pub mod test {
             parser_info: HashMap::new(),
             is_debuggable: false,
             refs: Vec::new(),
-            session_id: -1,
-            session_name: String::from("tree"),
+            session_id: ParsleyTree::default_session_id(),
+            session_name: ParsleyTree::default_session_name(),
         }
     }
 

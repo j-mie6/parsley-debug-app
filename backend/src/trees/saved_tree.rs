@@ -148,7 +148,8 @@ pub mod test {
             "parser_info" : {},
             "is_debuggable": false,
             "refs": [],
-            "session_id": -1
+            "session_id": -1,
+            "session_name": "tree"
         }"#
         .split_whitespace()
         .collect()
@@ -218,7 +219,8 @@ pub mod test {
             "parser_info" : {},
             "is_debuggable": false,
             "refs": [],
-            "session_id": -1
+            "session_id": -1,
+            "session_name": "tree"
         }"#
         .split_whitespace()
         .collect()
