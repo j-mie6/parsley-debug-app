@@ -20,11 +20,11 @@ import controller.tauri.Command
 
 object MainView extends DebugViewPage {
 
+    // TODO: we want this to be unique per session name, so that we can number cleanly.
     /* File counter */
     object Counter {
         private val num: Var[Int] = Var(0)
         val increment: Observer[Unit] = num.updater((x, unit) => x + 1)
-
 
         /* Generate name: tree-{num} for file */
         def genName: Signal[String] = num.signal.map(numFiles => s"tree-${numFiles}")
@@ -60,9 +60,7 @@ object MainView extends DebugViewPage {
                 treeStream.collectRight --> TreeViewController.setTree,
                 treeStream.collectRight --> StateManagementViewController.setCurrTree,
                 treeStream.collectRight.map(_.input) --> InputViewController.setInput,
-                treeStream.collectRight
-                    .map((tree: DebugTree) => CodeFileInformation(tree.parserInfo))
-                    --> CodeViewController.setFileInformation,
+                treeStream.collectRight.map(tree => CodeFileInformation(tree.parserInfo)) --> CodeViewController.setFileInformation,
 
                 /* Notify of any errors caught by treeStream */
                 treeStream.collectLeft --> ErrorController.setError,
