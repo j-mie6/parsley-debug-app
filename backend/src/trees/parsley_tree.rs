@@ -43,16 +43,10 @@ pub struct ParsleyTree {
 }
 
 impl ParsleyTree {
-    pub fn is_debuggable(&self) -> bool {
-        self.is_debuggable
-    }
-
     /* Function used by serde to parse default boolean values as false */
     fn default_bool() -> bool { false }
 
-    pub fn get_session_id(&self) -> i32 {
-        self.session_id
-    }
+    pub fn is_new_tree(&self) -> bool { self.session_id == Self::default_session_id() }
 
     fn default_session_id() -> i32 { -1 }
     fn default_session_name() -> String { String::from("run") }
@@ -104,10 +98,8 @@ impl From<ParsleyTree> for DebugTree {
         let mut current_id: u32 = 0;
 
         /* Convert the root node and return DebugTree */
-        let session_id = tree.get_session_id();
-        let is_debuggable = tree.is_debuggable();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, tree.parser_info, is_debuggable, tree.refs, session_id)
+        DebugTree::new(tree.input, node, tree.parser_info, tree.is_debuggable, tree.refs, tree.session_id)
     }
 }
 
