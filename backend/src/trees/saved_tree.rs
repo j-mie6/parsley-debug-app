@@ -114,7 +114,7 @@ impl From<SavedTree> for DebugTree {
         }
 
         let node: DebugNode = convert_node(saved_tree.root.clone());
-        DebugTree::new(saved_tree.input.clone(), node, saved_tree.parser_info.clone(), saved_tree.is_debuggable, saved_tree.refs, saved_tree.session_id/*, saved_tree.session_name.clone()*/)
+        DebugTree::new(saved_tree.input.clone(), node, saved_tree.parser_info.clone(), saved_tree.is_debuggable, saved_tree.refs, saved_tree.session_id, saved_tree.session_name.clone())
     }
 }
 

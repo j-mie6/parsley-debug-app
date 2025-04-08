@@ -99,7 +99,7 @@ impl From<ParsleyTree> for DebugTree {
 
         /* Convert the root node and return DebugTree */
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, tree.parser_info, tree.is_debuggable, tree.refs, tree.session_id)
+        DebugTree::new(tree.input, node, tree.parser_info, tree.is_debuggable, tree.refs, tree.session_id, tree.session_name.clone())
     }
 }
 

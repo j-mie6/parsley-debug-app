@@ -10,10 +10,11 @@ pub struct DebugTree {
     is_debuggable: bool,
     refs: Vec<(i32, String)>,
     session_id: i32,
+    session_name: String,
 }
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>,  session_id: i32) -> Self {
-        DebugTree { input, root, parser_info, is_debuggable, refs, session_id }
+    pub fn new(input: String, root: DebugNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>,  session_id: i32, session_name: String) -> Self {
+        DebugTree { input, root, parser_info, is_debuggable, refs, session_id, session_name }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -159,6 +160,7 @@ pub mod test {
             false,
             Vec::new(),
             -1,
+            String::from("tree"),
         )
     }
 
@@ -227,6 +229,7 @@ pub mod test {
             false,
             Vec::new(),
             -1,
+            String::from("tree"),
         )
     }
 
