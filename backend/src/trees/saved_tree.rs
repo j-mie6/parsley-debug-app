@@ -11,60 +11,18 @@ pub struct SavedTree {
     is_debuggable: bool,
     refs: Vec<(i32, String)>,
     session_id: i32,
+    #[serde(default = "SavedTree::default_session_name")] session_name: String,
 }
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SavedNode {
-    pub node_id: u32,               /* The user-defined name */
-    pub name: String,               /* The internal name of the parser */
-    pub internal: String,           /* Whether the parser was successful */
-    pub success: bool,              /* The unique child number of this node */
-    pub child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
-    pub input: String,              /* Offset into the input in which this node's parse attempt finished */
-    pub children: Vec<SavedNode>,   /* The children of this node */
-    pub is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
-    pub newly_generated: bool,      /* Whether this node was generated since the previous breakpoint */
-}
-
-impl From<DebugTree> for SavedTree {
-    fn from(debug_tree: DebugTree) -> Self {
-
-        fn convert_node(node: DebugNode) -> SavedNode {
-            /* Recursively convert children into SavedNodes */
-            let children: Vec<SavedNode> = node.children
-                .into_iter()
-                .map(convert_node)
-                .collect();
-    
-            /* Instantiate SavedNode */
-            SavedNode::new(
-                node.node_id, 
-                node.name,
-                node.internal,
-                node.success,
-                node.child_id,
-                node.input,
-                children,
-                node.is_iterative,
-                node.newly_generated,
-            )
-        }
-
-        let node: SavedNode = convert_node(debug_tree.get_root().clone());
-  
-        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_parser_info().clone(), debug_tree.is_debuggable(), debug_tree.refs(), debug_tree.get_session_id())
-    }
-}
-
 impl SavedTree {
-    pub fn new(input: String, root: SavedNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>, session_id: i32) -> Self {
-        SavedTree { 
+    pub fn new(input: String, root: SavedNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>, session_id: i32, session_name: String) -> Self {
+        SavedTree {
             input,
             root,
             parser_info,
             is_debuggable,
             refs,
             session_id,
+            session_name,
         }
     }
 
@@ -91,10 +49,28 @@ impl SavedTree {
     pub fn get_session_id(&self) -> i32 {
         self.session_id
     }
+
+    pub fn get_session_name(&self) -> &String {
+        &self.session_name
+    }
+
+    fn default_session_name() -> String { String::from("run") }
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SavedNode {
+    pub node_id: u32,               /* The user-defined name */
+    pub name: String,               /* The internal name of the parser */
+    pub internal: String,           /* Whether the parser was successful */
+    pub success: bool,              /* The unique child number of this node */
+    pub child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
+    pub input: String,              /* Offset into the input in which this node's parse attempt finished */
+    pub children: Vec<SavedNode>,   /* The children of this node */
+    pub is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
+    pub newly_generated: bool,      /* Whether this node was generated since the previous breakpoint */
+}
 impl SavedNode {
-    pub fn new(node_id: u32, name: String, internal: String, success: bool, 
+    pub fn new(node_id: u32, name: String, internal: String, success: bool,
             child_id: Option<u32>, input: String, children: Vec<SavedNode>,
             is_iterative: bool, newly_generated: bool) -> Self {
 
@@ -112,7 +88,35 @@ impl SavedNode {
     }
 }
 
+impl From<DebugTree> for SavedTree {
+    fn from(debug_tree: DebugTree) -> Self {
 
+        fn convert_node(node: DebugNode) -> SavedNode {
+            /* Recursively convert children into SavedNodes */
+            let children: Vec<SavedNode> = node.children
+                .into_iter()
+                .map(convert_node)
+                .collect();
+
+            /* Instantiate SavedNode */
+            SavedNode::new(
+                node.node_id,
+                node.name,
+                node.internal,
+                node.success,
+                node.child_id,
+                node.input,
+                children,
+                node.is_iterative,
+                node.newly_generated,
+            )
+        }
+
+        let node: SavedNode = convert_node(debug_tree.get_root().clone());
+
+        SavedTree::new(debug_tree.get_input().clone(), node, debug_tree.get_parser_info().clone(), debug_tree.is_debuggable(), debug_tree.refs(), debug_tree.get_session_id(), String::from("tree"))
+    }
+}
 
 /* Saved Tree testing */
 #[cfg(test)]
@@ -127,7 +131,6 @@ pub mod test {
     use super::{SavedTree, SavedNode};
     use crate::trees::{debug_tree, DebugTree};
 
-    
     pub fn json() -> String {
         r#"{
             "input": "Test",
@@ -238,10 +241,11 @@ pub mod test {
             HashMap::new(),
             false,
             Vec::new(),
-            -1
+            -1,
+            String::from("tree"),
         )
     }
-    
+
     pub fn nested_tree() -> SavedTree {
         SavedTree::new(
             String::from("01234"),
@@ -306,7 +310,8 @@ pub mod test {
             HashMap::new(),
             false,
             Vec::new(),
-            -1
+            -1,
+            String::from("tree"),
         )
     }
 
@@ -348,10 +353,10 @@ pub mod test {
     fn saved_tree_converts_into_debug_tree() {
         let saved_tree: SavedTree = tree();
         let debug_tree: DebugTree = debug_tree::test::tree();
-        
+
         assert_eq!(debug_tree, saved_tree.into());
     }
-    
+
     #[test]
     fn debug_tree_converts_into_saved_tree() {
         let saved_tree: SavedTree = tree();
@@ -364,10 +369,10 @@ pub mod test {
     fn nested_saved_tree_converts_into_nested_debug_tree() {
         let saved_tree: SavedTree = nested_tree();
         let debug_tree: DebugTree = debug_tree::test::nested_tree();
-        
+
         assert_eq!(debug_tree, saved_tree.into());
     }
-    
+
     #[test]
     fn nested_debug_tree_converts_into_nested_saved_tree() {
         let saved_tree: SavedTree = nested_tree();
@@ -376,7 +381,7 @@ pub mod test {
         assert_eq!(saved_tree, debug_tree.into());
     }
 
-    
+
     #[test]
     fn saved_tree_saved_to_json() {
         const FILE_PATH: &str = "test_save.json";
@@ -389,7 +394,7 @@ pub mod test {
 
         let contents: String = fs::read_to_string(FILE_PATH)
             .expect("File contents could not be read");
-    
+
         assert_eq!(contents, json());
 
         fs::remove_file(FILE_PATH)
@@ -402,7 +407,7 @@ pub mod test {
 
         let mut data_file: File = File::create(FILE_PATH)
             .expect("File creation failed");
-    
+
         write!(data_file, "{}", json())
             .expect("JSON could not be written to file");
 
