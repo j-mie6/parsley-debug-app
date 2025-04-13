@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use super::{SavedTree, SavedNode};
-
 /* Placeholder ParserInfo structures for state management */
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -10,13 +8,13 @@ pub struct DebugTree {
     root: DebugNode,
     parser_info: HashMap<String, Vec<(i32, i32)>>,
     is_debuggable: bool,
-    refs: Vec<(i32, String)>, 
+    refs: Vec<(i32, String)>,
     session_id: i32,
+    session_name: String,
 }
-
 impl DebugTree {
-    pub fn new(input: String, root: DebugNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>,  session_id: i32) -> Self {
-        DebugTree { input, root, parser_info, is_debuggable, refs, session_id }
+    pub fn new(input: String, root: DebugNode, parser_info: HashMap<String, Vec<(i32, i32)>>, is_debuggable: bool, refs: Vec<(i32, String)>,  session_id: i32, session_name: String) -> Self {
+        DebugTree { input, root, parser_info, is_debuggable, refs, session_id, session_name }
     }
 
     pub fn get_root(&self) -> &DebugNode {
@@ -34,7 +32,7 @@ impl DebugTree {
     pub fn is_debuggable(&self) -> bool {
         self.is_debuggable
     }
-    
+
     pub fn refs(&self) -> Vec<(i32, String)> {
         self.refs.clone()
     }
@@ -51,35 +49,6 @@ impl DebugTree {
         self.session_id = session_id
     }
 }
-
-impl From<SavedTree> for DebugTree {
-    fn from(saved_tree: SavedTree) -> Self {
-        /* Recursively convert children into SavedNodes */
-        fn convert_node(node: SavedNode) -> DebugNode {
-            let children: Vec<DebugNode> = node.children
-                .into_iter()
-                .map(convert_node)
-                .collect();
-
-            /* Instantiate SavedNode */
-            DebugNode::new(
-                node.node_id, 
-                node.name,
-                node.internal,
-                node.success,
-                node.child_id,
-                node.input,
-                children,
-                node.is_iterative,
-                node.newly_generated
-            )
-        }
-
-        let node: DebugNode = convert_node(saved_tree.get_root().clone());
-        DebugTree::new(saved_tree.get_input().clone(), node, saved_tree.get_parser_info().clone(), saved_tree.is_debuggable(), saved_tree.refs(), saved_tree.get_session_id())
-    }
-}
-
 
 /* Defines tree structure used in backend that will be passed to frontend */
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
@@ -98,7 +67,7 @@ pub struct DebugNode {
 }
 
 impl DebugNode {
-    pub fn new(node_id: u32, name: String, internal: String, success: bool, 
+    pub fn new(node_id: u32, name: String, internal: String, success: bool,
             child_id: Option<u32>, input: String, children: Vec<DebugNode>,
             is_iterative: bool, newly_generated: bool) -> Self {
 
@@ -127,10 +96,13 @@ pub mod test {
 
     use super::{DebugNode, DebugTree};
 
+    const DEFAULT_SESSION_ID: i32 = -1;
+    const DEFAULT_SESSION_NAME: &str = "tree";
+
     pub fn json() -> String {
-        r#"{
+        format!(r#"{{
             "input": "Test",
-            "root": {
+            "root": {{
                 "nodeId": 0,
                 "name": "Test",
                 "internal": "Test",
@@ -140,20 +112,21 @@ pub mod test {
                 "isLeaf": true,
                 "isIterative": false,
                 "newlyGenerated": false
-            },
-            "parserInfo" : {},
+            }},
+            "parserInfo" : {{}},
             "isDebuggable": false,
             "refs": [],
-            "sessionId": -1
-        }"#
+            "sessionId": {session_id},
+            "sessionName": "{session_name}"
+        }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect::<String>()
     }
 
     pub fn nested_json() -> String {
-        r#"{
+        format!(r#"{{
             "input": "01234",
-            "root": {
+            "root": {{
                 "nodeId": 0,
                 "name": "0",
                 "internal": "0",
@@ -163,12 +136,13 @@ pub mod test {
                 "isLeaf": false,
                 "isIterative": false,
                 "newlyGenerated": false
-            },
-            "parserInfo" : {},
+            }},
+            "parserInfo" : {{}},
             "isDebuggable": false,
             "refs": [],
-            "sessionId": -1
-        }"#
+            "sessionId": {session_id},
+            "sessionName": "{session_name}"
+        }}"#, session_id = DEFAULT_SESSION_ID, session_name = DEFAULT_SESSION_NAME)
         .split_whitespace()
         .collect()
     }
@@ -190,7 +164,8 @@ pub mod test {
             HashMap::new(),
             false,
             Vec::new(),
-            -1
+            DEFAULT_SESSION_ID,
+            String::from(DEFAULT_SESSION_NAME),
         )
     }
 
@@ -258,10 +233,11 @@ pub mod test {
             HashMap::new(),
             false,
             Vec::new(),
-            -1
+            DEFAULT_SESSION_ID,
+            String::from(DEFAULT_SESSION_NAME),
         )
     }
- 
+
 
     #[test]
     fn debug_tree_serialises() {
@@ -284,4 +260,3 @@ pub mod test {
     }
 
 }
-

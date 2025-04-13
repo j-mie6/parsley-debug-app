@@ -3,7 +3,7 @@ pub mod parsley_tree;
 pub mod saved_tree;
 
 pub use debug_tree::{DebugNode, DebugTree};
-pub use saved_tree::{SavedNode, SavedTree};
+pub use saved_tree::SavedTree;
 
-#[allow(unused_imports)] 
+#[allow(unused_imports)]
 pub use parsley_tree::{ParsleyNode, ParsleyTree};
