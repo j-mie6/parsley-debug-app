@@ -41,8 +41,8 @@ import controller.errors.ErrorController
 val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
 
 /**
-  * The DebugViewPage class represents the main page of the application, 
-  * containing both the tree and input view tabs, title and github / 
+  * The DebugViewPage class represents the main page of the application,
+  * containing both the tree and input view tabs, title and github /
   * light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {
@@ -64,7 +64,7 @@ abstract class DebugViewPage extends Page {
         /* Exports current tree */
         onClick(_
             .sample(TabViewController.getSelectedTab)
-            .flatMapMerge(TreeViewController.downloadTree)
+            .flatMapMerge(TreeViewController.downloadTree) // FIXME: I think this can be a flatMapSwitch?
         .map {
                 case Left(_) => TreeDownloadFailed
                 case Right(_) =>  TreeDownloaded
@@ -80,13 +80,13 @@ abstract class DebugViewPage extends Page {
             typ := "file",
             display := "none",
             multiple := true,
-            
+
             /* Handle tree uploading */
             onChange.flatMap { ev =>
                 loadFile(ev.target.asInstanceOf[dom.html.Input])
                     .map {
-                        case Left(_)   => TreeUploadFailed 
-                        case Right(_)  => TreeUploaded  
+                        case Left(_)   => TreeUploadFailed
+                        case Right(_)  => TreeUploaded
                     }
             } --> ToastController.setToast
 
@@ -112,11 +112,11 @@ abstract class DebugViewPage extends Page {
             }
         }
 
-        EventStream.merge(streams*) // Merge all file streams 
+        EventStream.merge(streams*) // Merge all file streams
             .tapEach(_ => input.value = "") // Reset input field after processing
     }
 
-                
+
     /* Overview help popup */
     private lazy val helpButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-info",
@@ -127,7 +127,7 @@ abstract class DebugViewPage extends Page {
     private lazy val stateButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-state",
         i(className:= "bi bi-sliders"),
-        onClick --> (_ => 
+        onClick --> (_ =>
             StateManagementViewController.toggleOpenState()
         )
     )
@@ -136,7 +136,7 @@ abstract class DebugViewPage extends Page {
     private lazy val settingsTabButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-settings",
         i(className := "bi bi-gear-wide-connected"),
-        onClick --> (_ => 
+        onClick --> (_ =>
             SettingsViewController.toggleOpenSettings()
         )
     )
@@ -158,7 +158,7 @@ abstract class DebugViewPage extends Page {
 
     /**
      * Semaphore controlling expansion of the descriptions.
-     * 
+     *
      * A value > 0 represents expanded.
      */
     private val viewCloseSemaphore: Var[Int] = Var(0)
@@ -173,7 +173,7 @@ abstract class DebugViewPage extends Page {
         fontSize.px := 33,
 
         /* Render moonIcon in light mode; sunIcon in dark mode */
-        child <-- AppStateController.getThemeIcon, 
+        child <-- AppStateController.getThemeIcon,
 
         onClick.mapToUnit --> AppStateController.toggleTheme()
     )
@@ -210,18 +210,18 @@ abstract class DebugViewPage extends Page {
     private lazy val leftButtonBar: HtmlElement = {
         div(
             className := "debug-view-left-button-bar",
-            
+
             onMouseEnter.mapTo(2) --> viewCloseSemaphoreIncrement,
             onMouseEnter(_.delay(mouseEnterOpenDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
             onMouseLeave(_.delay(mouseLeaveCloseDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
-            
+
             settingsTabButton,
             MainViewController.renderViewButton(View.Tree, viewCloseSemaphore),
             MainViewController.renderViewButton(View.Input, viewCloseSemaphore),
             MainViewController.renderViewButton(View.Code, viewCloseSemaphore),
         )
     }
-        
+
     /* Button bar right. */
     private lazy val rightButtonBar: HtmlElement = {
         div(
@@ -236,11 +236,11 @@ abstract class DebugViewPage extends Page {
     }
 
     /**
-      * Render the DebugViewPage header and a child element. This allows different views to 
+      * Render the DebugViewPage header and a child element. This allows different views to
       * be inserted.
       *
       * @param child The debug view to render.
-      * 
+      *
       * @return HTML element of the DebugView page.
       */
     override def render(childElem: Option[HtmlElement]): HtmlElement = {
@@ -251,7 +251,7 @@ abstract class DebugViewPage extends Page {
                 className := "debug-view-body",
                 child(HelpView(HelpViewController.getActiveSection)) <-- HelpViewController.isPopupOpen,
                 child(SettingsView()) <-- SettingsViewController.isSettingsOpen,
-                
+
                 div(
                     className := "tab-and-tree-view-container",
                     cls("left-compressed") <-- SettingsViewController.isSettingsOpen,
@@ -261,11 +261,11 @@ abstract class DebugViewPage extends Page {
                         className := "tab-view-container",
                         TabView()
                     ),
-                    
+
                     div (
                         className := "tree-view-page",
                         cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
-                        
+
                         div(
                             className := "debug-view-button-bar",
                             leftButtonBar,
@@ -274,7 +274,7 @@ abstract class DebugViewPage extends Page {
 
                         div(
                             className := "tree-view-page-scroll",
-                            
+
                             childElem.getOrElse(div())
                         )
                     ),
@@ -283,5 +283,5 @@ abstract class DebugViewPage extends Page {
                 child(StateManagementView()) <-- StateManagementViewController.isStateOpen,
             )
         )))
-    } 
+    }
 }
