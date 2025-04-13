@@ -109,14 +109,14 @@ impl From<StateError> for DownloadTreeError {
 #[tauri::command]
 pub fn import_tree(tree_name: String, contents: String, state: tauri::State<AppState>) -> Result<(), ImportTreeError> {
     /* Path to the json file used to store the tree */
-    let app_path: String = format!("{}{}", SAVED_TREE_DIR, &tree_name);
+    let file_path: OsString = format_filepath(&state, &tree_name)?;
 
     /* Creates a file in apps local saved tree folders and writes data from external json it */
-    let mut imported_tree: File = File::create(&app_path).map_err(|_| ImportTreeError::CreateDirFailed)?;
+    let mut imported_tree: File = File::create(&file_path).map_err(|_| ImportTreeError::CreateDirFailed)?;
     imported_tree.write(contents.as_bytes()).map_err(|_| ImportTreeError::WriteToFileFailed)?;
 
     /* Load tree in the state and emit an event to frontend, passing the new tree */
-    load_path(OsString::from(app_path), true, &state)?;
+    load_path(file_path, true, &state)?;
     state.emit(Event::NewTree).map_err(ImportTreeError::from)
 }
 
