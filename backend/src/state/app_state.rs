@@ -123,7 +123,7 @@ impl StateManager for AppState {
         state.tree = Some(tree);
     
         /* Unwrap cannot fail as tree has just been set */
-        let event: Event = Event::TreeReady(&state.tree.as_ref().unwrap());
+        let event: Event = Event::TreeReady(state.tree.as_ref().unwrap());
         state.app.emit(event) /* Notify frontend listener - call inline to avoid deadlock */ 
             .map_err(|_| StateError::EventEmitFailed)
     }
