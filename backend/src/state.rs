@@ -1,5 +1,5 @@
 mod app_state;
-mod state_manager;
+pub mod state_manager;
 mod app_handle;
 mod session_counter;
 

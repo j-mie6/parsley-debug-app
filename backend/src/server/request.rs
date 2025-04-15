@@ -6,7 +6,6 @@ use super::ServerState;
 use crate::events::Event;
 use crate::trees::{DebugTree, ParsleyTree};
 use crate::state::{StateError, StateManager};
-use crate::commands::save;
 
 /* Length of input slice returned in post response */
 const RESPONSE_INPUT_LEN: usize = 16;
@@ -95,7 +94,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
         match state.new_receiver(session_id, rx) {
             Some(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Receiver already exists for this session id", session_id)),
-            None => if let Err(_) = state.new_transmitter(session_id, tx) {
+            None => if state.new_transmitter(session_id, tx).is_err() {
                 return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise transmitter in state", session_id));
             },
         };
@@ -103,7 +102,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         /* Reset references for a post tree */
         let res: Result<(), StateError> = state.inner().reset_refs(session_id, debug_tree.refs());
 
-        if let Err(_) = res {
+        if res.is_err() {
             return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not get internal lock", -1))
         }
     }
@@ -128,7 +127,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         };
 
         /* Update the saved tree and set the updated tree into state */
-        if let Err(_) = save::update_tree(&debug_tree, tree_name) {
+        if state.inner().update_tree(&debug_tree, tree_name).is_err() {
             return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
         }
         state.set_tree(debug_tree)
@@ -148,7 +147,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         Err(StateError::ChannelError) =>
             (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again", session_id)),
 
-        Err(_) => panic!("Unexpected error on post_tree"),
+        Err(e) => panic!("Unexpected error on post_tree: {:?}", e),
     }
 
 }

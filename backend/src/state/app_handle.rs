@@ -5,6 +5,7 @@ use tauri::{Emitter, Manager};
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 use crate::state::state_manager::SkipsSender;
+use super::state_manager::{DirectoryKind, UpdateTreeError};
 use super::{AppState, StateManager, StateError};
 use std::path::PathBuf;
 
@@ -21,8 +22,15 @@ impl AppHandle {
         StateManager::emit(&self.0, event)
     }
 
-    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.0.get_download_path()
+
+    /* Caller for Tauri's system path resolvers */
+
+    pub fn tauri_temp_dir(&self) -> Result<PathBuf, StateError> {
+        self.0.path().temp_dir().map_err(|_| StateError::GetTempdirPathFail)
+    }
+
+    pub fn tauri_downloads_dir(&self) -> Result<PathBuf, StateError> {
+        self.0.path().download_dir().map_err(|_| StateError::GetDownloadPathFail)
     }
 }
 
@@ -74,10 +82,9 @@ impl StateManager for tauri::AppHandle {
     fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
         self.state::<AppState>().new_transmitter(session_id, tx)
     }
-    
-    fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.path().download_dir()
-            .map_err(|_| StateError::GetDownloadPathFail)
+
+    fn system_path(&self, dir: DirectoryKind) -> Result<PathBuf, StateError> {
+        self.state::<AppState>().system_path(dir)
     }
     
     fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {
@@ -90,5 +97,9 @@ impl StateManager for tauri::AppHandle {
 
     fn reset_trees(&self) -> Result<(), StateError> {
         self.state::<AppState>().reset_trees()
+    }
+
+    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+        self.state::<AppState>().update_tree(tree, tree_name)
     }
 }
