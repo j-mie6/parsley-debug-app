@@ -10,7 +10,7 @@ use crate::trees::{DebugNode, DebugTree, SavedTree};
 pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
 
 use super::session_counter::SessionCounter;
-use super::state_manager::UpdateTreeError;
+use super::state_manager::{DirectoryKind, UpdateTreeError};
 use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
@@ -159,13 +159,9 @@ impl StateManager for AppState {
             .send(skips)
             .map_err(|_| StateError::ChannelError)
     }
-    
-    fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
-        self.inner()?.app.get_app_localdata_path()
-    }
-    
-    fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.inner()?.app.get_download_path()
+
+    fn system_path(&self, _dir: super::state_manager::DirectoryKind) -> Result<PathBuf, StateError> {
+        todo!()
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
@@ -254,11 +250,8 @@ impl StateManager for AppState {
 
         /* Open the json file to update the tree */
         /* TODO: look into only updating the extra bits rather than replacing the tree */
-        let mut file_path = PathBuf::new();
-        file_path.push(crate::files::SAVED_TREE_DIR);
-        file_path.push(format!("{}.json", tree_name));
-
-        let full_path: PathBuf = self.app_path_to(file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+        let file_path = PathBuf::from(format!("{}.json", tree_name));
+        let full_path: PathBuf = self.system_path_to(DirectoryKind::SavedTrees, file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
 
         let mut data_file: File = File::create(full_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
 

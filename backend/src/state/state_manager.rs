@@ -21,17 +21,14 @@ pub trait StateManager: Send + Sync + 'static {
 
     fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError>;
 
-    fn get_app_localdata_path(&self) -> Result<PathBuf, StateError>;
+    fn system_path(&self, dir: DirectoryKind) -> Result<PathBuf, StateError>;
 
-    /** Returns the given PathBuf prefixed with `/path/to/app_localdata`. The given path should be a relative path. */
-    fn app_path_to(&self, path: PathBuf) -> Result<PathBuf, StateError> {
+    fn system_path_to(&self, dir: DirectoryKind, path: PathBuf) -> Result<PathBuf, StateError> {
         if path.is_absolute() {
             return Err(StateError::AbsolutePathNotAllowed);
         }
-        self.get_app_localdata_path().map(|app_local| app_local.join(path))
+        self.system_path(dir).map(|base| base.join(path))
     }
-
-    fn get_download_path(&self) -> Result<PathBuf, StateError>;
 
     fn add_session_id(&self, tree_name: String, session_id: i32) -> Result<(), StateError>;
 
@@ -55,13 +52,18 @@ pub trait StateManager: Send + Sync + 'static {
     fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError>;
 }
 
+#[derive(Debug)]
+pub enum DirectoryKind {
+    SavedTrees,
+    Downloads,
+}
+
 #[derive(Debug, serde::Serialize)]
 pub enum UpdateTreeError {
     SerialiseFailed,
     OpenFileFailed,
     WriteTreeFailed,
 }
-
 
 #[derive(Debug)]
 pub enum StateError {

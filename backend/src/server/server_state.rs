@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
-use crate::state::state_manager::UpdateTreeError;
+use crate::state::state_manager::{DirectoryKind, UpdateTreeError};
 use super::TokioMutex;
 
 pub type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<i32>;
@@ -71,12 +71,8 @@ impl StateManager for ServerState {
         self.inner().new_transmitter(session_id, tx)
     }
 
-    fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
-        self.inner().get_app_localdata_path()
-    }
-    
-    fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.inner().get_download_path()
+    fn system_path(&self, dir: DirectoryKind) -> Result<PathBuf, StateError> {
+        self.inner().system_path(dir)
     }
     
     fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {

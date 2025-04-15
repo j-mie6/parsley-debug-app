@@ -3,11 +3,11 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::path::PathBuf;
 
+use crate::state::state_manager::DirectoryKind;
 use crate::AppState;
 use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, SavedTree};
-use crate::files::SAVED_TREE_DIR;
 
 /* Saves current tree to saved_trees/name.json */
 #[tauri::command]
@@ -76,9 +76,8 @@ pub fn download_tree(state: tauri::State<AppState>, index: usize) -> Result<(), 
     /* Path to the json file used to store the tree */
     let file_path: OsString = format_filepath(&state, &tree_name)?;
 
-    /* Get path to Downloads folder */
-    let mut download_path: PathBuf = state.get_download_path()?;
-    download_path.push(format!("{}.json", tree_name));
+    /* Resolves to /path/to/downloads/tree_name.json */
+    let download_path: PathBuf = state.system_path_to(DirectoryKind::Downloads, PathBuf::from(format!("{}.json", tree_name)))?;
 
     /* Creates a file in Downloads and copies data into it */
     File::create(&download_path).map_err(|_| DownloadTreeError::CreateDirFailed)?;
@@ -179,7 +178,7 @@ pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String
 pub fn delete_saved_trees(state: tauri::State<AppState>) -> Result<(), DeleteTreeError> {
     state.reset_trees()?;
 
-    let path_to_saved_trees: PathBuf = state.app_path_to(PathBuf::from(SAVED_TREE_DIR))?;
+    let path_to_saved_trees: PathBuf = state.system_path(DirectoryKind::SavedTrees)?;
 
     fs::remove_dir_all(path_to_saved_trees.clone()).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
     fs::create_dir(path_to_saved_trees).map_err(|_| DeleteTreeError::FolderCreationFail)
@@ -260,12 +259,7 @@ impl From<StateError> for LoadTreeError {
 
 /* Generates the full path to a tree file in the form `APPDATA/SAVED_TREE_DIR/tree_name` */
 fn format_filepath(state: &tauri::State<AppState>, tree_name: &str) -> Result<OsString, StateError> {
-    let mut path_to_tree = PathBuf::new();
-    path_to_tree.push(SAVED_TREE_DIR);
-    path_to_tree.push(tree_name);
-
-    let full_path = state.app_path_to(path_to_tree)?;
-    Ok(full_path.into_os_string())
+    state.system_path_to(DirectoryKind::SavedTrees, PathBuf::from(tree_name)).map(OsString::from)
 }
 
 /* Updates local changed references for a tree */

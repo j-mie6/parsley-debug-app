@@ -5,7 +5,7 @@ use tauri::{Emitter, Manager};
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
 use crate::state::state_manager::SkipsSender;
-use super::state_manager::UpdateTreeError;
+use super::state_manager::{DirectoryKind, UpdateTreeError};
 use super::{AppState, StateManager, StateError};
 use std::path::PathBuf;
 
@@ -20,14 +20,6 @@ impl AppHandle {
     /* Delegate emit to wrapped Tauri AppHandle */
     pub fn emit(&self, event: Event) -> Result<(), StateError> {
         StateManager::emit(&self.0, event)
-    }
-
-    pub fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
-        self.0.get_app_localdata_path()
-    }
-
-    pub fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.0.get_download_path()
     }
 }
 
@@ -80,14 +72,8 @@ impl StateManager for tauri::AppHandle {
         self.state::<AppState>().new_transmitter(session_id, tx)
     }
 
-    fn get_app_localdata_path(&self) -> Result<PathBuf, StateError> {
-        self.path().app_local_data_dir()
-            .map_err(|_| StateError::GetAppLocalDataPathFail)
-    }
-    
-    fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.path().download_dir()
-            .map_err(|_| StateError::GetDownloadPathFail)
+    fn system_path(&self, dir: DirectoryKind) -> Result<PathBuf, StateError> {
+        self.state::<AppState>().system_path(dir)
     }
     
     fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {
