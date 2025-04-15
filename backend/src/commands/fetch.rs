@@ -22,7 +22,7 @@ impl From<StateError> for FetchTreeError {
         match state_error {
             StateError::LockFailed => FetchTreeError::LockFailed,
             StateError::TreeNotFound => FetchTreeError::TreeNotFound,
-            _ => panic!("Unexpected error on fetch_debug_tree"),
+            e => panic!("Unexpected error on fetch_debug_tree: {:?}", e),
         }
     }
 }
@@ -51,7 +51,7 @@ impl From<StateError> for FetchChildrenError {
         match state_error {
             StateError::LockFailed => FetchChildrenError::LockFailed,
             StateError::NodeNotFound(id) => FetchChildrenError::NodeNotFound(id),
-            _ => panic!("Unexpected error on fetch_node_children"),
+            e => panic!("Unexpected error on fetch_node_children: {:?}", e),
         }
     }
 }

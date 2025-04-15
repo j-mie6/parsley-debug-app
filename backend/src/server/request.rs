@@ -147,7 +147,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         Err(StateError::ChannelError) =>
             (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again", session_id)),
 
-        Err(_) => panic!("Unexpected error on post_tree"),
+        Err(e) => panic!("Unexpected error on post_tree: {:?}", e),
     }
 
 }

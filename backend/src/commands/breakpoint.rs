@@ -15,7 +15,7 @@ impl From<StateError> for SkipBreakpointError {
     fn from(err: StateError) -> Self {
         match err {
             StateError::ChannelError => Self::ChannelError,
-            _ => panic!("Unexpected error on skip_breakpoints"),
+            e => panic!("Unexpected error on skip_breakpoints: {:?}", e),
         }
     }
 }

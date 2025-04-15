@@ -61,7 +61,7 @@ impl From<StateError> for SaveTreeError {
         match state_error {
             StateError::LockFailed => SaveTreeError::LockFailed,
             StateError::TreeNotFound => SaveTreeError::TreeNotFound,
-            _ => panic!("Unexpected error on save_tree"),
+            e => panic!("Unexpected error on save_tree: {:?}", e),
         }
     }
 }
@@ -99,7 +99,7 @@ impl From<StateError> for DownloadTreeError {
         match state_error {
             StateError::LockFailed => DownloadTreeError::DownloadPathNotFound,
             StateError::TreeNotFound => DownloadTreeError::WriteToFileFailed,
-            _ => panic!("Unexpected error on save_tree"),
+            e => panic!("Unexpected error on save_tree: {:?}", e),
         }
     }
 }
@@ -136,7 +136,7 @@ impl From<StateError> for ImportTreeError {
             StateError::LockFailed => ImportTreeError::LockFailed,
             StateError::EventEmitFailed => ImportTreeError::EventEmitFailed,
             StateError::TreeNotFound => ImportTreeError::WriteToFileFailed,
-            _ => panic!("Unexpected error on save_tree"),
+            e => panic!("Unexpected error on save_tree: {:?}", e),
         }
     }
 }
@@ -253,7 +253,7 @@ impl From<StateError> for LoadTreeError {
         match state_error {
             StateError::LockFailed => LoadTreeError::LockFailed,
             StateError::EventEmitFailed => LoadTreeError::EventEmitFailed,
-            _ => panic!("Unexpected error on load_saved_tree"),
+            e => panic!("Unexpected error on load_saved_tree: {:?}", e),
         }
     }
 }
@@ -309,7 +309,7 @@ impl From<StateError> for RefError {
     fn from(state_error: StateError) -> Self {
         match state_error {
             StateError::LockFailed => RefError::RefMapFail,
-            _ => panic!("Unexpected error on load_saved_tree"),
+            e => panic!("Unexpected error on load_saved_tree: {:?}", e),
         }
     }
 }
