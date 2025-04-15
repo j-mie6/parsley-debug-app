@@ -72,7 +72,7 @@ pub enum StateError {
     NodeNotFound(u32),
     EventEmitFailed,
     AbsolutePathNotAllowed, /* A function was given an unexpected absolute path */
-    GetAppLocalDataPathFail,
+    GetTempdirPathFail,
     GetDownloadPathFail,
     ChannelError, /* Non-fatal error: The receiver from Parsley is no longer listening */
 }

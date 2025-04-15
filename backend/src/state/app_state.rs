@@ -5,6 +5,7 @@ use std::sync::{Mutex, MutexGuard};
 use std::path::PathBuf;
 
 use crate::events::Event;
+use crate::files::SAVED_TREE_DIR;
 use crate::trees::{DebugNode, DebugTree, SavedTree};
 
 pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
@@ -160,8 +161,14 @@ impl StateManager for AppState {
             .map_err(|_| StateError::ChannelError)
     }
 
-    fn system_path(&self, _dir: super::state_manager::DirectoryKind) -> Result<PathBuf, StateError> {
-        todo!()
+    fn system_path(&self, dir: super::state_manager::DirectoryKind) -> Result<PathBuf, StateError> {
+        let handle: &AppHandle = &self.inner()?.app;
+
+        match dir {
+            DirectoryKind::SavedTrees => handle.tauri_temp_dir()
+                                               .map(|path| path.join(SAVED_TREE_DIR)),
+            DirectoryKind::Downloads => handle.tauri_downloads_dir(),
+        }
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {

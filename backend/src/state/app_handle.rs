@@ -21,6 +21,17 @@ impl AppHandle {
     pub fn emit(&self, event: Event) -> Result<(), StateError> {
         StateManager::emit(&self.0, event)
     }
+
+
+    /* Caller for Tauri's system path resolvers */
+
+    pub fn tauri_temp_dir(&self) -> Result<PathBuf, StateError> {
+        self.0.path().temp_dir().map_err(|_| StateError::GetTempdirPathFail)
+    }
+
+    pub fn tauri_downloads_dir(&self) -> Result<PathBuf, StateError> {
+        self.0.path().download_dir().map_err(|_| StateError::GetDownloadPathFail)
+    }
 }
 
 

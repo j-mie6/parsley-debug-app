@@ -29,7 +29,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
     /* Manage the app state using Tauri */
     let app_state: AppState = AppState::new(app.app_handle().clone());
-    let path_to_saved_trees: PathBuf = app_state.system_path_to(DirectoryKind::Downloads, PathBuf::from(PathBuf::from(SAVED_TREE_DIR))).map_err(|_| tauri::Error::UnknownPath)?;
+    let path_to_saved_trees: PathBuf = app_state.system_path_to(DirectoryKind::Downloads, PathBuf::from(SAVED_TREE_DIR)).map_err(|_| tauri::Error::UnknownPath)?;
 
     app.manage(app_state);
 
@@ -61,7 +61,7 @@ pub fn run() {
         .build(tauri::generate_context!())      /* Build the app */
         .expect("Error building Dill");
 
-    let path_to_saved_trees: PathBuf = app.handle().system_path_to(DirectoryKind::Downloads, PathBuf::from(PathBuf::from(SAVED_TREE_DIR))).expect("Error occured whilst trying to find app-local storage");
+    let path_to_saved_trees: PathBuf = app.handle().system_path_to(DirectoryKind::Downloads, PathBuf::from(SAVED_TREE_DIR)).expect("Error occured whilst trying to find app-local storage");
 
     /* Runs app with handling events */
     app.run(move |_, event| {
