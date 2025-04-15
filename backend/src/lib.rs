@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-use files::SAVED_TREE_DIR;
 use state::state_manager::DirectoryKind;
 use state::StateManager;
 use tauri::Manager;
@@ -29,7 +28,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
     /* Manage the app state using Tauri */
     let app_state: AppState = AppState::new(app.app_handle().clone());
-    let path_to_saved_trees: PathBuf = app_state.system_path_to(DirectoryKind::Downloads, PathBuf::from(SAVED_TREE_DIR)).map_err(|_| tauri::Error::UnknownPath)?;
+    let path_to_saved_trees: PathBuf = app_state.system_path(DirectoryKind::SavedTrees).map_err(|_| tauri::Error::UnknownPath)?;
 
     app.manage(app_state);
 
@@ -61,12 +60,13 @@ pub fn run() {
         .build(tauri::generate_context!())      /* Build the app */
         .expect("Error building Dill");
 
-    let path_to_saved_trees: PathBuf = app.handle().system_path_to(DirectoryKind::Downloads, PathBuf::from(SAVED_TREE_DIR)).expect("Error occured whilst trying to find app-local storage");
+    let handle: tauri::AppHandle = app.handle().clone();
 
     /* Runs app with handling events */
     app.run(move |_, event| {
         /* On window shutdown, remove saved_trees folder */
         if let RunEvent::ExitRequested { code: None, .. } = event {
+            let path_to_saved_trees: PathBuf = handle.system_path(DirectoryKind::SavedTrees).expect("Error occured whilst trying to find saved trees");
             files::delete_saved_trees_dir(&path_to_saved_trees).expect("Error occured cleaning saved trees");
         }
     })
