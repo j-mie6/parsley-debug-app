@@ -98,7 +98,7 @@ impl StateManager for ServerState {
 
 impl ServerState {
     pub fn new_receiver(&self, session_id: i32, rx: SkipsReceiver) -> Option<SkipsReceiver> {
-        self.1.try_lock().ok().map(|mut map| map.insert(session_id, rx)).flatten()
+        self.1.try_lock().ok().and_then(|mut map| map.insert(session_id, rx))
     }
 
     pub async fn receive_breakpoint_skips(&self, session_id: i32) -> Option<i32> {
