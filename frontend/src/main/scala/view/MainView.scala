@@ -70,7 +70,7 @@ object MainView extends DebugViewPage {
                 newTreeStream
                     .collectRight
                     .sample(TreeViewController.getSessionName.map(FileCounter.freshName))
-                    .flatMapMerge(TabViewController.saveTree) --> tabBus.writer, // FIXME: I think this can be a flatMapSwitch?
+                    .flatMapSwitch(TabViewController.saveTree) --> tabBus.writer,
 
                 /* Update file names */
                 tabBus.stream.collectRight --> TabViewController.setFileNames,

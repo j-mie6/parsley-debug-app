@@ -74,7 +74,7 @@ object TreeViewController {
         sessionId
             .withCurrentValueOf(SettingsViewController.getNumSkipBreakpoints.signal)
             .map((sessionId, skips) => (sessionId, skips - 1))
-            .flatMapMerge(Tauri.invoke(Command.SkipBreakpoints, _)) // FIXME: I think this can be a flatMapSwitch?
+            .flatMapSwitch(Tauri.invoke(Command.SkipBreakpoints, _))
     }
 
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))

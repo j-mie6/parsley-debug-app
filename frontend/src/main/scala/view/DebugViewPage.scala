@@ -64,8 +64,8 @@ abstract class DebugViewPage extends Page {
         /* Exports current tree */
         onClick(_
             .sample(TabViewController.getSelectedTab)
-            .flatMapMerge(TreeViewController.downloadTree) // FIXME: I think this can be a flatMapSwitch?
-        .map {
+            .flatMapSwitch(TreeViewController.downloadTree)
+            .map {
                 case Left(_) => TreeDownloadFailed
                 case Right(_) =>  TreeDownloaded
             }

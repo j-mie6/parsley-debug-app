@@ -76,7 +76,7 @@ object TabView {
 
             /* Update tree on new tab selected */
             TabViewController.getSelectedTab.changes
-                .flatMapMerge(TabViewController.loadSavedTree) // FIXME: I think this can be a flatMapSwitch?
+                .flatMapSwitch(TabViewController.loadSavedTree)
                 .collectLeft --> controller.errors.ErrorController.setError,
 
             TabViewController.getSelectedTab.changes
