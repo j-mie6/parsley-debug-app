@@ -31,8 +31,7 @@ object TreeView {
             .mapToUnit
             --> StateManagementViewController.clearRefs,
 
-        TreeViewController.getSessionId.changes
-            .flatMapMerge(TreeViewController.getRefs) --> returnBus.writer, // FIXME: I think this can be a flatMapSwitch?
+        TreeViewController.getSessionId.changes.flatMapSwitch(TreeViewController.getRefs) --> returnBus.writer,
 
         returnBus.stream.collectRight --> seqBus.writer,
         returnBus.stream.collectLeft --> ErrorController.setError,

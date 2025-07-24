@@ -308,18 +308,17 @@ private object ReactiveNodeDisplay {
                     onClick(_
                         .filter(_ => !node.debugNode.isLeaf)
                         .sample(expansionState)
-                        .flatMapMerge { // FIXME: I think this can be a flatMapSwitch?
-                            _ match
-                                case ExpansionState.AllChildren =>
-                                    EventStream.fromValue(Nil)
-                                case ExpansionState.OneIterativeChild =>
-                                    expandAllChildren.set(true)
-                                    Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
-                                case ExpansionState.NoChildren =>
-                                    if (node.debugNode.isIterative) {
-                                        expandAllChildren.set(false)
-                                    }
-                                    Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                        .flatMapSwitch {
+                            case ExpansionState.AllChildren =>
+                                EventStream.fromValue(Nil)
+                            case ExpansionState.OneIterativeChild =>
+                                expandAllChildren.set(true)
+                                Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                            case ExpansionState.NoChildren =>
+                                if (node.debugNode.isIterative) {
+                                    expandAllChildren.set(false)
+                                }
+                                Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
                         }
                     ) --> node.children.writer
                 ),
