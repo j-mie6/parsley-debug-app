@@ -1,13 +1,17 @@
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Write;
 use std::sync::{Mutex, MutexGuard};
 use std::path::PathBuf;
 
 use crate::events::Event;
-use crate::trees::{DebugTree, DebugNode};
+use crate::files::SAVED_TREE_DIR;
+use crate::trees::{DebugNode, DebugTree, SavedTree};
 
 pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
 
 use super::session_counter::SessionCounter;
+use super::state_manager::{DirectoryKind, UpdateTreeError};
 use super::{StateError, StateManager, AppHandle};
 
 /* Unsynchronised AppState */
@@ -120,7 +124,7 @@ impl StateManager for AppState {
         state.tree = Some(tree);
     
         /* Unwrap cannot fail as tree has just been set */
-        let event: Event = Event::TreeReady(&state.tree.as_ref().unwrap());
+        let event: Event = Event::TreeReady(state.tree.as_ref().unwrap());
         state.app.emit(event) /* Notify frontend listener - call inline to avoid deadlock */ 
             .map_err(|_| StateError::EventEmitFailed)
     }
@@ -156,9 +160,15 @@ impl StateManager for AppState {
             .send(skips)
             .map_err(|_| StateError::ChannelError)
     }
-    
-    fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.inner()?.app.get_download_path()
+
+    fn system_path(&self, dir: super::state_manager::DirectoryKind) -> Result<PathBuf, StateError> {
+        let handle: &AppHandle = &self.inner()?.app;
+
+        match dir {
+            DirectoryKind::SavedTrees => handle.tauri_temp_dir()
+                                               .map(|path| path.join(SAVED_TREE_DIR)),
+            DirectoryKind::Downloads => handle.tauri_downloads_dir(),
+        }
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
@@ -235,6 +245,25 @@ impl StateManager for AppState {
         state.tab_names = Vec::new();
         state.debug_sessions = HashMap::new();
         state.saved_refs = HashMap::new();
+
+        Ok(())
+    }
+
+    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+        let new_tree: SavedTree = SavedTree::from(tree.clone());
+        /* Get the serialised JSON */
+        let tree_json: String = serde_json::to_string_pretty(&new_tree)
+            .map_err(|_| UpdateTreeError::SerialiseFailed)?;
+
+        /* Open the json file to update the tree */
+        /* TODO: look into only updating the extra bits rather than replacing the tree */
+        let file_path = PathBuf::from(format!("{}.json", tree_name));
+        let full_path: PathBuf = self.system_path_to(DirectoryKind::SavedTrees, file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+
+        let mut data_file: File = File::create(full_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
+
+        /* Write tree json to the json file */
+        data_file.write(tree_json.as_bytes()).map_err(|_| UpdateTreeError::WriteTreeFailed)?;
 
         Ok(())
     }
