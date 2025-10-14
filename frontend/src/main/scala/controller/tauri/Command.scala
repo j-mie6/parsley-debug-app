@@ -169,6 +169,24 @@ object Command {
         type Out = Unit
     }
 
+    case object SkipAllBreakpoints extends Command("skip_all_breakpoints") {
+        type In = Int
+        given args: Args[In] {
+            extension (sessionId: In)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
+        }
+        type Out = Unit
+    }
+
+    case object TerminateDebugging extends Command("terminate_debugging") {
+        type In = Int
+        given args: Args[In] {
+            extension (sessionId: In)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
+        }
+        type Out = Unit
+    }
+
     case object RequestSourceFile extends Command("request_source_file") {
         type In = String
         given args: Args[In] {
