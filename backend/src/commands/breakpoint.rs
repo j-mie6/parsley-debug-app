@@ -17,8 +17,6 @@ pub fn terminate_debugging(state: tauri::State<'_, AppState>, session_id: i32) -
     skip_breakpoints(state, session_id, PARSLEYDEBUG_TERMINATE)
 }
 
-
-
 #[derive(Debug, serde::Serialize)]
 pub enum SkipBreakpointError {
     ChannelError,
