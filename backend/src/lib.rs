@@ -67,7 +67,7 @@ pub fn run() {
         /* On window shutdown, remove saved_trees folder */
         if let RunEvent::ExitRequested { code: None, .. } = event {
             /* Terminate all debugging sessions */
-            for (_, session_id) in handle.get_session_ids().expect("Error") {
+            for (_, session_id) in handle.get_session_ids().expect("Error finding session ids ") {
                 handle.transmit_breakpoint_skips(session_id, server::PARSLEYDEBUG_TERMINATE).expect("Error occured when terminating debugging");
             }
 
