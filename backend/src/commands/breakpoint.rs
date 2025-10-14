@@ -6,6 +6,18 @@ pub fn skip_breakpoints(state: tauri::State<'_, AppState>, session_id: i32, skip
     state.transmit_breakpoint_skips(session_id, skips).map_err(SkipBreakpointError::from)
 }
 
+#[tauri::command]
+pub fn skip_all_breakpoints(state: tauri::State<'_, AppState>, session_id: i32) -> Result<(), SkipBreakpointError> {
+    skip_breakpoints(state, session_id, -1)
+}
+
+#[tauri::command]
+pub fn terminate_debugging(state: tauri::State<'_, AppState>, session_id: i32) -> Result<(), SkipBreakpointError> {
+    skip_breakpoints(state, session_id, -2)
+}
+
+
+
 #[derive(Debug, serde::Serialize)]
 pub enum SkipBreakpointError {
     ChannelError,

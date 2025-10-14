@@ -18,6 +18,8 @@ pub fn handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         save::reset_refs,
         save::delete_saved_trees,
         breakpoint::skip_breakpoints,
+        breakpoint::skip_all_breakpoints,
+        breakpoint::terminate_debugging,
         source::request_source_file
     ]
 }
