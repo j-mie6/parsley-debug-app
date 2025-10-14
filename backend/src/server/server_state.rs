@@ -10,6 +10,9 @@ use super::TokioMutex;
 
 pub type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<i32>;
 
+pub const PARSLEYDEBUG_SKIP_ALL: i32 = -1;
+pub const PARSLEYDEBUG_TERMINATE: i32 = -2;
+
 
 /* Wrapper for StateManager implementation used for Rocket server state management */
 pub struct ServerState(Box<dyn StateManager>, TokioMutex<HashMap<i32, SkipsReceiver>>);
