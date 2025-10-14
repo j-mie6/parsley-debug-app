@@ -77,6 +77,22 @@ object TreeViewController {
             .flatMapSwitch(Tauri.invoke(Command.SkipBreakpoints, _))
     }
 
+    /** Skips over all breakpoints, to receive the final parse tree
+      *
+      * @param sessionId The sessionId of the current debugging session
+      */
+    def skipAllBreakpoints(sessionId: EventStream[Int]): EventStream[Either[DillException, Unit]] = {
+        sessionId.flatMapSwitch(Tauri.invoke(Command.SkipAllBreakpoints, _))
+    }
+
+    /** Terminates debugging. Skips all breakpoints and will *not* receive the final parse tree.
+      *
+      * @param sessionId The sessionId of the current debugging session
+      */
+    def terminateDebugging(sessionId: EventStream[Int]): EventStream[Either[DillException, Unit]] = {
+        sessionId.flatMapSwitch(Tauri.invoke(Command.TerminateDebugging, _))
+    }
+
     val isDebuggingSession: Signal[Boolean] = tree.signal.map(_.exists(_.isDebuggable))
 
     /** Get the references of a debugging tree */
