@@ -15,6 +15,16 @@ pub enum BreakpointCode {
     Terminate,
 }
 
+impl BreakpointCode {
+    pub fn i32_code(&self) -> i32 {
+        match self {
+            BreakpointCode::Skip(skips) => *skips,
+            BreakpointCode::SkipAll => -1,
+            BreakpointCode::Terminate => -2,
+        }
+    }
+}
+
 #[cfg_attr(test, automock)]
 pub trait StateManager: Send + Sync + 'static {
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError>;

@@ -154,16 +154,11 @@ impl StateManager for AppState {
     }
 
     fn transmit_breakpoint_skips(&self, session_id: i32, code: BreakpointCode) -> Result<(), StateError> {
-        let val = match code {
-            BreakpointCode::Skip(skips) => skips,
-            BreakpointCode::SkipAll => -1,
-            BreakpointCode::Terminate => -2,
-        };
         self.inner()?
             .skips_tx
             .remove(&session_id)
             .ok_or(StateError::ChannelError)?
-            .send(val)
+            .send(code.i32_code())
             .map_err(|_| StateError::ChannelError)
     }
 
