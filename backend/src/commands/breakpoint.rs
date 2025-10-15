@@ -1,20 +1,19 @@
-use crate::state::{StateError, StateManager};
+use crate::state::{StateError, StateManager, state_manager::BreakpointCode};
 use crate::AppState;
-use crate::server::{PARSLEYDEBUG_SKIP_ALL, PARSLEYDEBUG_TERMINATE};
 
 #[tauri::command]
 pub fn skip_breakpoints(state: tauri::State<'_, AppState>, session_id: i32, skips: i32) -> Result<(), SkipBreakpointError> {
-    state.transmit_breakpoint_skips(session_id, skips).map_err(SkipBreakpointError::from)
+    state.transmit_breakpoint_skips(session_id, BreakpointCode::Skip(skips)).map_err(SkipBreakpointError::from)
 }
 
 #[tauri::command]
 pub fn skip_all_breakpoints(state: tauri::State<'_, AppState>, session_id: i32) -> Result<(), SkipBreakpointError> {
-    skip_breakpoints(state, session_id, PARSLEYDEBUG_SKIP_ALL)
+    state.transmit_breakpoint_skips(session_id, BreakpointCode::SkipAll).map_err(SkipBreakpointError::from)
 }
 
 #[tauri::command]
 pub fn terminate_debugging(state: tauri::State<'_, AppState>, session_id: i32) -> Result<(), SkipBreakpointError> {
-    skip_breakpoints(state, session_id, PARSLEYDEBUG_TERMINATE)
+    state.transmit_breakpoint_skips(session_id, BreakpointCode::Terminate).map_err(SkipBreakpointError::from)
 }
 
 #[derive(Debug, serde::Serialize)]

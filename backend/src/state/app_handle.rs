@@ -4,7 +4,7 @@ use tauri::{Emitter, Manager};
 
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
-use crate::state::state_manager::SkipsSender;
+use crate::state::state_manager::{BreakpointCode, SkipsSender};
 use super::state_manager::{DirectoryKind, UpdateTreeError};
 use super::{AppState, StateManager, StateError};
 use std::path::PathBuf;
@@ -55,8 +55,8 @@ impl StateManager for tauri::AppHandle {
             .map_err(|_| StateError::EventEmitFailed)
     }
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
-        self.state::<AppState>().transmit_breakpoint_skips(session_id, skips)
+    fn transmit_breakpoint_skips(&self, session_id: i32, code: BreakpointCode) -> Result<(), StateError> {
+        self.state::<AppState>().transmit_breakpoint_skips(session_id, code)
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {

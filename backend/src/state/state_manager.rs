@@ -9,6 +9,12 @@ use crate::trees::{DebugNode, DebugTree};
 
 pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
 
+pub enum BreakpointCode {
+    Skip(i32),
+    SkipAll,
+    Terminate,
+}
+
 #[cfg_attr(test, automock)]
 pub trait StateManager: Send + Sync + 'static {
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError>;
@@ -19,7 +25,7 @@ pub trait StateManager: Send + Sync + 'static {
 
     fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError>;
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError>;
+    fn transmit_breakpoint_skips(&self, session_id: i32, code: BreakpointCode) -> Result<(), StateError>;
 
     fn system_path(&self, dir: DirectoryKind) -> Result<PathBuf, StateError>;
 

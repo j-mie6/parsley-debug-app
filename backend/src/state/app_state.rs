@@ -6,6 +6,7 @@ use std::path::PathBuf;
 
 use crate::events::Event;
 use crate::files::SAVED_TREE_DIR;
+use crate::state::state_manager::BreakpointCode;
 use crate::trees::{DebugNode, DebugTree, SavedTree};
 
 pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
@@ -152,12 +153,17 @@ impl StateManager for AppState {
         self.inner()?.app.emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
+    fn transmit_breakpoint_skips(&self, session_id: i32, code: BreakpointCode) -> Result<(), StateError> {
+        let val = match code {
+            BreakpointCode::Skip(skips) => skips,
+            BreakpointCode::SkipAll => -1,
+            BreakpointCode::Terminate => -2,
+        };
         self.inner()?
             .skips_tx
             .remove(&session_id)
             .ok_or(StateError::ChannelError)?
-            .send(skips)
+            .send(val)
             .map_err(|_| StateError::ChannelError)
     }
 

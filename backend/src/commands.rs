@@ -1,6 +1,6 @@
 mod fetch;
 pub mod save;
-mod breakpoint;
+pub mod breakpoint;
 mod source;
 
 /* Expose command handlers for Tauri setup */

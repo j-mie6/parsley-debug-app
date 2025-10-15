@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use state::state_manager::DirectoryKind;
+use state::state_manager::{BreakpointCode, DirectoryKind};
 use state::StateManager;
 use tauri::Manager;
 use tauri::RunEvent;
@@ -68,7 +68,7 @@ pub fn run() {
         if let RunEvent::ExitRequested { code: None, .. } = event {
             /* Terminate all debugging sessions */
             for (_, session_id) in handle.get_session_ids().expect("Error finding session ids ") {
-                handle.transmit_breakpoint_skips(session_id, server::PARSLEYDEBUG_TERMINATE).expect("Error occured when terminating debugging");
+                handle.transmit_breakpoint_skips(session_id, BreakpointCode::Terminate).expect("Error occured when terminating debugging");
             }
 
             let path_to_saved_trees: PathBuf = handle.system_path(DirectoryKind::SavedTrees).expect("Error occured whilst trying to find saved trees");
