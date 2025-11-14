@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
-use crate::state::state_manager::{DirectoryKind, UpdateTreeError};
+use crate::state::state_manager::{BreakpointCode, DirectoryKind, UpdateTreeError};
 use super::TokioMutex;
 
 pub type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<i32>;
@@ -43,8 +43,8 @@ impl StateManager for ServerState {
         self.inner().emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
-        self.0.as_ref().transmit_breakpoint_skips(session_id, skips)
+    fn transmit_breakpoint_skips(&self, session_id: i32, code: BreakpointCode) -> Result<(), StateError> {
+        self.0.as_ref().transmit_breakpoint_skips(session_id, code)
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {

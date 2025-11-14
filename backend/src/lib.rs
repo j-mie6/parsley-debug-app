@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use state::state_manager::DirectoryKind;
+use state::state_manager::{BreakpointCode, DirectoryKind};
 use state::StateManager;
 use tauri::Manager;
 use tauri::RunEvent;
@@ -66,6 +66,11 @@ pub fn run() {
     app.run(move |_, event| {
         /* On window shutdown, remove saved_trees folder */
         if let RunEvent::ExitRequested { code: None, .. } = event {
+            /* Terminate all debugging sessions */
+            for (_, session_id) in handle.get_session_ids().expect("Error finding session ids ") {
+                handle.transmit_breakpoint_skips(session_id, BreakpointCode::Terminate).expect("Error occured when terminating debugging");
+            }
+
             let path_to_saved_trees: PathBuf = handle.system_path(DirectoryKind::SavedTrees).expect("Error occured whilst trying to find saved trees");
             files::delete_saved_trees_dir(&path_to_saved_trees).expect("Error occured cleaning saved trees");
         }
