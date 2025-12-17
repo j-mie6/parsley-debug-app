@@ -1,4 +1,4 @@
-# Dill ![Github Workflow Status](https://img.shields.io/github/actions/workflow/status/j-mie6/parsley-debug-app/dill-ci.yml?branch=main) ![Github release](https://img.shields.io/github/v/release/j-mie6/parsley-debug-app) ![Github license](https://img.shields.io/github/license/j-mie6/parsley-debug-app) 
+# Dill ![Github Workflow Status](https://img.shields.io/github/actions/workflow/status/j-mie6/parsley-debug-app/dill-ci.yml?branch=main) ![Github release](https://img.shields.io/github/v/release/j-mie6/parsley-debug-app) ![Github license](https://img.shields.io/github/license/j-mie6/parsley-debug-app)
 
 
 ## What is Dill?
@@ -49,7 +49,7 @@ import scala.annotation.experimental
 object Parser {
     import parsley.character.digit
     import parsley.expr.{InfixL, Ops, precedence}
-    
+
     /* Expression parsing */
     val natural: Parsley[Int] = digit.foldLeft1(0)((n, d) => n * 10 + d.asDigit)
     val hello: Parsley[Unit] = ('h' ~> ("ello" | "i") ~> " world!").void
@@ -73,13 +73,13 @@ object Parser {
     val aTagLeft = openTag ~> "a" <~ '>'
     val bTagLeft = openTag ~> 'b' <~ '>'
 
-    val xml = aTagLeft.fillRef { r1 => 
+    val xml = aTagLeft.fillRef { r1 =>
         object Ref1Codec extends RefCodec {
             type A = String
             val ref: Ref[A] = r1
             val codec: Codec[A] = summon[Codec[String]]
         }
-        bTagLeft.fillRef { r2 => 
+        bTagLeft.fillRef { r2 =>
             object Ref2Codec extends RefCodec {
                 type A = Char
                 val ref: Ref[A] = r2
@@ -119,6 +119,10 @@ This will install the node packages required to build the project, build the fro
 - `sbt runBackend` in a different terminal to start the [`Tauri`](https://v2.tauri.app/) app in development mode.
 
 _This will cause a quick-reload when any of the source files are modified._
+
+**To bundle the application for release, use `sbt build RELEASE=TRUE`:**
+
+This generates a packaged tauri application that is built into the `/backend/target/release/bundle` (you may need to run this in sudo for the bundler to function properly, in non-sudo mode you can still generate the application).
 
 
 ## Bug Reports
