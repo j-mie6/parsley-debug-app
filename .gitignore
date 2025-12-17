@@ -13,3 +13,6 @@ target/
 
 project/project
 project/metals.sbt
+
+# macos :(
+.DS_Store
