@@ -19,8 +19,8 @@ impl BreakpointCode {
     pub fn i32_code(&self) -> i32 {
         match self {
             BreakpointCode::Skip(skips) => *skips,
-            BreakpointCode::SkipAll => -1,
-            BreakpointCode::Terminate => -2,
+            BreakpointCode::Terminate => -1,
+            BreakpointCode::SkipAll => -2,
         }
     }
 }
