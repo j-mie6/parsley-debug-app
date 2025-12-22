@@ -39,14 +39,14 @@ pub struct ParsleyTree {
     #[serde(default = "ParsleyTree::default_session_id")] session_id: i32,
 
     /* The name for this session, should it be provided */
-    #[serde(default = "ParsleyTree::default_session_name")] session_name: String,
+    #[serde(default)] session_name: Option<String>,
 }
 
 impl ParsleyTree {
     /* Function used by serde to parse default boolean values as false */
     fn default_bool() -> bool { false }
 
-    pub fn is_new_tree(&self) -> bool { self.session_id == Self::default_session_id() }
+    pub fn session_not_set(&self) -> bool { self.session_id == Self::default_session_id() }
 
     const fn default_session_id() -> i32 { -1 }
     fn default_session_name() -> String { String::from("tree") }
@@ -99,7 +99,8 @@ impl From<ParsleyTree> for DebugTree {
 
         /* Convert the root node and return DebugTree */
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, tree.parser_info, tree.is_debuggable, tree.refs, tree.session_id, tree.session_name.clone())
+        let session_name = tree.session_name.unwrap_or(ParsleyTree::default_session_name());
+        DebugTree::new(tree.input, node, tree.parser_info, tree.is_debuggable, tree.refs, tree.session_id, session_name)
     }
 }
 
@@ -115,7 +116,6 @@ pub mod test {
     use crate::trees::{debug_tree, DebugTree};
 
     const DEFAULT_SESSION_ID: i32 = ParsleyTree::default_session_id();
-    const DEFAULT_SESSION_NAME: &str = "tree";
 
     pub fn json() -> String {
         r#"{
@@ -196,6 +196,7 @@ pub mod test {
             },
             "parserInfo" : {},
             "isDebuggable": false,
+            "sessionName": "tree",
             "refs": []
         }"#
         .split_whitespace()
@@ -220,7 +221,7 @@ pub mod test {
             is_debuggable: false,
             refs: Vec::new(),
             session_id: DEFAULT_SESSION_ID,
-            session_name: String::from(DEFAULT_SESSION_NAME),
+            session_name: None,
         }
     }
 
@@ -289,7 +290,7 @@ pub mod test {
             is_debuggable: false,
             refs: Vec::new(),
             session_id: DEFAULT_SESSION_ID,
-            session_name: String::from(DEFAULT_SESSION_NAME),
+            session_name: Some(String::from("tree")),
         }
     }
 

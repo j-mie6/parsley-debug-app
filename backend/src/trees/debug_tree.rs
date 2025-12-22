@@ -48,6 +48,10 @@ impl DebugTree {
     pub fn set_session_id(&mut self, session_id: i32) {
         self.session_id = session_id
     }
+
+    pub fn get_session_name(&self) -> String {
+        self.session_name.clone()
+    }
 }
 
 /* Defines tree structure used in backend that will be passed to frontend */
