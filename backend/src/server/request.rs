@@ -64,7 +64,7 @@ fn get_index() -> String {
 
 fn process_parsley_tree(mut parsley_tree: ParsleyTree, state: &rocket::State<ServerState>) -> Result<DebugTree, StateError> {
     /* SETUP: Allocate id if RemoteView doesn't have one */
-    if parsley_tree.is_new_tree() {
+    if parsley_tree.session_not_set() {
         let allocated_id: i32 = state.inner().next_session_id()?;
         parsley_tree.set_session_id(allocated_id);
     }
@@ -77,7 +77,7 @@ fn process_parsley_tree(mut parsley_tree: ParsleyTree, state: &rocket::State<Ser
 async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, Json<PostTreeResponse>) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
-    let new_tree: bool = parsley_tree.is_new_tree();
+    let session_exists: bool = !parsley_tree.session_not_set();
 
     let debug_tree: DebugTree = match process_parsley_tree(parsley_tree, state) {
         Ok(tree) => tree,
@@ -111,18 +111,23 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
 
     /* Check if tree is needing to be updated or is a new tree */
-    let set_tree_result: Result<(), StateError> = if new_tree {
+    let set_tree_result: Result<(), StateError> = if !session_exists {
         state.set_tree(debug_tree).and(state.emit(Event::NewTree))
     } else {
         /* Get the tree_name from the session_id */
-        let tree_name: String = {
-            let map: HashMap<String, i32> = match state.get_session_ids() {
-                Ok(map) => map,
-                Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not load tree_names", session_id)),
-            };
-            match map.into_iter().find(|(_, v)| *v == session_id) {
-                Some((name, _)) => name,
-                None => return (http::Status::InternalServerError, PostTreeResponse::no_skips("No tree exists with this session id", session_id)),
+        let map: HashMap<String, i32> = match state.get_session_ids() {
+            Ok(map) => map,
+            Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not load tree_names", session_id)),
+        };
+
+        let tree_name: String = match map.into_iter().find(|(_, v)| *v == session_id) {
+            Some((name, _)) => name,
+            None => {
+                let debug_tree_name = debug_tree.get_session_name();
+                match state.add_session_id(debug_tree.get_session_name(), session_id) {
+                    Ok(()) => debug_tree_name,
+                    Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise session id into map", session_id)),
+                }
             }
         };
 

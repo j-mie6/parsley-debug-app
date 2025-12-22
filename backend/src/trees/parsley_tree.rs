@@ -46,7 +46,7 @@ impl ParsleyTree {
     /* Function used by serde to parse default boolean values as false */
     fn default_bool() -> bool { false }
 
-    pub fn is_new_tree(&self) -> bool { self.session_id == Self::default_session_id() }
+    pub fn session_not_set(&self) -> bool { self.session_id == Self::default_session_id() }
 
     const fn default_session_id() -> i32 { -1 }
     fn default_session_name() -> String { String::from("tree") }
