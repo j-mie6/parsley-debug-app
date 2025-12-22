@@ -39,7 +39,7 @@ pub struct ParsleyTree {
     #[serde(default = "ParsleyTree::default_session_id")] session_id: i32,
 
     /* The name for this session, should it be provided */
-    #[serde(default = "ParsleyTree::default_session_name")] session_name: String,
+    #[serde(default)] session_name: Option<String>,
 }
 
 impl ParsleyTree {
@@ -99,7 +99,8 @@ impl From<ParsleyTree> for DebugTree {
 
         /* Convert the root node and return DebugTree */
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, tree.parser_info, tree.is_debuggable, tree.refs, tree.session_id, tree.session_name.clone())
+        let session_name = tree.session_name.unwrap_or(ParsleyTree::default_session_name());
+        DebugTree::new(tree.input, node, tree.parser_info, tree.is_debuggable, tree.refs, tree.session_id, session_name)
     }
 }
 
@@ -220,7 +221,7 @@ pub mod test {
             is_debuggable: false,
             refs: Vec::new(),
             session_id: DEFAULT_SESSION_ID,
-            session_name: String::from(DEFAULT_SESSION_NAME),
+            session_name: Some(String::from(DEFAULT_SESSION_NAME)),
         }
     }
 
@@ -289,7 +290,7 @@ pub mod test {
             is_debuggable: false,
             refs: Vec::new(),
             session_id: DEFAULT_SESSION_ID,
-            session_name: String::from(DEFAULT_SESSION_NAME),
+            session_name: Some(String::from(DEFAULT_SESSION_NAME)),
         }
     }
 
