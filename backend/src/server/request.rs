@@ -12,7 +12,7 @@ const RESPONSE_INPUT_LEN: usize = 16;
 
 /* Expose routes for mounting during launch */
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![get_index, get_tree, post_tree]
+    rocket::routes![get_index, get_tree, post_tree, new_session]
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -159,6 +159,21 @@ fn get_tree(state: &rocket::State<ServerState>) -> String {
         Ok(tree) => serde_json::to_string_pretty(tree)
             .unwrap_or(String::from("Could not serialise tree to JSON")),
         Err(err) => format!("{:?}", err),
+    }
+}
+
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct NewSessionResponse {
+    session_id: i32
+}
+
+/* Post request handler to accept debug tree */
+#[post("/api/remote/newSession", format = "application/json")]
+async fn new_session(state: &rocket::State<ServerState>) -> (http::Status, Json<NewSessionResponse>) {
+    match state.next_session_id() {
+        Ok(session_id) => (http::Status::Ok, Json(NewSessionResponse { session_id })),
+        Err(_) => (http::Status::InternalServerError, Json(NewSessionResponse { session_id: -1 })),
     }
 }
 
