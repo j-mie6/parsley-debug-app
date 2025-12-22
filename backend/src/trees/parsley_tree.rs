@@ -116,7 +116,6 @@ pub mod test {
     use crate::trees::{debug_tree, DebugTree};
 
     const DEFAULT_SESSION_ID: i32 = ParsleyTree::default_session_id();
-    const DEFAULT_SESSION_NAME: &str = "tree";
 
     pub fn json() -> String {
         r#"{
@@ -197,6 +196,7 @@ pub mod test {
             },
             "parserInfo" : {},
             "isDebuggable": false,
+            "sessionName": "tree",
             "refs": []
         }"#
         .split_whitespace()
@@ -221,7 +221,7 @@ pub mod test {
             is_debuggable: false,
             refs: Vec::new(),
             session_id: DEFAULT_SESSION_ID,
-            session_name: Some(String::from(DEFAULT_SESSION_NAME)),
+            session_name: None,
         }
     }
 
@@ -290,7 +290,7 @@ pub mod test {
             is_debuggable: false,
             refs: Vec::new(),
             session_id: DEFAULT_SESSION_ID,
-            session_name: Some(String::from(DEFAULT_SESSION_NAME)),
+            session_name: Some(String::from("tree")),
         }
     }
 
