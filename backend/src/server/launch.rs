@@ -86,7 +86,7 @@ mod test {
         let client: blocking::Client = server::test::tracked_client(mock);
 
         /* Assert the Rocket server was successfully built with 3 routes */
-        assert_eq!(client.rocket().routes().count(), 3);
+        assert_eq!(client.rocket().routes().count(), 4);
     }
 
     #[test]
