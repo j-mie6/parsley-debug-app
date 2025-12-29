@@ -1,13 +1,15 @@
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 use tauri::{Emitter, Manager};
 
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
-use crate::state::state_manager::{BreakpointCode, SkipsSender};
+use crate::state::state_manager::{BreakpointCode};
+use crate::server::SkipsSender;
+
 use super::state_manager::{DirectoryKind, UpdateTreeError};
 use super::{AppState, StateManager, StateError};
-use std::path::PathBuf;
 
 /* Wrapper for Tauri AppHandle */
 pub struct AppHandle(tauri::AppHandle);

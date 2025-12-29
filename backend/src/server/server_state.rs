@@ -8,7 +8,8 @@ use crate::trees::{DebugTree, DebugNode};
 use crate::state::state_manager::{BreakpointCode, DirectoryKind, UpdateTreeError};
 use super::TokioMutex;
 
-pub type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<i32>;
+pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
+type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<i32>;
 
 
 /* Wrapper for StateManager implementation used for Rocket server state management */
@@ -67,7 +68,7 @@ impl StateManager for ServerState {
         self.inner().next_session_id()
     }
     
-    fn new_transmitter(&self, session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<i32>) -> Result<(), StateError> {
+    fn new_transmitter(&self, session_id: i32, tx: SkipsSender) -> Result<(), StateError> {
         self.inner().new_transmitter(session_id, tx)
     }
 
