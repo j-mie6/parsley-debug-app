@@ -8,8 +8,7 @@ use crate::events::Event;
 use crate::files::SAVED_TREE_DIR;
 use crate::state::state_manager::BreakpointCode;
 use crate::trees::{DebugNode, DebugTree, SavedTree};
-
-pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
+use crate::server::SkipsSender;
 
 use super::session_counter::SessionCounter;
 use super::state_manager::{DirectoryKind, UpdateTreeError};

@@ -6,8 +6,7 @@ use std::collections::HashMap;
 
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
-
-pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
+use crate::server::SkipsSender;
 
 pub enum BreakpointCode {
     Skip(i32),
