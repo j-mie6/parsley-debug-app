@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, DebugNode};
-
+use crate::state::state_manager::{BreakpointCode, DirectoryKind, UpdateTreeError};
 use super::TokioMutex;
 
 pub type SkipsReceiver = rocket::tokio::sync::oneshot::Receiver<i32>;
@@ -43,8 +43,8 @@ impl StateManager for ServerState {
         self.inner().emit(event)
     }
 
-    fn transmit_breakpoint_skips(&self, session_id: i32, skips: i32) -> Result<(), StateError> {
-        self.0.as_ref().transmit_breakpoint_skips(session_id, skips)
+    fn transmit_breakpoint_skips(&self, session_id: i32, code: BreakpointCode) -> Result<(), StateError> {
+        self.0.as_ref().transmit_breakpoint_skips(session_id, code)
     }
     
     fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
@@ -70,9 +70,9 @@ impl StateManager for ServerState {
     fn new_transmitter(&self, session_id: i32, tx: rocket::tokio::sync::oneshot::Sender<i32>) -> Result<(), StateError> {
         self.inner().new_transmitter(session_id, tx)
     }
-    
-    fn get_download_path(&self) -> Result<PathBuf, StateError> {
-        self.inner().get_download_path()
+
+    fn system_path(&self, dir: DirectoryKind) -> Result<PathBuf, StateError> {
+        self.inner().system_path(dir)
     }
     
     fn reset_refs(&self, session_id: i32, default_refs: Vec<(i32, String)>) -> Result<(), StateError> {
@@ -86,11 +86,15 @@ impl StateManager for ServerState {
     fn reset_trees(&self) -> Result<(), StateError> {
         self.inner().reset_trees()
     }
+
+    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+        self.inner().update_tree(tree, tree_name)
+    }
 }
 
 impl ServerState {
     pub fn new_receiver(&self, session_id: i32, rx: SkipsReceiver) -> Option<SkipsReceiver> {
-        self.1.try_lock().ok().map(|mut map| map.insert(session_id, rx)).flatten()
+        self.1.try_lock().ok().and_then(|mut map| map.insert(session_id, rx))
     }
 
     pub async fn receive_breakpoint_skips(&self, session_id: i32) -> Option<i32> {

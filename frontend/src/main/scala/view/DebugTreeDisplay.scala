@@ -17,20 +17,20 @@ import controller.tauri.{Tauri, Command}
 * used to display the debug tree in the UI.
 */
 object DebugTreeDisplay {
-    
+
     /* Variable that keeps track of how much the tree has been zoomed into */
     val zoomFactor: Var[Double] = Var(1.0)
-    
+
     val zoomSpeed: Float = -0.002   /* Speed of zooming in and out */
     val maxZoomFactor: Double = 0.5 /* Maximum zoom factor */
     val minZoomFactor: Double = 3.0 /* Minimum zoom factor */
 
     /* Updater for the zoom factor */
-    val zoomUpdate: Observer[Double] = zoomFactor.updater[Double]((prev, delta) => 
+    val zoomUpdate: Observer[Double] = zoomFactor.updater[Double]((prev, delta) =>
         val zoomChange: Double = 1.0 + (delta * zoomSpeed)
         (prev * zoomChange).min(minZoomFactor).max(maxZoomFactor)
     )
-    
+
     /* Event handler for zooming in and out of the tree */
     val wheelHandler = onWheel.filter(_.ctrlKey).map { e =>
         e.preventDefault() /* Prevent default zooming */
@@ -44,7 +44,7 @@ object DebugTreeDisplay {
     * Render the entire tree from the root node downwards.
     *
     * @param tree The debug tree to render.
-    * 
+    *
     * @return HTML element representing the whole tree.
     */
 
@@ -68,7 +68,7 @@ object DebugTreeDisplay {
             ReactiveNodeDisplay(ReactiveNode(tree.root)),
         )
     }
-    
+
 }
 
 
@@ -98,11 +98,11 @@ private object ReactiveNodeDisplay {
 
     /**
     * Render a reactive node display. This display enables optional rendering
-    * of children nodes, toggled by ReactiveNode.reloadChildren() and 
+    * of children nodes, toggled by ReactiveNode.reloadChildren() and
     * ReactiveNode.resetChildren().
     *
     * @param node The reactive node structure.
-    * 
+    *
     * @return HTML element representing a reactive node with optional children.
     */
     def apply(node: ReactiveNode): HtmlElement = {
@@ -133,14 +133,14 @@ private object ReactiveNodeDisplay {
             case AllChildren          /* Either non-iterative or iterative fully expanded */
 
         /* Tracker for the expansion state of the current reactive node */
-        val expansionState: Signal[ExpansionState] = 
+        val expansionState: Signal[ExpansionState] =
             compressed.combineWith(expandAllChildren, treatIteratively.signal).map {
                 (isCompressed: Boolean, expandAll: Boolean, isIter: Boolean) =>
-                    if (isCompressed) 
+                    if (isCompressed)
                         ExpansionState.NoChildren
-                    else if (isIter && !expandAll) 
+                    else if (isIter && !expandAll)
                         ExpansionState.OneIterativeChild
-                    else 
+                    else
                         ExpansionState.AllChildren
          }
 
@@ -173,7 +173,7 @@ private object ReactiveNodeDisplay {
             if (childrenLen != 0) then
                 /* Check how large the move is (absolute value) */
                 val absDelta = math.abs(delta)
-                
+
                 /* If this delta is exactly the "skip amount" */
                 if (absDelta == skipAmount) then
                     val isForward: Boolean = delta > 0
@@ -207,7 +207,7 @@ private object ReactiveNodeDisplay {
         /* Button to increment selected iterative child */
         def iterativeArrowButton(icon: String, increment: Signal[Int], isRight: Boolean): HtmlElement = {
             val hoverVar: Var[Boolean] = Var(false)
-            
+
             button(
                 className := "debug-node-iterative-buttons",
                 marginBottom.px := 2,
@@ -215,20 +215,20 @@ private object ReactiveNodeDisplay {
                 i(
                     cls(s"bi bi-$icon") <-- hoverVar.signal.not,
                     cls(s"bi bi-$icon-fill") <-- hoverVar.signal,
-                                        
+
                     height.px := 16,
                     margin.auto,
 
                     whenNot (isRight) {
                         transform := "scaleX(-1)"
                     },
-                    
+
                     onMouseOver.mapTo(true) --> hoverVar,
                     onMouseOut.mapTo(false) --> hoverVar,
                 ),
 
                 onClick(event => event.sample(increment).map(incr => if isRight then incr else -incr)) --> moveIndex,
-                
+
                 onMouseOver.mapTo(true) --> hoverVar,
                 onMouseOut.mapTo(false) --> hoverVar
             )
@@ -241,9 +241,9 @@ private object ReactiveNodeDisplay {
 
                 children <-- iterativeNodeIndex.signal
                     .combineWith(node.children.signal.map(0 until _.length))
-                    .map((index, range) => range.map(i => 
+                    .map((index, range) => range.map(i =>
                         div(
-                            className := "iterative-progress", 
+                            className := "iterative-progress",
                             ".",
                             cls("fill") := i <= index,
                         )
@@ -257,7 +257,7 @@ private object ReactiveNodeDisplay {
         def arrows(isRight: Boolean) = {
             div(
                 className := "iterative-button-container",
-                
+
                 child(singleArrow(isRight)) <-- showIterativeOneByOne,
                 child(doubleArrow(isRight)) <-- showIterativeOneByOne
                     .combineWithFn(moreThanTenChildren)(_ && _),
@@ -277,10 +277,10 @@ private object ReactiveNodeDisplay {
 
             /* Render a box for user-defined parser types */
             cls("type-box") := hasUserType,
-            when (hasUserType) { 
+            when (hasUserType) {
                 p(className := "type-box-name", node.debugNode.name)
             },
-                
+
             /* Line connecting node to parent */
             div(className := "debug-node-line"),
 
@@ -294,9 +294,9 @@ private object ReactiveNodeDisplay {
 
                     /* Render debug node information */
                     div(
-                        p(className := "debug-node-name", 
+                        p(className := "debug-node-name",
                             child(i(className := "bi bi-stars", float.left, marginRight.ch := 1)) := node.debugNode.newlyGenerated,
-                            node.debugNode.internal, 
+                            node.debugNode.internal,
                             child(i(className := "bi bi-stars", float.right, marginLeft.ch := 1)) := node.debugNode.newlyGenerated
                         ),
 
@@ -308,22 +308,21 @@ private object ReactiveNodeDisplay {
                     onClick(_
                         .filter(_ => !node.debugNode.isLeaf)
                         .sample(expansionState)
-                        .flatMapMerge {
-                            _ match
-                                case ExpansionState.AllChildren => 
-                                    EventStream.fromValue(Nil)
-                                case ExpansionState.OneIterativeChild => 
-                                    expandAllChildren.set(true)
-                                    Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
-                                case ExpansionState.NoChildren => 
-                                    if (node.debugNode.isIterative) {
-                                        expandAllChildren.set(false)
-                                    }
-                                    Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                        .flatMapSwitch {
+                            case ExpansionState.AllChildren =>
+                                EventStream.fromValue(Nil)
+                            case ExpansionState.OneIterativeChild =>
+                                expandAllChildren.set(true)
+                                Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
+                            case ExpansionState.NoChildren =>
+                                if (node.debugNode.isIterative) {
+                                    expandAllChildren.set(false)
+                                }
+                                Tauri.invoke(Command.FetchNodeChildren, node.debugNode.nodeId).collectRight
                         }
                     ) --> node.children.writer
                 ),
-                
+
                 arrows(isRight = true),
             ),
 
@@ -339,7 +338,7 @@ private object ReactiveNodeDisplay {
             div(
                 className := "debug-node-children-container",
                 children <-- node.children.signal.combineWith(iterativeNodeIndex, compressed.not, expandAllChildren)
-                    .map((nodes, index, notCompressed, expandAllCs) => 
+                    .map((nodes, index, notCompressed, expandAllCs) =>
                         if node.debugNode.isIterative && notCompressed && !expandAllCs then
                             List(ReactiveNodeDisplay(ReactiveNode(nodes(index))))
                         else

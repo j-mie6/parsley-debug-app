@@ -14,9 +14,9 @@ import controller.errors.ErrorController
 import controller.tauri.Args
 
 
-/* Argument trait implemented for types passed to Command invoke call */ 
+/* Argument trait implemented for types passed to Command invoke call */
 private [tauri] sealed trait Args[A] {
-    extension (a: A) 
+    extension (a: A)
         def namedArgs: Map[String, Any]
 }
 
@@ -24,13 +24,13 @@ private [tauri] sealed trait Args[A] {
 private [tauri] object Args {
     /* Default conversion from Unit to empty Arg Map */
     given noArgs: Args[Unit] {
-        extension (unit: Unit) 
+        extension (unit: Unit)
             def namedArgs: Map[String, Any] = Map()
     }
 }
 
 
-/* Command trait implemented for each invokable Tauri command */ 
+/* Command trait implemented for each invokable Tauri command */
 sealed trait Command(private val name: String) {
 
     /* Argument type associated with Command */
@@ -39,9 +39,9 @@ sealed trait Command(private val name: String) {
 
     /* Response type associated with Command */
     type Out
-    given Reader[Out] = scala.compiletime.deferred 
+    given Reader[Out] = scala.compiletime.deferred
 
-    
+
     /* Invoke backend command using Tauri JS interface */
     private [tauri] def invoke(args: In): EventStream[Either[DillException, Out]] = {
         val stringDict: StringDictionary[Any] = StringDictionary(args.namedArgs.toSeq*)
@@ -62,12 +62,12 @@ object Command {
         given args: Args[In] = Args.noArgs
 
         type Out = DebugTree
-    } 
+    }
 
     case object FetchNodeChildren extends Command("fetch_node_children") {
         type In = Int
         given args: Args[In] {
-            extension (id: Int) 
+            extension (id: Int)
                 def namedArgs: Map[String, Any] = Map("nodeId" -> id)
         }
 
@@ -83,7 +83,7 @@ object Command {
                 def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
         }
 
-        type Out = List[String]
+        type Out = IndexedSeq[String]
     }
 
     case object LoadSavedTree extends Command("load_saved_tree") {
@@ -103,7 +103,7 @@ object Command {
                 def namedArgs: Map[String, Any] = Map("index" -> index)
         }
 
-        type Out = List[String]
+        type Out = IndexedSeq[String]
     }
 
     case object DeleteSavedTrees extends Command("delete_saved_trees") {
@@ -165,6 +165,24 @@ object Command {
         given args: Args[In] {
             extension (args: (Int, Int))
                 def namedArgs: Map[String, Any] = Map("sessionId" -> args._1, "skips" -> args._2)
+        }
+        type Out = Unit
+    }
+
+    case object SkipAllBreakpoints extends Command("skip_all_breakpoints") {
+        type In = Int
+        given args: Args[In] {
+            extension (sessionId: In)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
+        }
+        type Out = Unit
+    }
+
+    case object TerminateDebugging extends Command("terminate_debugging") {
+        type In = Int
+        given args: Args[In] {
+            extension (sessionId: In)
+                def namedArgs: Map[String, Any] = Map("sessionId" -> sessionId)
         }
         type Out = Unit
     }

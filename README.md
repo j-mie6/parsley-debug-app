@@ -1,4 +1,4 @@
-# Dill ![Github Workflow Status](https://img.shields.io/github/actions/workflow/status/j-mie6/parsley-debug-app/dill-ci.yml?branch=main) ![Github release](https://img.shields.io/github/v/release/j-mie6/parsley-debug-app) ![Github license](https://img.shields.io/github/license/j-mie6/parsley-debug-app) 
+# Dill ![Github Workflow Status](https://img.shields.io/github/actions/workflow/status/j-mie6/parsley-debug-app/dill-ci.yml?branch=main) ![Github release](https://img.shields.io/github/v/release/j-mie6/parsley-debug-app) ![Github license](https://img.shields.io/github/license/j-mie6/parsley-debug-app)
 
 
 ## What is Dill?
@@ -24,8 +24,8 @@ To build the `Dill` debugger on your own machine, go to [building](#building).
 You will first need to [install](#how-do-i-install-it) / [build](#building) the `Dill` debugging application onto your machine. Then once the application has started, you are ready to start sending it debug information from within `Parsley`:
 
 - First, ensure that your project has the `remote-view` project as a dependency (you will of course need to have the `Parsley` library as a dependency too).
-- Import the `DillRemoteView` object from `parsley.debug`.
-- Then on the parser which you would like to debug, attach the `DillRemoteView` object, before the parse step.
+- Import the `RemoteView` object from `parsley.debug`.
+- Then on the parser which you would like to debug, attach `RemoteView.dill` before calling `parse()`.
 
 **`test.sc`**: the following `scala` script uses `Parsley 5.0.0-M14`
 
@@ -34,7 +34,7 @@ You will first need to [install](#how-do-i-install-it) / [build](#building) the 
 
 //> using dep com.github.j-mie6::parsley:5.0.0-M14
 //> using dep com.github.j-mie6::parsley-debug:5.0.0-M14
-//> using dep com.github.j-mie6::parsley-debug-remote::0.1-5c47cfb-SNAPSHOT
+//> using dep com.github.j-mie6::parsley-debug-remote::0.1-49c36c0-SNAPSHOT
 //> using options -experimental
 
 import parsley.debug.*
@@ -45,13 +45,11 @@ import parsley.debug.combinator.*
 
 import scala.annotation.experimental
 
-import parsley.debug.DillRemoteView
-
 @experimental @parsley.debuggable
 object Parser {
     import parsley.character.digit
     import parsley.expr.{InfixL, Ops, precedence}
-    
+
     /* Expression parsing */
     val natural: Parsley[Int] = digit.foldLeft1(0)((n, d) => n * 10 + d.asDigit)
     val hello: Parsley[Unit] = ('h' ~> ("ello" | "i") ~> " world!").void
@@ -75,13 +73,13 @@ object Parser {
     val aTagLeft = openTag ~> "a" <~ '>'
     val bTagLeft = openTag ~> 'b' <~ '>'
 
-    val xml = aTagLeft.fillRef { r1 => 
+    val xml = aTagLeft.fillRef { r1 =>
         object Ref1Codec extends RefCodec {
             type A = String
             val ref: Ref[A] = r1
             val codec: Codec[A] = summon[Codec[String]]
         }
-        bTagLeft.fillRef { r2 => 
+        bTagLeft.fillRef { r2 =>
             object Ref2Codec extends RefCodec {
                 type A = Char
                 val ref: Ref[A] = r2
@@ -92,10 +90,10 @@ object Parser {
     }
 }
 
-Parser.expr.attach(DillRemoteView).parse("(3+1)-(2*4)")
-Parser.seq.attach(DillRemoteView).parse("abcd")
-Parser.xyxyxy.attach(DillRemoteView).parse("xyxyxyxyxyxyxyxyxyx")
-Parser.xml.attach(DillRemoteView).parse("<a><b> </B></A>") // Fails unless "A" and "B" are passed back by the user
+Parser.expr.attach(RemoteView.dill).parse("(3+1)-(2*4)")
+Parser.seq.attach(RemoteView.dill).parse("abcd")
+Parser.xyxyxy.attach(RemoteView.dill).parse("xyxyxyxyxyxyxyxyxyx")
+Parser.xml.attach(RemoteView.dill).parse("<a><b> </B></A>") // Fails unless "A" and "B" are passed back by the user
 
 
 ```
@@ -106,7 +104,7 @@ You will then be able to view a representation of the abstract syntax tree gener
 
 ![Debugging Simple Expr Parser](readme/images/exampleParser.png)
 
-The `DillRemoteView` object extends a generic `RemoteView` interface; by default the `DillRemoteView` object sends the debug tree over HTTP to local host, on the `Dill` default port. To send requests to another IP address on another port, use the `RemoteView` object with `userAddress = "..."` and `userPort = ...` parameters filled in the apply constructor.
+The `RemoteView` object creates instances of a generic `RemoteView` interface which sends debug trees to a target over HTTP. To create an instance for Dill running locally attach `RemoteView.dill`, or if hosted externally attach `RemoteView.dill(address)`.
 
 ## Building
 
@@ -121,6 +119,10 @@ This will install the node packages required to build the project, build the fro
 - `sbt runBackend` in a different terminal to start the [`Tauri`](https://v2.tauri.app/) app in development mode.
 
 _This will cause a quick-reload when any of the source files are modified._
+
+**To bundle the application for release, use `sbt build RELEASE=TRUE`:**
+
+This generates a packaged tauri application that is built into the `/backend/target/release/bundle` (you may need to run this in sudo for the bundler to function properly, in non-sudo mode you can still generate the application).
 
 
 ## Bug Reports

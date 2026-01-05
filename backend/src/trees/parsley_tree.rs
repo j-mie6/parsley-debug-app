@@ -15,10 +15,10 @@ pub struct ParsleyNode {
     children: Vec<ParsleyNode>, /* The children of this node */
 
     /* Whether this node needs bubbling (iterative and transparent) */
-    #[serde(default = "ParsleyTree::default_bool")] is_iterative: bool, 
+    #[serde(default = "ParsleyTree::default_bool")] is_iterative: bool,
 
     /* Whether this node was generated since the previous breakpoint */
-    #[serde(default = "ParsleyTree::default_bool")] newly_generated: bool, 
+    #[serde(default = "ParsleyTree::default_bool")] newly_generated: bool,
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
@@ -33,25 +33,23 @@ pub struct ParsleyTree {
     #[serde(default = "ParsleyTree::default_bool")] is_debuggable: bool,
 
     /* State references to be modified */
-    #[serde(default = "Vec::new")] refs: Vec<(i32, String)>, 
+    #[serde(default = "Vec::new")] refs: Vec<(i32, String)>,
 
     /* If this tree was produced by a currently-running parser */
-    #[serde(default = "ParsleyTree::default_session_id")] session_id: i32, 
+    #[serde(default = "ParsleyTree::default_session_id")] session_id: i32,
+
+    /* The name for this session, should it be provided */
+    #[serde(default = "ParsleyTree::default_session_name")] session_name: String,
 }
 
 impl ParsleyTree {
-    pub fn is_debuggable(&self) -> bool {
-        self.is_debuggable
-    }
-
     /* Function used by serde to parse default boolean values as false */
-    fn default_bool() -> bool { false } 
+    fn default_bool() -> bool { false }
 
-    pub fn get_session_id(&self) -> i32 {
-        self.session_id
-    }
+    pub fn is_new_tree(&self) -> bool { self.session_id == Self::default_session_id() }
 
-    fn default_session_id() -> i32 { -1 }
+    const fn default_session_id() -> i32 { -1 }
+    fn default_session_name() -> String { String::from("tree") }
 
     pub fn set_session_id(&mut self, session_id: i32) {
         self.session_id = session_id
@@ -100,10 +98,8 @@ impl From<ParsleyTree> for DebugTree {
         let mut current_id: u32 = 0;
 
         /* Convert the root node and return DebugTree */
-        let session_id = tree.get_session_id();
-        let is_debuggable = tree.is_debuggable();
         let node: DebugNode = convert_node(tree.root, &tree.input, &mut current_id);
-        DebugTree::new(tree.input, node, tree.parser_info, is_debuggable, tree.refs, session_id)
+        DebugTree::new(tree.input, node, tree.parser_info, tree.is_debuggable, tree.refs, tree.session_id, tree.session_name.clone())
     }
 }
 
@@ -117,6 +113,9 @@ pub mod test {
 
     use super::{ParsleyNode, ParsleyTree};
     use crate::trees::{debug_tree, DebugTree};
+
+    const DEFAULT_SESSION_ID: i32 = ParsleyTree::default_session_id();
+    const DEFAULT_SESSION_NAME: &str = "tree";
 
     pub fn json() -> String {
         r#"{
@@ -220,7 +219,8 @@ pub mod test {
             parser_info: HashMap::new(),
             is_debuggable: false,
             refs: Vec::new(),
-            session_id: -1,
+            session_id: DEFAULT_SESSION_ID,
+            session_name: String::from(DEFAULT_SESSION_NAME),
         }
     }
 
@@ -288,7 +288,8 @@ pub mod test {
             parser_info: HashMap::new(),
             is_debuggable: false,
             refs: Vec::new(),
-            session_id: -1,
+            session_id: DEFAULT_SESSION_ID,
+            session_name: String::from(DEFAULT_SESSION_NAME),
         }
     }
 
@@ -297,7 +298,7 @@ pub mod test {
     fn parsley_tree_deserialises() {
         let tree: ParsleyTree = serde_json::from_str(&json())
             .expect("Could not deserialise ParsleyTree");
-        
+
         assert_eq!(tree, self::tree());
     }
 
@@ -313,16 +314,16 @@ pub mod test {
     fn parsley_debug_tree_converts_into_debug_tree() {
         let parsley_tree: ParsleyTree = tree();
         let debug_tree: DebugTree = debug_tree::test::tree();
-        
+
         assert_eq!(debug_tree, parsley_tree.into());
     }
-    
+
     #[test]
     fn nested_parsley_debug_tree_converts_into_debug_tree() {
         let parsley_tree: ParsleyTree = nested_tree();
         let debug_tree: DebugTree = debug_tree::test::nested_tree();
-        
+
         assert_eq!(debug_tree, parsley_tree.into());
     }
-    
+
 }

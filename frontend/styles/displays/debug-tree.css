@@ -247,13 +247,28 @@
 
 
 /* Ellipsis rendered below compressed nodes to indicate more nodes available */
-.compress-ellipsis {
+.debug-node-container > .compress-ellipsis {
     position: relative;
     bottom: 4px;
     
     font-size: large;
     text-align: center;
+
+    color: var(--node-font-color);
 }
+
+.debug-node-container.fail > .compress-ellipsis {
+    color: var(--node-font-color-fail) !important;
+}
+
+.debug-node-container.iterative > .compress-ellipsis {
+    color: var(--node-font-color-iterative) !important;
+}
+
+.debug-node-container.debug > .compress-ellipsis {
+    color: var(--node-font-color-debug) !important;
+}
+
 
 /* Wrap node's children in a flexbox */
 .debug-node-children-container {

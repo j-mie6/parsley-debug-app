@@ -6,7 +6,6 @@ use super::ServerState;
 use crate::events::Event;
 use crate::trees::{DebugTree, ParsleyTree};
 use crate::state::{StateError, StateManager};
-use crate::commands::save;
 
 /* Length of input slice returned in post response */
 const RESPONSE_INPUT_LEN: usize = 16;
@@ -65,7 +64,7 @@ fn get_index() -> String {
 
 fn process_parsley_tree(mut parsley_tree: ParsleyTree, state: &rocket::State<ServerState>) -> Result<DebugTree, StateError> {
     /* SETUP: Allocate id if RemoteView doesn't have one */
-    if parsley_tree.get_session_id() == -1 {
+    if parsley_tree.is_new_tree() {
         let allocated_id: i32 = state.inner().next_session_id()?;
         parsley_tree.set_session_id(allocated_id);
     }
@@ -78,13 +77,13 @@ fn process_parsley_tree(mut parsley_tree: ParsleyTree, state: &rocket::State<Ser
 async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, Json<PostTreeResponse>) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
-    let new_tree: bool = parsley_tree.get_session_id() == -1;
+    let new_tree: bool = parsley_tree.is_new_tree();
 
     let debug_tree: DebugTree = match process_parsley_tree(parsley_tree, state) {
         Ok(tree) => tree,
         Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not allocate a session id", -1)),
     };
-    
+
     /* Extract useful fields from tree */
     let is_debuggable: bool = debug_tree.is_debuggable();
     let session_id: i32 = debug_tree.get_session_id();
@@ -95,7 +94,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
         match state.new_receiver(session_id, rx) {
             Some(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Receiver already exists for this session id", session_id)),
-            None => if let Err(_) = state.new_transmitter(session_id, tx) {
+            None => if state.new_transmitter(session_id, tx).is_err() {
                 return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise transmitter in state", session_id));
             },
         };
@@ -103,7 +102,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         /* Reset references for a post tree */
         let res: Result<(), StateError> = state.inner().reset_refs(session_id, debug_tree.refs());
 
-        if let Err(_) = res {
+        if res.is_err() {
             return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not get internal lock", -1))
         }
     }
@@ -128,7 +127,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         };
 
         /* Update the saved tree and set the updated tree into state */
-        if let Err(_) = save::update_tree(&debug_tree, tree_name) {
+        if state.inner().update_tree(&debug_tree, tree_name).is_err() {
             return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
         }
         state.set_tree(debug_tree)
@@ -142,13 +141,13 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
             None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
         },
 
-        Err(StateError::LockFailed) => 
+        Err(StateError::LockFailed) =>
             (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again", session_id)),
 
         Err(StateError::ChannelError) =>
             (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again", session_id)),
 
-        Err(_) => panic!("Unexpected error on post_tree"),
+        Err(e) => panic!("Unexpected error on post_tree: {:?}", e),
     }
 
 }
@@ -171,7 +170,7 @@ pub mod test {
     use rocket::{http, local::blocking};
 
     use crate::events::Event;
-    use crate::server::test::tracked_client; 
+    use crate::server::test::tracked_client;
     use crate::state::MockStateManager;
     use crate::trees::{debug_tree, parsley_tree};
 
@@ -212,13 +211,13 @@ pub mod test {
         mock.expect_set_tree()
             .with(predicate::eq(debug_tree::test::tree()))
             .returning(|_| Ok(()));
-        
+
         mock.expect_next_session_id().returning(|| Ok(-1));
 
 
         mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
-        
+
         let client: blocking::Client = tracked_client(mock);
 
         /* Perform POST request to '/api/remote/tree' */
@@ -290,7 +289,7 @@ pub mod test {
 
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
         mock.expect_next_session_id().returning(|| Ok(-1));
-        
+
         mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
 

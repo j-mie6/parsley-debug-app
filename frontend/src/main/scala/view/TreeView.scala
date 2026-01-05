@@ -19,20 +19,19 @@ import model.errors.DillException
 object TreeView {
 
     /* Render tree as HtmlElement */
-    def apply(): HtmlElement = 
+    def apply(): HtmlElement =
       val returnBus: EventBus[Either[DillException, Seq[(Int, String)]]] = EventBus()
 
       val seqBus: EventBus[Seq[(Int, String)]] = EventBus()
       val debuggableBus: EventBus[Boolean] = EventBus()
-      
+
       div(
         TreeViewController.isDebuggingSession.changes
             .filterNot(identity)
             .mapToUnit
             --> StateManagementViewController.clearRefs,
 
-        TreeViewController.getSessionId.changes
-            .flatMapMerge(TreeViewController.getRefs) --> returnBus.writer,
+        TreeViewController.getSessionId.changes.flatMapSwitch(TreeViewController.getRefs) --> returnBus.writer,
 
         returnBus.stream.collectRight --> seqBus.writer,
         returnBus.stream.collectLeft --> ErrorController.setError,
@@ -44,5 +43,5 @@ object TreeView {
 
         child <-- TreeViewController.getTreeElem, /* Renders the tree */
     )
-            
+
 }
