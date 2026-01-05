@@ -1,4 +1,7 @@
 .tab-bar {
+    position: relative;
+    top: 2px;
+
     max-width: 100%;
     width: fit-content;
     
@@ -18,10 +21,29 @@
     white-space: nowrap;
 }
 
+
 .tab-button {
+    margin: 0;
+    padding-left: 15px;
+    padding-right: 12px;
+    padding-block: 2px;
+    padding-bottom: 6px;
+    
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    
     color: var(--font-color-tertiary);
     background-color: var(--background-secondary);   
-    border-bottom: 2px solid transparent;
+    
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    white-space: nowrap;
+
+    align-items: center;
+    justify-content: space-between;
 }
 
 .tab-button:hover {
@@ -30,49 +52,16 @@
 }
 
 .tab-button.selected {
-    /* background-color: var(--background-tertiary);
-    color: var(--background-secondary); */
-    border: 2px solid var(--background-tertiary);
-    border-bottom: 2px solid var(--background-secondary);
-    z-index: 10;
-}
-
-
-.tab-button {
-    /* border: none; */
-    margin: 0;
-    padding-left: 15px;
-    padding-right: 12px;
-    padding-block: 2px;
-    padding-bottom: 6px;
-    font-size: 15px;
-
     position: relative;
-    top: 2px;
     z-index: 10;
 
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-
-    /* color: var(--background-secondary);
-    background-color: var(--background-tertiary-60); */
-    
-    cursor: pointer;
-    white-space: nowrap;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: bold;
+    border: 2px solid var(--background-tertiary);
 }
 
-/* .tab-button:hover {
-    color: var(--background-secondary);
-    background-color: var(--background-tertiary-40);
-} */
-
-.tab-button.selected {
-    /* color: var(--font-color-tertiary);
-    background-color: var(--background-secondary);  */
+.highlight-debug-session .tab-button.selected {
+    border-color: var(--font-color-debug);
 }
+
 
 .close-tab-button {
     height: inherit;

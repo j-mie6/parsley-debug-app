@@ -256,6 +256,8 @@ abstract class DebugViewPage extends Page {
                     className := "tab-and-tree-view-container",
                     cls("left-compressed") <-- SettingsViewController.isSettingsOpen,
                     cls("right-compressed") <-- StateManagementViewController.isStateOpen,
+                    cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
+                    cls("has-tabs") <-- TabViewController.noSavedTrees.not,
 
                     div(
                         className := "tab-view-container",
@@ -264,7 +266,6 @@ abstract class DebugViewPage extends Page {
 
                     div (
                         className := "tree-view-page",
-                        cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
 
                         div(
                             className := "debug-view-button-bar",
