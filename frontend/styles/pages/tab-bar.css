@@ -18,41 +18,44 @@
     white-space: nowrap;
 }
 
-[data-theme="dark"] {
-    .tab-bar {
-        border-bottom: 2px solid var(--background-tertiary);
-    }
+.tab-button {
+    color: var(--font-color-tertiary);
+    background-color: var(--background-secondary);   
+    border-bottom: 2px solid transparent;
+}
 
-    .tab-button {
-        color: var(--font-color-tertiary);
-        background-color: var(--background-secondary);     
-    }
+.tab-button:hover {
+    color: var(--background-secondary);
+    background-color: var(--background-tertiary);
+}
 
-    .tab-button:hover {
-        color: var(--background-secondary);
-        background-color: var(--background-tertiary);
-    }
-    
-    .tab-button.selected {
-        background-color: var(--background-tertiary);
-        color: var(--background-secondary);
-    }
+.tab-button.selected {
+    /* background-color: var(--background-tertiary);
+    color: var(--background-secondary); */
+    border: 2px solid var(--background-tertiary);
+    border-bottom: 2px solid var(--background-secondary);
+    z-index: 10;
 }
 
 
 .tab-button {
-    border: none;
+    /* border: none; */
     margin: 0;
     padding-left: 15px;
     padding-right: 12px;
     padding-block: 2px;
+    padding-bottom: 6px;
     font-size: 15px;
+
+    position: relative;
+    top: 2px;
+    z-index: 10;
 
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 
-    color: var(--background-secondary);
-    background-color: var(--background-tertiary-60);
+    /* color: var(--background-secondary);
+    background-color: var(--background-tertiary-60); */
     
     cursor: pointer;
     white-space: nowrap;
@@ -61,15 +64,14 @@
     font-weight: bold;
 }
 
-.tab-button:hover {
+/* .tab-button:hover {
     color: var(--background-secondary);
     background-color: var(--background-tertiary-40);
-}
+} */
 
 .tab-button.selected {
-    color: var(--font-color-tertiary);
-    background-color: var(--background-secondary); 
-    z-index: 1;
+    /* color: var(--font-color-tertiary);
+    background-color: var(--background-secondary);  */
 }
 
 .close-tab-button {
