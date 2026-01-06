@@ -8,17 +8,18 @@
     width: 100%;
 
     border-radius: 20px;
+    border-top: 1px solid transparent;
     
     background-color: var(--background-secondary);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 13px rgba(0, 0, 0, 0.2);
 }
 
 .has-tabs .tree-view-page {
-    border-top: 2px solid var(--background-tertiary);
+    border-color: var(--background-tertiary);
 }
 
 .highlight-debug-session .tree-view-page {
-    border-top-color: var(--font-color-debug);
+    border-color: var(--font-color-debug);
 }
 
 
