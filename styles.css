@@ -68,7 +68,7 @@
     --font-color-warning: #FF8C00;      /* Yellow Warning */
     --font-color-success: #4BB543;      /* Success green */
     --font-color-info: #6495ED;         /* Info blue */
-    --font-color-no-tree: #bde3d8;      /* Light green. */
+    --font-color-no-tree: #a8adaba3;    /* Dark green. */
     --font-color-debug: #ffa65e;        /* Debug highlight */       
     
     --node-color: #96DEC4;
