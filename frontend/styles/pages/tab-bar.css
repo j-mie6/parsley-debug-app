@@ -34,7 +34,7 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     
-    color: var(--font-color-tertiary);
+    color: var(--font-color-primary);
     background-color: var(--background-secondary);   
     
     cursor: pointer;
@@ -60,10 +60,14 @@
 }
 
 .highlight-debug-session .tab-button.selected {
-    color: var(--font-color-debug);
     border-color: var(--font-color-debug);
     border-bottom-color: transparent;
 }
+
+[data-theme="dark"] .highlight-debug-session .tab-button.selected {
+    color: var(--font-color-debug);
+}
+
 
 .highlight-debug-session .tab-button.selected:hover {
     background-color: var(--font-color-debug);
