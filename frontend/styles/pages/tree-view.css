@@ -8,8 +8,9 @@
     width: 100%;
 
     border-radius: 20px;
-    border-top: 1px solid transparent;
-    
+    border: 1px solid var(--background-tertiary);
+    border-bottom-width: 3px;
+
     background-color: var(--background-secondary);
     box-shadow: 0 4px 13px rgba(0, 0, 0, 0.2);
 }
