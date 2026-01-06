@@ -44,10 +44,6 @@
     gap: 15px;
 }
 
-.debug-view-header-button-bar i {
-    font-size: 20px;
-}
-
 .debug-view-header-button-bar-left {
     margin-right: auto;
     justify-content: start;
@@ -56,6 +52,19 @@
 .debug-view-header-button-bar-right {
     margin-left: auto;
     justify-content: end;
+}
+
+.debug-view-header-button {
+    color: var(--font-color-primary);
+    font-size: 20px;
+}
+
+.debug-view-header-button:hover {
+    color: var(--font-color-tertiary);
+}
+
+[data-theme="dark"] .debug-view-header-button:hover {
+    color: var(--background-tertiary-60);
 }
 
 
@@ -135,21 +144,28 @@
 }
 
 .debug-view-right-button-bar {
-    float: right;
-    
     display: flex;
     flex-wrap: nowrap;
     justify-content: end;
     align-items: center;
     
-    margin-right: 2px;
-    
     gap: 18px;
+    
+    float: right;
+    height: 100%;
 }
 
 .debug-view-button {
     cursor: pointer;
-    color: var(--font-color-tertiary);
+    color: var(--background-tertiary);
+}
+
+.debug-view-button:hover {
+    color: var(--font-color-quaternary);
+}
+
+[data-theme="dark"] .debug-view-button:hover {
+    color: var(--background-tertiary-60);
 }
 
 .debug-view-select-button {
@@ -201,6 +217,10 @@
 
 .debug-view-button-breakpoint-skip {
     color: var(--font-color-debug);
+}
+
+.debug-view-button-breakpoint-skip:hover {
+    color: var(--font-color-warning) !important;
 }
 
 .debug-view-expand-tree.expanded {
