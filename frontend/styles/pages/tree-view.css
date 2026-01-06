@@ -11,7 +11,7 @@
     border: 2px solid transparent;
     
     background-color: var(--background-secondary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .has-tabs .tree-view-page {
