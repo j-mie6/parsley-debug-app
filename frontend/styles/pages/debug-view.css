@@ -7,9 +7,12 @@
     width: 60vw;
     margin: auto;
     margin-top: 2vh;
-    margin-bottom: 4vh;
-    padding: 1vh 1.5vw;
+    margin-bottom: 1vh;
+    padding: 1.5vh 1.5vw;
     border-radius: 10px;
+
+    border: 1px solid var(--background-tertiary);
+    border-bottom-width: 3px;
 
     color: var(--font-color-primary);
     background-color: var(--background-secondary);
