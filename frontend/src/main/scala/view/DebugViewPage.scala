@@ -46,13 +46,6 @@ val gridTemplateColumns: StyleProp[String] = styleProp("grid-template-columns")
   * light & dark mode buttons.
   */
 abstract class DebugViewPage extends Page {
-    private lazy val gitIcon: HtmlElement = i(className := "bi bi-github", fontSize.px := 40)
-
-    /* Title element */
-    private lazy val title: HtmlElement = div(
-        className := "debug-view-header-title",
-        h1("Dill", fontSize.px := 40, margin.px := 0)
-    )
 
     /* Export tree button */
     val downloadButton: HtmlElement = button(
@@ -117,13 +110,6 @@ abstract class DebugViewPage extends Page {
     }
 
 
-    /* Overview help popup */
-    private lazy val helpButton: HtmlElement = button(
-        className := "debug-view-button debug-view-button-info",
-        i(className := "bi bi-question-circle-fill"),
-        onClick --> (_ => HelpViewController.openPopup())
-    )
-
     private lazy val stateButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-state",
         i(className:= "bi bi-sliders"),
@@ -165,42 +151,58 @@ abstract class DebugViewPage extends Page {
     private val viewCloseSemaphoreIncrement: Observer[Int] = viewCloseSemaphore.updater((x, add) => x + add)
     private val viewCloseSemaphoreDecrement: Observer[Int] = viewCloseSemaphore.updater((x, sub) => x - sub)
 
-    /* Button used to toggle the theme */
-    private lazy val themeButton: Element = div(
-        cursor.pointer,
-        alignContent.center,
-        marginRight.px := 20,
-        fontSize.px := 33,
 
+    /* Header elements */
+
+    /* Title elements */
+    private lazy val title: HtmlElement = div(
+        className := "debug-view-header-title", 
+        dillLogo,
+        "dill"
+    )
+
+    private lazy val dillLogo: HtmlElement = img(
+        className := "debug-view-header-logo", 
+        src := "/icons/dill-logo.png"
+    )
+
+    /* Button used to toggle the theme */
+    private lazy val themeButton: HtmlElement = button(
+        className := "debug-view-header-button debug-view-header-button-theme",
+        cursor.pointer,
         /* Render moonIcon in light mode; sunIcon in dark mode */
         child <-- AppStateController.getThemeIcon,
-
         onClick.mapToUnit --> AppStateController.toggleTheme()
     )
 
     /* Button that links to the 'parsley-debug-app' Github repo */
     private lazy val githubButton: HtmlElement = a(
-        href := "https://github.com/j-mie6/parsley-debug-app", target := "_blank", gitIcon
+        className := "debug-view-header-button debug-view-header-button-github",
+        href := "https://github.com/j-mie6/parsley-debug-app", 
+        target := "_blank",
+        i(className := "bi bi-github")
     )
 
-    /* Right section of the page header, containing various buttons */
-    private lazy val headerRight: HtmlElement = div(
-        className := "debug-view-header-right",
-        div(
-            className := "debug-view-header-right-buttons",
-            themeButton,
-            githubButton,
-        )
+    /* Overview help popup */
+    private lazy val helpButton: HtmlElement = button(
+        className := "debug-view-header-button debug-view-header-button-info",
+        i(className := "bi bi-question-circle-fill"),
+        onClick --> (_ => HelpViewController.openPopup())
     )
 
-    /* The page header */
-    private lazy val headerView: HtmlElement = headerTag(
-        className := "debug-view-header",
-
-        div(),
-        title,
-        headerRight,
+    /* Container for left header buttons */
+    private lazy val headerLeftButtonbar: HtmlElement = div(
+        className := "debug-view-header-button-bar debug-view-header-button-bar-left",
+        githubButton,
+        themeButton
     )
+
+    /* Container for right header buttons */
+    private lazy val headerRightButtonBar: HtmlElement = div(
+        className := "debug-view-header-button-bar debug-view-header-button-bar-right",
+        helpButton
+    )
+
 
     /* Delays for the button bar expanding */
     private final val mouseEnterOpenDelay = 500
@@ -216,6 +218,7 @@ abstract class DebugViewPage extends Page {
             onMouseLeave(_.delay(mouseLeaveCloseDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
 
             settingsTabButton,
+
             MainViewController.renderViewButton(View.Tree, viewCloseSemaphore),
             MainViewController.renderViewButton(View.Input, viewCloseSemaphore),
             MainViewController.renderViewButton(View.Code, viewCloseSemaphore),
@@ -229,9 +232,9 @@ abstract class DebugViewPage extends Page {
 
             child(div(breakpointSkipButton)) <-- TreeViewController.isDebuggingSession,
             child(downloadButton) <-- TreeViewController.treeExists,
+            
             uploadButton,
             stateButton,
-            helpButton,
         )
     }
 
@@ -246,7 +249,16 @@ abstract class DebugViewPage extends Page {
     override def render(childElem: Option[HtmlElement]): HtmlElement = {
         super.render(Some(mainTag(
             className := "debug-view-page",
-            headerView,
+            
+            /* The page header */
+            headerTag(
+                className := "debug-view-header",
+                headerLeftButtonbar,
+                title,
+                headerRightButtonBar
+            ),
+
+            /* The page body */
             div(
                 className := "debug-view-body",
                 cls("highlight-debug-session") <-- TreeViewController.isDebuggingSession,
@@ -267,16 +279,13 @@ abstract class DebugViewPage extends Page {
 
                     div (
                         className := "tree-view-page",
-
                         div(
                             className := "debug-view-button-bar",
                             leftButtonBar,
                             rightButtonBar,
                         ),
-
                         div(
                             className := "tree-view-page-scroll",
-
                             childElem.getOrElse(div())
                         )
                     ),
