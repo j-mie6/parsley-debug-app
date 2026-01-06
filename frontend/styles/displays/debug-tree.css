@@ -136,6 +136,18 @@
     background-color: var(--node-font-color);
 }
 
+.debug-node-container.fail > .debug-node-children-container > .debug-node-container > .debug-node-line {
+    background-color: var(--node-font-color-fail) !important;
+}
+
+.debug-node-container.iterative > .debug-node-children-container > .debug-node-container > .debug-node-line {
+    background-color: var(--node-font-color-iterative);
+}
+
+.debug-node-container.debug > .debug-node-children-container > .debug-node-container > .debug-node-line {
+    background-color: var(--node-font-color-debug);
+}
+
 /* No node-line displayed on the first node */
 .debug-tree-container:first-child > .debug-node-container > .debug-node-line {
     display: none !important;
