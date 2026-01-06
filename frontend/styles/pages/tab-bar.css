@@ -66,11 +66,9 @@
 .close-tab-button {
     height: inherit;
 
+    padding: 0;
     margin: auto;
     margin-left: 8px;
-    
-    padding: 0;
-    
     border: none;
     border-radius: 0;
     
@@ -79,5 +77,5 @@
 }
 
 .close-tab-button:hover {
-    transform: scale(1.1);
+    color: var(--font-color-error);
 }
