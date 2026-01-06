@@ -272,10 +272,7 @@ abstract class DebugViewPage extends Page {
                     cls("right-compressed") <-- StateManagementViewController.isStateOpen,
                     cls("has-tabs") <-- TabViewController.noSavedTrees.not,
 
-                    div(
-                        className := "tab-view-container",
-                        TabView()
-                    ),
+                    div(className := "tab-view-container", TabView()),
 
                     div (
                         className := "tree-view-page",
