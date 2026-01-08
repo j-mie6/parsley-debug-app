@@ -62,7 +62,7 @@ object StateManagementViewController {
     /**
     * Toggles the visibility of the state management panel between open and closed.
     */
-    def toggleOpenState(): Unit = stateOpen.set(!stateOpen.now())
+    def toggleOpen: Observer[Unit] = stateOpen.updater((old, _) => !old)
 
     /**
     * Obtains a signal of an optional DebugTree, representing the current debug tree.
