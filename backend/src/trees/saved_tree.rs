@@ -36,14 +36,15 @@ pub struct SavedNode {
     internal: String,           /* Whether the parser was successful */
     success: bool,              /* The unique child number of this node */
     child_id: Option<u32>,      /* Offset into the input in which this node's parse attempt starts */
-    input: String,              /* Offset into the input in which this node's parse attempt finished */
+    pub input_start: u32,       /* Index of start of consumed input */
+    pub input_end: u32,         /* Index of end of consumed input (exclusive) */
     children: Vec<SavedNode>,   /* The children of this node */
     is_iterative: bool,         /* Whether this node needs bubbling (iterative and transparent) */
     newly_generated: bool,      /* Whether this node was generated since the previous breakpoint */
 }
 impl SavedNode {
     pub fn new(node_id: u32, name: String, internal: String, success: bool,
-            child_id: Option<u32>, input: String, children: Vec<SavedNode>,
+            child_id: Option<u32>, input_start: u32, input_end: u32, children: Vec<SavedNode>,
             is_iterative: bool, newly_generated: bool) -> Self {
 
         SavedNode {
@@ -52,7 +53,8 @@ impl SavedNode {
             internal,
             success,
             child_id,
-            input,
+            input_start,
+            input_end,
             children,
             is_iterative,
             newly_generated,
@@ -77,7 +79,8 @@ impl From<DebugTree> for SavedTree {
                 node.internal,
                 node.success,
                 node.child_id,
-                node.input,
+                node.input_start,
+                node.input_end,
                 children,
                 node.is_iterative,
                 node.newly_generated,
@@ -106,7 +109,8 @@ impl From<SavedTree> for DebugTree {
                 node.internal,
                 node.success,
                 node.child_id,
-                node.input,
+                node.input_start,
+                node.input_end,
                 children,
                 node.is_iterative,
                 node.newly_generated
@@ -238,7 +242,7 @@ pub mod test {
                 String::from("Test"),
                 true,
                 Some(0),
-                String::from("Test"),
+                0, 4,
                 Vec::new(),
                 false,
                 false
@@ -260,7 +264,7 @@ pub mod test {
                 String::from("0"),
                 true,
                 Some(0),
-                String::from("0"),
+                0, 5,
                 vec![
                     SavedNode::new(
                         1,
@@ -268,7 +272,7 @@ pub mod test {
                         String::from("1"),
                         true,
                         Some(1),
-                        String::from("1"),
+                        1, 2,
                         vec![
                             SavedNode::new(
                                 2,
@@ -276,7 +280,7 @@ pub mod test {
                                 String::from("2"),
                                 true,
                                 Some(2),
-                                String::from("2"),
+                                2, 3,
                                 Vec::new(),
                                 false,
                                 false
@@ -291,7 +295,7 @@ pub mod test {
                         String::from("3"),
                         true,
                         Some(3),
-                        String::from("3"),
+                        3, 4,
                         vec![
                             SavedNode::new(
                                 4,
@@ -299,7 +303,7 @@ pub mod test {
                                 String::from("4"),
                                 true,
                                 Some(4),
-                                String::from("4"),
+                                4, 5,
                                 Vec::new(),
                                 false,
                                 false

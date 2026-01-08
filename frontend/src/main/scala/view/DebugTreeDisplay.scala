@@ -274,9 +274,9 @@ private object ReactiveNodeDisplay {
             cls("leaf") := node.debugNode.isLeaf,
             cls("iterative") := node.debugNode.isIterative,
             cls("debug") := node.debugNode.isBreakpoint,
+            cls("type-box") := hasUserType,
 
             /* Render a box for user-defined parser types */
-            cls("type-box") := hasUserType,
             when (hasUserType) {
                 p(className := "type-box-name", node.debugNode.name)
             },
@@ -300,7 +300,6 @@ private object ReactiveNodeDisplay {
                             child(i(className := "bi bi-stars", float.right, marginLeft.ch := 1)) := node.debugNode.newlyGenerated
                         ),
 
-                        p(fontStyle := "italic", node.debugNode.input),
                         child(p(className := "debug-node-iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),

@@ -67,11 +67,6 @@ impl From<ParsleyTree> for DebugTree {
             /* Convert child_id, handling -1 case */
             let child_id: Option<u32> = node.child_id.try_into().ok();
 
-            /* Slice the input into input consumed by this node, handling -1 case */
-            let input_slice: String = usize::try_from(node.from_offset)
-                .and_then(|from: usize| Ok(from..usize::try_from(node.to_offset)?))
-                .map_or("", |range| &input[range])
-                .to_string();
 
             /* Recursively convert children into DebugNodes */
             let children: Vec<DebugNode> = node
@@ -87,7 +82,8 @@ impl From<ParsleyTree> for DebugTree {
                 node.internal,
                 node.success,
                 child_id,
-                input_slice,
+                u32::try_from(node.from_offset).unwrap_or(0),
+                u32::try_from(node.to_offset).unwrap_or(0),
                 children,
                 node.is_iterative,
                 node.newly_generated,
