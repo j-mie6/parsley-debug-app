@@ -15,6 +15,12 @@ pub fn routes() -> Vec<rocket::Route> {
     rocket::routes![get_index, get_tree, post_tree, new_session]
 }
 
+/* Placeholder GET request handler to print 'Hello world!' */
+#[get("/")]
+fn get_index() -> String {
+    String::from("DILL: Debugging Interactively for the ParsLey Language")
+}
+
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct PostTreeResponse {
@@ -56,12 +62,6 @@ impl PostTreeResponse {
     }
 }
 
-/* Placeholder GET request handler to print 'Hello world!' */
-#[get("/")]
-fn get_index() -> String {
-    String::from("DILL: Debugging Interactively for the ParsLey Language")
-}
-
 fn process_parsley_tree(mut parsley_tree: ParsleyTree, state: &rocket::State<ServerState>) -> Result<DebugTree, StateError> {
     /* SETUP: Allocate id if RemoteView doesn't have one */
     if parsley_tree.session_not_set() {
@@ -70,6 +70,22 @@ fn process_parsley_tree(mut parsley_tree: ParsleyTree, state: &rocket::State<Ser
     }
 
     Ok(parsley_tree.into())
+}
+
+
+/* Create thread communication channels */
+fn create_breakpoint_channels(state: &rocket::State<ServerState>, session_id: i32, refs: Vec<(i32, String)>) -> Result<(), &'static str> {
+    let (tx, rx) = rocket::tokio::sync::oneshot::channel::<i32>();
+
+    match state.new_receiver(session_id, rx) {
+        Some(_) => Err("Receiver already exists for this session id")?,
+        None => if state.new_transmitter(session_id, tx).is_err() {
+            Err("Could not initialise transmitter in state")?
+        },
+    };
+
+    /* Reset references for a post tree */
+    state.inner().reset_refs(session_id, refs).map_err(|_| "Could not acquire internal lock")
 }
 
 /* Post request handler to accept debug tree */
@@ -88,22 +104,9 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     let is_debuggable: bool = debug_tree.is_debuggable();
     let session_id: i32 = debug_tree.get_session_id();
 
-    /* Create channels */
     if is_debuggable {
-        let (tx, rx) = rocket::tokio::sync::oneshot::channel::<i32>();
-
-        match state.new_receiver(session_id, rx) {
-            Some(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Receiver already exists for this session id", session_id)),
-            None => if state.new_transmitter(session_id, tx).is_err() {
-                return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise transmitter in state", session_id));
-            },
-        };
-
-        /* Reset references for a post tree */
-        let res: Result<(), StateError> = state.inner().reset_refs(session_id, debug_tree.refs());
-
-        if res.is_err() {
-            return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not get internal lock", -1))
+        if let Err(msg) = create_breakpoint_channels(state, session_id, debug_tree.refs()) {
+            return (http::Status::InternalServerError, PostTreeResponse::no_skips(msg, session_id));
         }
     }
 
@@ -154,7 +157,6 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
 
         Err(e) => panic!("Unexpected error on post_tree: {:?}", e),
     }
-
 }
 
 /* Return posted DebugTree as JSON string */
