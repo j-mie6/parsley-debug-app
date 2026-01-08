@@ -16,9 +16,22 @@ import controller.tauri.{Tauri, Event}
 /**
   * Object containing rendering functions for the input view page.
   */
-
 object InputView {
-    def apply(): HtmlElement = 
-        /* Renders the input */
+    def apply(): HtmlElement = {
         div(className:= "debug-input-page", child <-- InputViewController.getInputElem) 
+    }
+}
+
+object InputViewSidepanel {
+        def apply(): HtmlElement = {
+        div(
+            className := "sidepanel-container state",
+            cls("open") <-- InputViewController.isInputOpen,
+
+            div(className := "sidepanel-header", "Input"),
+
+            /* Renders the input */
+            child <-- InputViewController.getInputElem
+        )
+    }
 }

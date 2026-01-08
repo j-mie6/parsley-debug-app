@@ -50,6 +50,8 @@
     --node-font-color-fail: #FFA3A3;
     --node-font-color-iterative: #a3d6ff;
     --node-font-color-debug: #ffa65e;
+
+    --input-unselected: #808080;
 }
 
 [data-theme="light"] {

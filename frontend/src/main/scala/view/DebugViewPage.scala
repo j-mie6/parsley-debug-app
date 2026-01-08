@@ -70,7 +70,7 @@ abstract class DebugViewPage extends Page {
     /* Uploading json element */
     val uploadButton: HtmlElement = label(
         className := "debug-view-button debug-view-button-upload",
-        i(className := "bi bi-file-earmark-arrow-up"),
+        i(className := "bi bi-file-earmark-arrow-up-fill"),
         input(
             typ := "file",
             display := "none",
@@ -115,18 +115,20 @@ abstract class DebugViewPage extends Page {
     private lazy val stateButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-state",
         i(className:= "bi bi-sliders"),
-        onClick --> (_ =>
-            StateManagementViewController.toggleOpenState()
-        )
+        onClick.mapToUnit --> StateManagementViewController.toggleOpen
+    )
+    
+    private lazy val inputButton: HtmlElement = button(
+        className := "debug-view-button",
+        i(className := "bi bi-file-earmark-text-fill"),
+        onClick.mapToUnit --> InputViewController.toggleOpen
     )
 
     /* Opener for the settings tab. */
     private lazy val settingsTabButton: HtmlElement = button(
         className := "debug-view-button debug-view-button-settings",
         i(className := "bi bi-gear-wide-connected"),
-        onClick --> (_ =>
-            SettingsViewController.toggleOpenSettings()
-        )
+        onClick.mapToUnit --> SettingsViewController.toggleOpen
     )
 
     /* Fast forward icon for skipping */
@@ -187,6 +189,7 @@ abstract class DebugViewPage extends Page {
             child(downloadButton) <-- TreeViewController.treeExists,
             
             uploadButton,
+            inputButton,
             stateButton,
         )
     }
@@ -288,6 +291,7 @@ abstract class DebugViewPage extends Page {
                             leftButtonBar,
                             rightButtonBar,
                         ),
+                        // child <-- InputViewController.getInputElem,
                         div(
                             className := "tree-view-page-scroll",
                             childElem.getOrElse(div())
@@ -295,6 +299,7 @@ abstract class DebugViewPage extends Page {
                     ),
                 ),
 
+                child(InputViewSidepanel()) <-- InputViewController.isInputOpen,
                 child(StateManagementView()) <-- StateManagementViewController.isStateOpen,
             )
         )))

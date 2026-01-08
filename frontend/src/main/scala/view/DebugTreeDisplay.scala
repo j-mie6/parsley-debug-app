@@ -10,6 +10,7 @@ import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.tauri.{Tauri, Command}
+import controller.viewControllers.InputViewController
 
 
 /**
@@ -263,7 +264,7 @@ private object ReactiveNodeDisplay {
                     .combineWithFn(moreThanTenChildren)(_ && _),
             )
         }
-
+        
 
         div(
             className := "debug-node-container",
@@ -304,7 +305,12 @@ private object ReactiveNodeDisplay {
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
+                    /* Select input consumed by this node */
+                    /* Shift + Click allows node expansion to be toggled without focusing */
+                    onClick(_.filterNot(_.altKey).mapTo(node.debugNode)) --> InputViewController.selectNode,
+                    
                     onClick(_
+                        .filterNot(_.ctrlKey) // Allow focus node without toggling expansion
                         .filter(_ => !node.debugNode.isLeaf)
                         .sample(expansionState)
                         .flatMapSwitch {

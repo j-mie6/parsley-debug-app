@@ -44,12 +44,13 @@ object TreeViewController {
     /** Get debug tree element or warning if no tree found */
     def getTreeElem: Signal[HtmlElement] = getTree.map(_ match
         /* Default tree view when no tree is loaded */
-        case None =>
-          StateManagementViewController.clearRefs
-          div(
-            className := "nothing-shown",
-            "Nothing to show"
-          )
+        case None => {
+            StateManagementViewController.clearRefs
+            div(
+                className := "nothing-shown",
+                "Nothing to show"
+            )
+        }
 
         /* Render as DebugTreeDisplay */
         case Some(tree) => DebugTreeDisplay(tree)
