@@ -209,6 +209,7 @@ pub mod test {
 
         mock.expect_next_session_id().returning(|| Ok(-1));
 
+        mock.expect_update_tree().returning(|_, _| Ok(()));
 
         mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));
@@ -284,6 +285,8 @@ pub mod test {
 
         mock.expect_get_tree().returning(|| Ok(debug_tree::test::tree()));
         mock.expect_next_session_id().returning(|| Ok(-1));
+
+        mock.expect_update_tree().returning(|_, _| Ok(()));
 
         mock.expect_emit().withf(|expected| &Event::NewTree == expected)
             .returning(|_| Ok(()));

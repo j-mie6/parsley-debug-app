@@ -48,6 +48,8 @@ pub mod test {
 
         mock.expect_next_session_id().returning(|| Ok(-1));
 
+        mock.expect_update_tree().times(NUM_REPEATS).returning(|_, _| Ok(()));
+
         let client: blocking::Client = tracked_client(mock);
 
         /* Format GET request to index route '/' */
