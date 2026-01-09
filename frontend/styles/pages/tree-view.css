@@ -1,17 +1,28 @@
 .tree-view-page {
+    z-index: 1;
+
     box-sizing: border-box;
+    overflow: hidden;
 
     height: 100%;
     width: 100%;
 
     border-radius: 20px;
-    border: 2px solid transparent;
+    border: 1px solid var(--background-tertiary);
+    border-bottom-width: 3px;
+
     background-color: var(--background-secondary);
-
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-
-    overflow: hidden;
+    box-shadow: 0 4px 13px rgba(0, 0, 0, 0.2);
 }
+
+.has-tabs .tree-view-page {
+    border-color: var(--background-tertiary);
+}
+
+.highlight-debug-session .tree-view-page {
+    border-color: var(--font-color-debug);
+}
+
 
 .tree-view-page-scroll {
     box-sizing: border-box;
@@ -22,20 +33,10 @@
     overflow: auto;
 }
 
+
 .zoom-container {
     transform-origin: left top;
     width: fit-content;
     height: fit-content;
     margin: auto;
-}
-
-.tree-view-page.highlight-debug-session {
-    animation: borderColorDebugAnim 1.8s infinite alternate ease-in !important;
-}
-
-@keyframes borderColorDebugAnim {
-    from { }
-    to {
-        border-color: var(--font-color-debug);
-    }
 }

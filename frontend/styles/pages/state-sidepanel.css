@@ -1,3 +1,7 @@
 .ref-value {
     font-style: italic;
 }
+
+.highlight-debug-session .sidepanel-container.state {
+    border-color: var(--font-color-debug);
+}
