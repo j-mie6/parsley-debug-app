@@ -31,6 +31,8 @@
     padding-bottom: 4px;
     margin-inline: 2px;
 
+    box-decoration-break: clone;
+
     border: 1px solid;
     border-bottom-width: 2px;
     border-radius: 5px;
