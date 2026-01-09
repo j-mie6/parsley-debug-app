@@ -121,30 +121,6 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     if let Err(_) = state.emit(Event::NewTree) {
         todo!()
     }
-
-        // /* Update the saved tree and set the updated tree into state */
-        // if state.inner().update_tree(&debug_tree, session_id).is_err() {
-        //     return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
-        // }
-        // if should_emit { state.set_tree(debug_tree).and(state.emit(Event::NewTree)) } else {state.set_tree(debug_tree)}
-    // };
-
-    // match set_tree_result {
-    //     Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
-
-    //     Ok(()) => match state.receive_breakpoint_skips(session_id).await {
-    //         Some(skips) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, state.get_refs(session_id).expect("Session ID should exist"))),
-    //         None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
-    //     },
-
-    //     Err(StateError::LockFailed) =>
-    //         (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again", session_id)),
-
-    //     Err(StateError::ChannelError) =>
-    //         (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again", session_id)),
-
-    //     Err(e) => panic!("Unexpected error on post_tree: {:?}", e),
-    // }
     
     if !is_debuggable {
         (http::Status::Ok, PostTreeResponse::no_skips(&success_msg, session_id))

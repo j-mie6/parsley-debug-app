@@ -14,27 +14,6 @@ fn format_filepath(state: &tauri::State<AppState>, session_id: i32) -> Result<Os
     state.system_path_to(DirectoryKind::SavedTrees, PathBuf::from(session_id.to_string())).map(OsString::from)
 }
 
-#[derive(Debug, serde::Serialize)]
-pub enum SaveTreeError {
-    LockFailed,
-    TreeNotFound,
-    SerialiseFailed,
-    CreateDirFailed,
-    WriteToFileFailed,
-    AddSessionFailed,
-}
-
-impl From<StateError> for SaveTreeError {
-    fn from(state_error: StateError) -> Self {
-        match state_error {
-            StateError::LockFailed => SaveTreeError::LockFailed,
-            StateError::TreeNotFound => SaveTreeError::TreeNotFound,
-            e => panic!("Unexpected error on save_tree: {:?}", e),
-        }
-    }
-}
-
-
 /* Downloads the tree into Downloads folder */
 #[tauri::command]
 pub fn download_tree(state: tauri::State<AppState>, index: usize) -> Result<(), DownloadTreeError> {
@@ -154,8 +133,6 @@ pub fn delete_saved_trees(state: tauri::State<AppState>) -> Result<(), DeleteTre
 #[derive(Debug, serde::Serialize)]
 pub enum DeleteTreeError {
     TreeFileRemoveFail,
-    NameRetrievalFail,
-    TreeRemovalFail,
     SerialiseFailed,
     SessionIdRemovalFail,
     FolderCreationFail,
