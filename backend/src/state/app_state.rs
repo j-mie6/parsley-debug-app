@@ -92,6 +92,10 @@ impl AppState {
 
         Ok(())
     }
+
+    fn is_debuggable_session(&self, session_id: i32) -> Result<bool, StateError> {
+        Ok(self.inner()?.skips_tx.contains_key(&session_id))
+    }
 }
 
 
@@ -179,6 +183,9 @@ impl StateManager for AppState {
         let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
 
         let session_id: i32 = state.tabs.keys()[index];
+        if self.is_debuggable_session(session_id)? {
+            self.transmit_breakpoint_skips(session_id, BreakpointCode::Terminate)?;
+        }
         state.saved_refs.remove(&session_id);
 
         self.tab_names()
