@@ -114,10 +114,10 @@ object Command {
     }
 
     case object ImportTree extends Command("import_tree") {
-        type In = (String, String)
+        type In = String
         given args: Args[In] {
-            extension (fileInfo: (String, String))
-                def namedArgs: Map[String, Any] = Map("treeName" -> fileInfo._1, "contents" -> fileInfo._2)
+            extension (fileInfo: String)
+                def namedArgs: Map[String, Any] = Map("contents" -> fileInfo)
         }
 
         type Out = Unit

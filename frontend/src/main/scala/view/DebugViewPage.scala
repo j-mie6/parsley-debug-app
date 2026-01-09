@@ -103,7 +103,7 @@ abstract class DebugViewPage extends Page {
                     val reader = new dom.FileReader()
                     reader.onload = _ => {
                         val content = reader.result.asInstanceOf[String]
-                        val result = TreeViewController.importTree(file.name, content)
+                        val result = TreeViewController.importTree(content)
                         result.collectRight.foreach(_ => resolve(Right(())))(unsafeWindowOwner)
                         result.collectLeft.foreach(err => resolve(Left(err)))(unsafeWindowOwner)
                     }

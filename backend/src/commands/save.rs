@@ -73,11 +73,11 @@ impl From<StateError> for DownloadTreeError {
 
 /* Imports JSON file to display a tree */
 #[tauri::command]
-pub fn import_tree(tree_name: String, contents: String, state: tauri::State<AppState>) -> Result<(), ImportTreeError> {
-    // TODO new session id shenanigans
-    let assigned_session_id: i32 = todo!();
+pub fn import_tree(contents: String, state: tauri::State<AppState>) -> Result<(), ImportTreeError> {
+    let assigned_session_id: i32 = state.next_session_id()?;
+
     /* Path to the json file used to store the tree */
-    let file_path: OsString = format_filepath(&state, &tree_name)?;
+    let file_path: OsString = format_filepath(&state, assigned_session_id)?;
 
     /* Creates a file in apps local saved tree folders and writes data from external json it */
     let mut imported_tree: File = File::create(&file_path).map_err(|_| ImportTreeError::CreateDirFailed)?;
