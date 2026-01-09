@@ -1,5 +1,9 @@
 .tab-bar {
+    position: relative;
+    top: 1px;
+
     max-width: 100%;
+    width: fit-content;
     
     display: flex;
     flex-direction: row;
@@ -17,48 +21,74 @@
     white-space: nowrap;
 }
 
+
 .tab-button {
     margin: 0;
-    margin-bottom: -2px;
     padding-left: 15px;
     padding-right: 12px;
     padding-block: 2px;
-    font-size: 15px;
-
-    border: 2px solid var(--font-color-tertiary);
+    padding-top: 4px;
+    padding-bottom: 7px; /* Do not reduce - causes border corners to mismatch */
+    
+    border: 1px solid transparent;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-
-    color: var(--font-color-tertiary);
-    background-color: var(--background-secondary); 
-
-    box-shadow: none;
-    white-space: nowrap;
-    justify-content: space-between;
-    align-items: center;
+    
+    color: var(--font-color-primary);
+    background-color: var(--background-secondary);   
+    
+    cursor: pointer;
+    font-size: 15px;
     font-weight: bold;
+    white-space: nowrap;
+
+    align-items: center;
+    justify-content: space-between;
 }
 
 .tab-button:hover {
-    background-color: var(--background-secondary-hover); 
-    cursor: pointer;
+    color: var(--background-secondary);
+    background-color: var(--background-tertiary);
 }
 
 .tab-button.selected {
-    background-color: var(--font-color-tertiary);
-    color: var(--background-secondary)
+    position: relative;
+    z-index: 10;
+
+    border-color: var(--background-tertiary);
+    border-bottom-color: transparent;
 }
 
+.highlight-debug-session .tab-button.selected {
+    border-color: var(--font-color-debug);
+    border-bottom-color: transparent;
+}
+
+[data-theme="dark"] .highlight-debug-session .tab-button.selected {
+    color: var(--font-color-debug);
+}
+
+
+.highlight-debug-session .tab-button.selected:hover {
+    background-color: var(--font-color-debug);
+    color: var(--font-color-quaternary);
+}
+
+
+
 .close-tab-button {
-    margin-left: 8px;
+    height: inherit;
+
     padding: 0;
+    margin: auto;
+    margin-left: 10px;
     border: none;
     border-radius: 0;
-    height: 20px;
-    margin-bottom: -1px;
-    transition: background-color 0s;
+    
+    background-color: transparent;
+    box-shadow: none;
 }
 
 .close-tab-button:hover {
-    transform: scale(1.75);
+    color: var(--font-color-error);
 }
