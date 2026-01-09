@@ -20,7 +20,8 @@ class Test extends AnyFlatSpec with should.Matchers {
             "internal": "Test",
             "success": true,
             "childId": 0,
-            "input": "Test",
+            "inputStart": 0,
+            "inputEnd": 4,
             "isLeaf": false,
             "isIterative": false,
             "newlyGenerated": false
