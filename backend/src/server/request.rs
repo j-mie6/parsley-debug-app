@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use rocket::{get, post, http, serde::json::Json};
 
 use super::ServerState;
@@ -93,7 +91,6 @@ fn create_breakpoint_channels(state: &rocket::State<ServerState>, session_id: i3
 async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) -> (http::Status, Json<PostTreeResponse>) {
     /* Deserialise and unwrap json data */
     let parsley_tree: ParsleyTree = data.into_inner();
-    let session_exists: bool = !parsley_tree.session_not_set();
 
     let debug_tree: DebugTree = match process_parsley_tree(parsley_tree, state) {
         Ok(tree) => tree,
@@ -111,51 +108,51 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
     }
 
     /* Format informative response for RemoteView */
-    let msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
+    let success_msg: String = PostTreeResponse::success_msg(debug_tree.get_input());
 
-    /* Check if tree is needing to be updated or is a new tree */
-    let set_tree_result: Result<(), StateError> = if !session_exists {
-        state.set_tree(debug_tree).and(state.emit(Event::NewTree))
+    if let Err(_) = state.set_tree(debug_tree.clone()) {
+        todo!()
+    }
+
+    if let Err(_) = state.update_tree(&debug_tree, session_id) {
+        todo!()
+    }
+
+    if let Err(_) = state.emit(Event::NewTree) {
+        todo!()
+    }
+
+        // /* Update the saved tree and set the updated tree into state */
+        // if state.inner().update_tree(&debug_tree, session_id).is_err() {
+        //     return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
+        // }
+        // if should_emit { state.set_tree(debug_tree).and(state.emit(Event::NewTree)) } else {state.set_tree(debug_tree)}
+    // };
+
+    // match set_tree_result {
+    //     Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
+
+    //     Ok(()) => match state.receive_breakpoint_skips(session_id).await {
+    //         Some(skips) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, state.get_refs(session_id).expect("Session ID should exist"))),
+    //         None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
+    //     },
+
+    //     Err(StateError::LockFailed) =>
+    //         (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again", session_id)),
+
+    //     Err(StateError::ChannelError) =>
+    //         (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again", session_id)),
+
+    //     Err(e) => panic!("Unexpected error on post_tree: {:?}", e),
+    // }
+    
+    if !is_debuggable {
+        (http::Status::Ok, PostTreeResponse::no_skips(&success_msg, session_id))
     } else {
-        /* Get the tree_name from the session_id */
-        let map: HashMap<String, i32> = match state.get_session_ids() {
-            Ok(map) => map,
-            Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not load tree_names", session_id)),
-        };
-
-        let (tree_name, should_emit): (String, bool) = match map.into_iter().find(|(_, v)| *v == session_id) {
-            Some((name, _)) => (name, false),
-            None => {
-                let debug_tree_name = debug_tree.get_session_name();
-                match state.add_session_id(debug_tree.get_session_name(), session_id) {
-                    Ok(()) => (debug_tree_name, true),
-                    Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise session id into map", session_id)),
-                }
-            }
-        };
-
-        /* Update the saved tree and set the updated tree into state */
-        if state.inner().update_tree(&debug_tree, session_id).is_err() {
-            return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
+        match state.receive_breakpoint_skips(session_id).await {
+            Some(skips) => (http::Status::Ok, PostTreeResponse::with_refs(&success_msg, session_id, skips, state.get_refs(session_id).expect("Session ID should exist"))),
+            None => (http::Status::InternalServerError, PostTreeResponse::no_skips("TODO", session_id)),
         }
-        if should_emit { state.set_tree(debug_tree).and(state.emit(Event::NewTree)) } else {state.set_tree(debug_tree)}
-    };
-
-    match set_tree_result {
-        Ok(()) if !is_debuggable => (http::Status::Ok, PostTreeResponse::no_skips(&msg, session_id)),
-
-        Ok(()) => match state.receive_breakpoint_skips(session_id).await {
-            Some(skips) => (http::Status::Ok, PostTreeResponse::with_refs(&msg, session_id, skips, state.get_refs(session_id).expect("Session ID should exist"))),
-            None => (http::Status::InternalServerError, PostTreeResponse::no_skips(&msg, session_id)),
-        },
-
-        Err(StateError::LockFailed) =>
-            (http::Status::InternalServerError, PostTreeResponse::no_skips("Locking state mutex failed - try again", session_id)),
-
-        Err(StateError::ChannelError) =>
-            (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to receive value from channel - try again", session_id)),
-
-        Err(e) => panic!("Unexpected error on post_tree: {:?}", e),
     }
 }
 

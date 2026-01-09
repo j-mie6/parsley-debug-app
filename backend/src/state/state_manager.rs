@@ -90,6 +90,5 @@ pub enum StateError {
     GetTempdirPathFail,
     GetDownloadPathFail,
     ChannelError, /* Non-fatal error: The receiver from Parsley is no longer listening */
-    DuplicateSessionId,
     TabOutOfBounds,
 }

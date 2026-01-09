@@ -50,7 +50,7 @@ impl AppState {
     }
 
     /* Access wrapped inner AppStateInternal struct */
-    fn inner(&self) -> Result<MutexGuard<AppStateInternal>, StateError> {
+    fn inner(&self) -> Result<MutexGuard<'_, AppStateInternal>, StateError> {
         self.0.lock()
             .map_err(|_| StateError::LockFailed)
     }
@@ -60,30 +60,30 @@ impl AppState {
         Ok(state.tabs.values().map(|name| name.clone()).collect())
     }
 
-    /* Add tree name to tab_names */
-    pub fn add_tree(&self, session_id: i32, tab_name: String) -> Result<Vec<String>, StateError> {
-        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+    // /* Add tree name to tab_names */
+    // pub fn add_tree(&self, session_id: i32, tab_name: String) -> Result<Vec<String>, StateError> {
+    //     let mut state: MutexGuard<AppStateInternal> = self.inner()?;
 
-        /* Add new tree name and return all saved tree names */
-        state.tabs.insert(session_id, tab_name);
+    //     /* Add new tree name and return all saved tree names */
+    //     state.tabs.insert(session_id, tab_name);
 
-        self.tab_names()
-    }
+    //     self.tab_names()
+    // }
 
-    /* Remove tree name from tab_names */
-    pub fn rmv_tree(&self, index: usize) -> Result<Vec<String>, StateError> {
-        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+    // /* Remove tree name from tab_names */
+    // pub fn rmv_tree(&self, index: usize) -> Result<Vec<String>, StateError> {
+    //     let mut state: MutexGuard<AppStateInternal> = self.inner()?;
 
-        /* Remove tree name at index */
-        state.tabs.shift_remove_index(index);
+    //     /* Remove tree name at index */
+    //     state.tabs.shift_remove_index(index);
 
-        /* If this was the final tree then the loaded tree needs to be removed */
-        if state.tabs.is_empty() {
-            state.tree = None
-        }
+    //     /* If this was the final tree then the loaded tree needs to be removed */
+    //     if state.tabs.is_empty() {
+    //         state.tree = None
+    //     }
 
-        self.tab_names()
-    }
+    //     self.tab_names()
+    // }
 
     pub fn update_refs(&self, session_id: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
         let mut state: MutexGuard<AppStateInternal> = self.inner()?;
@@ -124,6 +124,7 @@ impl StateManager for AppState {
 
         insert_node(&mut state, tree.get_root())?;
 
+        state.tabs.insert(tree.get_session_id(), tree.get_session_name());
         
         /* Update tree */
         state.tree = Some(tree);
@@ -170,14 +171,6 @@ impl StateManager for AppState {
             DirectoryKind::Downloads => handle.tauri_downloads_dir(),
         }
     }
-    
-    // fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
-    //     self.inner()?
-    //         .debug_sessions
-    //         .insert(tree_name, session_id);
-
-    //     Ok(())
-    // }
     
     fn rmv_tab(&self, index: usize) -> Result<Vec<String>, StateError> {
         let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
