@@ -123,12 +123,12 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
             Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not load tree_names", session_id)),
         };
 
-        let tree_name: String = match map.into_iter().find(|(_, v)| *v == session_id) {
-            Some((name, _)) => name,
+        let (tree_name, should_emit): (String, bool) = match map.into_iter().find(|(_, v)| *v == session_id) {
+            Some((name, _)) => (name, false),
             None => {
                 let debug_tree_name = debug_tree.get_session_name();
                 match state.add_session_id(debug_tree.get_session_name(), session_id) {
-                    Ok(()) => debug_tree_name,
+                    Ok(()) => (debug_tree_name, true),
                     Err(_) => return (http::Status::InternalServerError, PostTreeResponse::no_skips("Could not initialise session id into map", session_id)),
                 }
             }
@@ -138,7 +138,7 @@ async fn post_tree(data: Json<ParsleyTree>, state: &rocket::State<ServerState>) 
         if state.inner().update_tree(&debug_tree, tree_name).is_err() {
             return (http::Status::InternalServerError, PostTreeResponse::no_skips("Failed to update tree file", session_id));
         }
-        state.set_tree(debug_tree)
+        if should_emit { state.set_tree(debug_tree).and(state.emit(Event::NewTree)) } else {state.set_tree(debug_tree)}
     };
 
     match set_tree_result {
