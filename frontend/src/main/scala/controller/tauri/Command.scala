@@ -76,16 +76,6 @@ object Command {
 
 
     /* Save commands */
-    case object SaveTree extends Command("save_tree") {
-        type In = String
-        given args: Args[In] {
-            extension (treeName: String)
-                def namedArgs: Map[String, Any] = Map("treeName" -> treeName)
-        }
-
-        type Out = IndexedSeq[String]
-    }
-
     case object LoadSavedTree extends Command("load_saved_tree") {
         type In = Int
         given args: Args[In] {

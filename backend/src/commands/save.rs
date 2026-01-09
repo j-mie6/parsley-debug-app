@@ -9,41 +9,9 @@ use crate::events::Event;
 use crate::state::{StateError, StateManager};
 use crate::trees::{DebugTree, SavedTree};
 
-/* Saves current tree to saved_trees/name.json */
-#[tauri::command]
-pub fn save_tree(state: tauri::State<AppState>, tree_name: String) -> Result<String, SaveTreeError> {
-    /* Get DebugTree from current state */
-    let debug_tree: DebugTree = state.get_tree()?;
-
-    let is_debuggable: bool = debug_tree.is_debuggable();
-
-    /* Get the session_id of the current DebugTree */
-    let session_id: i32 = debug_tree.get_session_id();
-
-    /* Access the `tree` field from the locked state */
-    let saved_tree: SavedTree = SavedTree::from(debug_tree);
-
-    /* Get the serialised JSON */
-    let tree_json: String = serde_json::to_string_pretty(&saved_tree)
-        .map_err(|_| SaveTreeError::SerialiseFailed)?;
-
-    /* Create the json file to store the tree */
-    let file_path: OsString = format_filepath(&state, &tree_name)?;
-    let mut data_file: File = File::create(file_path).map_err(|_| SaveTreeError::CreateDirFailed)?;
-
-    /* Write tree json to the json file */
-    data_file.write(tree_json.as_bytes()).map_err(|_| SaveTreeError::WriteToFileFailed)?;
-
-    /* Add new debugging session if the tree has a valid session_id */
-    if is_debuggable {
-        state.add_session_id(tree_name.clone(), session_id).map_err(|_| SaveTreeError::AddSessionFailed)?;
-    }
-
-    /* Get a list of all saved tree names */
-    let tree_names: Vec<String> = state.add_tree(tree_name)?;
-
-    serde_json::to_string_pretty(&tree_names)
-        .map_err(|_| SaveTreeError::SerialiseFailed)
+/* Generates the full path to a tree file in the form `APPDATA/SAVED_TREE_DIR/file_name` */
+fn format_filepath(state: &tauri::State<AppState>, session_id: i32) -> Result<OsString, StateError> {
+    state.system_path_to(DirectoryKind::SavedTrees, PathBuf::from(session_id.to_string())).map(OsString::from)
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -70,11 +38,10 @@ impl From<StateError> for SaveTreeError {
 /* Downloads the tree into Downloads folder */
 #[tauri::command]
 pub fn download_tree(state: tauri::State<AppState>, index: usize) -> Result<(), DownloadTreeError> {
-    /* Get tree name from index */
-    let tree_name: String = state.get_tree_name(index)?;
+    let (session_id, tree_name) = state.get_tab(index)?;
 
     /* Path to the json file used to store the tree */
-    let file_path: OsString = format_filepath(&state, &tree_name)?;
+    let file_path: OsString = format_filepath(&state, session_id)?;
 
     /* Resolves to /path/to/downloads/tree_name.json */
     let download_path: PathBuf = state.system_path_to(DirectoryKind::Downloads, PathBuf::from(format!("{}.json", tree_name)))?;
@@ -107,6 +74,8 @@ impl From<StateError> for DownloadTreeError {
 /* Imports JSON file to display a tree */
 #[tauri::command]
 pub fn import_tree(tree_name: String, contents: String, state: tauri::State<AppState>) -> Result<(), ImportTreeError> {
+    // TODO new session id shenanigans
+    let assigned_session_id: i32 = todo!();
     /* Path to the json file used to store the tree */
     let file_path: OsString = format_filepath(&state, &tree_name)?;
 
@@ -154,20 +123,18 @@ impl From<LoadTreeError> for ImportTreeError {
 /* Delete file associated with where tree is saved */
 #[tauri::command]
 pub fn delete_tree(state: tauri::State<AppState>, index: usize) -> Result<String, DeleteTreeError> {
+    // TODO idk yet
     /* Get the tree name given the index */
-    let tree_name: String = state.get_tree_name(index).map_err(|_| DeleteTreeError::NameRetrievalFail)?;
+    // let tree_name: String = state.get_tree_name(index).map_err(|_| DeleteTreeError::NameRetrievalFail)?;
 
-    /* Path to the json file used to store the tree */
-    let file_path: OsString = format_filepath(&state, &tree_name)?;
+    // /* Path to the json file used to store the tree */
+    // let file_path: OsString = format_filepath(&state, &tree_name)?;
 
-    /* Remove the file from the file system */
-    fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
+    // /* Remove the file from the file system */
+    // fs::remove_file(file_path).map_err(|_| DeleteTreeError::TreeFileRemoveFail)?;
 
-    /* Will remove the session map entry and saved refs if they exist */
-    state.rmv_session_id(tree_name).map_err(|_| DeleteTreeError::SessionIdRemovalFail)?;
-
-    /* Returns a list of the tree names that are left */
-    let tree_names: Vec<String> = state.rmv_tree(index).map_err(|_| DeleteTreeError::TreeRemovalFail)?;
+    /* Will remove entries inside internal state and returns a list of remaining tree names */
+    let tree_names: Vec<String> = state.rmv_tab(index).map_err(|_| DeleteTreeError::SessionIdRemovalFail)?;
 
     serde_json::to_string_pretty(&tree_names)
         .map_err(|_| DeleteTreeError::SerialiseFailed)
@@ -206,10 +173,10 @@ impl From<StateError> for DeleteTreeError {
 #[tauri::command]
 pub fn load_saved_tree(index: usize, state: tauri::State<AppState>) -> Result<(), LoadTreeError>  {
     /* Get the tree name given the index */
-    let tree_name: String = state.get_tree_name(index)?;
+    let (session_id, _) = state.get_tab(index)?;
 
     /* Get the file path of the tree to be reloaded */
-    let file_path: OsString = format_filepath(&state, &tree_name)?;
+    let file_path: OsString = format_filepath(&state, session_id)?;
     load_path(file_path, false, &state)
 }
 
@@ -255,11 +222,6 @@ impl From<StateError> for LoadTreeError {
             e => panic!("Unexpected error on load_saved_tree: {:?}", e),
         }
     }
-}
-
-/* Generates the full path to a tree file in the form `APPDATA/SAVED_TREE_DIR/tree_name` */
-fn format_filepath(state: &tauri::State<AppState>, tree_name: &str) -> Result<OsString, StateError> {
-    state.system_path_to(DirectoryKind::SavedTrees, PathBuf::from(tree_name)).map(OsString::from)
 }
 
 /* Updates local changed references for a tree */

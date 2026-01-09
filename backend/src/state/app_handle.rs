@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 use tauri::{Emitter, Manager};
@@ -61,20 +60,20 @@ impl StateManager for tauri::AppHandle {
         self.state::<AppState>().transmit_breakpoint_skips(session_id, code)
     }
     
-    fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
-        self.state::<AppState>().add_session_id(tree_name, session_id)
+    // fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
+    //     self.state::<AppState>().add_session_id(tree_name, session_id)
+    // }
+    
+    fn rmv_tab(&self, index: usize) -> Result<Vec<String>, StateError> {
+        self.state::<AppState>().rmv_tab(index)
     }
     
-    fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
-        self.state::<AppState>().rmv_session_id(tree_name)
-    }
-    
-    fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
-        self.state::<AppState>().session_id_exists(session_id)
+    fn get_tab(&self, index: usize) -> Result<(i32, String), StateError> {
+        self.state::<AppState>().get_tab(index)
     }
 
-    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError> {
-        self.state::<AppState>().get_session_ids()
+    fn debuggable_session_ids(&self) -> Result<Vec<i32>, StateError> {
+        self.state::<AppState>().debuggable_session_ids()
     }
 
     fn next_session_id(&self) -> Result<i32, StateError> {
@@ -101,7 +100,7 @@ impl StateManager for tauri::AppHandle {
         self.state::<AppState>().reset_trees()
     }
 
-    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
-        self.state::<AppState>().update_tree(tree, tree_name)
+    fn update_tree(&self, tree: &DebugTree, session_id: i32) -> Result<(), UpdateTreeError> {
+        self.state::<AppState>().update_tree(tree, session_id)
     }
 }
