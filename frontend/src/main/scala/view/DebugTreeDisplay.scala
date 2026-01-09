@@ -276,6 +276,8 @@ private object ReactiveNodeDisplay {
             cls("iterative") := node.debugNode.isIterative,
             cls("debug") := node.debugNode.isBreakpoint,
             cls("type-box") := hasUserType,
+            cls("selected") <-- TreeViewController.getSelectedNode
+                .mapSome(_.nodeId == node.debugNode.nodeId).map(_.getOrElse(false)),
 
             /* Render a box for user-defined parser types */
             when (hasUserType) {
@@ -307,7 +309,8 @@ private object ReactiveNodeDisplay {
 
                     /* Select input consumed by this node */
                     /* Shift + Click allows node expansion to be toggled without focusing */
-                    onClick(_.filterNot(_.altKey).mapTo(node.debugNode)) --> InputViewController.selectNode,
+                    onClick(_.filterNot(_.altKey).mapTo(node.debugNode)) 
+                        --> TreeViewController.selectNode,
                     
                     onClick(_
                         .filterNot(_.ctrlKey) // Allow focus node without toggling expansion
@@ -327,7 +330,6 @@ private object ReactiveNodeDisplay {
                         }
                     ) --> node.children.writer
                 ),
-
                 arrows(isRight = true),
             ),
 

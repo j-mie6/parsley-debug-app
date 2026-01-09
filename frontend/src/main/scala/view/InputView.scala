@@ -23,7 +23,7 @@ object InputView {
 }
 
 object InputViewSidepanel {
-        def apply(): HtmlElement = {
+    def apply(): HtmlElement = {
         div(
             className := "sidepanel-container state",
             cls("open") <-- InputViewController.isInputOpen,

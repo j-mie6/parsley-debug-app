@@ -19,29 +19,29 @@ import model.errors.DillException
 object TreeView {
 
     /* Render tree as HtmlElement */
-    def apply(): HtmlElement =
-      val returnBus: EventBus[Either[DillException, Seq[(Int, String)]]] = EventBus()
+    def apply(): HtmlElement = {
+        val returnBus: EventBus[Either[DillException, Seq[(Int, String)]]] = EventBus()
 
-      val seqBus: EventBus[Seq[(Int, String)]] = EventBus()
-      val debuggableBus: EventBus[Boolean] = EventBus()
+        val seqBus: EventBus[Seq[(Int, String)]] = EventBus()
+        val debuggableBus: EventBus[Boolean] = EventBus()
 
-      div(
-        TreeViewController.isDebuggingSession.changes
-            .filterNot(identity)
-            .mapToUnit
-            --> StateManagementViewController.clearRefs,
+        div(
+            TreeViewController.isDebuggingSession.changes
+                .filterNot(identity)
+                .mapToUnit --> StateManagementViewController.clearRefs,
 
-        TreeViewController.getSessionId.changes.flatMapSwitch(TreeViewController.getRefs) --> returnBus.writer,
+            TreeViewController.getSessionId.changes.flatMapSwitch(TreeViewController.getRefs) --> returnBus.writer,
 
-        returnBus.stream.collectRight --> seqBus.writer,
-        returnBus.stream.collectLeft --> ErrorController.setError,
+            returnBus.stream.collectRight --> seqBus.writer,
+            returnBus.stream.collectLeft --> ErrorController.setError,
 
-        seqBus.stream.sample(TreeViewController.isDebuggingSession) --> debuggableBus.writer,
+            seqBus.stream.sample(TreeViewController.isDebuggingSession) --> debuggableBus.writer,
 
-        debuggableBus.stream.filter(identity).flatMapTo(seqBus.stream) --> StateManagementViewController.setRefs,
-        debuggableBus.stream.filterNot(identity).mapTo(Nil) --> StateManagementViewController.setRefs,
+            debuggableBus.stream.filter(identity).flatMapTo(seqBus.stream) --> StateManagementViewController.setRefs,
+            debuggableBus.stream.filterNot(identity).mapTo(Nil) --> StateManagementViewController.setRefs,
 
-        child <-- TreeViewController.getTreeElem, /* Renders the tree */
-    )
+            child <-- TreeViewController.getTreeElem, /* Renders the tree */
+        )
+    }
 
 }

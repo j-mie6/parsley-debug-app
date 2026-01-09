@@ -12,27 +12,22 @@ object InputViewController {
     /** The input element to be render by InputView */
     private val input: Var[Option[String]] = Var(None)
 
+    /** Set input string */
+    val setInput: Observer[String] = input.someWriter
+
     /** A reactive variable that determines whether the input panel is open */
     private val inputOpen: Var[Boolean] = Var(false)
 
     /** Retrieves a signal indicating whether the settings panel is open */
     def isInputOpen: Signal[Boolean] = inputOpen.signal
     def toggleOpen: Observer[Unit] = inputOpen.updater((old, _) => !old)
-
-    /** Node selected in tree view */
-    private val selectedNode: Var[Option[DebugNode]] = Var(None) 
-    
-    /** Set input string */
-    val setInput: Observer[String] = input.someWriter
-
-    /** Set selected input range */
-    val selectNode: Observer[DebugNode] = selectedNode.someWriter
     
     /** Set input to None to stop rendering */
     def unloadInput: Observer[Unit] = Observer(_ => input.set(None))
     
+    /** Render input block */
     def getInputElem: Signal[HtmlElement] = input.signal
-        .combineWith(selectedNode.signal)
+        .combineWith(TreeViewController.getSelectedNode)
         .map(_ match {
             /* Default tree view when no tree is loaded */
             case (None, _) => div(className := "nothing-shown", "Nothing to show")
@@ -56,8 +51,7 @@ object InputViewController {
             /* Ensures correct text rendering */
             renderInputString(input.slice(0, selected.inputStart)),
             span(
-                className := "debug-input debug-input-selected", 
-                cls("empty") := (selected.inputStart == selected.inputEnd),
+                className := "debug-input selected",    
                 cls("fail") := !selected.success,
                 cls("iterative") := selected.isIterative,
                 cls("debug") := selected.isBreakpoint,

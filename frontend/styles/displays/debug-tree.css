@@ -47,25 +47,25 @@
     border-color: var(--font-color-primary);
 }
 
-.debug-input.debug-input-selected {
+.debug-input.selected {
     color: var(--node-font-color);
     border-color: var(--node-font-color);
     background-color: var(--node-color);
 }
 
-.debug-input.debug-input-selected.iterative { 
-    color: var(--node-font-color-iterative);
-    border-color: var(--node-font-color-iterative);
-    background-color: var(--node-color-iterative);
-}
-
-.debug-input.debug-input-selected.fail {
+.debug-input.selected.fail {
     color: var(--node-font-color-fail) !important;
     border-color: var(--node-font-color-fail) !important;
     background-color: var(--node-color-fail) !important;
 }
 
-.debug-input.debug-input-selected.debug {
+.debug-input.selected.iterative { 
+    color: var(--node-font-color-iterative);
+    border-color: var(--node-font-color-iterative);
+    background-color: var(--node-color-iterative);
+}
+
+.debug-input.selected.debug {
     color: var(--node-font-color-debug);
     border-color: var(--node-font-color-debug);
     background-color: var(--node-color-debug);
@@ -268,8 +268,19 @@
     background-color: var(--node-color-debug);
 }
 
+/* Debug nodes are orange */
 .debug-node-container.debug > div > .debug-node:hover {
     background-color: var(--node-hover-color-debug);
+}
+
+/* Add extra outline to selected node and connected lines */
+.debug-node-container.selected > div > .debug-node {
+    outline: 3px solid;
+}
+
+.debug-node-container.selected > .debug-node-line,
+.debug-node-container.selected > .debug-node-children-container > .debug-node-container > .debug-node-line {
+    padding-inline: 1px;
 }
 
 /* Set bottom border of leaf equal to other borders */
