@@ -342,14 +342,19 @@
     margin-bottom: 6px;
 }
 
-/* The iterative progress bar (dots) itself */
+/* The iterative progress bar (dots) coloured faint blue */
 .iterative-progress {
     font-size: 24px;
     line-height: 6px;
     color: color-mix(in srgb, var(--node-color-iterative), var(--font-color-primary) 30%);
 }
 
+/* If iterative node failed, colour iterative progress dots faint red */
+.debug-node-container.fail > div > .debug-node .iterative-progress {
+    color: color-mix(in srgb, var(--node-color-fail), var(--font-color-primary) 30%);
+}
+
 /* Additional effects on the bar (dots) when progress is being made */
 .iterative-progress.fill {
-    color: var(--font-color-iterative);
+    color: var(--font-color-iterative) !important;
 }
