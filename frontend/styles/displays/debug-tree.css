@@ -339,6 +339,12 @@
     background-color: var(--node-font-color);
 }
 
+/* Move leaf line to avoid clashing with selected outline */
+.debug-node-container.selected.leaf > .leaf-line {
+    position: relative;
+    top: 3px;
+}
+
 .debug-node-container.fail.leaf > .leaf-line {
     background-color: var(--node-font-color-fail);
 }
