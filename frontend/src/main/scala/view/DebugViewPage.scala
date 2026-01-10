@@ -188,7 +188,7 @@ abstract class DebugViewPage extends Page {
 
 
 
-    /* Header elements */
+    /* Page header elements */
 
     /* Title elements */
     private lazy val title: HtmlElement = div(
