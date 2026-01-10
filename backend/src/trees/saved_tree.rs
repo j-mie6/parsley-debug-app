@@ -147,7 +147,8 @@ pub mod test {
                 "internal": "Test",
                 "success": true,
                 "child_id": 0,
-                "input": "Test",
+                "input_start": 0,
+                "input_end": 4,
                 "children": [],
                 "is_iterative": false,
                 "newly_generated": false
@@ -171,7 +172,8 @@ pub mod test {
                 "internal": "0",
                 "success": true,
                 "child_id": 0,
-                "input": "0",
+                "input_start": 0,
+                "input_end": 1,
                 "children": [
                     {{
                         "node_id": 1,
@@ -179,7 +181,8 @@ pub mod test {
                         "internal": "1",
                         "success": true,
                         "child_id": 1,
-                        "input": "1",
+                        "input_start": 1,
+                        "input_end": 2,
                         "children": [
                             {{
                                 "node_id": 2,
@@ -187,7 +190,8 @@ pub mod test {
                                 "internal": "2",
                                 "success": true,
                                 "child_id": 2,
-                                "input": "2",
+                                "input_start": 2,
+                                "input_end": 3,
                                 "children": [],
                                 "is_iterative": false,
                                 "newly_generated": false
@@ -202,7 +206,8 @@ pub mod test {
                         "internal": "3",
                         "success": true,
                         "child_id": 3,
-                        "input": "3",
+                        "input_start": 3,
+                        "input_end": 4,
                         "children": [
                             {{
                                 "node_id": 4,
@@ -210,7 +215,8 @@ pub mod test {
                                 "internal": "4",
                                 "success": true,
                                 "child_id": 4,
-                                "input": "4",
+                                "input_start": 4,
+                                "input_end": 5,
                                 "children": [],
                                 "is_iterative": false,
                                 "newly_generated": false
@@ -264,7 +270,7 @@ pub mod test {
                 String::from("0"),
                 true,
                 Some(0),
-                0, 5,
+                0, 1,
                 vec![
                     SavedNode::new(
                         1,

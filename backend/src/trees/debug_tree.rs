@@ -115,8 +115,8 @@ pub mod test {
                 "internal": "Test",
                 "success": true,
                 "childId": 0,
-                "input_start": 0,
-                "input_end": 4,
+                "inputStart": 0,
+                "inputEnd": 4,
                 "isLeaf": true,
                 "isIterative": false,
                 "newlyGenerated": false
@@ -140,8 +140,8 @@ pub mod test {
                 "internal": "0",
                 "success": true,
                 "childId": 0,
-                "input_start": 0,
-                "input_end": 1,
+                "inputStart": 0,
+                "inputEnd": 1,
                 "isLeaf": false,
                 "isIterative": false,
                 "newlyGenerated": false
