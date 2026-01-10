@@ -1,64 +1,63 @@
 .debug-view-header {
-    display: grid;
-    columns: 3;
-    padding-inline: 20px;
-    padding-block: 10px;
-    grid-template-rows: 1fr;
-    grid-template-columns: 1fr 1fr 1fr;
-    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
     align-items: center;
-}
+    justify-content: center;
 
-.debug-view-header-right {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-}
+    width: 60vw;
+    margin: auto;
+    margin-top: 2vh;
+    margin-bottom: 1vh;
+    padding: 1.5vh 1.5vw;
+    border-radius: 10px;
 
-.debug-view-header-right-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
+    border: 1px solid var(--background-tertiary);
+    border-bottom-width: 3px;
+
+    color: var(--font-color-primary);
+    background-color: var(--background-secondary);
 }
 
 .debug-view-header-title {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-}
-
-.debug-view-header-left {
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: row;
-}
-
-.debug-view-header-left-container {
-    display: flex;
-    cursor: pointer;
-    flex-direction: row;
-    text-wrap: nowrap;
     align-items: center;
-    border-radius: 2px;
-    padding: 5px 10px 5px;
+    justify-content: center;
+
+    font-size: 28px;
+    font-weight: 550;
+    font-style: italic;
+    font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
-.debug-view-header-left-container:hover {
-    background-color: var(--background-secondary);
+.debug-view-header-logo {
+    height: 25px;
+    margin-right: 5px;
 }
 
-.debug-view-header-left-container.selected {
-    background-color: var(--background-tertiary);
-    color: var(--font-color-secondary);
+.debug-view-header-button-bar {
+    width: 10vw;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
 }
 
-.debug-view-header-left-vbar {
-    width: 0.5px;
-    height: 40px;
-    border: 1px solid var(--font-color-primary);
-    background-color: var(--font-color-primary);
-    margin-block: auto;
+.debug-view-header-button-bar i {
+    font-size: 20px;
 }
+
+.debug-view-header-button-bar-left {
+    margin-right: auto;
+    justify-content: start;
+}
+
+.debug-view-header-button-bar-right {
+    margin-left: auto;
+    justify-content: end;
+}
+
 
 .debug-view-body {
     display: flex;
@@ -133,7 +132,7 @@
     
     margin-right: 2px;
     
-    gap: 18px;  
+    gap: 18px;
 }
 
 .debug-view-button {
