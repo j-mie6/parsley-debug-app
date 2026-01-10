@@ -269,15 +269,15 @@
 }
 
 .debug-node-container.fail > .compress-ellipsis {
-    color: var(--node-font-color-fail) !important;
+    color: var(--node-font-color-fail);
 }
 
-.debug-node-container.iterative > .compress-ellipsis {
-    color: var(--node-font-color-iterative) !important;
+.debug-node-container.iterative:not(.fail) > .compress-ellipsis {
+    color: var(--node-font-color-iterative);
 }
 
 .debug-node-container.debug > .compress-ellipsis {
-    color: var(--node-font-color-debug) !important;
+    color: var(--node-font-color-debug);
 }
 
 
