@@ -46,6 +46,11 @@
     --node-hover-color-iterative: var(--node-hover-color);
     --node-hover-color-debug: var(--node-hover-color);
 
+    --node-hover-color-inverted: #93cfba;
+    --node-hover-color-fail-inverted: #f29a9a;
+    --node-hover-color-iterative-inverted: #95c2e7;
+    --node-hover-color-debug-inverted: #ea9956;
+
     --node-font-color: #96DEC4;
     --node-font-color-fail: #FFA3A3;
     --node-font-color-iterative: #a3d6ff;
@@ -82,6 +87,11 @@
     --node-hover-color-fail: #f29a9a;
     --node-hover-color-iterative: #95c2e7;
     --node-hover-color-debug: #ea9956;
+
+    --node-hover-color-inverted: #3d3f41;
+    --node-hover-color-fail-inverted: var(--node-hover-color-inverted);
+    --node-hover-color-iterative-inverted: var(--node-hover-color-inverted);
+    --node-hover-color-debug-inverted: var(--node-hover-color-inverted);
 
     --node-font-color: #2E2F30;
     --node-font-color-fail: var(--node-font-color);

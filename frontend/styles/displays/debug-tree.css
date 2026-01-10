@@ -261,23 +261,63 @@
     background-color: var(--node-hover-color-iterative);
 }
 
-/* Iterative nodes are blue */
+/* Debug nodes are orange */
 .debug-node-container.debug > div > .debug-node {
     color: var(--node-font-color-debug);
     border-color: var(--node-font-color-debug);
     background-color: var(--node-color-debug);
 }
 
-/* Debug nodes are orange */
 .debug-node-container.debug > div > .debug-node:hover {
     background-color: var(--node-hover-color-debug);
 }
 
-/* Add extra outline to selected node and connected lines */
+/* Invert theme on selected nodes and add extra outline */
 .debug-node-container.selected > div > .debug-node {
-    outline: 3px solid;
+    outline: 3px solid var(--node-font-color);
+    color: var(--node-color);
+    border-color: var(--node-color);
+    background-color: var(--node-font-color);
 }
 
+.debug-node-container.fail.selected > div > .debug-node {
+    color: var(--node-color-fail) !important;
+    outline-color: var(--node-font-color-fail) !important;
+    border-color: var(--node-color-fail) !important;
+    background-color: var(--node-font-color-fail) !important;
+}
+
+.debug-node-container.iterative.selected > div > .debug-node {
+    color: var(--node-color-iterative);
+    outline-color: var(--node-font-color-iterative);
+    border-color: var(--node-color-iterative);
+    background-color: var(--node-font-color-iterative);
+}
+
+.debug-node-container.debug.selected > div > .debug-node {
+    color: var(--node-color-debug);
+    outline-color: var(--node-font-color-debug);
+    border-color: var(--node-color-debug);
+    background-color: var(--node-font-color-debug);
+}
+
+.debug-node-container.selected > div > .debug-node:hover {
+    background-color: var(--node-hover-color-inverted);
+}
+
+.debug-node-container.fail.selected > div > .debug-node:hover {
+    background-color: var(--node-hover-color-fail-inverted);
+}
+
+.debug-node-container.iterative.selected > div > .debug-node:hover {
+    background-color: var(--node-hover-color-iterative-inverted);
+}
+
+.debug-node-container.debug.selected > div > .debug-node:hover {
+    background-color: var(--node-hover-color-debug-inverted);
+}
+
+/* Add extra width to node lines connected to selected node */  
 .debug-node-container.selected > .debug-node-line,
 .debug-node-container.selected > .debug-node-children-container > .debug-node-container > .debug-node-line {
     padding-inline: 1px;
