@@ -291,7 +291,6 @@ abstract class DebugViewPage extends Page {
                             leftButtonBar,
                             rightButtonBar,
                         ),
-                        // child <-- InputViewController.getInputElem,
                         div(
                             className := "tree-view-page-scroll",
                             childElem.getOrElse(div())
