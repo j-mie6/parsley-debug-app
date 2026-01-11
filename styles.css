@@ -40,21 +40,31 @@
     --node-color-fail: var(--node-color);
     --node-color-iterative: var(--node-color);
     --node-color-debug: var(--node-color);
-    
+
+    --node-color-selected: #96DEC4;
+    --node-color-fail-selected: #FFA3A3;
+    --node-color-iterative-selected: #a3d6ff;
+    --node-color-debug-selected: #ffa65e;
+
     --node-hover-color: #3d3f41;
     --node-hover-color-fail: var(--node-hover-color);
     --node-hover-color-iterative: var(--node-hover-color);
     --node-hover-color-debug: var(--node-hover-color);
 
-    --node-hover-color-inverted: #93cfba;
-    --node-hover-color-fail-inverted: #f29a9a;
-    --node-hover-color-iterative-inverted: #95c2e7;
-    --node-hover-color-debug-inverted: #ea9956;
+    --node-hover-color-selected: #93cfba;
+    --node-hover-color-fail-selected: #f29a9a;
+    --node-hover-color-iterative-selected: #95c2e7;
+    --node-hover-color-debug-selected: #ea9956;
 
     --node-font-color: #96DEC4;
     --node-font-color-fail: #FFA3A3;
     --node-font-color-iterative: #a3d6ff;
     --node-font-color-debug: #ffa65e;
+
+    --node-font-color-selected: #2E2F30;
+    --node-font-color-fail-selected: var(--node-font-color-selected);
+    --node-font-color-iterative-selected: var(--node-font-color-selected);
+    --node-font-color-debug-selected: var(--node-font-color-selected);
 
     --input-unselected: #808080;
 }
@@ -83,20 +93,30 @@
     --node-color-iterative: #a3d6ff;
     --node-color-debug: #ffa65e;
 
+    --node-color-selected: color-mix(in srgb, #242526 80%, #96DEC4);
+    --node-color-fail-selected: color-mix(in srgb, #242526 82%, #ffa3a3);
+    --node-color-iterative-selected: color-mix(in srgb, #242526 80%, #a3d6ff);
+    --node-color-debug-selected: color-mix(in srgb, #242526 80%, #ffa65e);
+    
     --node-hover-color: #93cfba;
     --node-hover-color-fail: #f29a9a;
     --node-hover-color-iterative: #95c2e7;
     --node-hover-color-debug: #ea9956;
-
-    --node-hover-color-inverted: #3d3f41;
-    --node-hover-color-fail-inverted: var(--node-hover-color-inverted);
-    --node-hover-color-iterative-inverted: var(--node-hover-color-inverted);
-    --node-hover-color-debug-inverted: var(--node-hover-color-inverted);
+    
+    --node-hover-color-selected: color-mix(in srgb, #242526 70%, #96DEC4);
+    --node-hover-color-fail-selected: color-mix(in srgb, #242526 72%, #ffa3a3);
+    --node-hover-color-iterative-selected: color-mix(in srgb, #242526 70%, #a3d6ff);
+    --node-hover-color-debug-selected: color-mix(in srgb, #242526 70%, #ffa65e);
 
     --node-font-color: #2E2F30;
     --node-font-color-fail: var(--node-font-color);
     --node-font-color-iterative: var(--node-font-color);
     --node-font-color-debug: var(--node-font-color);
+
+    --node-font-color-selected: #96DEC4; 
+    --node-font-color-fail-selected: #FFA3A3;
+    --node-font-color-iterative-selected: #a3d6ff;
+    --node-font-color-debug-selected: #ffa65e;
 }
 
 body {

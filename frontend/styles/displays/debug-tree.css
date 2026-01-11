@@ -204,6 +204,9 @@
 
 /* Debug tree node information */
 .debug-node {
+    position: relative;
+    z-index: 1;
+    
     padding: 10px;
     margin: 0px 5px;
 
@@ -240,81 +243,81 @@
 }
 
 /* Failed nodes are red */
-.debug-node-container.fail > div > .debug-node {
-    color: var(--node-font-color-fail) !important;
-    border-color: var(--node-font-color-fail) !important;
-    background-color: var(--node-color-fail) !important;
+.debug-node-container.fail:not(.selected) > div > .debug-node {
+    color: var(--node-font-color-fail);
+    border-color: var(--node-font-color-fail);
+    background-color: var(--node-color-fail);
 }
 
-.debug-node-container.fail > div > .debug-node:hover {
-    background-color: var(--node-hover-color-fail) !important;
+.debug-node-container.fail:not(.selected) > div > .debug-node:hover {
+    background-color: var(--node-hover-color-fail);
 }
 
 /* Iterative nodes are blue */
-.debug-node-container.iterative > div > .debug-node {
+.debug-node-container.iterative:not(.fail):not(.selected) > div > .debug-node {
     color: var(--node-font-color-iterative);
     border-color: var(--node-font-color-iterative);
     background-color: var(--node-color-iterative);
 }
 
-.debug-node-container.iterative > div > .debug-node:hover {
+.debug-node-container.iterative:not(.fail):not(.selected) > div > .debug-node:hover {
     background-color: var(--node-hover-color-iterative);
 }
 
 /* Debug nodes are orange */
-.debug-node-container.debug > div > .debug-node {
+.debug-node-container.debug:not(.selected) > div > .debug-node {
     color: var(--node-font-color-debug);
     border-color: var(--node-font-color-debug);
     background-color: var(--node-color-debug);
 }
 
-.debug-node-container.debug > div > .debug-node:hover {
+.debug-node-container.debug:not(.selected) > div > .debug-node:hover {
     background-color: var(--node-hover-color-debug);
 }
 
 /* Invert theme on selected nodes and add extra outline */
 .debug-node-container.selected > div > .debug-node {
-    outline: 3px solid var(--node-font-color);
-    color: var(--node-color);
-    border-color: var(--node-color);
-    background-color: var(--node-font-color);
-}
-
-.debug-node-container.fail.selected > div > .debug-node {
-    color: var(--node-color-fail) !important;
-    outline-color: var(--node-font-color-fail) !important;
-    border-color: var(--node-color-fail) !important;
-    background-color: var(--node-font-color-fail) !important;
-}
-
-.debug-node-container.iterative.selected > div > .debug-node {
-    color: var(--node-color-iterative);
-    outline-color: var(--node-font-color-iterative);
-    border-color: var(--node-color-iterative);
-    background-color: var(--node-font-color-iterative);
-}
-
-.debug-node-container.debug.selected > div > .debug-node {
-    color: var(--node-color-debug);
-    outline-color: var(--node-font-color-debug);
-    border-color: var(--node-color-debug);
-    background-color: var(--node-font-color-debug);
+    outline: 3px solid var(--node-color-selected);
+    color: var(--node-font-color-selected);
+    border-color: var(--node-font-color-selected);
+    background-color: var(--node-color-selected);
 }
 
 .debug-node-container.selected > div > .debug-node:hover {
-    background-color: var(--node-hover-color-inverted);
+    background-color: var(--node-hover-color-selected);
+}
+
+.debug-node-container.fail.selected > div > .debug-node {
+    outline-color: var(--node-color-fail-selected);  
+    color: var(--node-font-color-fail-selected);
+    border-color: var(--node-font-color-fail-selected);
+    background-color: var(--node-color-fail-selected);
 }
 
 .debug-node-container.fail.selected > div > .debug-node:hover {
-    background-color: var(--node-hover-color-fail-inverted);
+    background-color: var(--node-hover-color-fail-selected);
 }
 
-.debug-node-container.iterative.selected > div > .debug-node:hover {
-    background-color: var(--node-hover-color-iterative-inverted);
+.debug-node-container.iterative:not(.fail).selected > div > .debug-node {
+    outline-color: var(--node-color-iterative-selected);  
+    color: var(--node-font-color-iterative-selected);
+    border-color: var(--node-font-color-iterative-selected);
+    background-color: var(--node-color-iterative-selected);
+}
+
+.debug-node-container.iterative:not(.fail).selected > div > .debug-node:hover {
+    background-color: var(--node-hover-color-iterative-selected);
+}
+
+.debug-node-container.debug.selected > div > .debug-node {
+    outline-color: var(--node-color-debug-selected);
+    color: var(--node-font-color-debug-selected);
+    border-color: var(--node-font-color-debug-selected);
+    background-color: var(--node-color-debug-selected);
 }
 
 .debug-node-container.debug.selected > div > .debug-node:hover {
-    background-color: var(--node-hover-color-debug-inverted);
+    background-color: var(--node-hover-color-debug-selected);
 }
 
 /* Add extra width to node lines connected to selected node */  
