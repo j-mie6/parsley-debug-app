@@ -30,8 +30,6 @@ You will first need to [install](#how-do-i-install-it) / [build](#building) the 
 **`test.sc`**: the following `scala` script uses `Parsley 5.0.0-M14`
 
 ```scala
-//> using repository sonatype-s01:snapshots
-
 //> using dep com.github.j-mie6::parsley:5.0.0-M16
 //> using dep com.github.j-mie6::parsley-debug:5.0.0-M16
 //> using dep com.github.j-mie6::parsley-debug-remote:0.1.0-M3
