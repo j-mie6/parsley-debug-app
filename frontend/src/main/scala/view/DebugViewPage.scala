@@ -153,7 +153,7 @@ abstract class DebugViewPage extends Page {
     private val viewCloseSemaphoreDecrement: Observer[Int] = viewCloseSemaphore.updater((x, sub) => x - sub)
 
     /* Delays for the button bar expanding */
-    private final val mouseEnterOpenDelay = 500
+    private final val mouseEnterOpenDelay = 1200
     private final val mouseLeaveCloseDelay = 200
 
     /* Button bar left. */
@@ -161,15 +161,20 @@ abstract class DebugViewPage extends Page {
         div(
             className := "debug-view-left-button-bar",
 
-            onMouseEnter.mapTo(2) --> viewCloseSemaphoreIncrement,
-            onMouseEnter(_.delay(mouseEnterOpenDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
-            onMouseLeave(_.delay(mouseLeaveCloseDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
-
             settingsTabButton,
+            div(className := "debug-view-button-sep"),
 
-            MainViewController.renderViewButton(View.Tree, viewCloseSemaphore),
-            MainViewController.renderViewButton(View.Input, viewCloseSemaphore),
-            MainViewController.renderViewButton(View.Code, viewCloseSemaphore),
+            div(
+                className := "debug-view-select-button-bar",
+                
+                onMouseEnter(_.delay(mouseEnterOpenDelay).mapTo(2)) --> viewCloseSemaphoreIncrement,
+                onMouseEnter(_.delay(mouseEnterOpenDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
+                onMouseLeave(_.delay(mouseLeaveCloseDelay).mapTo(1)) --> viewCloseSemaphoreDecrement,
+
+                MainViewController.renderViewButton(View.Tree, viewCloseSemaphore),
+                MainViewController.renderViewButton(View.Input, viewCloseSemaphore),
+                MainViewController.renderViewButton(View.Code, viewCloseSemaphore),
+            )
         )
     }
 
