@@ -26,3 +26,5 @@ tauri-plugin-log = "2.0.0-rc"
 rocket = { version = "0.5.1", features = ["json"] }
 mockall = "0.13.1"
 tauri-plugin-shell = "2"
+indexmap = "2.11.4"
+ambassador = "0.5.0"

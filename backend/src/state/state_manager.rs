@@ -1,13 +1,11 @@
 use std::path::PathBuf;
 
-use std::collections::HashMap;
-
+use ambassador::delegatable_trait;
 #[cfg(test)] use mockall::automock;
 
 use crate::events::Event;
 use crate::trees::{DebugNode, DebugTree};
-
-pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
+use crate::server::SkipsSender;
 
 pub enum BreakpointCode {
     Skip(i32),
@@ -25,6 +23,7 @@ impl BreakpointCode {
     }
 }
 
+#[delegatable_trait]
 #[cfg_attr(test, automock)]
 pub trait StateManager: Send + Sync + 'static {
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError>;
@@ -46,13 +45,13 @@ pub trait StateManager: Send + Sync + 'static {
         self.system_path(dir).map(|base| base.join(path))
     }
 
-    fn add_session_id(&self, tree_name: String, session_id: i32) -> Result<(), StateError>;
+    // fn add_session_id(&self, tree_name: String, session_id: i32) -> Result<(), StateError>;
 
-    fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError>;
+    fn rmv_tab(&self, index: usize) -> Result<Vec<String>, StateError>;
 
-    fn session_id_exists(&self, session_id: i32) -> Result<bool, StateError>;
+    fn get_tab(&self, index: usize) -> Result<(i32, String), StateError>;
     
-    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError>;
+    fn debuggable_session_ids(&self) -> Result<Vec<i32>, StateError>;
 
     fn next_session_id(&self) -> Result<i32, StateError>;
 
@@ -65,7 +64,7 @@ pub trait StateManager: Send + Sync + 'static {
     fn reset_trees(&self) -> Result<(), StateError>;
 
     /* Updates a saved tree with new breakpoint skips */
-    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError>;
+    fn update_tree(&self, tree: &DebugTree, session_id: i32) -> Result<(), UpdateTreeError>;
 }
 
 #[derive(Debug)]
@@ -91,4 +90,5 @@ pub enum StateError {
     GetTempdirPathFail,
     GetDownloadPathFail,
     ChannelError, /* Non-fatal error: The receiver from Parsley is no longer listening */
+    TabOutOfBounds,
 }

@@ -4,12 +4,13 @@ use std::io::Write;
 use std::sync::{Mutex, MutexGuard};
 use std::path::PathBuf;
 
+use indexmap::IndexMap;
+
 use crate::events::Event;
 use crate::files::SAVED_TREE_DIR;
 use crate::state::state_manager::BreakpointCode;
 use crate::trees::{DebugNode, DebugTree, SavedTree};
-
-pub type SkipsSender = rocket::tokio::sync::oneshot::Sender<i32>;
+use crate::server::SkipsSender;
 
 use super::session_counter::SessionCounter;
 use super::state_manager::{DirectoryKind, UpdateTreeError};
@@ -21,8 +22,7 @@ struct AppStateInternal {
     tree: Option<DebugTree>,                        /* Parser tree that is posted to Server */
     map: HashMap<u32, DebugNode>,                   /* Map from node_id to the respective node */
     skips_tx: HashMap<i32, SkipsSender>,            /* Transmitter how many breakpoints to skip, sent to parsley */
-    tab_names: Vec<String>,                         /* List of saved tree names */
-    debug_sessions: HashMap<String, i32>,           /* Map of tree name to sessionId */
+    tabs: IndexMap<i32, String>,                    /* List of saved tree names */
     saved_refs: HashMap<i32, Vec<(i32, String)>>,   /* Map of sessionId to saved refs for a tab */
     counter: SessionCounter                         /* Counter to hold next sessionId */
 }
@@ -41,8 +41,7 @@ impl AppState {
                     tree: None,
                     map: HashMap::new(),
                     skips_tx: HashMap::new(),
-                    tab_names: Vec::new(),
-                    debug_sessions: HashMap::new(),
+                    tabs: IndexMap::new(),
                     saved_refs: HashMap::new(),
                     counter: SessionCounter::new(),
                 }
@@ -51,43 +50,40 @@ impl AppState {
     }
 
     /* Access wrapped inner AppStateInternal struct */
-    fn inner(&self) -> Result<MutexGuard<AppStateInternal>, StateError> {
+    fn inner(&self) -> Result<MutexGuard<'_, AppStateInternal>, StateError> {
         self.0.lock()
             .map_err(|_| StateError::LockFailed)
     }
 
-    /* Add tree name to tab_names */
-    pub fn add_tree(&self, new_tab: String) -> Result<Vec<String>, StateError> {
-        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
-
-        /* Add new tree name and return all saved tree names */
-        state.tab_names.push(new_tab);
-
-        Ok(state.tab_names.clone())
-    }
-
-    /* Remove tree name from tab_names */
-    pub fn rmv_tree(&self, index: usize) -> Result<Vec<String>, StateError> {
-        let mut state: MutexGuard<AppStateInternal> = self.inner()?;
-
-        /* Remove tree name at index */
-        state.tab_names.remove(index);
-
-        /* If this was the final tree then the loaded tree needs to be removed */
-        if state.tab_names.is_empty() {
-            state.tree = None
-        }
-
-        Ok(state.tab_names.clone())
-    }
-
-    /* Given an index returns the tree name */
-    pub fn get_tree_name(&self, index: usize) -> Result<String, StateError> {
+    fn tab_names(&self) -> Result<Vec<String>, StateError> {
         let state: MutexGuard<AppStateInternal> = self.inner()?;
-        
-        /* Index will never be out of range as the frontend representation and the backend will be in sync */
-        Ok(state.tab_names[index].clone()) 
+        Ok(state.tabs.values().map(|name| name.clone()).collect())
     }
+
+    // /* Add tree name to tab_names */
+    // pub fn add_tree(&self, session_id: i32, tab_name: String) -> Result<Vec<String>, StateError> {
+    //     let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+
+    //     /* Add new tree name and return all saved tree names */
+    //     state.tabs.insert(session_id, tab_name);
+
+    //     self.tab_names()
+    // }
+
+    // /* Remove tree name from tab_names */
+    // pub fn rmv_tree(&self, index: usize) -> Result<Vec<String>, StateError> {
+    //     let mut state: MutexGuard<AppStateInternal> = self.inner()?;
+
+    //     /* Remove tree name at index */
+    //     state.tabs.shift_remove_index(index);
+
+    //     /* If this was the final tree then the loaded tree needs to be removed */
+    //     if state.tabs.is_empty() {
+    //         state.tree = None
+    //     }
+
+    //     self.tab_names()
+    // }
 
     pub fn update_refs(&self, session_id: i32, new_refs: Vec<(i32, String)>) -> Result<(), StateError> {
         let mut state: MutexGuard<AppStateInternal> = self.inner()?;
@@ -96,10 +92,18 @@ impl AppState {
 
         Ok(())
     }
+
+    fn is_debuggable_session(&self, session_id: i32) -> Result<bool, StateError> {
+        Ok(self.inner()?.skips_tx.contains_key(&session_id))
+    }
 }
 
 
 impl StateManager for AppState {
+    fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError> {
+        self.inner()?.app.emit(event)
+    }
+
     /* Update StateManager's tree */
     fn set_tree(&self, tree: DebugTree) -> Result<(), StateError> {
         let mut state: MutexGuard<AppStateInternal> = self.inner()?;
@@ -120,6 +124,7 @@ impl StateManager for AppState {
 
         insert_node(&mut state, tree.get_root())?;
 
+        state.tabs.insert(tree.get_session_id(), tree.get_session_name());
         
         /* Update tree */
         state.tree = Some(tree);
@@ -148,11 +153,6 @@ impl StateManager for AppState {
             .cloned()
     }
 
-    /* Notify frontend listeners of an event */        
-    fn emit<'a>(&self, event: Event<'a>) -> Result<(), StateError> {
-        self.inner()?.app.emit(event)
-    }
-
     fn transmit_breakpoint_skips(&self, session_id: i32, code: BreakpointCode) -> Result<(), StateError> {
         self.inner()?
             .skips_tx
@@ -172,38 +172,27 @@ impl StateManager for AppState {
         }
     }
     
-    fn add_session_id(&self, tree_name: String, session_id:i32) -> Result<(), StateError> {
-        self.inner()?
-            .debug_sessions
-            .insert(tree_name, session_id);
-
-        Ok(())
-    }
-    
-    fn rmv_session_id(&self, tree_name: String) -> Result<(), StateError> {
+    fn rmv_tab(&self, index: usize) -> Result<Vec<String>, StateError> {
         let mut state: MutexGuard<'_, AppStateInternal> = self.inner()?;
 
-        state
-            .debug_sessions
-            .remove(&tree_name);
-
-        if let Some(session_id) = state.debug_sessions.get(&tree_name).cloned() {
-            state.saved_refs.remove(&session_id);
+        let session_id: i32 = state.tabs.keys()[index];
+        if self.is_debuggable_session(session_id)? {
+            self.transmit_breakpoint_skips(session_id, BreakpointCode::Terminate)?;
         }
+        state.saved_refs.remove(&session_id);
 
-        Ok(())
+        self.tab_names()
     }
     
-    fn session_id_exists(&self, session_id:i32) -> Result<bool, StateError> {
+    fn get_tab(&self, index: usize) -> Result<(i32, String), StateError> {
         let state: MutexGuard<'_, AppStateInternal> = self.inner()?;
-
-        Ok(state.debug_sessions.values().any(|&id| id == session_id))
+        
+        state.tabs.get_index(index).map(|(id, name)| (*id, name.clone())).ok_or(StateError::TabOutOfBounds)
     }
 
-    fn get_session_ids(&self) -> Result<HashMap<String, i32>, StateError> {
-        let state: MutexGuard<AppStateInternal> = self.inner()?;
-        
-        Ok(state.debug_sessions.clone())
+    fn debuggable_session_ids(&self) -> Result<Vec<i32>, StateError> {
+        let state: MutexGuard<'_, AppStateInternal> = self.inner()?;
+        Ok(state.tabs.keys().filter(|id| state.skips_tx.contains_key(id)).cloned().collect())
     }
 
     fn next_session_id(&self) -> Result<i32, StateError> {
@@ -243,14 +232,13 @@ impl StateManager for AppState {
     fn reset_trees(&self) -> Result<(), StateError> {
         let mut state: MutexGuard<AppStateInternal> = self.inner()?;
 
-        state.tab_names = Vec::new();
-        state.debug_sessions = HashMap::new();
+        state.tabs = IndexMap::new();
         state.saved_refs = HashMap::new();
 
         Ok(())
     }
 
-    fn update_tree(&self, tree: &DebugTree, tree_name: String) -> Result<(), UpdateTreeError> {
+    fn update_tree(&self, tree: &DebugTree, session_id: i32) -> Result<(), UpdateTreeError> {
         let new_tree: SavedTree = SavedTree::from(tree.clone());
         /* Get the serialised JSON */
         let tree_json: String = serde_json::to_string_pretty(&new_tree)
@@ -258,7 +246,7 @@ impl StateManager for AppState {
 
         /* Open the json file to update the tree */
         /* TODO: look into only updating the extra bits rather than replacing the tree */
-        let file_path = PathBuf::from(format!("{}.json", tree_name));
+        let file_path = PathBuf::from(format!("{}.json", session_id));
         let full_path: PathBuf = self.system_path_to(DirectoryKind::SavedTrees, file_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;
 
         let mut data_file: File = File::create(full_path).map_err(|_| UpdateTreeError::OpenFileFailed)?;

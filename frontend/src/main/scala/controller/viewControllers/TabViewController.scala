@@ -47,9 +47,6 @@ object TabViewController {
     def tabSelected(index: Int): Signal[Boolean] = getSelectedTab.map(_ == index)
 
 
-    /** Saves current tree to the backend with given name, returning assigned tab index  */
-    def saveTree(name: String): EventStream[Either[DillException, IndexedSeq[String]]] = Tauri.invoke(Command.SaveTree, name)
-
     /** Loads a saved tree from the backend as DebugTree */
     def loadSavedTree(index: Int): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.LoadSavedTree, index)
 

@@ -66,12 +66,6 @@ object MainView extends DebugViewPage {
                 /* Notify of any errors caught by treeStream */
                 eitherTreeStream.collectLeft --> ErrorController.setError,
 
-                /* Save any new trees when received */
-                newTreeStream
-                    .collectRight
-                    .sample(TreeViewController.getSessionName.map(FileCounter.freshName))
-                    .flatMapSwitch(TabViewController.saveTree) --> tabBus.writer,
-
                 /* Update file names */
                 tabBus.stream.collectRight --> TabViewController.setFileNames,
 
