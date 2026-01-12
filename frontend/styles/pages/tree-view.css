@@ -39,4 +39,9 @@
     width: fit-content;
     height: fit-content;
     margin: auto;
+
+    padding-right: 1.5vw;
+    padding-bottom: 3vh;
+
+    overflow: hidden;
 }
