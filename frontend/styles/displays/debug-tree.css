@@ -113,6 +113,7 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: safe center;     /* Requires Safari 17.6+ for MacOS devices */
+    padding-top: 3px;             /* Add padding to avoid cutting off selected node outline */
 }
 
 
