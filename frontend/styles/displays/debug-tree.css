@@ -74,6 +74,10 @@
     line-height: 36px;
 }
 
+.debug-input.empty.fail.selected i, .debug-input.empty.debug.selected i {
+    font-size: 12px;
+}
+
 
 /* Render stateful refs */
 .debug-tree-refs-container {

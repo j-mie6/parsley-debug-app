@@ -47,16 +47,28 @@ object InputViewController {
 
 
     private def renderInput(input: String, selected: DebugNode): HtmlElement = {
+        val empty: Boolean = selected.inputStart == selected.inputEnd;
+
+        /* Ensures correct text rendering */
         div(
-            /* Ensures correct text rendering */
             renderInputString(input.slice(0, selected.inputStart)),
             span(
-                className := "debug-input selected",    
+                className := "debug-input selected",
+                
+                cls("empty") := empty,
                 cls("fail") := !selected.success,
                 cls("iterative") := selected.isIterative,
                 cls("debug") := selected.isBreakpoint,
+
+                if (empty)
+                    i(
+                        className := "bi",
+                        cls("bi-exclamation-lg") := !selected.success,
+                        cls("bi-pause-fill") := selected.isBreakpoint
+                    )
+                else
+                    input.slice(selected.inputStart, selected.inputEnd)
                 
-                input.slice(selected.inputStart, selected.inputEnd)
             ),
             renderInputString(input.slice(selected.inputEnd, input.length()))
         )
