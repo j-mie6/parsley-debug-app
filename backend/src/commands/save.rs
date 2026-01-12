@@ -11,7 +11,7 @@ use crate::trees::{DebugTree, SavedTree};
 
 /* Generates the full path to a tree file in the form `APPDATA/SAVED_TREE_DIR/file_name` */
 fn format_filepath(state: &tauri::State<AppState>, session_id: i32) -> Result<OsString, StateError> {
-    state.system_path_to(DirectoryKind::SavedTrees, PathBuf::from(session_id.to_string())).map(OsString::from)
+    state.system_path_to(DirectoryKind::SavedTrees, PathBuf::from(format!("{session_id}.json"))).map(OsString::from)
 }
 
 /* Downloads the tree into Downloads folder */
