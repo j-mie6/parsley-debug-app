@@ -2,6 +2,7 @@ package controller.viewControllers
 
 import com.raquo.laminar.api.L.*
 import model.DebugNode
+import view.InputView
 
 /**
  * Object containing functions and variables defining the input view,
@@ -43,49 +44,9 @@ object InputViewController {
             case (None, _) => div(className := "nothing-shown", "Nothing to show")
 
             /* Render as Input View without any selected text */
-            case (Some(input), None) => div(
-                className := "debug-input-container", 
-                renderInputString(input)
-            )
+            case (Some(input), None) => InputView.renderInput(input)
 
             /* Render as Input View with selected text corresponding to node */
-            case (Some(input), Some(selected)) => div(
-                className:= "debug-input-container", 
-                renderInput(input, selected)
-            )
+            case (Some(input), Some(selected)) => InputView.renderInput(input, selected)
         })
-
-
-    private def renderInput(input: String, selected: DebugNode): HtmlElement = {
-        val empty: Boolean = selected.inputStart == selected.inputEnd;
-
-        /* Ensures correct text rendering */
-        div(
-            renderInputString(input.slice(0, selected.inputStart)),
-            span(
-                className := "debug-input selected",
-                
-                cls("empty") := empty,
-                cls("fail") := !selected.success,
-                cls("iterative") := selected.isIterative,
-                cls("debug") := selected.isBreakpoint,
-
-                if (empty)
-                    i(
-                        className := "bi",
-                        cls("bi-exclamation-lg") := !selected.success,
-                        cls("bi-pause-fill") := selected.isBreakpoint
-                    )
-                else
-                    input.slice(selected.inputStart, selected.inputEnd)
-                
-            ),
-            renderInputString(input.slice(selected.inputEnd, input.length()))
-        )
-    }
-
-    private def renderInputString(input: String) = {
-        child(span(className := "debug-input", input)) := input.nonEmpty
-    }
-    
 }
