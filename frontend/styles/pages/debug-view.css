@@ -81,6 +81,8 @@
 
     padding: 2vh 1vw;
     gap: 1.25vw;
+
+    overflow: auto;
 }
 
 .tab-and-tree-view-container {
