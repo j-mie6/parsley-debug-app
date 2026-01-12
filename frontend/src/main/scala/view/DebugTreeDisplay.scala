@@ -308,12 +308,12 @@ private object ReactiveNodeDisplay {
                     ),
 
                     /* Select input consumed by this node */
-                    /* Shift + Click allows node expansion to be toggled without focusing */
+                    /* Alt + Click allows toggle node expansion without focusing */
                     onClick(_.filterNot(_.altKey).mapTo(node.debugNode)) 
                         --> TreeViewController.selectNode,
                     
                     onClick(_
-                        .filterNot(_.ctrlKey) // Allow focus node without toggling expansion
+                        .filterNot(_.ctrlKey) /* Ctrl + Click allow focus node without toggle expansion */
                         .filter(_ => !node.debugNode.isLeaf)
                         .sample(expansionState)
                         .flatMapSwitch {
