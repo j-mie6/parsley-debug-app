@@ -353,7 +353,7 @@ private object ReactiveNodeDisplay {
                     /* Alt + Click allows toggle node expansion without focusing */
                     onClick(_.filterNot(_.altKey).mapTo(node.debugNode)) 
                         --> TreeViewController.selectNode,
-                    
+
                     onClick(_
                         .filterNot(_.ctrlKey) /* Ctrl + Click allow focus node without toggle expansion */
                         .filter(_ => !node.debugNode.isLeaf)
@@ -372,7 +372,7 @@ private object ReactiveNodeDisplay {
                         }
                     ) --> node.children.writer
                 ),
-                
+
                 arrows(isRight = true),
             ),
 
