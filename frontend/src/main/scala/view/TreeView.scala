@@ -12,6 +12,7 @@ import controller.viewControllers.TabViewController
 import controller.errors.ErrorController
 import controller.viewControllers.StateManagementViewController
 import model.errors.DillException
+import controller.viewControllers.InputViewController
 
 /**
   * Object containing rendering functions for the TreeView
@@ -19,29 +20,32 @@ import model.errors.DillException
 object TreeView {
 
     /* Render tree as HtmlElement */
-    def apply(): HtmlElement =
-      val returnBus: EventBus[Either[DillException, Seq[(Int, String)]]] = EventBus()
+    def apply(): HtmlElement = {
+        val returnBus: EventBus[Either[DillException, Seq[(Int, String)]]] = EventBus()
 
-      val seqBus: EventBus[Seq[(Int, String)]] = EventBus()
-      val debuggableBus: EventBus[Boolean] = EventBus()
+        val seqBus: EventBus[Seq[(Int, String)]] = EventBus()
+        val debuggableBus: EventBus[Boolean] = EventBus()
 
-      div(
-        TreeViewController.isDebuggingSession.changes
-            .filterNot(identity)
-            .mapToUnit
-            --> StateManagementViewController.clearRefs,
+        div(
+            InputViewController.getInput.changes
+                .mapToUnit --> TreeViewController.unselectNode,
 
-        TreeViewController.getSessionId.changes.flatMapSwitch(TreeViewController.getRefs) --> returnBus.writer,
+            TreeViewController.isDebuggingSession.changes
+                .filterNot(identity)
+                .mapToUnit --> StateManagementViewController.clearRefs,
 
-        returnBus.stream.collectRight --> seqBus.writer,
-        returnBus.stream.collectLeft --> ErrorController.setError,
+            TreeViewController.getSessionId.changes.flatMapSwitch(TreeViewController.getRefs) --> returnBus.writer,
 
-        seqBus.stream.sample(TreeViewController.isDebuggingSession) --> debuggableBus.writer,
+            returnBus.stream.collectRight --> seqBus.writer,
+            returnBus.stream.collectLeft --> ErrorController.setError,
 
-        debuggableBus.stream.filter(identity).flatMapTo(seqBus.stream) --> StateManagementViewController.setRefs,
-        debuggableBus.stream.filterNot(identity).mapTo(Nil) --> StateManagementViewController.setRefs,
+            seqBus.stream.sample(TreeViewController.isDebuggingSession) --> debuggableBus.writer,
 
-        child <-- TreeViewController.getTreeElem, /* Renders the tree */
-    )
+            debuggableBus.stream.filter(identity).flatMapTo(seqBus.stream) --> StateManagementViewController.setRefs,
+            debuggableBus.stream.filterNot(identity).mapTo(Nil) --> StateManagementViewController.setRefs,
+
+            child <-- TreeViewController.getTreeElem, /* Renders the tree */
+        )
+    }
 
 }

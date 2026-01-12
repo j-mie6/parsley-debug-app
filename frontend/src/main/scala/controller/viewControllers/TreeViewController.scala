@@ -9,6 +9,7 @@ import view.DebugTreeDisplay
 import controller.tauri.Tauri
 import controller.tauri.Command
 import controller.viewControllers.SettingsViewController
+import model.DebugNode
 
 
 
@@ -27,7 +28,21 @@ object TreeViewController {
     val setTree: Observer[DebugTree] = tree.someWriter
 
     /** Set optional debug tree (can be None) */
-    val setTreeOpt: Observer[Option[DebugTree]] = tree.writer
+    private val setTreeOpt: Observer[Option[DebugTree]] = tree.writer
+
+
+    /* Selected node */
+    private val selectedNode: Var[Option[DebugNode]] = Var(None)
+
+    /* DebugTree signal */
+    val getSelectedNode: Signal[Option[DebugNode]] = selectedNode.signal
+
+    /** Set debug tree */
+    val selectNode: Observer[DebugNode] = selectedNode.someWriter
+
+    /** Set debug tree to None to stop rendering */
+    def unselectNode: Observer[Unit] = selectedNode.writer.contramap(_ => None)
+
 
     /** Set debug tree to None to stop rendering */
     def unloadTree: Observer[Unit] = setTreeOpt.contramap(_ => None)
@@ -44,12 +59,13 @@ object TreeViewController {
     /** Get debug tree element or warning if no tree found */
     def getTreeElem: Signal[HtmlElement] = getTree.map(_ match
         /* Default tree view when no tree is loaded */
-        case None =>
-          StateManagementViewController.clearRefs
-          div(
-            className := "nothing-shown",
-            "Nothing to show"
-          )
+        case None => {
+            StateManagementViewController.clearRefs
+            div(
+                className := "nothing-shown",
+                "Nothing to show"
+            )
+        }
 
         /* Render as DebugTreeDisplay */
         case Some(tree) => DebugTreeDisplay(tree)
@@ -101,6 +117,6 @@ object TreeViewController {
     /** Get the references of a debugging tree */
     def setRefs(newRefs: Seq[(Int, String)]): EventStream[Either[DillException, Unit]] = Tauri.invoke(Command.SetRefs, newRefs)
 
-     /** Resets the references of a debugging tree */
+    /** Resets the references of a debugging tree */
     def resetRefs(): EventStream[Either[DillException, Seq[(Int, String)]]] = Tauri.invoke(Command.ResetRefs, ())
 }

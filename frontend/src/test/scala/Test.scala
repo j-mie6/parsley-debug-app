@@ -20,7 +20,8 @@ class Test extends AnyFlatSpec with should.Matchers {
             "internal": "Test",
             "success": true,
             "childId": 0,
-            "input": "Test",
+            "inputStart": 0,
+            "inputEnd": 4,
             "isLeaf": false,
             "isIterative": false,
             "newlyGenerated": false
@@ -51,7 +52,8 @@ class Test extends AnyFlatSpec with should.Matchers {
         tree.root.internal should be ("Test")
         tree.root.success should be (true)
         tree.root.childId should be (0)
-        tree.root.input should be ("Test")
+        tree.root.inputStart should be (0)
+        tree.root.inputEnd should be (4)
         tree.root.isLeaf should be (false)
         tree.root.isIterative should be (false)
         tree.root.newlyGenerated should be (false)

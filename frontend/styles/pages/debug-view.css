@@ -162,11 +162,15 @@
     color: var(--background-tertiary);
 }
 
-.debug-view-button:hover {
+.debug-view-button:disabled {
+    color: var(--background-tertiary-40) !important;
+}
+
+.debug-view-button:not(:disabled):hover {
     color: var(--font-color-quaternary);
 }
 
-[data-theme="dark"] .debug-view-button:hover {
+[data-theme="dark"] .debug-view-button:not(:disabled):hover {
     color: var(--background-tertiary-60);
 }
 
@@ -185,7 +189,12 @@
     padding-block: 4px;
 }
 
-.debug-view-select-button:hover {
+.debug-view-select-button:disabled {
+    color: var(--background-tertiary-60) !important;
+    background-color: var(--background-primary) !important;
+}
+
+.debug-view-select-button:not(:disabled):hover {
     color: var(--font-color-quaternary) !important;
     background-color: var(--background-tertiary-60) !important;
 }

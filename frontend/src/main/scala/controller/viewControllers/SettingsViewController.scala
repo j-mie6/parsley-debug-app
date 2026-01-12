@@ -42,7 +42,7 @@ object SettingsViewController {
     /**
      * Toggles the visibility of the settings panel.
      */
-    def toggleOpenSettings(): Unit = settingsOpen.set(!settingsOpen.now())
+    def toggleOpen: Observer[Unit] = settingsOpen.updater((old, _) => !old)
     
     /**
      * Retrieves the variable for the number of iterative children to skip.

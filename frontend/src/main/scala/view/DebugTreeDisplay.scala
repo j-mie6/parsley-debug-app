@@ -10,6 +10,7 @@ import controller.viewControllers.StateManagementViewController
 import controller.viewControllers.TabViewController
 import controller.viewControllers.TreeViewController
 import controller.tauri.{Tauri, Command}
+import controller.viewControllers.InputViewController
 
 
 /**
@@ -17,6 +18,10 @@ import controller.tauri.{Tauri, Command}
 * used to display the debug tree in the UI.
 */
 object DebugTreeDisplay {
+
+    val nodeInputPreChars: Int = 10
+    val nodeInputSeparator: String = "..."
+    val nodeInputPostChars: Int = 5
 
     /* Variable that keeps track of how much the tree has been zoomed into */
     val zoomFactor: Var[Double] = Var(1.0)
@@ -227,8 +232,17 @@ private object ReactiveNodeDisplay {
                     onMouseOut.mapTo(false) --> hoverVar,
                 ),
 
-                onClick(event => event.sample(increment).map(incr => if isRight then incr else -incr)) --> moveIndex,
+                /* Increment move index on click */
+                onClick(_.sample(increment)
+                    .map(incr => if isRight then incr else -incr))
+                     --> moveIndex,
 
+                /* If not pressing alt, select next iterative child */
+                onClick(_.filterNot(_.altKey)
+                    .delaySync(iterativeNodeIndex.signal.changes)
+                    .sample(iterativeNodeIndex.signal, node.children)
+                    .map((i, nodes) => nodes(i))) --> TreeViewController.selectNode,
+                
                 onMouseOver.mapTo(true) --> hoverVar,
                 onMouseOut.mapTo(false) --> hoverVar
             )
@@ -263,6 +277,40 @@ private object ReactiveNodeDisplay {
                     .combineWithFn(moreThanTenChildren)(_ && _),
             )
         }
+        
+
+        def nodeInput: HtmlElement = {
+            def quote(str: String): HtmlElement = {
+                span(
+                    span("'"), 
+                    span(className := "debug-node-input quoted-input", str), 
+                    span("'")
+                )
+            }
+
+            def truncateNodeInput(input: String): HtmlElement = {
+                val maxInputLen = DebugTreeDisplay.nodeInputPreChars 
+                    + DebugTreeDisplay.nodeInputSeparator.length() 
+                    + DebugTreeDisplay.nodeInputPostChars
+
+                if (input.length <= maxInputLen) {
+                    div(quote(input))
+                } else {
+                    div(
+                        quote(input.take(DebugTreeDisplay.nodeInputPreChars)),
+                        span(DebugTreeDisplay.nodeInputSeparator),
+                        quote(input.takeRight(DebugTreeDisplay.nodeInputPostChars))
+                    )
+                }
+            }
+
+            p(
+                className := "debug-node-input",
+                child.maybe <-- InputViewController.getNodeInput(node.debugNode)
+                    .map(input => if input.exists(_.isEmpty()) then None else input)
+                    .map(_.map(truncateNodeInput))
+            )
+        }
 
 
         div(
@@ -274,9 +322,11 @@ private object ReactiveNodeDisplay {
             cls("leaf") := node.debugNode.isLeaf,
             cls("iterative") := node.debugNode.isIterative,
             cls("debug") := node.debugNode.isBreakpoint,
+            cls("type-box") := hasUserType,
+            cls("selected") <-- TreeViewController.getSelectedNode
+                .mapSome(_.nodeId == node.debugNode.nodeId).map(_.getOrElse(false)),
 
             /* Render a box for user-defined parser types */
-            cls("type-box") := hasUserType,
             when (hasUserType) {
                 p(className := "type-box-name", node.debugNode.name)
             },
@@ -300,12 +350,19 @@ private object ReactiveNodeDisplay {
                             child(i(className := "bi bi-stars", float.right, marginLeft.ch := 1)) := node.debugNode.newlyGenerated
                         ),
 
-                        p(fontStyle := "italic", node.debugNode.input),
+                        nodeInput,
+                        
                         child(p(className := "debug-node-iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
 
+                    /* Select input consumed by this node */
+                    /* Alt + Click allows toggle node expansion without focusing */
+                    onClick(_.filterNot(_.altKey).mapTo(node.debugNode)) 
+                        --> TreeViewController.selectNode,
+
                     onClick(_
+                        .filterNot(_.ctrlKey) /* Ctrl + Click allow focus node without toggle expansion */
                         .filter(_ => !node.debugNode.isLeaf)
                         .sample(expansionState)
                         .flatMapSwitch {

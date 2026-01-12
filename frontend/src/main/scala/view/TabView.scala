@@ -82,6 +82,10 @@ object TabView {
             TabViewController.getSelectedTab.changes
                 .mapToUnit --> DebugTreeDisplay.resetZoom,
 
+            /* Unselect currently selected DebugNode when changing tabs */
+            TabViewController.getSelectedTab.changes
+                .mapToUnit --> TreeViewController.unselectNode,
+
             /* If there are no tabs, unload tree and input from frontend */
             TabViewController.noSavedTrees.changes
                 .filter(identity)
@@ -90,6 +94,10 @@ object TabView {
             TabViewController.noSavedTrees.changes
                 .filter(identity)
                 .mapToUnit --> InputViewController.unloadInput,
+
+            TabViewController.noSavedTrees.changes
+                .filter(identity)
+                .mapToUnit --> TreeViewController.unselectNode,
 
             TabViewController.noSavedTrees.changes
                 .filter(identity)

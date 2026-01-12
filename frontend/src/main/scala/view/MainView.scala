@@ -12,6 +12,7 @@ import model.errors.DillException
 import controller.AppStateController
 import controller.errors.ErrorController
 import controller.viewControllers.CodeViewController
+import controller.viewControllers.MainViewController.View
 import controller.ToastController
 import controller.tauri.{Tauri, Event}
 import controller.viewControllers.{MainViewController, TreeViewController, InputViewController, TabViewController, StateManagementViewController}
@@ -81,6 +82,11 @@ object MainView extends DebugViewPage {
 
                 /* Load main page */
                 child <-- MainViewController.getViewElem,
+
+                /* Close input sidebar */
+                MainViewController.getView.changes
+                    .filter(_ == View.Input)
+                    .mapToUnit --> InputViewController.closeInput,
 
                 /* Displaying Dill Exceptions */
                 child.maybe <-- ErrorController.getErrorElem,
