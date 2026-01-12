@@ -121,6 +121,7 @@ abstract class DebugViewPage extends Page {
     private lazy val inputButton: HtmlElement = button(
         className := "debug-view-button",
         i(className := "bi bi-file-earmark-text-fill"),
+        disabled <-- MainViewController.getView.map(_ == View.Input),
         onClick.mapToUnit --> InputViewController.toggleOpen
     )
 
