@@ -20,7 +20,7 @@ import controller.viewControllers.InputViewController
 object DebugTreeDisplay {
 
     val nodeInputPreChars: Int = 10
-    val ellipsisLen: Int = 3
+    val nodeInputSeparator: String = "..."
     val nodeInputPostChars: Int = 5
 
     /* Variable that keeps track of how much the tree has been zoomed into */
@@ -290,7 +290,7 @@ private object ReactiveNodeDisplay {
 
             def truncateNodeInput(input: String): HtmlElement = {
                 val maxInputLen = DebugTreeDisplay.nodeInputPreChars 
-                    + DebugTreeDisplay.ellipsisLen 
+                    + DebugTreeDisplay.nodeInputSeparator.length() 
                     + DebugTreeDisplay.nodeInputPostChars
 
                 if (input.length <= maxInputLen) {
@@ -298,7 +298,7 @@ private object ReactiveNodeDisplay {
                 } else {
                     div(
                         quote(input.take(DebugTreeDisplay.nodeInputPreChars)),
-                        span("..."),
+                        span(DebugTreeDisplay.nodeInputSeparator),
                         quote(input.takeRight(DebugTreeDisplay.nodeInputPostChars))
                     )
                 }
