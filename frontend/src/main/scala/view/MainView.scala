@@ -86,8 +86,7 @@ object MainView extends DebugViewPage {
                 /* Close input sidebar */
                 MainViewController.getView.changes
                     .filter(_ == View.Input)
-                    .mapToUnit
-                    --> InputViewController.closeInput,
+                    .mapToUnit --> InputViewController.closeInput,
 
                 /* Displaying Dill Exceptions */
                 child.maybe <-- ErrorController.getErrorElem,

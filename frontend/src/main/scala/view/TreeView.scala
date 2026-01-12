@@ -12,6 +12,7 @@ import controller.viewControllers.TabViewController
 import controller.errors.ErrorController
 import controller.viewControllers.StateManagementViewController
 import model.errors.DillException
+import controller.viewControllers.InputViewController
 
 /**
   * Object containing rendering functions for the TreeView
@@ -26,6 +27,9 @@ object TreeView {
         val debuggableBus: EventBus[Boolean] = EventBus()
 
         div(
+            InputViewController.getInput.changes
+                .mapToUnit --> TreeViewController.unselectNode,
+
             TreeViewController.isDebuggingSession.changes
                 .filterNot(identity)
                 .mapToUnit --> StateManagementViewController.clearRefs,

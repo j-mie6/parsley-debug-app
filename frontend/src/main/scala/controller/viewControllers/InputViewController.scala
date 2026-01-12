@@ -16,6 +16,9 @@ object InputViewController {
     /** Set input string */
     val setInput: Observer[String] = input.someWriter
 
+    /** Retrieve signal for input */
+    val getInput: Signal[Option[String]] = input.signal
+
     /** A reactive variable that determines whether the input panel is open */
     private val inputOpen: Var[Boolean] = Var(false)
 
