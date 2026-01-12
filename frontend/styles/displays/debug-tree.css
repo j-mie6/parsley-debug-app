@@ -1,79 +1,77 @@
 .debug-input-page {
-    width: 80%;
+    padding-left: 3vw;
+    padding-right: 2vw;
     max-width: 70vw;
+    height: 100%;
     margin: 20px auto;
 }
 
 .debug-input-container {
     box-sizing: border-box;
+
     width: 100%;
     max-height: 70vh;
-
-    margin: 20px auto;
-    padding: 10px;
     
-    border: 2px solid var(--node-font-color);
-    border-radius: 8px;
+    margin-top: 15px;
+    margin-right: auto;
+    margin-bottom: 5px;
+
+    padding-left: 8px;
+    padding-top: 10px;
+    padding-bottom: 14px;
+    padding-right: 18px;
+    
+    border-left: 5px solid var(--font-color-tertiary);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
     
     text-align: left;
-    line-height: 30px;
+    line-height: 32px;
     word-wrap: break-word;
     
     overflow-x: hidden;
     overflow-y: auto;
+
+    background-color: var(--input-background);
 }
 
 .debug-input {
+    cursor: default;
+
     font-size: 16px;
     font-weight: normal;
-
+    
     padding-inline: 2px;
     padding-bottom: 4px;
     margin-inline: 2px;
-
+    
     box-decoration-break: clone;
-
+    
+    outline-width: 2px !important;
+    
     border: 1px solid;
     border-bottom-width: 2px;
     border-radius: 5px;
-
+    
     color: var(--input-unselected);
     border-color: var(--input-unselected);
-    background-color: var(--background-primary);
+    background-color: var(--background-secondary);
 }
 
-[data-theme="light"] .debug-input {
-    color: var(--font-color-primary);
-    border-color: var(--font-color-primary);
+.debug-input-container:hover:has(.debug-input.selected:not(:hover)) .debug-input:not(.selected) {
+    background-color: var(--input-unselected-hover);
+}
+
+[data-theme="light"] {
+    .debug-input {
+        color: var(--font-color-primary);
+        border-color: var(--font-color-primary);
+    }
 }
 
 .debug-input.selected {
-    color: var(--node-font-color);
-    border-color: var(--node-font-color);
-    background-color: var(--node-color);
-}
-
-.debug-input.selected.fail {
-    color: var(--node-font-color-fail) !important;
-    border-color: var(--node-font-color-fail) !important;
-    background-color: var(--node-color-fail) !important;
-}
-
-.debug-input.selected.iterative { 
-    color: var(--node-font-color-iterative);
-    border-color: var(--node-font-color-iterative);
-    background-color: var(--node-color-iterative);
-}
-
-.debug-input.selected.debug {
-    color: var(--node-font-color-debug);
-    border-color: var(--node-font-color-debug);
-    background-color: var(--node-color-debug);
-}
-
-
-.code-text {
-    width: fit-content;
+    margin-inline: 4px;
+    line-height: 36px;
 }
 
 
@@ -276,6 +274,7 @@
 }
 
 /* Invert theme on selected nodes and add extra outline */
+.debug-input.selected,
 .debug-node-container.selected > div > .debug-node {
     outline: 3px solid var(--node-color-selected);
     color: var(--node-font-color-selected);
@@ -283,10 +282,12 @@
     background-color: var(--node-color-selected);
 }
 
+.debug-input.selected:hover,
 .debug-node-container.selected > div > .debug-node:hover {
     background-color: var(--node-hover-color-selected);
 }
 
+.debug-input.fail.selected,
 .debug-node-container.fail.selected > div > .debug-node {
     outline-color: var(--node-color-fail-selected);  
     color: var(--node-font-color-fail-selected);
@@ -294,10 +295,12 @@
     background-color: var(--node-color-fail-selected);
 }
 
+.debug-input.fail.selected:hover,
 .debug-node-container.fail.selected > div > .debug-node:hover {
     background-color: var(--node-hover-color-fail-selected);
 }
 
+.debug-input.iterative:not(.fail).selected,
 .debug-node-container.iterative:not(.fail).selected > div > .debug-node {
     outline-color: var(--node-color-iterative-selected);  
     color: var(--node-font-color-iterative-selected);
@@ -305,10 +308,12 @@
     background-color: var(--node-color-iterative-selected);
 }
 
+.debug-input.iterative:not(.fail).selected:hover,
 .debug-node-container.iterative:not(.fail).selected > div > .debug-node:hover {
     background-color: var(--node-hover-color-iterative-selected);
 }
 
+.debug-input.debug.selected,
 .debug-node-container.debug.selected > div > .debug-node {
     outline-color: var(--node-color-debug-selected);
     color: var(--node-font-color-debug-selected);
@@ -316,6 +321,7 @@
     background-color: var(--node-color-debug-selected);
 }
 
+.debug-input.debug.selected:hover,
 .debug-node-container.debug.selected > div > .debug-node:hover {
     background-color: var(--node-hover-color-debug-selected);
 }

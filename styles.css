@@ -67,6 +67,8 @@
     --node-font-color-debug-selected: var(--node-font-color-selected);
 
     --input-unselected: #808080;
+    --input-unselected-hover: #373839;
+    --input-background: #42665b;
 }
 
 [data-theme="light"] {
@@ -117,6 +119,10 @@
     --node-font-color-fail-selected: #FFA3A3;
     --node-font-color-iterative-selected: #a3d6ff;
     --node-font-color-debug-selected: #ffa65e;
+
+    --input-background: #ecf5f2;
+    --input-unselected: #808080;
+    --input-unselected-hover: #f5f5f5;
 }
 
 body {
