@@ -25,6 +25,11 @@ object InputViewController {
     /** Set input to None to stop rendering */
     def unloadInput: Observer[Unit] = Observer(_ => input.set(None))
     
+    /** Retrieves the input consumed by a node */
+    def getNodeInput(node: DebugNode): Signal[Option[String]] = 
+        input.signal.map(_.map(_.slice(node.inputStart, node.inputEnd)))
+
+
     /** Render input block */
     def getInputElem: Signal[HtmlElement] = input.signal
         .combineWith(TreeViewController.getSelectedNode)

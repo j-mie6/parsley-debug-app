@@ -19,6 +19,9 @@ import controller.viewControllers.InputViewController
 */
 object DebugTreeDisplay {
 
+    val nodeInputChars: Int = 15
+    val nodeInputPreChars: Int = 10
+
     /* Variable that keeps track of how much the tree has been zoomed into */
     val zoomFactor: Var[Double] = Var(1.0)
 
@@ -266,6 +269,26 @@ private object ReactiveNodeDisplay {
         }
         
 
+        def nodeInput: HtmlElement = {
+            def truncateNodeInput(input: String): String = {
+                if (input.length <= DebugTreeDisplay.nodeInputChars) {
+                    input
+                } else {
+                    input.take(DebugTreeDisplay.nodeInputPreChars) 
+                        + "..."
+                        + input.takeRight(DebugTreeDisplay.nodeInputChars - DebugTreeDisplay.nodeInputPreChars)
+                }
+            }
+
+            p(
+                fontStyle := "italic", 
+                text <-- InputViewController.getNodeInput(node.debugNode)
+                    .map(_.getOrElse("none"))
+                    .map(truncateNodeInput)
+            )
+        }
+
+
         div(
             className := "debug-node-container",
 
@@ -303,6 +326,8 @@ private object ReactiveNodeDisplay {
                             child(i(className := "bi bi-stars", float.right, marginLeft.ch := 1)) := node.debugNode.newlyGenerated
                         ),
 
+                        nodeInput,
+                        
                         child(p(className := "debug-node-iterative-child-text", "child ", text <-- iterativeNodeIndex.signal)) <-- showIterativeOneByOne,
                         child(iterativeProgress) <-- showIterativeOneByOne,
                     ),
