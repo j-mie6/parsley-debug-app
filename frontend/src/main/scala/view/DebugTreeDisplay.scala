@@ -19,8 +19,9 @@ import controller.viewControllers.InputViewController
 */
 object DebugTreeDisplay {
 
-    val nodeInputChars: Int = 15
     val nodeInputPreChars: Int = 10
+    val ellipsisLen: Int = 3
+    val nodeInputPostChars: Int = 5
 
     /* Variable that keeps track of how much the tree has been zoomed into */
     val zoomFactor: Var[Double] = Var(1.0)
@@ -279,20 +280,27 @@ private object ReactiveNodeDisplay {
         
 
         def nodeInput: HtmlElement = {
-            def truncateNodeInput(input: String): String = {
-                if (input.length <= DebugTreeDisplay.nodeInputChars) {
-                    input
+            def truncateNodeInput(input: String): HtmlElement = {
+                val maxInputLen = DebugTreeDisplay.nodeInputPreChars 
+                    + DebugTreeDisplay.ellipsisLen 
+                    + DebugTreeDisplay.nodeInputPostChars
+
+                if (input.length <= maxInputLen) {
+                    div(quote(input))
                 } else {
-                    input.take(DebugTreeDisplay.nodeInputPreChars) 
-                        + "..."
-                        + input.takeRight(DebugTreeDisplay.nodeInputChars - DebugTreeDisplay.nodeInputPreChars)
+                    div(
+                        quote(input.take(DebugTreeDisplay.nodeInputPreChars)),
+                        span("..."),
+                        quote(input.takeRight(DebugTreeDisplay.nodeInputPostChars))
+                    )
                 }
             }
 
+            def quote(str: String): HtmlElement = span(span("'"), span(fontStyle.italic, str), span("'"))
+
             p(
-                fontStyle := "italic", 
-                text <-- InputViewController.getNodeInput(node.debugNode)
-                    .map(_.getOrElse("none"))
+                child <-- InputViewController.getNodeInput(node.debugNode)
+                    .map(_.getOrElse(""))
                     .map(truncateNodeInput)
             )
         }
