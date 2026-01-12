@@ -280,6 +280,14 @@ private object ReactiveNodeDisplay {
         
 
         def nodeInput: HtmlElement = {
+            def quote(str: String): HtmlElement = {
+                span(
+                    span("'"), 
+                    span(className := "debug-node-input quoted-input", str), 
+                    span("'")
+                )
+            }
+
             def truncateNodeInput(input: String): HtmlElement = {
                 val maxInputLen = DebugTreeDisplay.nodeInputPreChars 
                     + DebugTreeDisplay.ellipsisLen 
@@ -296,12 +304,11 @@ private object ReactiveNodeDisplay {
                 }
             }
 
-            def quote(str: String): HtmlElement = span(span("'"), span(fontStyle.italic, str), span("'"))
-
             p(
-                child <-- InputViewController.getNodeInput(node.debugNode)
-                    .map(_.getOrElse(""))
-                    .map(truncateNodeInput)
+                className := "debug-node-input",
+                child.maybe <-- InputViewController.getNodeInput(node.debugNode)
+                    .map(input => if input.exists(_.isEmpty()) then None else input)
+                    .map(_.map(truncateNodeInput))
             )
         }
 

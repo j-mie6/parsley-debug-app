@@ -234,6 +234,11 @@
     margin-bottom: 5px;
 }
 
+.debug-node-input.quoted-input {
+    font-style: italic;
+    padding-inline-end: 2px;
+}
+
 .debug-node-iterative-child-text {
     font-size: 10px;
     margin-bottom: -5px;
