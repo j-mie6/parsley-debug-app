@@ -38,8 +38,6 @@ object MainViewController {
                 p(text, marginLeft.px := 5),
             ),
 
-            disabled <-- InputViewController.isInputOpen.map(_ && buttonType == "input"),
-
             onClick.preventDefault.mapTo(view) --> MainViewController.setView,
         )
     }

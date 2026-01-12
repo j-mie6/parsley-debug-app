@@ -20,7 +20,12 @@ object InputViewController {
 
     /** Retrieves a signal indicating whether the settings panel is open */
     def isInputOpen: Signal[Boolean] = inputOpen.signal
-    def toggleOpen: Observer[Unit] = inputOpen.updater((old, _) => !old)
+
+    /** Close the input sidepanel */
+    def closeInput: Observer[Unit] = Observer(_ => inputOpen.set(false))
+
+    /** Toggle whether the input sidepanel is open */
+    def toggleOpen: Observer[Unit] = inputOpen.invertWriter
     
     /** Set input to None to stop rendering */
     def unloadInput: Observer[Unit] = Observer(_ => input.set(None))
