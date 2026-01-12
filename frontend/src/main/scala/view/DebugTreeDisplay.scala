@@ -239,7 +239,7 @@ private object ReactiveNodeDisplay {
 
                 /* If not pressing alt, select next iterative child */
                 onClick(_.filterNot(_.altKey)
-                    .debounce(10)
+                    .delaySync(iterativeNodeIndex.signal.changes)
                     .sample(iterativeNodeIndex.signal, node.children)
                     .map((i, nodes) => nodes(i))) --> TreeViewController.selectNode,
                 
