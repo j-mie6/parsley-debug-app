@@ -231,8 +231,17 @@ private object ReactiveNodeDisplay {
                     onMouseOut.mapTo(false) --> hoverVar,
                 ),
 
-                onClick(event => event.sample(increment).map(incr => if isRight then incr else -incr)) --> moveIndex,
+                /* Increment move index on click */
+                onClick(_.sample(increment)
+                    .map(incr => if isRight then incr else -incr))
+                     --> moveIndex,
 
+                /* If not pressing alt, select next iterative child */
+                onClick(_.filterNot(_.altKey)
+                    .debounce(10)
+                    .sample(iterativeNodeIndex.signal, node.children)
+                    .map((i, nodes) => nodes(i))) --> TreeViewController.selectNode,
+                
                 onMouseOver.mapTo(true) --> hoverVar,
                 onMouseOut.mapTo(false) --> hoverVar
             )
@@ -355,6 +364,7 @@ private object ReactiveNodeDisplay {
                         }
                     ) --> node.children.writer
                 ),
+                
                 arrows(isRight = true),
             ),
 
