@@ -236,7 +236,7 @@
 
 .debug-node-input.quoted-input {
     font-style: italic;
-    padding-inline-end: 1px;
+    padding-inline: 1px;
 }
 
 .debug-node-iterative-child-text {
